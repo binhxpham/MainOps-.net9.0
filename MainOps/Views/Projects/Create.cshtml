@@ -1,0 +1,178 @@
+﻿@model MainOps.Models.Project
+@inject UserManager<ApplicationUser> _userManager;
+<h2>@ViewData["Title"]</h2>
+
+<h4>@SharedLocalizer.GetLocalizedHtmlString("Project")</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ProjectNr" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.ProjectNr))</label>
+                <input asp-for="ProjectNr" class="form-control" />
+                <span asp-validation-for="ProjectNr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.Name))</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Abbreviation" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.Abbreviation))</label>
+                <input asp-for="Abbreviation" class="form-control" />
+                <span asp-validation-for="Abbreviation" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Address" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.Address))</label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Responsible_Person" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.Responsible_Person))</label>
+                <input asp-for="Responsible_Person" class="form-control" />
+                <span asp-validation-for="Responsible_Person" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Client" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.Client))</label>
+                <input asp-for="Client" class="form-control" />
+                <span asp-validation-for="Client" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ClientContact" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.ClientContact))</label>
+                <input asp-for="ClientContact" class="form-control" />
+                <span asp-validation-for="ClientContact" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ClientEmail" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.ClientEmail))</label>
+                <input asp-for="ClientEmail" class="form-control" />
+                <span asp-validation-for="ClientEmail" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CoordSystemId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.CoordSystemId))</label>
+                <select asp-for="CoordSystemId" class="form-control" asp-items="ViewBag.CoordSystemId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Latitude" class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Latitude")</label>
+                <input asp-for="Latitude" class="form-control" />
+                <span asp-validation-for="Latitude" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Longitude" class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Longitude")</label>
+                <input asp-for="Longitude" class="form-control" />
+                <span asp-validation-for="Longitude" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Active" class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Active")</label>
+                <input asp-for="Active" value="true" checked="checked" onchange="this.checked ? this.value = true : this.value = false" class="form-control" />
+                <span asp-validation-for="Active" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AlertCalls" class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Alert Call Response?")</label>
+                <input asp-for="AlertCalls" class="form-control" />
+                <span asp-validation-for="AlertCalls" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ClientContactAlert" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.ClientContactAlert))</label>
+                <input asp-for="ClientContactAlert" class="form-control" />
+                <span asp-validation-for="ClientContactAlert" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ClientAlertPhone" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.ClientAlertPhone))</label>
+                <input asp-for="ClientAlertPhone" class="form-control" />
+                <span asp-validation-for="ClientContactAlert" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ImplementBreakTime" class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Take off break time on daily report hours for invoicing?")</label>
+                <input asp-for="ImplementBreakTime" class="form-control" />
+                <span asp-validation-for="ImplementBreakTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IsTemplate" class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Use as a template for BoQs")</label>
+                <input asp-for="IsTemplate" class="form-control" />
+                <span asp-validation-for="IsTemplate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DivisionId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.DivisionId))</label>
+                <select asp-for="DivisionId" class="form-control" asp-items="ViewBag.DivisionId"></select>
+            </div>
+            @if ((await _userManager.GetUserAsync(User)).DivisionId.Equals(4))
+            {
+                <div class="form-group">
+                    <label asp-for="DepartmentId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.DepartmentId))</label>
+                    <select asp-for="DepartmentId" class="form-control" asp-items="ViewBag.DepartmentId">
+                        <option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Department")</option>
+                    </select>
+                </div>
+            }
+            else
+            {
+                <div class="form-group" hidden="hidden">
+                    <label asp-for="DepartmentId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.DepartmentId))</label>
+                    <select asp-for="DepartmentId" class="form-control" asp-items="ViewBag.DepartmentId">
+                        <option value="" selected="selected">@SharedLocalizer.GetLocalizedHtmlString("Choose Department")</option>
+                    </select>
+                </div>
+            }
+            <div class="form-group">
+                <label asp-for="Description" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.Description))</label>
+                <textarea asp-for="Description" class="form-control" cols="40" rows="6"></textarea>
+                @*<input asp-for="Description" class="form-control" />*@
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StartDate" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.StartDate))</label>
+                <input asp-for="StartDate" class="form-control" type="date" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EndDate" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.EndDate))</label>
+                <input asp-for="EndDate" class="form-control" type="date" />
+                <span asp-validation-for="EndDate" class="text-danger"></span>
+            </div>
+            @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin"))
+            {
+                <h3>@SharedLocalizer.GetLocalizedHtmlString("Specify Address for GeoLocation")</h3>
+                <div class="form-group">
+                    <label asp-for="AddressLine1" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.AddressLine1))</label>
+                    <input asp-for="AddressLine1" class="form-control" />
+                    <span asp-validation-for="AddressLine1" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="PostalCode" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.PostalCode))</label>
+                    <input asp-for="PostalCode" class="form-control" />
+                    <span asp-validation-for="PostalCode" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="City" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.City))</label>
+                    <input asp-for="City" class="form-control" />
+                    <span asp-validation-for="City" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Country" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.Country))</label>
+                    <input asp-for="Country" class="form-control" />
+                    <span asp-validation-for="Country" class="text-danger"></span>
+                </div>
+            }
+            else
+            {
+                <input asp-for="AddressLine1" hidden="hidden" />
+                <input asp-for="PostalCode" hidden="hidden" />
+                <input asp-for="City" hidden="hidden" />
+                <input asp-for="Country" hidden="hidden" />
+            }
+            <div class="form-group">
+                <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString("Create")" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,201 @@
+﻿@model IEnumerable<MainOps.Models.ItemType>
+@inject UserManager<ApplicationUser> _userManager;
+@{
+    ViewData["Title"] = "Index";
+}
+@if (User.IsInRole("International"))
+{
+    <div style="width:100%;">
+        <form asp-action="MainMenu_HIH" asp-controller="TrackItems">
+            <button class="btn-hoelscher" style="width:100%;height:36px;">
+                @SharedLocalizer.GetLocalizedHtmlString("Back to Main Menu")
+            </button>
+        </form>
+    </div>
+}
+@if (User.IsInRole("International"))
+{
+    <h2>@SharedLocalizer.GetLocalizedHtmlString("Items and Prices")</h2>
+}
+else
+{
+    <h2>@SharedLocalizer.GetLocalizedHtmlString("Bill of Quantity Items")</h2>
+}
+
+<p>
+    <a asp-action="Create">@SharedLocalizer.GetLocalizedHtmlString("Create New")</a>
+</p>
+<p>
+    <a asp-action="Index" asp-controller="boqheadlines">@SharedLocalizer.GetLocalizedHtmlString("BoQ Headlines")</a>
+</p>
+<p>
+    <a asp-controller="DecommissionableItems" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Decommissionable Items")</a>
+</p>
+<table style="width:100%;">
+    @if (User.IsInRole("Admin") || User.IsInRole("ProjectMember"))
+    {
+        <tr>
+            <td colspan="2">
+                <form asp-action="IndexAsPdf" method="post" target="_blank">
+                    <input id="ProjectIdPdf" name="ProjectIdPdf" value="@ViewBag.ChosenProjectId" hidden="hidden"/>
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Download PDF Version")</button>
+                </form>
+            </td>
+        </tr>
+    }
+    <tr>
+        <td colspan="2">
+            <form asp-controller="ItemTypes" asp-action="Combsearch">
+                <table>
+                    <tr>
+                        <td><label>@SharedLocalizer.GetLocalizedHtmlString("Project"):</label></td>
+                        <td>
+                            <select id="ProjectId" name="filterchoice" class="form-control" asp-items="ViewBag.ProjectId" onchange="UpdatePrintID();">
+                                <option value="@null">@SharedLocalizer.GetLocalizedHtmlString("All")</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button type="submit" class="btn-hoelscher">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                        </td>
+                        <td><input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoComplete","ItemTypes")" /></td>
+
+                    </tr>
+                </table>
+            </form>
+        </td>
+    </tr>
+</table>
+
+
+<table class="table" style="width:100%;table-layout:fixed;word-break:break-word;">
+    <thead>
+        <tr>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Project")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Item Type")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("BoQ Number")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("BoQ Rental Number")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Price")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Rental Price")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Price Unit")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Rental Price Unit")
+            </th>
+            <th colspan="5"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Item_Type)
+            </td>
+            <td>
+                @String.Format("{0:N3}",item.BoQnr)
+            </td>
+            <td>
+                @String.Format("{0:N3}", item.BoQnr_Rental)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.rental_price)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Install_Unit.TheUnit)
+            </td>
+            <td>
+                @if (item.Rental_Unit != null)
+                {
+                    @Html.DisplayFor(modelItem => item.Rental_Unit.TheUnit)
+                }
+            </td>
+            <td><a asp-controller="ItemTypes" asp-action="MakeDecom" asp-route-id="@item.Id" target="_blank">Make Decom Item</a></td>
+            <td>
+                <form asp-action="Create" asp-controller="Discounts" asp-route-id="@item.Id" method="get" target="_blank">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Add Discount Rental")</button>
+                </form>
+                <form asp-action="Create" asp-controller="Discounts_Installation" asp-route-id="@item.Id" method="get" target="_blank">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Add Discount Install")</button>
+                </form>
+            </td>
+            <td>
+                @if ((await _userManager.GetUserAsync(User)).DivisionId.Equals(item.Project.DivisionId))
+                {
+                    <a asp-action="Edit" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
+                    if (User.IsInRole("Admin"))
+                    {
+                        <a asp-action="@SharedLocalizer.GetLocalizedHtmlString("Delete")" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Delete")</a>
+                    }
+                }
+            </td>
+            <td id="partial_@item.Id">
+                <button type="button" onclick="ShowFiles(@item.Id);" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Show Data Sheets")</button>
+            </td>
+            <td>
+                @if ((await _userManager.GetUserAsync(User)).DivisionId.Equals(item.Project.DivisionId))
+                {
+                    <form asp-action="UploadDataSheets" asp-controller="ItemTypes" asp-route-id="@item.Id" method="get" target="_blank">
+                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload Data Sheet")</button>
+                    </form>
+                }
+            </td>
+            <td>
+                <form asp-action="UploadMarkerImage" asp-controller="ItemTypes" asp-route-id="@item.Id" enctype="multipart/form-data">
+                    <input type="file" name="photo" accept=".jpg" />
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload")</button>
+                </form>
+            </td>
+            <td style="min-width:50px;background-image: url(@String.Concat("/Markers/",item.Id.ToString(),".jpg"));
+            background-repeat:repeat;
+            background-position: center center; background-size:100%;">
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        function UpdatePrintID() {
+            var ProjectId = $("#ProjectId").val();
+            $("#ProjectIdPdf").val(ProjectId);
+        }
+        function ShowFiles(index) {
+            var url = '@Url.Action("ShowDataSheets", "ItemTypes")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: {
+                    'id': index,
+                },
+                success: function (data) {
+                    $("#partial_"+ index).html(data);
+                }
+            });
+        }
+    </script>
+}
+

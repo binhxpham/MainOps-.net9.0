@@ -1,0 +1,71 @@
+﻿@model MainOps.Models.ViewModels.UploadDataMeasPointVM
+<h2>
+    @SharedLocalizer.GetLocalizedHtmlString("Re-Upload Measurements to FTP")
+</h2>
+<div class="col-md-6">
+    <form asp-action="ReUploadToFTP" asp-controller="MeasPoints" method="post">
+
+        <div class="form-group">
+            <label>search project:</label>
+            <select id="ProjectId" asp-items="ViewBag.ProjectId" onchange="FillMeasPoints();" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Search Project")</option></select>
+        </div>
+        <div class="form-group">
+            <label asp-for="MeasPointId"></label>
+            <select asp-for="MeasPointId" asp-items="ViewBag.MeasPointId" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Choose MeasPoint")</select>
+
+        </div>
+        <div class="form-group">
+            <label asp-for="StartTime"></label>
+            <input type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" asp-for="StartTime" style="width:100%;" />
+        </div>
+        <div class="form-group">
+            <label asp-for="EndTime"></label>
+            <input type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" asp-for="EndTime" style="width:100%;" />
+        </div>
+        <div class="form-group">
+            <label asp-for="CommentToAdd"></label>
+            <textarea asp-for="CommentToAdd" cols="50" rows="3"></textarea>
+        </div>
+        <button>@SharedLocalizer.GetLocalizedHtmlString("Upload")</button>
+    </form>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">   
+        function FillMeasPoints() {
+            var MeasPointId = $('#MeasPointId').val();
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetWellsProject", "Projects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                },
+                success: function (data) {
+                    var s = '<option value="">Select MeasPoint</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                    }
+                    $("#MeasPointId").html(s);
+                    document.getElementById("MeasPointId").style.width = "100%";
+                    var x = document.getElementById("MeasPointId");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        if (x.options[i].value == MeasPointId) {
+                            x.options[i].selected = true;
+                        }
+
+                    }
+                }
+
+            });
+            FillVariationOrders();
+    }
+   
+       
+    </script>
+}

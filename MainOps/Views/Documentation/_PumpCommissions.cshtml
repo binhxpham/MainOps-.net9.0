@@ -1,0 +1,37 @@
+﻿@model IEnumerable<MainOps.Models.ReportClasses.Pump_Commission>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WellName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Scetch_path)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WellName)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.Scetch_path)
+            </td>           
+            <td>
+                <form asp-action="Pump_Commission_DetailsPdf" asp-controller="Documentation" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("View")</button></form>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

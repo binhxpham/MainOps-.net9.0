@@ -1,0 +1,39 @@
+﻿@model MainOps.Models.HJItem
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<style>
+    .rotated {
+        transform: rotate(15deg);
+    }
+</style>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@Model.HJId</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+
+<body>
+    <font size="3">
+        <table style="height: 5.2cm; width: 4cm; margin-bottom: 2cm; margin-right: 1cm; float: left; ">
+            <tbody>
+                <tr>
+                    <td align="left" style="height: 1.4cm; border-style: solid"><img src="~/images/Divisions/Photos/@Model.DivisionId/@Model.Division.LogoPath" style="width:90%;" /></td>      
+                </tr>
+                <tr>
+                    <td align="center" style="border-width:thin;border-style:solid;height:0.7cm;">@Html.DisplayFor(Model => Model.HJId)</td>
+                </tr>
+                <tr>
+                    <td align="left" style="height: 2.9cm;"><img src='@Url.Action("GetQR","HJItems",new { Id = Model.Id })' alt="" style="height:95%;" /></td>
+                </tr>
+                <tr>
+                    <td align="center" style="border-width:thin;border-style:solid;height:0.7cm;">@Html.DisplayFor(Model => Model.Name)</td>
+                </tr>
+            </tbody>
+        </table>
+    </font>
+</body>
+</html>

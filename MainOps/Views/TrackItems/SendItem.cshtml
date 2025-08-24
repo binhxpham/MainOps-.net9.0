@@ -1,0 +1,67 @@
+﻿@model MainOps.Models.ViewModels.SendItemVM
+
+@{
+    ViewData["Title"] = "Send Item";
+}
+<form asp-controller="TrackITems" asp-action="SendItem" method="post" enctype="multipart/form-data">
+    <table>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(x => x.TrackItem.TAGnr)
+            </td>
+            <td>
+                @Html.DisplayFor(x => x.TrackItem.TAGnr)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(x => x.isSent)
+            </td>
+            <td>
+                @Html.EditorFor(x=> x.isSent)
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.DisplayNameFor(x => x.LogText)
+            </td>
+            <td>
+                <textarea rows="4" cols="24" name="LogText" id="LogText"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label></td>
+            <td><input type="file" name="files" multiple accept=".jpg,.jpeg,.png,.gif,.pdf" /></td>
+        </tr>
+    </table>
+    <input type="number" value="@Model.TrackItemId" name="TrackItemId" hidden="hidden" />
+    <input type="datetime" value="@DateTime.Now" name="TimeStamp" hidden="hidden" />
+    <input type="number" id="latinput" value="0" name="Latitude" hidden="hidden" />
+    <input type="number" id="longinput" value="0" name="Longitude" hidden="hidden" />
+    <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Update")</button>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        var myLat = 0, myLng = 0;
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                myLat = position.coords.latitude;
+                myLng = position.coords.longitude;
+                getPos(myLat, myLng);
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                                                //alert("error");
+                    }
+
+                }, { maximumAge: 200000, timeout: 8000, enableHighAccuracy: true });
+        }
+        function getPos(lat, lng) {
+            $("#latinput").val(lat);
+            $("#longinput").val(lng);
+        }
+
+    </script>
+}

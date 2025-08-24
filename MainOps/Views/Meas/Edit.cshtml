@@ -1,0 +1,93 @@
+﻿@model MainOps.Models.Meas
+<link href="~/css/jquery-ui-timepicker-addon.min.css" rel="stylesheet" />
+
+@inject UserManager<ApplicationUser>  _userManager;
+@{ var theuser = await _userManager.GetUserAsync(User);}
+<h2>@ViewData["Title"]</h2>
+
+<h4>@SharedLocalizer.GetLocalizedHtmlString("Measurements")</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <input asp-for="Latitude" hidden />
+            <input asp-for="Longitude" hidden />
+            <input asp-for="DoneBy" value="@theuser.full_name()" hidden />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="TheMeasurement" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.TheMeasurement))</label>
+                <input asp-for="TheMeasurement" class="form-control" />
+                <span asp-validation-for="TheMeasurement" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TheComment" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.TheComment))</label>
+                @Html.DropDownListFor(m => m.CommentId, ViewData["CommentId"] as IEnumerable<SelectListItem>, "Select Reason", new { style = "width:250px;height:40px;" })
+                <span asp-validation-for="TheComment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NewComment" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.NewComment))</label>
+                <input asp-for="NewComment" class="form-control" />
+                <span asp-validation-for="NewComment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="When" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.When))</label>
+                <input type="datetime" class="date-picker" value="@Model.When" asp-for="When" />
+                <span asp-validation-for="When" class="text-danger"></span>
+            </div>
+                <div class="form-group">
+                <label asp-for="MeasPointId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.MeasPointId))</label>
+                @Html.DropDownListFor(m => m.MeasPointId, ViewData["MeasPointId"] as IEnumerable<SelectListItem>, "Please Select Measurement Point", new { style = "width:250px;height:40px;" })
+                <span asp-validation-for="MeasPointId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString("Save")" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        var myLat = 0, myLng = 0;
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                myLat = position.coords.latitude;
+                myLng = position.coords.longitude;
+                getPos(myLat, myLng);
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                        //alert("error");
+                    }
+
+                }, { maximumAge: 200000, timeout: 8000, enableHighAccuracy: true });
+        }
+
+        function getPos(lat, lng) {
+            $("#latinput").val(lat);
+            $("#longinput").val(lng);
+        }
+
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datetimepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: 'dd-M-yy',
+                    controlType: 'select',
+                    timeFormat: 'hh:mm TT'
+                });
+
+            });
+        });
+
+    </script>
+}

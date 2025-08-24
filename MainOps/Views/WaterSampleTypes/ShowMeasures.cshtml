@@ -1,0 +1,293 @@
+﻿@model IEnumerable<MainOps.Models.WaterSampleMeasVM>
+
+@{
+    ViewData["Title"] = "ShowMeasures";
+}
+<div id="ModalInput" class="TwoModal">
+    <div class="TwoModal-content">
+        <div class="TwoModal-header">
+            <span class="closer" onclick="closethepopup();">&times;</span>
+            <h3>@SharedLocalizer.GetLocalizedHtmlString("Edit Alert Limits")</h3>
+        </div>
+        <div class="TwoModal-body">
+            <div id="theMPContent"></div>
+        </div>
+    </div>
+</div>
+<p><a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to Main WaterSample Page")</a></p>
+
+<form asp-controller="WaterSampleTypes" asp-action="Combsearch">
+    <table>
+        <tr>
+            <td>
+                <label>@SharedLocalizer.GetLocalizedHtmlString("Sample Place"):</label>
+            </td>
+            <td>
+                @Html.DropDownList("filterchoice", ViewData["WaterSamplePlaceId"] as IEnumerable<SelectListItem>, @SharedLocalizer.GetLocalizedHtmlString("All"), new { @class = "form-control" })
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>@SharedLocalizer.GetLocalizedHtmlString("Start Date"):</label>
+            </td>
+            <td>
+                <input name="StartDate" id="StartDate" type="text" class="date-picker" value="@DateTime.Now.AddDays(-3000)" onchange="UpdateStartDates();"/>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>@SharedLocalizer.GetLocalizedHtmlString("End Date"):</label>
+            </td>
+            <td>
+                <input name="EndDate" id="EndDate" type="text" class="date-picker" value="@DateTime.Now" onchange="UpdateEndDates();" />
+            </td>
+        </tr>
+        <tr>
+            <td><input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" /></td>
+            <td>
+                <button type="submit" class="btn-hoelscher" onclick="StartSpinner();">
+                    <span class="glyphicon glyphicon-search"></span>
+                </button>
+            </td>
+        </tr>
+    </table>
+</form>
+<table>
+    <tr>
+        <td>
+            <select name="ProjectId" id="ProjectId" asp-items="@ViewBag.ProjectId" onchange="UpdateProject();"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Project")</option></select>
+        </td>
+        <td>
+            <form asp-controller="WaterSampleTypes" asp-action="GetProjectReportAll" method="get">
+                <input name="StartDate" id="StartDateAll" class="date-picker" value="@DateTime.Now.AddDays(-3000)" hidden="hidden" />
+                <input name="EndDate" id="EndDateAll" type="text" class="date-picker" value="@DateTime.Now" hidden="hidden" />
+                <select name="ProjectId" id="ProjectIdAll" asp-items="@ViewBag.ProjectId" hidden="hidden"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Project")</option></select>
+                <button class="btn-hoelscher" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Show Project Report - All")</button>
+                <input type="checkbox" value="true" checked="checked" name="goodbad" onclick="$(this).val(this.checked ? true : false)" hidden="hidden" />
+        </form>
+        </td>
+        <td>
+            <form asp-controller="WaterSampleTypes" asp-action="GetProjectReportBad" method="get">
+                <input name="StartDate" id="StartDateBad" class="date-picker" value="@DateTime.Now.AddDays(-3000)" hidden="hidden" />
+                <input name="EndDate" id="EndDateBad" type="text" class="date-picker" value="@DateTime.Now" hidden="hidden" />
+                <select name="ProjectId" id="ProjectIdBad" asp-items="@ViewBag.ProjectId" hidden="hidden"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Project")</option></select>
+                <button class="btn-hoelscher" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Show Project Report - Bad Values")</button>
+                <input type="checkbox" value="true" checked="checked" name="goodbad" onclick="$(this).val(this.checked ? true : false)" hidden="hidden"/>
+        </form>
+        </td>
+    </tr>
+</table>
+
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Project))
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.WaterSamplePlace))
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.WaterSampleType))
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.value))
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.method))
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Dato))
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.WaterSampleNumber))
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            if (item.holdslimit == 0)
+            {
+                <tr class="rowid" style="background-color:yellow;">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WaterSamplePlace.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WaterSampleType.Komponent)
+                    </td>
+                    <td id="@item.Id" class="tdform">
+                        @Html.DisplayFor(modelItem => item.value)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.method)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Dato)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WaterSampleNumber)
+                    </td>
+                    <td>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        }
+                        <button type="button" onclick="editAlerts(@item.Id)">@SharedLocalizer.GetLocalizedHtmlString("Edit Alert Limits")</button>
+                    </td>
+                    <td class="td_1" hidden="hidden">@item.Id</td>
+                </tr>
+            }
+            else if (item.holdslimit == 1)
+            {
+                <tr class="rowid" style="background-color:lightgreen;">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WaterSamplePlace.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WaterSampleType.Komponent)
+                    </td>
+                    <td id="@item.Id" class="tdform">
+                        @Html.DisplayFor(modelItem => item.value)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.method)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Dato)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WaterSampleNumber)
+                    </td>
+                    <td>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        }
+                        <button type="button" onclick="editAlerts(@item.Id)">@SharedLocalizer.GetLocalizedHtmlString("Edit Alert Limits")</button>
+                    </td>
+                    <td class="td_1" hidden="hidden">@item.Id</td>
+                </tr>
+            }
+            else
+            {
+                <tr class="rowid" style="background-color:lightcoral;">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WaterSamplePlace.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WaterSampleType.Komponent)
+                    </td>
+                    <td id="@item.Id" class="tdform">
+                        @Html.DisplayFor(modelItem => item.value)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.method)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Dato)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WaterSampleNumber)
+                    </td>
+                    <td>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        }
+                        <button type="button" onclick="editAlerts(@item.Id)">@SharedLocalizer.GetLocalizedHtmlString("Edit Alert Limits")</button>
+                    </td>
+                    <td class="td_1" hidden="hidden">@item.Id</td>
+                </tr>
+            }
+
+        }
+    </tbody>
+</table>
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+            });
+        });
+        
+        
+        var AlertModal = document.getElementById('ModalInput');
+        var span4 = document.getElementByClassName("closer")[1];
+
+        function doTheSubmit() {
+            $.ajax({
+                type: "POST",
+                url: $('#TheForm').attr('action'),
+                data: $('#TheForm').serialize(),
+                success: function (response) {
+                    AlertModal.style.display = "none";
+                },
+                error: function (response) {
+                    alert("error");
+                }
+            });
+        }
+        function editAlerts(theindex) {
+            $.ajax({
+                type: 'get',
+                url: '/WaterSampleTypes/EditAlert',
+                data: {
+                    'Id': theindex
+                },
+                success: function (response) {
+                    $('#theMPContent').html(response);
+                    AlertModal.style.display = "block";
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+        }
+        function closethepopup() {
+            AlertModal.style.display = "none";
+        }
+        function UpdateStartDates() {
+            var startdate = $("#StartDate").val();
+            $("#StartDateAll").val(startdate);
+            $("#StartDateBad").val(startdate);
+        }
+        function UpdateEndDates() {
+            var enddate = $("#EndDate").val();
+            $("#EndDateAll").val(enddate);
+            $("#EndDateBad").val(enddate);
+        }
+        function UpdateProject() {
+            var ProjectId = $("#ProjectId").val();
+            $("#ProjectIdAll").val(ProjectId);
+            $("#ProjectIdBad").val(ProjectId);
+        }
+
+        
+    </script>
+}

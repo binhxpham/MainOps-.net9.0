@@ -1,0 +1,21 @@
+﻿@model MainOps.Models.WTPClasses.MainClasses.Contamination
+@{
+    ViewData["Title"] = Localizer["Create"];
+}
+
+<h2>@Localizer["Create"]</h2>
+
+<h4>@Localizer["Contamination"]</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            @Html.EditorForModel()
+            <div class="form-group">
+                <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString("Create")" class="btn btn-hoelscher" /> |
+                <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+            </div>
+        </form>
+    </div>
+</div>
+

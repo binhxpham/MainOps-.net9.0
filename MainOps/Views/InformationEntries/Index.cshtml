@@ -1,0 +1,82 @@
+﻿@model IEnumerable<MainOps.Models.InformationEntry>
+
+@{
+    ViewData["Title"] = "SharedInfo";
+}
+@inject UserManager<ApplicationUser> _userManager;
+@{ var user = await _userManager.GetUserAsync(User);}
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Shared Information")</h2>
+
+<table>
+    <tr>
+        <td>
+            <form asp-action="Index" asp-controller="Telefonlisten" method="get">
+                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Phone List")</button>
+            </form>
+        </td>
+        <td>
+            <form asp-action="SharedDocuments" asp-controller="InformationEntries" method="get">
+                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Shared Documents")</button>
+            </form>
+        </td>
+    </tr>
+</table>
+
+<table style="width:100%;table-layout:fixed;">
+    <tr>
+        <td style="width:20%;"><a asp-action="Create">@SharedLocalizer.GetLocalizedHtmlString("New Entry")</a></td>
+        <td style="font-style:italic">@SharedLocalizer.GetLocalizedHtmlString("Due to GDPR reasons, only the last 7 days entries are shown. Older entries are deleted. If you personally want to store information as a log, you can store it within your account in your log-book")</td>
+    </tr>
+</table>
+
+<table class="table" style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th style="width:20%;">
+                @Html.DisplayNameFor(model => model.DateEntered)
+            </th>
+            <th style="width:60%;">
+                @Html.DisplayNameFor(model => model.Text)
+            </th>
+            <th colspan="2" style="width:30%;">
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th> 
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr style="border-bottom:dashed;">
+            @if (user.full_name().Equals(@item.DoneBy))
+            {
+                <td style="width:15%;font-size:10px;">
+                    @Html.DisplayFor(modelItem => item.DateEntered)
+                </td>
+                <td style="word-break:break-word;">
+                    @Html.Raw(item.Text)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DoneBy)
+                </td>
+                <td>
+
+                    <a asp-action="Edit" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Delete")</a>
+
+                </td>
+            }
+            else
+            {
+                <td style="width:15%;font-size:10px;">
+                    @Html.DisplayFor(modelItem => item.DateEntered)
+                </td>
+                <td colspan="2" style="word-break:break-word;">
+                    @Html.Raw(item.Text)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DoneBy)
+                </td>
+            }
+        </tr>
+}
+    </tbody>
+</table>

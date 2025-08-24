@@ -1,0 +1,163 @@
+﻿@model MainOps.Models.ProjectStatusEditVM
+
+@{
+    ViewData["Title"] = "Edit";
+    var categories = (List<ProjectCategory>)ViewBag.ProjectCategories;
+}
+
+<h2>Edit</h2>
+
+<h4>ProjectStatus</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ProjectStatus.Id" />
+            <input type="hidden" asp-for="ProjectStatus.DivisionId" />
+            <div class="form-group">
+                <label asp-for="ProjectStatus.StatusDescriptionId" class="control-label"></label>
+                <select asp-for="ProjectStatus.StatusDescriptionId" class="form-control" asp-items="ViewBag.StatusDescriptionId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectStatus.QuoteNumber" class="control-label"></label>
+                <input asp-for="ProjectStatus.QuoteNumber" class="form-control" />
+                <span asp-validation-for="ProjectStatus.QuoteNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectStatus.ProjectName" class="control-label"></label>
+                <input asp-for="ProjectStatus.ProjectName" class="form-control" />
+                <span asp-validation-for="ProjectStatus.ProjectName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectStatus.Client" class="control-label"></label>
+                <input id="writteclient" asp-for="ProjectStatus.Client" class="form-control" />
+                <span asp-validation-for="ProjectStatus.Client" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectStatus.TenderManager" class="control-label"></label>
+                <input asp-for="ProjectStatus.TenderManager" class="form-control" />
+                <span asp-validation-for="ProjectStatus.TenderManager" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectStatus.StartDate" class="control-label"></label>
+                <input type="datetime" class="date-picker" value="@Model.ProjectStatus.StartDate.ToString("yyyy-MM-dd")" asp-for="ProjectStatus.StartDate" style="width:100%;height:36px;" />
+                <span asp-validation-for="ProjectStatus.StartDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectStatus.EndDate" class="control-label"></label>
+                <input type="datetime" class="date-picker" value="@Model.ProjectStatus.EndDate.ToString("yyyy-MM-dd")" asp-for="ProjectStatus.EndDate" style="width:100%;height:36px;" />
+                <span asp-validation-for="ProjectStatus.EndDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectStatus.TenderDate" class="control-label"></label>
+                <input type="datetime" class="date-picker" asp-for="ProjectStatus.TenderDate" style="width:100%;height:36px;" />
+                <span asp-validation-for="ProjectStatus.TenderDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectStatus.ClientTenderDate" class="control-label"></label>
+                <input type="datetime" class="date-picker" asp-for="ProjectStatus.ClientTenderDate" style="width:100%;height:36px;" />
+                <span asp-validation-for="ProjectStatus.ClientTenderDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectStatus.DateSubmitted" class="control-label"></label>
+                <input type="datetime" class="date-picker" asp-for="ProjectStatus.DateSubmitted" style="width:100%;height:36px;" />
+                <span asp-validation-for="ProjectStatus.DateSubmitted" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectStatus.ProjectDescription" class="control-label"></label>
+                <textarea asp-for="ProjectStatus.ProjectDescription" class="form-control" cols="50" rows="6"></textarea>
+                <span asp-validation-for="ProjectStatus.ProjectDescription" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>@SharedLocalizer.GetLocalizedHtmlString("Project Categories")</label>
+                <table border="1">
+                    @foreach (var item in categories)
+                    {
+                        if (Model.ProjectStatus.ProjectStatusProjectCategories.Where(x => x.ProjectCategoryId.Equals(item.Id)).Count() > 0)
+                        {
+                            Model.ProjectCategories.Add(item.Id);
+                            <tr><td>@item.Text</td><td><input id="checkbox_@item.Id" type="checkbox" value="@item.Id" checked="checked" onchange="UpdateProjectStatusProjectCategory(this,this.checked);" /></td></tr>
+                        }
+                        else
+                        {
+                            <tr><td>@item.Text</td><td><input id="checkbox_@item.Id" type="checkbox" value="@item.Id" onchange="UpdateProjectStatusProjectCategory(this,this.checked)" /></td></tr>
+                        }
+
+                    }
+                </table>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ProjectStatus.TotalContractValue" class="control-label"></label>
+                <input asp-for="ProjectStatus.TotalContractValue" class="form-control" />
+                <span asp-validation-for="ProjectStatus.TotalContractValue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectStatus.OptionsValue" class="control-label"></label>
+                <input asp-for="ProjectStatus.OptionsValue" class="form-control" />
+                <span asp-validation-for="ProjectStatus.OptionsValue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectStatus.WinChance" class="control-label"></label>
+                <input asp-for="ProjectStatus.WinChance" value="@Convert.ToInt32(Model.ProjectStatus.WinChance)" class="form-control" type="number" min="0" max="100" step="1" />
+                <span asp-validation-for="ProjectStatus.WinChance" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectStatus.Comments" class="control-label"></label>
+                <input asp-for="ProjectStatus.Comments" class="form-control" />
+                <span asp-validation-for="ProjectStatus.Comments" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-15:+2",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+                //$('.date-picker').datepicker("setDate", new Date("dd-MM-yy"));
+            });
+        });
+        function UpdateProjectStatusProjectCategory(elem,ischecked) {
+            $.ajax({
+                    url: '@Url.Action("UpdateProjectCategories", "ProjectStatus")',
+                data: {
+                    ProjectStatusId: @Model.ProjectStatus.Id,
+                    CategoryId: elem.value,
+                    tobeset: ischecked
+                    },
+                    type: "POST",
+                success: function (data) {
+                    if (data == true) {
+                        //alert("updated");
+                    }
+                    else {
+                        alert("Did not update, something went wrong");
+                    }
+                       
+                    },
+                    error: function (data) {
+                        alert("failure");
+                    },
+                });
+        }
+    </script>
+}

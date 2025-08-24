@@ -1,0 +1,84 @@
+﻿@model MainOps.Models.WaterHandling
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>WaterHandling</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.MeasPoint)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MeasPoint.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ClearPumpTest)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ClearPumpTest.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DrillWater)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DrillWater.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WellName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WellName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Well)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Well.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PumpWaterStart)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PumpWaterStart)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PumpWaterEnd)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PumpWaterEnd)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DrillWaterStart)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DrillWaterStart)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DrillWaterEnd)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DrillWaterEnd)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AmountContainerDrill)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AmountContainerDrill)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AmountContainerPump)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AmountContainerPump)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

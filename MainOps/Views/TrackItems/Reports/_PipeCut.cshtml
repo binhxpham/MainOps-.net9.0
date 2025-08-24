@@ -1,0 +1,151 @@
+﻿@model MainOps.Models.PipeCut
+
+@{
+    Layout = null;
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("Pipe Cut-Extend")</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+
+<table style="page-break-inside:avoid;">
+    <tr>
+        <td colspan="3">
+            @if (Model.Cut_Or_Extended.Equals("Cut"))
+            {
+                <b>@SharedLocalizer.GetLocalizedHtmlString("Pipe Cutting")</b>
+            }
+            else
+            {
+                <b>@SharedLocalizer.GetLocalizedHtmlString("Pipe Extension")</b>
+            }
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.MeasPoint.Project.Name)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.MeasPoint.Project.Name)
+        </td>
+        <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@Model.MeasPoint.Project.DivisionId/@Model.MeasPoint.Project.Division.LogoPath" width="151" height="66" /></td>
+    </tr>
+
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.MeasPoint.Project.ProjectNr)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.MeasPoint.Project.ProjectNr)
+        </td>
+    </tr>
+    @if (Model.MeasPoint.SubProjectId != null)
+    {
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(Model => Model.MeasPoint.SubProject.Name)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.MeasPoint.SubProject.Name) : @Html.DisplayFor(Model => Model.MeasPoint.SubProject.SubProjectNr)
+            </td>
+        </tr>
+    }
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.MeasPoint.Project.Client)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.MeasPoint.Project.Client)
+        </td>
+
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.TimeStamp)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.TimeStamp.Date)
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Cut_Or_Extended)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Cut_Or_Extended)
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Meters_Cut)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Meters_Cut)
+        </td>
+    </tr>
+</table>
+
+<table name="phototable" style="page-break-inside:avoid;">
+    @{ var rows = 0;}
+    @if (Model.Photos.Count() % 3 == 0)
+    {
+        rows = Model.Photos.Count() / 3;
+    }
+    else
+    {
+        rows = Convert.ToInt32(Model.Photos.Count() / 3) + 1;
+    }
+    @{ var totalpics = Model.Photos.Count();}
+    @for (int i = 0; i < rows; i++)
+    {
+
+        @if (totalpics - 3 >= 0) //enough room to add whole row
+        {
+            var photo1 = Model.Photos.ElementAt((i + 1) * 3 - 3);
+            var photo2 = Model.Photos.ElementAt((i + 1) * 3 - 3 + 1);
+            var photo3 = Model.Photos.ElementAt((i + 1) * 3 - 3 + 2);
+
+            <tr>
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo3.Path.Split(".")[0], "_edit.", photo3.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+            </tr>
+            totalpics -= 3;
+        }
+        else if (totalpics - 2 >= 0)
+        {
+            var photo1 = Model.Photos.ElementAt((i + 1) * 3 - 3);
+            var photo2 = Model.Photos.ElementAt((i + 1) * 3 - 3 + 1);
+            <tr>
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                <td></td>
+            </tr>
+            totalpics -= 2;
+        }
+        else //enough room to add 1 picture in row
+        {
+            var photo1 = Model.Photos.ElementAt((i + 1) * 3 - 3);
+            <tr>
+                <td colspan="3"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+            </tr>
+            totalpics -= 1;
+        }
+
+    }
+</table>

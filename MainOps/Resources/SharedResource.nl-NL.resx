@@ -1,0 +1,849 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="name" xml:space="preserve">
+    <value>naam</value>
+  </data>
+  <data name="search.." xml:space="preserve">
+    <value>Zoeken:</value>
+  </data>
+  <data name="Authenticator code" xml:space="preserve">
+    <value>Authenticatorcode</value>
+  </data>
+  <data name="Confirm password" xml:space="preserve">
+    <value>Bevestig wachtwoord</value>
+  </data>
+  <data name="E-Mail Adress" xml:space="preserve">
+    <value>E-mail adres</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Wachtwoord</value>
+  </data>
+  <data name="Recovery Code" xml:space="preserve">
+    <value>Herstel code</value>
+  </data>
+  <data name="Remember me" xml:space="preserve">
+    <value>Wachtwoord opslaan</value>
+  </data>
+  <data name="Remember me?" xml:space="preserve">
+    <value>Onthoud mij?</value>
+  </data>
+  <data name="Remember this machine" xml:space="preserve">
+    <value>nthoud deze machine</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Gebruikersnaam</value>
+  </data>
+  <data name="Contact" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Omschrijving</value>
+  </data>
+  <data name="Employee" xml:space="preserve">
+    <value>Medewerker</value>
+  </data>
+  <data name="Field must be at least 2 characters" xml:space="preserve">
+    <value>Veld moet minimaal 2 tekens bevatten</value>
+  </data>
+  <data name="First Name" xml:space="preserve">
+    <value>Voornaam</value>
+  </data>
+  <data name="Last Name" xml:space="preserve">
+    <value>Achternaam</value>
+  </data>
+  <data name="Phone Number" xml:space="preserve">
+    <value>Telefoonnummer</value>
+  </data>
+  <data name="Confirm new password" xml:space="preserve">
+    <value>Bevestig nieuw wachtwoord</value>
+  </data>
+  <data name="Confirmed" xml:space="preserve">
+    <value>Bevestigd</value>
+  </data>
+  <data name="Current password" xml:space="preserve">
+    <value>Huidig ​​wachtwoord</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>Datum</value>
+  </data>
+  <data name="E-Mail Adress confirmed" xml:space="preserve">
+    <value>E-mailadres bevestigd</value>
+  </data>
+  <data name="Must be positive" xml:space="preserve">
+    <value>Moet positief zijn</value>
+  </data>
+  <data name="New password" xml:space="preserve">
+    <value>Nieuw paswoord</value>
+  </data>
+  <data name="The new password and confirmation password do not match." xml:space="preserve">
+    <value>Het nieuwe wachtwoord en het bevestigingswachtwoord komen niet overeen</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>Gebruiker</value>
+  </data>
+  <data name="Verification Code" xml:space="preserve">
+    <value>Verificatie code</value>
+  </data>
+  <data name="First Name(s)" xml:space="preserve">
+    <value>Voornamen</value>
+  </data>
+  <data name="Is employee" xml:space="preserve">
+    <value>Is werknemer</value>
+  </data>
+  <data name="User ID" xml:space="preserve">
+    <value>Gebruiker ID</value>
+  </data>
+  <data name="User Roles" xml:space="preserve">
+    <value>Gebruikersrollen</value>
+  </data>
+  <data name="-- Please Select --" xml:space="preserve">
+    <value>-- Selecteer alstublieft --</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>Allemaal</value>
+  </data>
+  <data name="Add flow:" xml:space="preserve">
+    <value>Stroom toevoegen:</value>
+  </data>
+  <data name="Add Watermeter:" xml:space="preserve">
+    <value>Watermeter toevoegen:</value>
+  </data>
+  <data name="Are you sure you want to delete this?" xml:space="preserve">
+    <value>Weet je zeker dat je dit wilt verwijderen?</value>
+  </data>
+  <data name="Back to List" xml:space="preserve">
+    <value>Terug naar lijst</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Creëren</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Verwijderen</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Details</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Bewerk</value>
+  </data>
+  <data name="Index" xml:space="preserve">
+    <value>inhoudsopgave</value>
+  </data>
+  <data name="Measurement Points" xml:space="preserve">
+    <value>Meetpunten</value>
+  </data>
+  <data name="Measurements" xml:space="preserve">
+    <value>Metingen</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Opslaan</value>
+  </data>
+  <data name="Search:" xml:space="preserve">
+    <value>Zoeken:</value>
+  </data>
+  <data name="Select CSV-Delimiter" xml:space="preserve">
+    <value>Selecteer CSV-scheidingsteken</value>
+  </data>
+  <data name="Select Project (choose none if all)" xml:space="preserve">
+    <value>Selecteer Project (kies niets als alles)</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Opmerking</value>
+  </data>
+  <data name="Logger Change" xml:space="preserve">
+    <value>Logger wijzigen</value>
+  </data>
+  <data name="MeasType" xml:space="preserve">
+    <value>MeeteType</value>
+  </data>
+  <data name="Offset" xml:space="preserve">
+    <value>Offset</value>
+  </data>
+  <data name="Project" xml:space="preserve">
+    <value>Project</value>
+  </data>
+  <data name="ProjectUser" xml:space="preserve">
+    <value>ProjectGebruiker</value>
+  </data>
+  <data name="You do not have access to this resource." xml:space="preserve">
+    <value>U heeft geen toegang tot deze bron.</value>
+  </data>
+  <data name="Abbreviation" xml:space="preserve">
+    <value>Afkorting</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Toevoegen</value>
+  </data>
+  <data name="Add WaterMeter" xml:space="preserve">
+    <value>Watermeter toevoegen</value>
+  </data>
+  <data name="Client" xml:space="preserve">
+    <value>Klant</value>
+  </data>
+  <data name="Coordinate System Id" xml:space="preserve">
+    <value>Coördinatensysteem</value>
+  </data>
+  <data name="Delimiter" xml:space="preserve">
+    <value>scheidingsteken</value>
+  </data>
+  <data name="End Date" xml:space="preserve">
+    <value>Einddatum</value>
+  </data>
+  <data name="Flow Rate" xml:space="preserve">
+    <value>Stroomsnelheid</value>
+  </data>
+  <data name="For Scada" xml:space="preserve">
+    <value>Voor Scada</value>
+  </data>
+  <data name="hi alexandra" xml:space="preserve">
+    <value>hallo alexandra GERMAN</value>
+  </data>
+  <data name="Logger" xml:space="preserve">
+    <value>Logger</value>
+  </data>
+  <data name="Logger Added" xml:space="preserve">
+    <value>Logger toegevoegd</value>
+  </data>
+  <data name="Logger Changes" xml:space="preserve">
+    <value>Loggerwijzigingen</value>
+  </data>
+  <data name="Measurement" xml:space="preserve">
+    <value>Meting</value>
+  </data>
+  <data name="Measurement Point" xml:space="preserve">
+    <value>Meetpunt</value>
+  </data>
+  <data name="Measurement Type" xml:space="preserve">
+    <value>Metingstype</value>
+  </data>
+  <data name="New Comment" xml:space="preserve">
+    <value>Nieuwe reactie</value>
+  </data>
+  <data name="Please Select Logger No" xml:space="preserve">
+    <value>Selecteer Logger Nee</value>
+  </data>
+  <data name="Project ID" xml:space="preserve">
+    <value>Projekt ID</value>
+  </data>
+  <data name="Project Number" xml:space="preserve">
+    <value>Projectnummer</value>
+  </data>
+  <data name="Projects" xml:space="preserve">
+    <value>Projecten</value>
+  </data>
+  <data name="Scada Adress" xml:space="preserve">
+    <value>Scada-adres</value>
+  </data>
+  <data name="Select Project(choose none if all)" xml:space="preserve">
+    <value>Selecteer Project (kies niets als alles)</value>
+  </data>
+  <data name="Start Date" xml:space="preserve">
+    <value>Startdatum</value>
+  </data>
+  <data name="System" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="User E-Mail-Adress" xml:space="preserve">
+    <value>E-mailadres van gebruiker</value>
+  </data>
+  <data name="Water Level" xml:space="preserve">
+    <value>Water niveau</value>
+  </data>
+  <data name="WaterMeter" xml:space="preserve">
+    <value>Watermeter</value>
+  </data>
+  <data name="When" xml:space="preserve">
+    <value>Tijdstempel</value>
+  </data>
+  <data name="X-Coordinate" xml:space="preserve">
+    <value>X-coördinaat</value>
+  </data>
+  <data name="Y-Coordinate" xml:space="preserve">
+    <value>Y-coördinaat</value>
+  </data>
+  <data name="Logger Number" xml:space="preserve">
+    <value>Logger nummer</value>
+  </data>
+  <data name="Logger Removed" xml:space="preserve">
+    <value>Logger verwijderd</value>
+  </data>
+  <data name="Serial Number" xml:space="preserve">
+    <value>Serienummer</value>
+  </data>
+  <data name="Sim Card Number" xml:space="preserve">
+    <value>Simkaartnummer</value>
+  </data>
+  <data name="Add Raw Measurements" xml:space="preserve">
+    <value>Ruwe metingen toevoegen</value>
+  </data>
+  <data name="Error Status" xml:space="preserve">
+    <value>Foutstatus</value>
+  </data>
+  <data name="Has Error" xml:space="preserve">
+    <value>Heeft fout</value>
+  </data>
+  <data name="HOFOR Description" xml:space="preserve">
+    <value>HOFOR Beschrijving:</value>
+  </data>
+  <data name="Install Item" xml:space="preserve">
+    <value>tem installeren</value>
+  </data>
+  <data name="Is Installed" xml:space="preserve">
+    <value>Is geinstalleerd</value>
+  </data>
+  <data name="Is Packed" xml:space="preserve">
+    <value>Is ingepakt</value>
+  </data>
+  <data name="Is Received" xml:space="preserve">
+    <value>Is ontvangen</value>
+  </data>
+  <data name="Is Sent" xml:space="preserve">
+    <value>Is verstuurd</value>
+  </data>
+  <data name="Item Information" xml:space="preserve">
+    <value>Artikel informatie</value>
+  </data>
+  <data name="Item Installed" xml:space="preserve">
+    <value>Artikel geïnstalleerd</value>
+  </data>
+  <data name="Item Packed" xml:space="preserve">
+    <value>Artikel verpakt</value>
+  </data>
+  <data name="Item Received" xml:space="preserve">
+    <value>Item ontvangen</value>
+  </data>
+  <data name="Item Sent" xml:space="preserve">
+    <value>Item verzonden</value>
+  </data>
+  <data name="Log Book" xml:space="preserve">
+    <value>Logboek</value>
+  </data>
+  <data name="Pack Item" xml:space="preserve">
+    <value>Pakketitem:</value>
+  </data>
+  <data name="Photos from Errors" xml:space="preserve">
+    <value>Foto's van fouten</value>
+  </data>
+  <data name="Photos from Installation" xml:space="preserve">
+    <value>Foto's van installatie</value>
+  </data>
+  <data name="Photos from Packing" xml:space="preserve">
+    <value>Foto's van Verpakking:</value>
+  </data>
+  <data name="Photos from Receival" xml:space="preserve">
+    <value>Foto's van ontvangst</value>
+  </data>
+  <data name="Photos from Sending" xml:space="preserve">
+    <value>Foto's van Verzenden</value>
+  </data>
+  <data name="Receive Item" xml:space="preserve">
+    <value>Artikel ontvangen</value>
+  </data>
+  <data name="Report Error" xml:space="preserve">
+    <value>Foutmelding</value>
+  </data>
+  <data name="Send Item" xml:space="preserve">
+    <value>Artikel verzenden</value>
+  </data>
+  <data name="Show Map" xml:space="preserve">
+    <value>Kaart weergeven</value>
+  </data>
+  <data name="Track Items" xml:space="preserve">
+    <value>Artikelen volgen</value>
+  </data>
+  <data name="Error Resolved.:" xml:space="preserve">
+    <value>Fout opgelost.:</value>
+  </data>
+  <data name="Number of Measurement Days" xml:space="preserve">
+    <value>Aantal meetdagen</value>
+  </data>
+  <data name="Number of Measurements" xml:space="preserve">
+    <value>Aantal metingen</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Fout</value>
+  </data>
+  <data name="Filter both ON and OFF" xml:space="preserve">
+    <value>Filter zowel AAN als UIT</value>
+  </data>
+  <data name="Filter specifically ON or OFF" xml:space="preserve">
+    <value>Filter specifiek AAN of UIT</value>
+  </data>
+  <data name="Installed" xml:space="preserve">
+    <value>Geïnstalleerd</value>
+  </data>
+  <data name="Packed" xml:space="preserve">
+    <value>Pakketitem:</value>
+  </data>
+  <data name="Received" xml:space="preserve">
+    <value>Ontvangen</value>
+  </data>
+  <data name="Sent" xml:space="preserve">
+    <value>Verzonden</value>
+  </data>
+  <data name="3.6 V Saft Battery" xml:space="preserve">
+    <value>3,6 V Saft-batterij</value>
+  </data>
+  <data name="Add Item to Install List" xml:space="preserve">
+    <value>Item toevoegen aan installatielijst</value>
+  </data>
+  <data name="Alarm Call" xml:space="preserve">
+    <value>Alarm</value>
+  </data>
+  <data name="Amount" xml:space="preserve">
+    <value>Hoeveelheid</value>
+  </data>
+  <data name="Arrivals(Put on Rent!)" xml:space="preserve">
+    <value>Aankomsten (Te huur!)</value>
+  </data>
+  <data name="Clear Pumping" xml:space="preserve">
+    <value>Duidelijk pompen</value>
+  </data>
+  <data name="Current Accuracy" xml:space="preserve">
+    <value>Huidige nauwkeurigheid</value>
+  </data>
+  <data name="Cut/Extend Pipe" xml:space="preserve">
+    <value>Pijp knippen/verlengen</value>
+  </data>
+  <data name="Daily Report" xml:space="preserve">
+    <value>Dagelijks rapport</value>
+  </data>
+  <data name="DAILY REPORT - Direct Link" xml:space="preserve">
+    <value>DAGELIJKS RAPPORT - Directe link</value>
+  </data>
+  <data name="Daily Report and Alarm Call" xml:space="preserve">
+    <value>Dagelijks rapport en alarmoproep</value>
+  </data>
+  <data name="Data Logger Antenna" xml:space="preserve">
+    <value>Datalogger-antenne</value>
+  </data>
+  <data name="Data Logger Flowmeter 4&quot;" xml:space="preserve">
+    <value>Datalogger Flowmeter 4"</value>
+  </data>
+  <data name="Data Logger Flowmeter 6&quot;" xml:space="preserve">
+    <value>Datalogger Flowmeter 6"</value>
+  </data>
+  <data name="Decommission" xml:space="preserve">
+    <value>Ontmanteling</value>
+  </data>
+  <data name="DeInstall" xml:space="preserve">
+    <value>Installatie ongedaan maken</value>
+  </data>
+  <data name="Discounts" xml:space="preserve">
+    <value>Kortingen</value>
+  </data>
+  <data name="Do Maintenance" xml:space="preserve">
+    <value>Onderhoud uitvoeren</value>
+  </data>
+  <data name="Extra Works" xml:space="preserve">
+    <value>Extra Werken</value>
+  </data>
+  <data name="Generate Invoice" xml:space="preserve">
+    <value>Factuur genereren</value>
+  </data>
+  <data name="Generator Test" xml:space="preserve">
+    <value>Generatortest</value>
+  </data>
+  <data name="Horizontal Drain Pipe" xml:space="preserve">
+    <value>Horizontale afvoerpijp</value>
+  </data>
+  <data name="Horizontal Drain Tests" xml:space="preserve">
+    <value>Horizontale afvoertests</value>
+  </data>
+  <data name="Install" xml:space="preserve">
+    <value>Installeren</value>
+  </data>
+  <data name="Install Data Logger" xml:space="preserve">
+    <value>Datalogger installeren</value>
+  </data>
+  <data name="Install Small Parts" xml:space="preserve">
+    <value>Kleine onderdelen installeren</value>
+  </data>
+  <data name="INSTALL!" xml:space="preserve">
+    <value>INSTALLEREN!</value>
+  </data>
+  <data name="Invoices and Costs" xml:space="preserve">
+    <value>Facturen en kosten</value>
+  </data>
+  <data name="Item Amounts" xml:space="preserve">
+    <value>Artikelbedragen</value>
+  </data>
+  <data name="Item IDs" xml:space="preserve">
+    <value>Artikel-ID's</value>
+  </data>
+  <data name="Item Names" xml:space="preserve">
+    <value>Artikelnamen</value>
+  </data>
+  <data name="Item UniqueIDs" xml:space="preserve">
+    <value>Unieke ID's van artikelen</value>
+  </data>
+  <data name="Main Menu" xml:space="preserve">
+    <value>Hoofdmenu</value>
+  </data>
+  <data name="Manual Flowmeter 4&quot;" xml:space="preserve">
+    <value>Handmatige debietmeter 4"</value>
+  </data>
+  <data name="Manual Flowmeter 6&quot;" xml:space="preserve">
+    <value>Handmatige debietmeter 6"</value>
+  </data>
+  <data name="Meassure Pipe" xml:space="preserve">
+    <value>Meet pijp</value>
+  </data>
+  <data name="Measure Pipe" xml:space="preserve">
+    <value>Meet pijp</value>
+  </data>
+  <data name="Mobilize" xml:space="preserve">
+    <value>Mobiliseren</value>
+  </data>
+  <data name="Overview" xml:space="preserve">
+    <value>Overzicht</value>
+  </data>
+  <data name="Payments" xml:space="preserve">
+    <value>Betalingen</value>
+  </data>
+  <data name="Please Select" xml:space="preserve">
+    <value>Selecteer alstublieft</value>
+  </data>
+  <data name="Project Actions" xml:space="preserve">
+    <value>Projectacties</value>
+  </data>
+  <data name="Project Documents" xml:space="preserve">
+    <value>Projectdocumenten</value>
+  </data>
+  <data name="Projects Overview" xml:space="preserve">
+    <value>Projectoverzicht</value>
+  </data>
+  <data name="Pump Sump" xml:space="preserve">
+    <value>Pompput</value>
+  </data>
+  <data name="Pump Tests" xml:space="preserve">
+    <value>Pomptesten</value>
+  </data>
+  <data name="Reports" xml:space="preserve">
+    <value>Rapporten</value>
+  </data>
+  <data name="Safety" xml:space="preserve">
+    <value>Veiligheid</value>
+  </data>
+  <data name="Select Item" xml:space="preserve">
+    <value>Selecteer item</value>
+  </data>
+  <data name="Sensors Check" xml:space="preserve">
+    <value>Sensoren controleren</value>
+  </data>
+  <data name="Shared Information" xml:space="preserve">
+    <value>Gedeelde informatie</value>
+  </data>
+  <data name="Site Check" xml:space="preserve">
+    <value>Sitecontrole</value>
+  </data>
+  <data name="Site Maintenance" xml:space="preserve">
+    <value>Site onderhoud</value>
+  </data>
+  <data name="Sprinklers with stativ" xml:space="preserve">
+    <value>Sproeiers met stativ</value>
+  </data>
+  <data name="Sub Project" xml:space="preserve">
+    <value>SubProject</value>
+  </data>
+  <data name="SubProject" xml:space="preserve">
+    <value>SubProject</value>
+  </data>
+  <data name="Three Step Test" xml:space="preserve">
+    <value>Test in drie stappen</value>
+  </data>
+  <data name="TimeStamp" xml:space="preserve">
+    <value>tijdstempel</value>
+  </data>
+  <data name="Unique ID(if applicable)" xml:space="preserve">
+    <value>Unieke ID (indien van toepassing)</value>
+  </data>
+  <data name="Unit" xml:space="preserve">
+    <value>Eenheid</value>
+  </data>
+  <data name="Upload pictures" xml:space="preserve">
+    <value>Foto's uploaden</value>
+  </data>
+  <data name="Water Samples" xml:space="preserve">
+    <value>Watermonsters</value>
+  </data>
+  <data name="WTP Check" xml:space="preserve">
+    <value>WTP-controle</value>
+  </data>
+  <data name="Account" xml:space="preserve">
+    <value>Account</value>
+  </data>
+  <data name="Log out" xml:space="preserve">
+    <value>Uitloggen</value>
+  </data>
+  <data name="Tasks" xml:space="preserve">
+    <value>Taken</value>
+  </data>
+  <data name="Truck Daily Report" xml:space="preserve">
+    <value>Dagelijkse vrachtwagenrapport</value>
+  </data>
+  <data name="Truck Daily Reports" xml:space="preserve">
+    <value>Dagelijkse vrachtwagenrapporten</value>
+  </data>
+  <data name="Drill Well Form" xml:space="preserve">
+    <value>Boorputvorm</value>
+  </data>
+  <data name="Fill Hour Sheet" xml:space="preserve">
+    <value>Urenformulier invullen</value>
+  </data>
+  <data name="Measurement Items" xml:space="preserve">
+    <value>Meetitems</value>
+  </data>
+  <data name="You can also add an external link to view a file from another destination" xml:space="preserve">
+    <value>U kunt ook een externe link toevoegen om een bestand vanaf een andere bestemming te bekijken</value>
+  </data>
+  <data name="Do your daily maintenance right here on the internet!" xml:space="preserve">
+    <value>Doe uw dagelijkse onderhoud hier op internet!</value>
+  </data>
+  <data name="Go To Projects" xml:space="preserve">
+    <value>Ga naar projecten</value>
+  </data>
+  <data name="Hölscher Jensen A/S" xml:space="preserve">
+    <value>Tjaden B.V.</value>
+  </data>
+  <data name="Hölscher Jensen A/S - Maintenance &amp; Operations" xml:space="preserve">
+    <value>Tjaden B.V.</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Volgende</value>
+  </data>
+  <data name="Previous" xml:space="preserve">
+    <value>Vorig</value>
+  </data>
+  <data name="There are powerful new features in Hoelscher" xml:space="preserve">
+    <value>Hij heeft geweldige nieuwe functies in Tjaden B.V.</value>
+  </data>
+  <data name="Type in Measurements" xml:space="preserve">
+    <value>Voer metingen in</value>
+  </data>
+  <data name="Find..." xml:space="preserve">
+    <value>Vind...</value>
+  </data>
+  <data name="Select Project" xml:space="preserve">
+    <value>Selecteer Project</value>
+  </data>
+  <data name="Select SubProject" xml:space="preserve">
+    <value>Selecteer SubProject</value>
+  </data>
+  <data name="2600 Glostrup" xml:space="preserve">
+    <value>4765 SN Zevenbergschen Hoek</value>
+  </data>
+  <data name="About Us" xml:space="preserve">
+    <value>Over ons</value>
+  </data>
+  <data name="Directions" xml:space="preserve">
+    <value>Routebeschrijving</value>
+  </data>
+  <data name="Fabriksparken 37" xml:space="preserve">
+    <value>Oude Moerdijkseweg 13</value>
+  </data>
+  <data name="Information" xml:space="preserve">
+    <value>Informatie</value>
+  </data>
+  <data name="lal" xml:space="preserve">
+    <value>bal</value>
+  </data>
+  <data name="Location and Directions" xml:space="preserve">
+    <value>Locatie en routebeschrijving</value>
+  </data>
+  <data name="String1" xml:space="preserve">
+    <value>Contact</value>
+  </data>
+  <data name="City" xml:space="preserve">
+    <value>Locatie</value>
+  </data>
+  <data name="Client Contact" xml:space="preserve">
+    <value>Klant kontakt</value>
+  </data>
+  <data name="Client Phone" xml:space="preserve">
+    <value>telefonnummer</value>
+  </data>
+  <data name="Department" xml:space="preserve">
+    <value>Afdeling</value>
+  </data>
+  <data name="Project Manager" xml:space="preserve">
+    <value>Uitvoerder</value>
+  </data>
+  <data name="Project Name" xml:space="preserve">
+    <value>Projectnaame</value>
+  </data>
+  <data name="test" xml:space="preserve">
+    <value>test</value>
+  </data>
+  <data name="Access denied" xml:space="preserve">
+    <value>Toegang geweigerd</value>
+  </data>
+  <data name="Back to main page" xml:space="preserve">
+    <value>Terug naar hoofdpagina</value>
+  </data>
+  <data name="Confirm Account" xml:space="preserve">
+    <value>Account bevestigen</value>
+  </data>
+  <data name="Email confirmed" xml:space="preserve">
+    <value>E-mail bevestigd</value>
+  </data>
+  <data name="Enter your email." xml:space="preserve">
+    <value>Voer uw e-mailadres in.</value>
+  </data>
+  <data name="Forgot password confirmation" xml:space="preserve">
+    <value>Bevestiging wachtwoord vergeten</value>
+  </data>
+  <data name="Forgot your password?" xml:space="preserve">
+    <value>Je wachtwoord vergeten?</value>
+  </data>
+  <data name="here" xml:space="preserve">
+    <value>hier</value>
+  </data>
+  <data name="Reset" xml:space="preserve">
+    <value>Resetten</value>
+  </data>
+  <data name="Reset password" xml:space="preserve">
+    <value>Wachtwoord resetten</value>
+  </data>
+  <data name="Reset your password." xml:space="preserve">
+    <value>Stel je wachtwoord opnieuw in.</value>
+  </data>
+  <data name="Submit" xml:space="preserve">
+    <value>Voorleggen</value>
+  </data>
+  <data name="Thank you for confirming the Account for the user" xml:space="preserve">
+    <value>Bedankt voor het bevestigen van het account voor de gebruiker</value>
+  </data>
+  <data name="Thank you for confirming your email." xml:space="preserve">
+    <value>Bedankt voor het bevestigen van uw e-mail.</value>
+  </data>
+  <data name="to log in." xml:space="preserve">
+    <value>toe inloggen.</value>
+  </data>
+  <data name="We have sent an Email to your Email-address. Please check your Email and follow the instructions to reset your password." xml:space="preserve">
+    <value>We hebben een e-mail naar uw e-mailadres gestuurd. Controleer uw e-mail en volg de instructies om uw wachtwoord opnieuw in te stellen.</value>
+  </data>
+  <data name="Your password has been reset. Please click" xml:space="preserve">
+    <value>Je wachtwoord is gereset. Klik alstublieft</value>
+  </data>
+</root>

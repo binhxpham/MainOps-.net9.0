@@ -1,0 +1,15 @@
+﻿@model IEnumerable<MainOps.Models.Document>
+@{
+    Layout = null;
+}
+<table class="table">
+    @foreach (var item in Model)
+    {
+    <tr>
+        <td><img src="~/Documents/AlarmBoxInfo/@item.path.Split('\\').Last()" /></td>
+    </tr>
+    }
+</table>
+
+        
+

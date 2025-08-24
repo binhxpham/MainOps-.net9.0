@@ -1,0 +1,223 @@
+﻿@model MainOps.Models.ViewModels.InstallSmallVM
+<head>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM&sensor=true&libraries=places,geometry"></script>
+</head>
+@{
+    ViewData["Title"] = "Small Parts";
+}
+<div class="row">
+    <div class="col-xs-12">
+        <form asp-controller="TrackItems" asp-action="InstallSmallItems" method="post" enctype="multipart/form-data" onsubmit="retrievedata();" id="TheForm">
+            <table style="width:100%;table-layout:fixed;">
+                <tr>
+                    <td align="left"><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Upload Pictures:")</label></td>
+                    <td align="right"><input type="file" name="files" multiple accept=".jpg,.jpeg,.png,.gif,.pdf" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td align="left"><label asp-for="TimeStamp" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.TimeStamp))</label></td>
+                    <td>
+                        <input type="text" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd")" asp-for="TimeStamp" id="thetime" style="width:100%;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td align="left">
+                        <label asp-for="InstallationsId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Item")</label>
+                    </td>
+                    <td>
+                        <input type="number" id="InstallationsId" name="InstallationsId" value="-1" style="width:100%;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td align="left" style="width:60%;">
+                        <label asp-for="Amount" class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Amount")</label>
+                    </td>
+                    <td>
+                        <input type="number" id="Amount" name="Amount" value="0" style="width:100%;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><select id="SmallPartChoice" class="form-control" asp-items="ViewBag.SmallPartId" style="width:100%;height:50px;"></select></td>
+                    <td><button type="button" class="btn-hoelscher" onclick="AddSmallPart();" style="width:100%;height:50px;">@SharedLocalizer.GetLocalizedHtmlString("Add Small Part")</button></td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="width:100%"><button class="btn-hoelscher" type="submit" style="width:100%;height:50px;">@SharedLocalizer.GetLocalizedHtmlString("Send Results!!")</button></td>
+                </tr>
+            </table>
+            <input type="text" id="latss" name="latss" value="" hidden="hidden" />
+            <input type="text" id="longss" name="longss" value="" hidden="hidden" />
+            <input type="text" id="errorss" name="errorss" value="" hidden="hidden" />
+            <input type="text" id="smallitemss" name="smallitemss" value="" hidden="hidden" />
+        </form>
+    </div>
+</div>
+<div>
+    <button type="button" onclick="setthecenter();" class="btn-hoelscher" style="width:100px;height:50px;">@SharedLocalizer.GetLocalizedHtmlString("Center Map")</button>
+</div>
+<div>
+    <a asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+<div id="myDiv" style="width:100%;height:400px;"></div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        var countcoords = 0;
+        var gmarkers = [];
+        var myposmarker;
+        var isfound = false;
+        var Lats = new Array();
+        var Longs = new Array();
+        var Errors = new Array();
+        var SmallItems = new Array();
+        var myLat = 0, myLng = 0, myErr = 0;
+        var id;      
+        var myLatLng = { lat: 55.682936, lng: 12.3729016 };
+        //Create Options or set different Characteristics of Google Map
+        var mapOptions = {
+            center: myLatLng,
+            zoom: 11,
+            minZoom: 2,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        //Display the Google map in the div control with the defined Options
+        const map = new google.maps.Map(document.getElementById("myDiv"), mapOptions);
+        if (navigator.geolocation) {
+            id = navigator.geolocation.watchPosition(function (position) {
+                myLat = position.coords.latitude;
+                myLng = position.coords.longitude;
+                myErr = position.coords.accuracy;
+                if (isfound == false) {
+                    setPos(myLat, myLng);
+                }
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                        alert("error");
+                    }
+
+                }, { maximumAge: 20000, timeout: 30000, enableHighAccuracy: true });
+        }
+        $(document).ready(function () {
+            DisplayGoogleMap();
+        });
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-2:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select',
+                    firstDay: 1
+                });
+                $('.date-picker').datepicker("setDate", new Date());
+
+            });
+        });
+        function setPos(lat, lng) {            
+            if (myposmarker == null) {
+                var initialLocation = new google.maps.LatLng(lat, lng);
+                myposmarker = new google.maps.Marker({
+                    map: map,
+                    position: { lat: lat, lng: lng },
+                    title: "You",
+
+                });
+                myposmarker.setIcon({
+                    url: 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
+                    scaledSize: new google.maps.Size(70, 70)
+                })
+
+                myposmarker['infowindow'] = new google.maps.InfoWindow({
+                    content: 'Your Position!'
+                });
+                myposmarker.setMap(map);
+                map.setCenter(new google.maps.LatLng(lat, lng));
+                google.maps.event.addListener(myposmarker, 'click', function () {
+                    this['infowindow'].open(map, this);
+                });
+                map.setCenter(initialLocation);
+                isfound = true;
+            }  
+        }
+        function setthecenter() {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                var Lat = position.coords.latitude;
+                var Lng = position.coords.longitude;
+                map.setCenter({ lat: Lat, lng: Lng });
+                setPos(Lat, Lng);
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                        alert("error permission denied");
+                    }
+                }, { maximumAge: 0, timeout: 8000, enableHighAccuracy: true });
+        }
+        function AddSmallPart() {
+            var e = document.getElementById("SmallPartChoice");
+            var theval = e.options[e.selectedIndex].value;
+            if (theval != -1) {
+
+                var qtt = +$('#Amount').val();
+                if (qtt < 1) {
+                    qtt = 1;
+                }
+                $('#Amount').val(qtt);
+                Lats.push(myLat);
+                Longs.push(myLng);
+                Errors.push(myErr);
+                SmallItems.push(parseInt(theval));
+                alert("Added");
+            }
+        }
+        function retrievedata() {
+            
+            navigator.geolocation.clearWatch(id);
+            var s1 = document.getElementById("latss");
+            s1.value = JSON.stringify(Lats);
+            var s2 = document.getElementById("longss");
+            s2.value = JSON.stringify(Longs);
+            var s3 = document.getElementById("errorss");
+            s3.value = JSON.stringify(Errors);
+            var s4 = document.getElementById("smallitemss");
+            s4.value = JSON.stringify(SmallItems);
+            StartSpinner();
+
+        }
+
+        function chooseThis(index) {
+            $("#InstallationsId").val(index);
+        }
+        
+        function DisplayGoogleMap() {
+            //Set the Latitude and Longitude of the Map
+
+            @foreach(var item in Model.InstalledCoordinates)
+            {
+             <text>
+
+            var marker = new google.maps.Marker({
+                  map: map,
+                  position: { lat: @item.Latitude, lng: @item.Longitude },
+                    title: '@item.ItemType.Item_Type.Replace("\""," inch",0) : @item.Install_Text',
+            });
+            marker['infowindow'] = new google.maps.InfoWindow({
+                content: 'Item: @item.ItemType.Item_Type : @item.Install_Text <button type="button" onclick="chooseThis(@item.Id)">Choose this</button>'
+            });
+
+            google.maps.event.addListener(marker, 'click', function () {
+                this['infowindow'].open(map, this);
+            });
+            gmarkers.push(marker);
+
+            marker.setMap(map);
+            </text>
+            }
+
+
+        }
+
+    </script>
+}
+

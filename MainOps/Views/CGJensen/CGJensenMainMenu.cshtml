@@ -1,0 +1,85 @@
+﻿
+@{
+    ViewData["Title"] = "Main Menu";
+}
+@inject UserManager<ApplicationUser> _userManager;
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Main Menu")</h2>
+
+<div class="row">
+    <div class="col-xs-12">
+        <table style="width:100%;table-layout:fixed;font-size:18px;">
+            <tr><td colspan="2">@SharedLocalizer.GetLocalizedHtmlString("Forms")</td></tr>
+            <tr>
+                <td>
+                    <form asp-action="Create_Dagsrapport" asp-controller="CGJensen" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Opret Dagsrapport")</button>
+                    </form>
+                </td>
+            </tr>
+            <tr><td colspan="2">@SharedLocalizer.GetLocalizedHtmlString("Reports and Tables")</td></tr>
+            <tr>
+                <td>
+                    <form asp-action="Dagsrapporter" asp-controller="CGJensen" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Dagsrapporter")</button>
+                    </form>
+                </td>
+                <td>
+                    <form asp-action="Ekstraarbejder" asp-controller="CGJensen" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Ekstra Arbejder")</button>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <form asp-action="Structures" asp-controller="CGJensen" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Structures")</button>
+                    </form>
+                </td>
+                <td>
+                    <form asp-action="Buildings" asp-controller="CGJensen" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Buildings")</button>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <form asp-action="Junctions" asp-controller="CGJensen" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Junctions")</button>
+                    </form>
+                </td>
+                <td>
+                    <form asp-action="RoadSections" asp-controller="CGJensen" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Road Sections")</button>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <form asp-action="AccommodationWorks" asp-controller="CGJensen" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Accommodation Works")</button>
+                    </form>
+                </td>
+                <td>
+                    <form asp-action="SiteClearancesBetweenContractBorders" asp-controller="CGJensen" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Site Clearances Between Contract Borders")</button>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <form asp-action="SiteClearanceForUtilityRelocations" asp-controller="CGJensen" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Site Clearances For Utility Relocations")</button>
+                    </form>
+                </td>
+                <td>
+                    <form asp-action="Protocols" asp-controller="CGJensen" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Protocols")</button>
+                    </form>
+                </td>
+            </tr>
+
+        </table>
+    </div>
+</div>
+
+

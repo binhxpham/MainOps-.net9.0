@@ -1,0 +1,183 @@
+﻿@model MainOps.Models.ViewModels.GenerateInvoiceVM
+@{
+    ViewData["Title"] = "Generate Invoice";
+}
+@if (User.IsInRole("International"))
+{
+    <div style="width:100%;">
+        <form asp-action="MainMenu_HIH" asp-controller="TrackItems">
+            <button class="btn-hoelscher" style="width:100%;height:36px;">
+                @SharedLocalizer.GetLocalizedHtmlString("Back to Main Menu")
+            </button>
+        </form>
+    </div>
+}
+<form asp-action="GenerateInvoice" asp-controller="TrackItems" method="post" target="_blank">
+    <table>
+        <tr>
+            <td>
+                @Html.LabelFor(x => x.starttime)
+            </td>
+            <td>
+                <input asp-for="starttime" type="date" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                @Html.LabelFor(x => x.endtime)
+            </td>
+            <td>
+                <input asp-for="endtime" type="date" />
+            </td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(x => x.ProjectId)</b></td>
+            <td><select asp-for="ProjectId" class="form-control" onchange="FillSubProjects();" asp-items="ViewBag.ProjectId"></select></td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(x => x.SubProjectId)</b></td>
+            <td>
+                <select asp-for="SubProjectId" class="form-control">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("No Sub Projects")</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Generate Akonto File")</td>
+            <td>@Html.EditorFor(x => x.GenerateAkonto)</td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Generate Akonto File in Background")</td>
+            <td>@Html.EditorFor(x => x.GenerateAkontoBackGround)</td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Generate Documentation File")</td>
+            <td>@Html.EditorFor(x => x.AddDocumentation)</td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Generate Documentation File in Background")</td>
+            <td>@Html.EditorFor(x => x.AddDocumentationBackGround)</td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Show Documentation File")</td>
+            <td>@Html.EditorFor(x => x.ShowDocumentation)</td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Split Invoice into subprojects")</td>
+            <td>@Html.EditorFor(x => x.SplitSubProjects)</td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Download Excel")</td>
+            <td>@Html.EditorFor(x => x.DownloadExcel)</td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Download Simple Excel")</td>
+            <td>@Html.EditorFor(x => x.DownloadSimpleExcel)</td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Hide Old items from invoice")</td>
+            <td>@Html.EditorFor(x => x.HideOldItems)</td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Make Downtime Paid on all daily reports")</td>
+            <td>@Html.EditorFor(x => x.PayDownTime)</td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Only Hours!")</td>
+            <td>@Html.EditorFor(x => x.OnlyHours)</td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("No Money numbers!")</td>
+            <td>@Html.EditorFor(x => x.NoMoneyNumbers)</td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Refundable VAT / Non-Refundable VAT")</td>
+            <td>@Html.EditorFor(x => x.Tax)</td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Zip Invoices And Documentation")</td>
+            <td>@Html.EditorFor(x => x.ZipItAll)</td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Hide Photos from Documentation")</td>
+            <td>@Html.EditorFor(x => x.HidePhotos)</td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Generate SnapShot for Comparison")</td>
+            <td>@Html.EditorFor(x => x.GenerateSnapShot)</td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Check Inconsistencies")</td>
+            <td>@Html.EditorFor(x => x.CheckInconsistensies)</td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Show Change Logs in Period")</td>
+            <td>@Html.EditorFor(x => x.ShowLogs)</td>
+        </tr>
+        <tr>
+            <td colspan="2"><button type="submit">@SharedLocalizer.GetLocalizedHtmlString("Generate Invoice")</button></td>
+        </tr>
+    </table>
+</form>
+
+<form asp-action="CompareSnapShotToSnapShot">
+    <table>
+        <tr>
+            <td>Snapshot1: </td>
+            <td><select name="modelid" asp-items="ViewBag.snapshotid"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Snapshot 1")</option></select></td>
+        </tr>
+        <tr>
+            <td>Snapshot2: </td>
+            <td><select name="snapshotid" asp-items="ViewBag.snapshotid"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Snapshot 2")</option></select></td>
+        </tr>
+        <tr>
+            <td>Order by:</td>
+            <td><select name="orderbyoption">
+                <option value="1">StartTime</option>
+                <option value="2">UniqueID</option>
+                <option value="3">Location</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Compare!")</button></td>
+        </tr>
+    </table>    
+</form>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+        }
+        $(document).ready(function () {
+            $(function () {
+                FillSubProjects();
+            });
+        });
+    </script>
+}
+

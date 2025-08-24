@@ -1,0 +1,755 @@
+﻿@model MainOps.Models.CGJClasses.CGJDailyReportVM
+@{
+    ViewData["Title"] = "Dagsrapport";
+}
+@inject IHostingEnvironment _env;
+<style>
+    #thetable {
+        width: 100%;
+        table-layout: fixed;
+    }
+
+        #thetable td {
+            text-align: center;
+            background-color: black;
+            color: white;
+            word-break: break-all;
+            width: 100%;
+        }
+
+    input[type=checkbox] {
+        /* Double-sized Checkboxes */
+        -ms-transform: scale(2); /* IE */
+        -moz-transform: scale(2); /* FF */
+        -webkit-transform: scale(2); /* Safari and Chrome */
+        -o-transform: scale(2); /* Opera */
+        transform: scale(2);
+        padding: 10px;
+    }
+</style>
+<h2>Dagsrapport</h2>
+<div id="myModal3" class="ThreeModal">
+    <div class="ThreeModal-content">
+        <div class="ThreeModal-header">
+            <span class="ThreeModalclose">&times;</span>
+            <h2>@SharedLocalizer.GetLocalizedHtmlString("Location")</h2>
+        </div>
+        <div class="ThreeModal-body">
+            <div id="myDivMap" style="width:100%;height:400px;">
+                <img id="modal-img" src="" style="width:100%;height:100%;align-content:center;" />
+            </div>
+        </div>
+    </div>
+</div>
+<form asp-action="Dagsrapport" asp-controller="CGJensen" id="theform" method="post" enctype="multipart/form-data" onsubmit="retrieveData();">
+    <div style="font-size:20px;">
+
+        <table border="1" id="thetable">
+            <tr>
+                <td colspan="10" style="background-color:orange;color:black;"><b>Stam Data</b></td>
+            </tr>
+            <tr>
+                <td colspan="3">Kontrakt nr:</td>
+                <td colspan="7">
+                    <b>
+                        <select asp-for="Kontraktnr" asp-items="ViewBag.SubProjectId" onchange="UpdateStuff();" style="width:100%;background-color:black;color:white;">
+                            <option value="">Vælg Kontraktnr</option>
+                        </select>
+                    </b>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">Kontrakt navn:</td>
+                <td colspan="7"><b><input asp-for="Kontraktnavn" style="width:100%;background-color:grey;color:white;" readonly="readonly" /></b></td>
+            </tr>
+            <tr>
+                <td colspan="3">Dato:</td>
+                <td colspan="7"><b><input type="text" class="date-picker" asp-for="Report_Date" value="@DateTime.Now.ToString("dd-MM-yy")" style="width:100%;background-color:black;color:white;" /></b></td>
+            </tr>
+            <tr>
+                <td colspan="3">Afdeling:</td>                
+                <td colspan="7">
+                    <b>
+                        <select asp-for="Afdeling" style="width:100%;background-color:black;color:white;">
+                            <option value="JVA">JVA</option>
+                            <option value="Anden">Anden</option>
+                        </select>
+                    </b>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="10" style="background-color:orange;color:black;"><b>Lokation (Vælg Protokol - dernæst 1 lokation)</b></td>
+            </tr>
+            <tr>
+                <td colspan="5">
+                    <b>
+                        <select asp-for="Location.ProtocolId" asp-items="ViewBag.ProtocolId" style="width:100%;background-color:black;color:white;" onchange="changeProtocol();">
+                            <option value="">Vælg Protokol</option>
+                        </select>
+                    </b>
+                </td>
+                <td colspan="5">
+                    <b>
+                        <select asp-for="Location.StructureId" asp-items="ViewBag.StructureId" style="width:100%;background-color:black;color:white;" onchange="ClearOthers(event);">
+                            <option value="">Vælg Struktur</option>
+                        </select>
+                    </b>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="5">
+                    <b>
+                        <select asp-for="Location.AccomodationWorkId" asp-items="ViewBag.AccomodationWorkId" style="width:100%;background-color:black;color:white;" onchange="ClearOthers(event);">
+                            <option value="">Vælg Støttemur etc.</option>
+                        </select>
+                    </b>
+                </td>
+                <td colspan="5">
+                    <b>
+                        <select asp-for="Location.BuildingId" asp-items="ViewBag.BuildingId" style="width:100%;background-color:black;color:white;" onchange="ClearOthers(event);">
+                            <option value="">Vælg Bygning</option>
+                        </select>
+                    </b>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="5">
+                    <b>
+                        <select asp-for="Location.RoadSectionId" asp-items="ViewBag.RoadSectionId" style="width:100%;background-color:black;color:white;" onchange="ClearOthers(event);">
+                            <option value="">Vælg Vej Sektion</option>
+                        </select>
+                    </b>
+                </td>
+                <td colspan="5">
+                    <b>
+                        <select asp-for="Location.JunctionId" asp-items="ViewBag.JunctionId" style="width:100%;background-color:black;color:white;" onchange="ClearOthers(event);">
+                            <option value="">Vælg Kryds</option>
+                        </select>
+                    </b>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="5">
+                    <b>
+                        <select asp-for="Location.SiteClearancesBetweenContractBorderId" asp-items="ViewBag.SiteClearancesBetweenContractBorderId" style="width:100%;background-color:black;color:white;" onchange="ClearOthers(event);">
+                            <option value="">Vælg Rydning mellem grænser</option>
+                        </select>
+                    </b>
+                </td>
+                <td colspan="5">
+                    <b>
+                        <select asp-for="Location.SiteClearanceForUtilityRelocationId" asp-items="ViewBag.SiteClearanceForUtilityRelocationId" style="width:100%;background-color:black;color:white;" onchange="ClearOthers(event);">
+                            <option value="">Vælg Rydning For ledningsomlægning</option>
+                        </select>
+                    </b>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">Addresse <span asp-validation-for="Addresse" class="text-danger"></span></td>
+                <td colspan="7"><input asp-for="Addresse" placeholder="Skriv Addresse.." style="width:100%;background-color:black;color:white;" /></td>
+            </tr>
+            <tr>
+                <td colspan="10" style="background-color:orange;color:black;"><b><button class="btn-hoelscher" type="button" onclick="CheckMap();" style="width:100%;height:100%;background-color:black;color:white;">Se valgte Lokation</button></b></td>
+            </tr>
+            <tr>
+                <td colspan="3">Fortsætter?</td>
+                <td colspan="7"><input asp-for="Fortsaetter" value="true" style="width:100%;background-color:black;color:white;" /></td>
+            </tr>
+            <tr>
+                <td colspan="10" style="background-color:orange;color:black;">
+                    <b>Tidsregistrering af mandskab</b>
+                </td>
+            </tr>
+            <tr>
+                <td rowspan="2">Aktivitet</td>
+                <td rowspan="2">Antal Personer</td>
+                <td rowspan="2">Timer</td>
+                <td rowspan="2">Timer Før Overtid</td>
+                <td colspan="2">Overtid</td>
+                <td rowspan="2">CGJ Timer Totalt</td>
+                <td colspan="3" rowspan="2">Note</td>
+
+            </tr>
+            <tr>
+                <td>50%</td>
+                <td>100%</td>
+            </tr>
+            <tr>
+                <td colspan="10" style="background-color:orange;color:black;"><b>Kontraktarbejde</b></td>
+            </tr>
+
+            @for (int i = 0; i < 5; i++)
+            {
+                <tr>
+                    <td>
+                        <b>
+                            <select asp-for="@Model.Timer[i].Title" style="width:100%;background-color:black;color:white;">
+                                <option value="">Titel</option>
+                                <option value="Timelønnede">Timelønnede</option>
+                                <option value="Byggeleder">Byggeleder</option>
+                                <option value="Formand">Formand</option>
+                                <option value="Lærlinge/Elever">Lærlinge/Elever</option>
+                                <option value="Funktionærer">Funktionærer</option>
+                            </select>
+                        </b>
+                    </td>
+                    <td>
+                        <input asp-for="@Model.Timer[i].AntalPersoner" value="0" type="number" step="1" min="0" style="width:100%;background-color:black;color:white;" onchange="UpdateHours(event)" />
+                    </td>
+                    <td>
+                        <input asp-for="@Model.Timer[i].Timer" type="number" step="0.25" min="0" style="width:100%;background-color:black;color:white;" onchange="UpdateHours(event)" />
+                    </td>
+                    <td>
+                        <input asp-for="@Model.Timer[i].TimerFoerOvertid" type="number" step="0.25" min="0" style="width:100%;background-color:grey;color:white;" readonly />
+                    </td>
+                    <td>
+                        <input asp-for="@Model.Timer[i].Overtid_50" type="number" step="0.25" min="0" style="width:100%;background-color:black;color:white;" onchange="UpdateHours(event)" />
+                    </td>
+                    <td>
+                        <input asp-for="@Model.Timer[i].Overtid_100" type="number" step="0.25" min="0" style="width:100%;background-color:black;color:white;" onchange="UpdateHours(event)" />
+                    </td>
+                    <td>
+                        <input asp-for="@Model.Timer[i].CGJ_Timer_Total" style="width:100%;background-color:grey;color:white;" readonly />
+                        <input asp-for="@Model.Timer[i].EANr" hidden="hidden" style="width:100%;background-color:black;color:white;" />
+                    </td>
+
+                    <td colspan="3">
+                        <input asp-for="@Model.Timer[i].Note" style="width:100%;background-color:black;color:white;" />
+                    </td>
+                </tr>
+
+            }
+            <tr>
+                <td colspan="7" style="background-color:orange;color:black;"><b>Ekstraarbejder</b></td>
+                <td style="background-color:orange;">
+                    EA Nr
+                </td>
+                <td colspan="2" style="background-color:orange;color:black;">
+                    Note
+                </td>
+            </tr>
+            @for (int i = 5; i < 10; i++)
+            {
+                <tr>
+                    <td>
+                        <b>
+                            <select asp-for="@Model.Timer[i].Title" style="width:100%;background-color:black;color:white;">
+                                <option value="">Titel</option>
+                                <option value="Timelønnede">Timelønnede</option>
+                                <option value="Byggeleder">Byggeleder</option>
+                                <option value="Formand">Formand</option>
+                                <option value="Lærlinge/Elever">Lærlinge/Elever</option>
+                                <option value="Funktionærer">Funktionærer</option>
+                            </select>
+                        </b>
+                    </td>
+                    <td>
+                        <input asp-for="@Model.Timer[i].AntalPersoner" value="0" type="number" step="1" min="0" max="100" style="width:100%;background-color:black;color:white;" onchange="UpdateHours(event)" />
+                    </td>
+                    <td>
+                        <input asp-for="@Model.Timer[i].Timer" type="number" step="0.25" min="0" max="24" style="width:100%;background-color:black;color:white;" onchange="UpdateHours(event)" />
+                    </td>
+                    <td>
+                        <input asp-for="@Model.Timer[i].TimerFoerOvertid" type="number" step="0.25" min="0" style="width:100%;background-color:grey;color:white;" readonly />
+                    </td>
+                    <td>
+                        <input asp-for="@Model.Timer[i].Overtid_50" type="number" step="0.25" min="0" style="width:100%;background-color:black;color:white;" onchange="UpdateHours(event)" />
+                    </td>
+                    <td>
+                        <input asp-for="@Model.Timer[i].Overtid_100" type="number" step="0.25" min="0" style="width:100%;background-color:black;color:white;" onchange="UpdateHours(event)" />
+                    </td>
+                    <td>
+                        <input asp-for="@Model.Timer[i].CGJ_Timer_Total" style="width:100%;background-color:grey;color:white;" readonly />
+                    </td>
+                    <td>
+                        <b>
+                            <select asp-for="@Model.Timer[i].EANr" asp-items="ViewBag.EAId" onchange="updateea(event);" style="width:100%;background-color:black;color:white;">
+                                <option value="">EA Nr</option>
+                            </select>
+                        </b>
+                    </td>
+                    <td colspan="2">
+                        <input asp-for="@Model.Timer[i].Note" style="width:100%;background-color:black;color:white;" />
+                    </td>
+                </tr>
+
+            }
+            <tr>
+                <td><b>I alt:</b></td>
+                <td><input id="totalantal" style="width:100%;background-color:grey;color:white;" readonly /></td>
+                <td><input id="totaltimer" style="width:100%;background-color:grey;color:white;" readonly /></td>
+                <td><input id="totaltimerfoerovertid" style="width:100%;background-color:grey;color:white;" readonly /></td>
+                <td><input id="totalovertid50" style="width:100%;background-color:grey;color:white;" readonly /></td>
+                <td><input id="totalovertid100" style="width:100%;background-color:grey;color:white;" readonly /></td>
+                <td><input id="totaltotal" style="width:100%;background-color:grey;color:white;" readonly /></td>
+                <td colspan="3"></td>
+            </tr>
+            <tr>
+                <td colspan="2">Dagens vejr: <span asp-validation-for="Addresse" class="text-danger"></span></td>
+                <td colspan="3"><input asp-for="Vejret" style="width:100%;background-color:black;color:white;" /></td>
+                <td colspan="2">Vejrlig:</td>
+                <td colspan="3"><input asp-for="Vejrlig" style="width:100%;background-color:black;color:white;" /></td>
+            </tr>
+            <tr>
+                <td colspan="10" style="background-color:orange;color:black;"><b>Kontraktarbejde</b></td>
+            </tr>
+            <tr>
+                <td rowspan="2" colspan="5">Eget Materiel og Materialer</td>
+                <td colspan="5">Underleverandør - materiel, materialer, kørsel mm.</td>
+            </tr>
+            <tr>
+
+                <td colspan="2">Firma</td>
+                <td colspan="3">Hvilket materiel, materiale</td>
+            </tr>
+            @for (int i = 0; i < 10; i++)
+            {
+                <tr>
+                    <td colspan="5"><input asp-for="@Model.Kontraktarbejder[i].EgetMateriel" style="width:100%;background-color:black;color:white;" /></td>
+                    <td colspan="2"><input asp-for="@Model.Kontraktarbejder[i].UL_Firma" style="width:100%;background-color:black;color:white;" /></td>
+                    <td colspan="3"><input asp-for="@Model.Kontraktarbejder[i].UL_Materiel" style="width:100%;background-color:black;color:white;" /></td>
+                </tr>
+            }
+            <tr>
+                <td colspan="10" style="background-color:orange;color:black;"><b>Ekstraarbejde</b></td>
+            </tr>
+            <tr>
+                <td colspan="3">EA nr.</td>
+                <td colspan="2">Opgave</td>
+                <td colspan="2">Eget Materiel og materialer</td>
+                <td colspan="2">UE firma,m ateriel, materialer, kørsel mm</td>
+                <td>Fortsætter</td>
+            </tr>
+            @for (int i = 0; i < 5; i++)
+            {
+                <tr>
+                    <td>
+                        <b>
+                            <select asp-for="@Model.Ekstraarbejder[i].EANr" asp-items="ViewBag.EAId" onchange="updateea(event);" style="width:100%;background-color:black;color:white;">
+                                <option value="">EA Nr</option>
+                            </select>
+                        </b>
+                    </td>
+                    <td colspan="2"><input asp-for="@Model.Ekstraarbejder[i].EANr_skrevet" placeholder="Eller skriv selv:" style="width:100%;background-color:black;color:white;" /></td>
+                    <td colspan="2"><input asp-for="@Model.Ekstraarbejder[i].Opgave" style="width:100%;background-color:black;color:white;" /></td>
+                    <td colspan="2"><input asp-for="@Model.Ekstraarbejder[i].Eget_Materiel" style="width:100%;background-color:black;color:white;" /></td>
+                    <td colspan="2"><input asp-for="@Model.Ekstraarbejder[i].UEFirma_Materiel" style="width:100%;background-color:black;color:white;" /></td>
+                    <td><input asp-for="@Model.Ekstraarbejder[i].Fortsaetter" style="width:100%;background-color:black;color:white;" /></td>
+                </tr>
+            }
+            <tr>
+                <td colspan="10" style="background-color:orange;color:black;"><b>Uddybende Noter</b></td>
+            </tr>
+            <tr>
+                <td colspan="10" style="background-color:orange;color:black;"><textarea asp-for="UddybendeNoter" rows="6" cols="80" style="width:100%;background-color:black;color:white;"></textarea></td>
+            </tr>
+            <tr>
+                <td colspan="10" style="background-color:orange;color:black;"><b>Underskrift og billeder</b></td>
+            </tr>
+            <tr>
+                <td colspan="3">Upload billeder</td>
+                <td colspan="7"><input type="file" name="files" multiple accept=".jpg,.jpeg,.png" style="width:100%;" /></td>
+            </tr>
+            <tr>
+                <td colspan="10">Underskrift</td>
+            </tr>
+            <tr>
+                <td colspan="10">
+                    <canvas width="440" height="240" id="signature" style="border:1px solid orange;"></canvas>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="5">
+                    <button type="button" id="accept" style="width:100%;height:50px;background-color:black;color:orange;">Accepter Underskrift</button>
+                </td>
+                <td colspan="5">
+                    <button type="button" id="clear" style="width:100%;height:50px;background-color:black;color:orange;">Slet</button>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="10">
+                    <input asp-for="Signature" value="" hidden="hidden" />
+                    <input type="text" id="signaturedata" hidden="hidden" />
+                    <img width="80" height="60" id="savetarget" hidden="hidden">
+                    <button type="submit" style="background-color:black;color:orange;height:80px;width:100%;font-size:24px;"><b>Indsend Rapport</b></button>
+                </td>
+            </tr>
+
+        </table>
+        <button type="button" id="modalbutton" hidden="hidden"></button>
+    </div>
+</form>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/signature_pad.min.js"></script>
+    <script type="text/javascript">
+        var pad = null;
+        var modal = document.getElementById("myModal3");
+        var btn = document.getElementById("modalbutton");
+        var span = document.getElementsByClassName("ThreeModalclose")[0];
+        btn.onclick = function () {
+            modal.style.display = "block";
+        }
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-1:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+                $('.date-picker').datepicker("setDate", new Date("dd-MM-yy"));
+            });
+        });
+        $(document).ready(function () {
+            $(function () {
+                var canvas = document.querySelector("#signature");
+                pad = new SignaturePad(canvas, { penColor: "orange"});
+                $('#accept').click(function () {
+                    var data = pad.toDataURL();
+                    $('#savetarget').attr('src', data);
+                    var base64signature = data.split(',')[1];
+                    $('#signaturedata').val(base64signature);
+                });
+                $('#clear').click(function () {
+                    pad.clear();
+                })
+            })
+        });
+        function retrieveData(e) {
+            var posting = true;
+            
+            var s1 = document.getElementById("Signature");
+            var signature = "";
+            signature = document.getElementById("signaturedata").value;
+            s1.value = signature;
+            if (signature == "") {
+                posting = false;
+                e.preventDefault();
+                alert("Venligst skriv under!");
+            }
+            if ($("#theform").valid() == false) {
+                posting = false;
+            }
+            if (posting == true) {
+                StartSpinner();
+            }
+
+        }
+        function UpdateHours(e) {
+            var id = e.target.id.split("_")[1].split("__")[0];
+            var nump = +$("#Timer_" + id + "__AntalPersoner").val();
+            var numh = +$("#Timer_" + id + "__Timer").val();
+            var t_over_50 = +$("#Timer_" + id + "__Overtid_50").val();
+            var t_over_100 = +$("#Timer_" + id + "__Overtid_100").val();
+            if (nump > 0 && numh > 0) {
+                $("#Timer_" + id + "__TimerFoerOvertid").val(nump * numh);
+                $("#Timer_" + id + "__CGJ_Timer_Total").val(nump * numh + t_over_50 * 0.5 * nump + t_over_100 * nump);
+            }
+            var totalantal = 0.0;
+            var totaltimer = 0.0;
+            var totaltimerfoerovertid = 0.0;
+            var totalovertid50 = 0.0;
+            var totalovertid100 = 0.0;
+            var totaltotal = 0.0;
+            for (i = 0; i < 10; i++) {
+                totalantal += +$("#Timer_" + i + "__AntalPersoner").val();
+                totaltimer += +$("#Timer_" + i + "__Timer").val();
+                totaltimerfoerovertid += +$("#Timer_" + i + "__TimerFoerOvertid").val();
+                totalovertid50 += +$("#Timer_" + i + "__Overtid_50").val();
+                totalovertid100 += +$("#Timer_" + i + "__Overtid_100").val();
+                totaltotal += +$("#Timer_" + i + "__CGJ_Timer_Total").val();
+            }
+            $("#totalantal").val(totalantal);
+            $("#totaltimer").val(totaltimer);
+            $("#totaltimerfoerovertid").val(totaltimerfoerovertid);
+            $("#totalovertid50").val(totalovertid50);
+            $("#totalovertid100").val(totalovertid100);
+            $("#totaltotal").val(totaltotal);
+
+        }
+        function updateea(e) {
+            var id = e.target.id.split("_")[1].split("__")[0];
+            var selectedText = $("#" + e.target.id + " option:selected").text();
+            $("#Ekstraarbejder_" + id + "__" + "EANr_skrevet").val(selectedText.split(":")[0]);
+            $("#Ekstraarbejder_" + id + "__" + "Opgave").val(selectedText.split(":")[1]);
+            $("#Ekstraarbejder_" + id + "__" + "Fortsaetter").prop('checked', true);
+        }
+        function UpdateStuff()
+        {
+            var projectid = $("#Kontraktnr option:selected").val();
+            var selectedText = $("#Kontraktnr option:selected").text();
+            var subnr = selectedText.split("-")[1];
+            if (parseInt(subnr) >= 28) {
+                $("#Kontraktnavn").val("RH");
+            }
+            else {
+                $("#Kontraktnavn").val("G");
+            }
+            var url = '@Url.Action("GetProtocol", "CGJensen")';
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    dataType: 'json',
+                    data: {
+                        'theId': projectid,
+                    },
+                    success: function (data) {
+                        var x = document.getElementById("Location_ProtocolId");
+                        var i;
+                        for (i = 0; i < x.length; i++) {
+                            if (x.options[i].value == data["id"]) {
+                                x.options[i].selected = true;
+                            }
+                        }
+                        changeProtocol();
+                    }
+                });
+        }
+        function changeProtocol() {
+            changeBuliding();
+        }
+        function changeBuliding() {
+            var ProtocolId = $('#Location_ProtocolId').val();
+            var url = '@Url.Action("GetList", "CGJensen")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProtocolId,
+                    'type': "B"
+                },
+                success: function (data) {
+                    var s = '<option value="">Vælg Bygning</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["location"] + ':' + data[prop]["address"] +  '</option>';
+                    }
+                    $("#Location_BuildingId").html(s);
+                    document.getElementById("Location_BuildingId").style.width = "100%";
+                    changeStructure();
+                }
+            });
+        }
+        function changeStructure() {
+            var ProtocolId = $('#Location_ProtocolId').val();
+            var url = '@Url.Action("GetList", "CGJensen")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProtocolId,
+                    'type': "C"
+                },
+                success: function (data) {
+                    var s = '<option value="">Vælg Struktur</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["location"] + ':' + data[prop]["name"] +  '</option>';
+                    }
+                    $("#Location_StructureId").html(s);
+                    document.getElementById("Location_StructureId").style.width = "100%";
+                    changeJunction();
+                }
+            });
+        }
+        function changeJunction() {
+            var ProtocolId = $('#Location_ProtocolId').val();
+            var url = '@Url.Action("GetList", "CGJensen")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProtocolId,
+                    'type': "J"
+                },
+                success: function (data) {
+                    var s = '<option value="">Vælg Kryds</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["location"] + ':' + data[prop]["name"] +  '</option>';
+                    }
+                    $("#Location_JunctionId").html(s);
+                    document.getElementById("Location_JunctionId").style.width = "100%";
+                    changeAccommodation()
+                }
+            });
+        }
+        function changeAccommodation() {
+            var ProtocolId = $('#Location_ProtocolId').val();
+            var url = '@Url.Action("GetList", "CGJensen")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProtocolId,
+                    'type': "A"
+                },
+                success: function (data) {
+                    var s = '<option value="">Vælg Støttemur etc.</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["location"] + ':' + data[prop]["name"] +  '</option>';
+                    }
+                    $("#Location_AccomodationWorkId").html(s);
+                    document.getElementById("Location_AccomodationWorkId").style.width = "100%";
+                    changeSiteClear1();
+                }
+            });
+        }
+        function ClearOthers(e) {
+            var id = e.target.id;
+            if (id != "Location_StructureId") {
+                document.getElementById("Location_StructureId").options[0].selected = true;
+            }
+            if (id != "Location_BuildingId") {
+                document.getElementById("Location_BuildingId").options[0].selected = true;
+            }
+            if (id != "Location_RoadSectionId") {
+                document.getElementById("Location_RoadSectionId").options[0].selected = true;
+            }
+            if (id != "Location_SiteClearancesBetweenContractBorderId") {
+                document.getElementById("Location_SiteClearancesBetweenContractBorderId").options[0].selected = true;
+            }
+            if (id != "Location_SiteClearanceForUtilityRelocationId") {
+                document.getElementById("Location_SiteClearanceForUtilityRelocationId").options[0].selected = true;
+            }
+            if (id != "Location_JunctionId") {
+                document.getElementById("Location_JunctionId").options[0].selected = true;
+            }
+            if (id != "Location_AccomodationWorkId") {
+                document.getElementById("Location_AccomodationWorkId").options[0].selected = true;
+            }
+        }
+        function CheckMap() {
+            var type = "";
+            var theid = -1;
+            if (document.getElementById("Location_StructureId").options[0].selected == false) {
+                type = "Structure";
+                theid = $("#Location_StructureId").val();
+            }
+            else if (document.getElementById("Location_BuildingId").options[0].selected == false) {
+                type = "Building";
+                theid = $("#Location_BulidingId").val();
+            }
+            else if (document.getElementById("Location_RoadSectionId").options[0].selected == false) {
+                type = "RoadSectin";
+                theid = $("#Location_RoadSectionId").val();
+            }
+            else if (document.getElementById("Location_SiteClearancesBetweenContractBorderId").options[0].selected == false) {
+                type = "SiteClearBorder";
+                theid = $("#Location_SiteClearancesBetweenContractBorderId").val();
+            }
+            else if (document.getElementById("Location_SiteClearanceForUtilityRelocationId").options[0].selected == false) {
+                type = "siteClearUtil";
+                theid = $("#Location_SiteClearanceForUtilityRelocationId").val();
+            }
+            else if (document.getElementById("Location_JunctionId").options[0].selected == false) {
+                type = "Junction";
+                theid = $("#Location_JunctionId").val();
+            }
+            else if (document.getElementById("Location_AccomodationWorkId").options[0].selected == false) {
+                type = "AccommodationWork";
+                theid = $("#Location_AccomodationWorkId").val();
+            }
+            if (type != "") {
+                var url = '@Url.Action("GetMap", "CGJensen")';
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    data: {
+                        'theId': theid,
+                        'type': type
+                    },
+                    success: function (data) {
+                        var thesrc = "/CGJensen/" + type + "Photos/" + theid + "/" + data.split("\\")[data.split("\\").length - 1];
+                        $("#modal-img").prop("src", thesrc);
+                        btn.click();
+                    },
+                    error: function (data) {
+                        alert("error");
+                    }
+                });
+            }
+
+        }
+        function changeSiteClear1() {
+            var ProtocolId = $('#Location_ProtocolId').val();
+            var url = '@Url.Action("GetList", "CGJensen")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProtocolId,
+                    'type': "SICB"
+                },
+                success: function (data) {
+                    var s = '<option value="">Vælg Rydning mellem grænser</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["location"] + ':' + data[prop]["name"] +  '</option>';
+                    }
+                    $("#Location_SiteClearancesBetweenContractBorderId").html(s);
+                    document.getElementById("Location_SiteClearancesBetweenContractBorderId").style.width = "100%";
+                    changeSiteClear2();
+                }
+            });
+        }
+        function changeSiteClear2() {
+            var ProtocolId = $('#Location_ProtocolId').val();
+            var url = '@Url.Action("GetList", "CGJensen")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProtocolId,
+                    'type': "SICA"
+                },
+                success: function (data) {
+                    var s = '<option value="">Vælg Rydning For ledningsomlægning</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["location"] + ':' + data[prop]["name"] +  '</option>';
+                    }
+                    $("#Location_SiteClearanceForUtilityRelocationId").html(s);
+                    document.getElementById("Location_SiteClearanceForUtilityRelocationId").style.width = "100%";
+                    changeRoad();
+                }
+            });
+        }
+        function changeRoad() {
+            var ProtocolId = $('#Location_ProtocolId').val();
+            var url = '@Url.Action("GetList", "CGJensen")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProtocolId,
+                    'type': "R"
+                },
+                success: function (data) {
+                    var s = '<option value="">Vælg Vej Sektion</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["location"] + ':' + data[prop]["name"] +  '</option>';
+                    }
+                    $("#Location_RoadSectionId").html(s);
+                    document.getElementById("Location_RoadSectionId").style.width = "100%";
+                }
+            });
+        }
+
+    </script>
+}

@@ -1,0 +1,81 @@
+﻿@model IEnumerable<MainOps.Models.Project>
+@{ 
+    Layout = null;
+}
+@foreach (var item in Model) {
+
+                <table width="500">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(modelItem => item.Name)
+                            </th>
+                            <th>
+                                @SharedLocalizer.GetLocalizedHtmlString("Document")
+                            </th>
+                            <th>
+                                @SharedLocalizer.GetLocalizedHtmlString("Document Type")
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var doc in item.Documents)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+                                <td> @Html.DisplayFor(modelItem => doc.Name)</td>
+                                <td> @Html.DisplayFor(modelItem => doc.DocumentType.Type)</td>
+                                <td> <form asp-action="Details" asp-controller="Documents" asp-route-id="@doc.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("View")</button></form></td>
+                            </tr>
+                        }
+                        @foreach (var doc in item.Generator_TestsDocuments)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+                                <td> @Html.DisplayFor(modelItem => doc.Test_name)</td>
+                                <td> @Html.DisplayFor(modelItem => doc.Date_Done)</td>
+                                <td> <form asp-action="Generator_DetailsPdf" asp-controller="Documentation" asp-route-id="@doc.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("View")</button></form></td>
+                            </tr>
+                        }
+                        @foreach (var doc in item.WTP_TestsDocuments)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+                                <td> @Html.DisplayFor(modelItem => doc.Test_name)</td>
+                                <td> @Html.DisplayFor(modelItem => doc.Date_Done)</td>
+                                <td> <form asp-action="WTP_DetailsPdf" asp-controller="Documentation" asp-route-id="@doc.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("View")</button></form></td>
+                            </tr>
+                        }
+                        @foreach (var doc in item.WellInstallationsDocuments)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+                                <td> @Html.DisplayFor(modelItem => doc.Test_name) : @Html.DisplayFor(modelItem => doc.WellName)</td>
+                                <td> @Html.DisplayFor(modelItem => doc.Date_Done)</td>
+                                <td> <form asp-action="Well_Installation_DetailsPdf" asp-controller="Documentation" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("View")</button></form></td>
+                            </tr>
+                        }
+                        @foreach (var doc in item.WellDevelopmentsDocuments)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+                                <td> @Html.DisplayFor(modelItem => doc.Test_name)</td>
+                                <td> @Html.DisplayFor(modelItem => doc.Date_Done)</td>
+                                <td> <form asp-action="Well_Development_DetailsPdf" asp-controller="Documentation" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("View")</button></form></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+                <br />
+                }

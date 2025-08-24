@@ -1,0 +1,207 @@
+﻿@model MainOps.Models.Diet
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>Diet</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.FullName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.FullName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.EmployeeNumber)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.EmployeeNumber)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PayPeriod)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PayPeriod)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Project)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Project.Abbreviation)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Day1_start)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Day1_start)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Day2_start)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Day2_start)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Day3_start)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Day3_start)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Day4_start)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Day4_start)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Day5_start)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Day5_start)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Day6_start)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Day6_start)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Day1_end)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Day1_end)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Day2_end)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Day2_end)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Day3_end)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Day3_end)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Day4_end)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Day4_end)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Day5_end)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Day5_end)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Day6_end)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Day6_end)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WorkPlaceName1)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WorkPlaceName1)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WorkPlaceName2)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WorkPlaceName2)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WorkPlaceName3)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WorkPlaceName3)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WorkPlaceName4)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WorkPlaceName4)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WorkPlaceName5)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WorkPlaceName5)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WorkPlaceName6)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WorkPlaceName6)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SelfContainedExpenses)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SelfContainedExpenses)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.LivingInCamperWagon)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LivingInCamperWagon)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CalculationOfDietsAndSmallNecessities)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CalculationOfDietsAndSmallNecessities)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.HourAddon)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.HourAddon)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DeductionBreakFast)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DeductionBreakFast)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DeductionLunch)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DeductionLunch)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DeductionDinner)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DeductionDinner)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SignatureEmployee)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SignatureEmployee)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SignatureSupervisor)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SignatureSupervisor)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

@@ -1,0 +1,213 @@
+﻿@model MainOps.Models.Arrival
+
+@{
+    ViewData["Title"] = "SendBackOrTransfer";
+}
+@if (User.IsInRole("International"))
+{
+    <div style="width:100%;">
+        <form asp-action="MainMenu_HIH" asp-controller="TrackItems">
+            <button class="btn-hoelscher" style="width:100%;height:36px;">
+                @SharedLocalizer.GetLocalizedHtmlString("Back to Main Menu")
+            </button>
+        </form>
+    </div>
+}
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Send Items Back Or Transfer to other Project")</h2>
+
+<table style="width:100%;table-layout:fixed;">
+    <tr>
+        <td>@Html.DisplayNameFor(model => model.Project)</td>
+        <td>@Html.DisplayFor(model => model.Project.Name)</td>
+    </tr>
+    <tr>
+        <td>@Html.DisplayNameFor(model => model.ItemType)</td>
+        <td>@Html.DisplayFor(model => model.ItemType.Item_Type)</td>
+    </tr>
+    <tr>
+        <td>@Html.DisplayNameFor(model => model.Amount)</td>
+        <td>@Html.DisplayFor(model => model.Amount)</td>
+    </tr>
+    <tr>
+        <td>@SharedLocalizer.GetLocalizedHtmlString("Rental started on:")</td>
+        <td>@Html.DisplayFor(model => model.TimeStamp)</td>
+    </tr>
+</table>
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Send Items back!")</h2>
+<form asp-controller="TrackItems" asp-action="SendBack" onsubmit="CheckAmountSendBack(event);">
+    @Html.HiddenFor(Model => Model.Arrival_Text)
+    @Html.HiddenFor(Model => Model.ItemTypeId)
+    @Html.HiddenFor(Model => Model.TimeStamp)
+    @Html.HiddenFor(Model => Model.Amount)
+    @Html.HiddenFor(Model => Model.Id)
+    @Html.HiddenFor(Model => Model.Latitude)
+    @Html.HiddenFor(Model => Model.Longitude)
+    @Html.HiddenFor(Model => Model.ProjectId)
+    @Html.HiddenFor(Model => Model.MobilisationId)
+    @Html.HiddenFor(Model => Model.EndStamp)
+    @Html.HiddenFor(Model => Model.SubProjectId)
+    <input type="number" value="@Model.Id" name="ArrivalId" hidden="hidden" />
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Amount to send back")</label></td>
+            <td><input type="number" id="AmountSendBack" name="AmountSendBack" value="0" /></td>
+        </tr>
+        <tr>
+            <td>
+                <label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Date to send back")</label>
+            </td>
+            <td>
+                <input type="datetime" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd")" name="TransferDate" id="TransferDate1" style="width:100%;height:36px;" />
+                <input type="datetime" class="date-picker" value="@Model.TimeStamp" id="ModelDate1" hidden="hidden" style="width:100%;height:36px;" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Send Items back")</button></td>
+        </tr>
+    </table>
+</form>
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Move items to other project!")</h2>
+<form asp-controller="TrackItems" asp-action="TransferItems" onsubmit="CheckAmountTransfer(event);">
+    @Html.HiddenFor(Model => Model.Arrival_Text)
+    @Html.HiddenFor(Model => Model.ItemTypeId)
+    @Html.HiddenFor(Model => Model.TimeStamp)
+    @Html.HiddenFor(Model => Model.Amount)
+    @Html.HiddenFor(Model => Model.Id)
+    @Html.HiddenFor(Model => Model.Latitude)
+    @Html.HiddenFor(Model => Model.Longitude)
+    @Html.HiddenFor(Model => Model.ProjectId)
+    @Html.HiddenFor(Model => Model.MobilisationId)
+    @Html.HiddenFor(Model => Model.EndStamp)
+    <input type="number" value="@Model.Id" name="ArrivalId" hidden="hidden" />
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Send to project:")</label></td>
+            <td><select name="ProjectIdTransfer" id="ProjectIdTransfer" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();"></select></td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Send to sub project:")</label></td>
+            <td><select name="SubProjectIdTransfer" id="SubProjectIdTransfer" class="form-control" asp-items="ViewBag.SubProjectId"></select></td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Amount to send to project")</label></td>
+            <td><input type="number" id="AmountTransfer" name="AmountTransfer" value="0" /></td>
+        </tr>
+        <tr>
+            <td>
+                <label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Date to transfer")</label>
+            </td>
+            <td>
+                <input type="datetime" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd")" name="TransferDate" id="TransferDate2" style="width:100%;height:36px;" />
+                <input type="datetime" class="date-picker" value="@Model.TimeStamp" id="ModelDate2" hidden="hidden" style="width:100%;height:36px;" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Transfer Items")</button></td>
+        </tr>
+    </table>
+</form>
+<br />
+<br />
+<br />
+<div>
+    <a asp-action="Arrivals">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        var pad = null;
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select',
+                    firstDay: 1
+
+                });
+                $('#TransferDate1').datepicker("setDate", new Date("dd-MM-yy"));
+                $('#TransferDate2').datepicker("setDate", new Date("dd-MM-yy"));
+                FillSubProjects();
+            });
+        });
+        function CheckAmountSendBack(e) {
+            var posting = true;
+            var amount = document.getElementById("AmountSendBack").value;
+            var date = $("#TransferDate1").datepicker('getDate');
+            var modelDate = $("#ModelDate1").val();
+            if (date < modelDate) {
+                posting = false;
+                alert("Cannot send items back before they arrived");
+                e.preventDefault();
+            }
+            if (amount > @Convert.ToInt32(Model.Amount)) {
+                posting = false;
+                alert("Too much sent back compared to existing");
+                e.preventDefault();
+            }
+            if (amount <= 0) {
+                posting = false;
+                alert("Cannot send back 0 or negative numbers");
+                e.preventDefault();
+            }
+            if (posting == true) {
+                StartSpinner();
+            }
+
+
+        }
+        function CheckAmountTransfer(e) {
+            var posting = true;
+            var amount = document.getElementById("AmountTransfer").value;
+            var date = $("#TransferDate2").datepicker('getDate');
+            var modelDate = $("#ModelDate2").val();
+            if (date < modelDate) {
+                posting = false;
+                alert("Cannot send items back before they arrived");
+                e.preventDefault();
+            }
+            if (amount > @Convert.ToInt32(Model.Amount)) {
+                posting = false;
+                alert("Too much sent back compared to existing");
+                e.preventDefault();
+            }
+            if (amount <= 0) {
+                posting = false;
+                alert("Cannot send back 0 or negative numbers");
+                e.preventDefault();
+            }
+            if (posting == true) {
+                StartSpinner();
+            }
+
+
+    }
+    function FillSubProjects() {
+            var ProjectId = $('#ProjectIdTransfer').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectIdTransfer").html(s);
+                        document.getElementById("SubProjectIdTransfer").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectIdTransfer").html(s);
+                    }
+                }
+            });
+        }
+    </script>
+}

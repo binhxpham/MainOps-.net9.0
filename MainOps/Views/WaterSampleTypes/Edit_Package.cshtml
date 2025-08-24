@@ -1,0 +1,82 @@
+﻿@model MainOps.Models.CreatePackageViewModel
+@inject LocService SharedLocalizer;
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Edit Water Sample Package");
+}
+
+<h4>
+    @SharedLocalizer.GetLocalizedHtmlString("Edit Water Sample Package")
+</h4>
+<div class="col-xs-12">
+    <form asp-action="Edit_Package" asp-controller="WaterSampleTypes" method="post">
+        <input id="WaterSampleTypes" asp-for="WaterSampleTypes" hidden="hidden" />
+        @Html.HiddenFor(Model => Model.OldPackageId)
+        <table style="width:100%;table-layout:fixed;">
+            <tr>
+                <td><label asp-for="ProjectId"></label></td>
+                <td><select asp-for="ProjectId" asp-items="@ViewBag.ProjectId" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select Project")</option></select></td>
+            </tr>
+            <tr>
+                <td><label asp-for="Annotation"></label></td>
+                <td><input asp-for="Annotation" style="width:100%;" /></td>
+            </tr>
+            <tr>
+                <td><textarea cols="40" rows="8" id="WaterSampleTypesNames" asp-for="WaterSampleTypesNames"></textarea></td>
+                <td><select id="WaterSampleTypeIds" asp-items="ViewBag.WaterSampleTypeId" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Add Sample Type")</option></select></td>
+            </tr>
+            <tr>
+                <td><button type="button" class="btn-hoelscher" onclick="AddSelection();" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add Sample Type")</button></td>
+                <td><button type="button" class="btn-hoelscher" onclick="RemoveLast();" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Remove Last")</button></td>
+            </tr>
+            <tr><td colspan="2"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button></td></tr>
+        </table>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        function RemoveLast() {
+            var new_text = "";
+            var new_textnames = "";
+            var oldtext = $("#WaterSampleTypes").val();
+            var oldtextnames = $("#WaterSampleTypesNames").val();
+            var splitted = oldtext.split(",");
+            var splittednames = oldtextnames.split(",");
+            var length = splitted.length;
+            for (i = 0; i < length - 1; i++) {
+                if (i == 0) {
+                    new_text = splitted[i];
+                    new_textnames = splittednames[i];
+                }
+                else {
+                    new_text = new_text + "," + splitted[i];
+                    new_textnames = new_textnames + "," + splittednames[i];
+                }
+            }
+            $("#WaterSampleTypes").val(new_text);
+            $("#WaterSampleTypesNames").val(new_textnames);
+        }
+        function AddSelection() {
+            var selected_text = $('#WaterSampleTypeIds option:selected')
+                .toArray().map(item => item.text).join();
+            var selected_id = $('#WaterSampleTypeIds option:selected')
+                .toArray().map(item => item.value).join();
+            var currenttext = $("#WaterSampleTypesNames").val();
+            var currentids = $("#WaterSampleTypes").val();
+            if (currenttext != "") {
+                var newtext = currenttext + "," + selected_text;
+                var newtextid = currentids + "," + selected_id;
+                $("#WaterSampleTypesNames").val(newtext);
+                $("#WaterSampleTypes").val(newtextid);
+            }
+            else {
+                $("#WaterSampleTypesNames").val(selected_text);
+                $("#WaterSampleTypes").val(selected_id);
+            }
+        }
+        function ClearSelection() {
+            $("#WaterSampleTypesNames").val("");
+        }
+    </script>
+}

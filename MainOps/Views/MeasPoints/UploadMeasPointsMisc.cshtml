@@ -1,0 +1,50 @@
+﻿
+<h2>
+    @SharedLocalizer.GetLocalizedHtmlString("Uplaod Measurement Points to Letbanen")
+</h2>
+
+<form asp-action="UploadMeasPointsMisc" asp-controller="MeasPoints" enctype="multipart/form-data" method="post">
+    <select name="ProjectId" asp-items="@ViewBag.ProjectId" onchange="FillSubProjects();">
+        <option value="">Choose Project</option>
+    </select>
+    <select name="SubProjectId">
+        <option value="">Select SubProject</option>
+    </select>
+    <input type="file" accept=".csv" name="files" />
+    <button>@SharedLocalizer.GetLocalizedHtmlString("Upload")</button>
+</form>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+<script type="text/javascript">
+    function FillSubProjects() {
+        var SubProjectId = $('#SubProjectId').val();
+        var ProjectId = $('#ProjectId').val();
+        var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+        $.ajax({
+            type: 'GET',
+            url: url,
+            dataType: 'json',
+            data: { 'theId': ProjectId },
+            success: function (data) {
+                if (data.length > 0) {
+                    var s = '<option value="">Please Select SubProject</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                    }
+                    $("#SubProjectId").html(s);
+                    document.getElementById("SubProjectId").style.width = "100%";
+                }
+                else {
+                    var s = '<option value="">Please Select SubProject</option>';
+                    $("#SubProjectId").html(s);
+                }
+            }
+        });
+    }
+    
+    
+</script>
+}

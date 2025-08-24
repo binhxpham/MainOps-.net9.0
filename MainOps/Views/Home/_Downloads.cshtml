@@ -1,0 +1,24 @@
+﻿@model IEnumerable<string>
+
+@{Layout = null;}
+
+<table style="width:100%;table-layout:fixed;">
+    @foreach (var filename in Model)
+    {
+        <tr>
+            <td>
+                <form asp-action="DownloadFile" asp-controller="Home" method="get">
+                    <input name="filename" value="@filename" hidden="hidden" />
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Download")</button>
+                </form>
+            </td>
+            <td>@filename.Split("\\").Last()</td>
+            <td>
+                <form asp-action="RemoveFile" asp-controller="Home" method="post">
+                    <input name="filename" value="@filename" hidden="hidden" />
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Remove")</button>
+                </form>
+            </td>
+        </tr>
+    }
+</table>

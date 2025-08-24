@@ -1,0 +1,325 @@
+﻿@model IEnumerable<MainOps.Models.ManageViewModels.ApplicationUserListViewModel>
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@inject IViewLocalizer Localizer
+
+
+@{
+    ViewBag.Title = Localizer["Users With Roles"];
+}
+@inject UserManager<ApplicationUser> UserManager
+
+<h3 class="box-title">
+    <b>@Localizer["Users with Roles"]</b> - <a asp-action="UsersWithRolesInactive" controller="Manage">@SharedLocalizer.GetLocalizedHtmlString("Show Inactive Users")</a> - <a asp-action="UsersWithRoles" controller="Manage">@SharedLocalizer.GetLocalizedHtmlString("Show Active Users")</a>
+</h3>
+
+<div class="row">
+    <div class="col-xs-12">
+
+        <table class="table table-hover table-bordered table-condensed" id="example1" style="width:100%;table-layout:fixed;">
+            <thead>
+                <tr style="background-color:cornflowerblue;">
+                    <th style="width:20%;">
+                        @Html.DisplayNameFor(model => model.Username)
+                    </th>
+                    <th style="width:20%;">
+                        @Html.DisplayNameFor(model => model.Email)
+                    </th>
+                    <th style="width:50%;">
+                        @Html.DisplayNameFor(model => model.Role)
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int counter = 0;
+                    foreach (var item in Model)
+                    {
+                        counter++;
+                        @Html.HiddenFor(modelItem => item.UserId)
+                        <tr>
+                            <td style="word-wrap: break-word;vertical-align:middle;text-align:center;">
+                                @Html.DisplayFor(modelItem => item.Username)
+                                @if (item.Active.Equals(true))
+                                {
+                                    <button type="button" class="btn-hoelscher" onclick="Doodlidut('@item.Email');">@SharedLocalizer.GetLocalizedHtmlString("Inactivate User")</button>
+                                }
+                                else
+                                {
+                                    <button type="button" class="btn-hoelscher" onclick="Doodlidut2('@item.Email');">@SharedLocalizer.GetLocalizedHtmlString("Activate User")</button>
+                                }
+                                @if (item.MemberShipConfirmed.Equals(false))
+                                {
+                                    <button type="button" class="btn-hoelscher" onclick="Doodlidut3('@item.Email');">@SharedLocalizer.GetLocalizedHtmlString("Confirm Membership")</button>
+                                }
+                                @if (item.EmailConfirmed.Equals(false))
+                                {
+                                    <button type="button" class="btn-hoelscher" onclick="Doodlidut4('@item.Email');">@SharedLocalizer.GetLocalizedHtmlString("Confirm Email")</button>
+                                }
+
+                            </td>
+                            <td style="word-wrap: break-word;vertical-align:middle;text-align:center;">
+                                @Html.DisplayFor(modelItem => item.Email)
+                            </td>
+
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin"))
+                                {
+
+                                    <td>
+                                        <form asp-action="UpdateUserRights" method="post">
+                                            <input name="id" hidden="hidden" value="@item.UserId" />
+                                            <table style="width:100%;table-layout:fixed;">
+                                                <tr>
+                                                    <td>Guest:</td>
+                                                    @if (item.Role.Split(",").ToList().IndexOf("Guest") >= 0)
+                                                    {
+                                                        <td><input type="checkbox" value="true" checked="checked" name="Guest" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td><input type="checkbox" value="false" name="Guest" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                    <td>MemberGuest:</td>
+                                                    @if (item.Role.Split(",").ToList().IndexOf("MemberGuest") >= 0)
+                                                    {
+                                                        <td><input type="checkbox" value="true" checked="checked" name="MemberGuest" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td><input type="checkbox" value="false" name="MemberGuest" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                    <td rowspan="5"><button class="btn-hoelscher" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Update")</button></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Member:</td>
+                                                    @if (item.Role.Split(",").ToList().IndexOf("Member") >= 0)
+                                                    {
+                                                        <td><input type="checkbox" value="true" checked="checked" name="Member" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td><input type="checkbox" value="false" name="Member" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                    <td>ProjectMember:</td>
+                                                    @if (item.Role.Split(",").ToList().IndexOf("ProjectMember") >= 0)
+                                                    {
+                                                        <td><input type="checkbox" value="true" checked="checked" name="ProjectMember" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td><input type="checkbox" value="false" name="ProjectMember" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                </tr>
+                                                <tr>
+                                                    <td>Manager:</td>
+                                                    @if (item.Role.Split(",").ToList().IndexOf("Manager") >= 0)
+                                                    {
+                                                        <td><input type="checkbox" value="true" checked="checked" name="Manager" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td><input type="checkbox" value="false" name="Manager" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                    <td>Supervisor:</td>
+                                                    @if (item.Role.Split(",").ToList().IndexOf("Supervisor") >= 0)
+                                                    {
+                                                        <td><input type="checkbox" value="true" checked="checked" name="Supervisor" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td><input type="checkbox" value="false" name="Supervisor" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                </tr>
+                                                <tr>
+                                                    <td>StorageManager:</td>
+                                                    @if (item.Role.Split(",").ToList().IndexOf("StorageManager") >= 0)
+                                                    {
+                                                        <td><input type="checkbox" value="true" checked="checked" name="StorageManager" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td><input type="checkbox" value="false" name="StorageManager" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                    <td>International:</td>
+                                                    @if (item.Role.Split(",").ToList().IndexOf("International") >= 0)
+                                                    {
+                                                        <td><input type="checkbox" value="true" checked="checked" name="International" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td><input type="checkbox" value="false" name="International" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                </tr>
+                                                <tr>
+                                                    <td>DivisionAdmin:</td>
+                                                    @if (item.Role.Split(",").ToList().IndexOf("DivisionAdmin") >= 0)
+                                                    {
+                                                        <td><input type="checkbox" value="true" checked="checked" name="DivisionAdmin" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td><input type="checkbox" value="false" name="DivisionAdmin" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                    <td>Admin:</td>
+                                                    @if (User.IsInRole("Admin"))
+                                                    {
+                                                        @if (item.Role.Split(",").ToList().IndexOf("Admin") >= 0)
+                                                        {
+                                                            <td><input type="checkbox" value="true" checked="checked" name="Admin" onchange="updatevalue(this);" /></td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td><input type="checkbox" value="false" name="Admin" onchange="updatevalue(this);" /></td>
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        @if (item.Role.Split(",").ToList().IndexOf("Admin") >= 0)
+                                                        {
+                                                            <td>
+                                                                <input type="checkbox" hidden="hidden" value="true" checked="checked" name="Admin" onchange="updatevalue(this);" />
+                                                                <input type="checkbox" checked="checked" disabled="disabled" />
+                                                            </td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td>
+                                                                <input type="checkbox" hidden="hidden" value="false" name="Admin" onchange="updatevalue(this);" />
+                                                                <input type="checkbox" value="false" disabled="disabled" />
+                                                            </td>
+                                                        }
+                                                    }
+                                                </tr>
+                                                <tr>
+                                                    <td>AlarmTeam:</td>
+                                                    @if (item.Role.Split(",").ToList().IndexOf("AlarmTeam") >= 0)
+                                                    {
+                                                        <td><input type="checkbox" value="true" checked="checked" name="AlarmTeam" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td><input type="checkbox" value="false" name="AlarmTeam" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                    <td>ExternalDriller:</td>
+                                                    @if (item.Role.Split(",").ToList().IndexOf("ExternalDriller") >= 0)
+                                                    {
+                                                        <td><input type="checkbox" value="true" checked="checked" name="ExternalDriller" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td><input type="checkbox" value="false" name="ExternalDriller" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                </tr>
+                                                <tr>
+                                                    <td>Board:</td>
+                                                    @if (item.Role.Split(",").ToList().IndexOf("Board") >= 0)
+                                                    {
+                                                        <td><input type="checkbox" value="true" checked="checked" name="Board" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td><input type="checkbox" value="false" name="Board" onchange="updatevalue(this);" /></td>
+                                                    }
+                                                </tr>
+                                            </table>
+                                        </form>
+
+                                    </td>
+
+
+                                }
+
+
+                            }
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+<script type="text/javascript">
+        $(document).ready(function () {
+            //
+        })
+        function updatevalue(elem) {
+            if ($(elem).is(':checked')) {
+                $(elem).val(true);
+            } else {
+                $(elem).val(false);
+            }
+        }
+        function Doodlidut(idx) {
+            var url = '@Url.Action("SetInactive", "Manage")';
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: { 'theId': idx },
+                success: function (data) {
+                    if (data == true) {
+                        alert("Inactivated");
+                    }
+                    else {
+                        alert("something is wrong");
+                    }
+                }
+            });
+        }
+        function Doodlidut2(idx) {
+            var url = '@Url.Action("SetActive", "Manage")';
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: { 'theId': idx },
+                success: function (data) {
+                    if (data == true) {
+                        alert("Activated");
+                    }
+                    else {
+                        alert("something is wrong");
+                    }
+                }
+            });
+    }
+    function Doodlidut3(idx) {
+            var url = '@Url.Action("ConfirmMemberShip", "Manage")';
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: { 'theId': idx },
+                success: function (data) {
+                    if (data == true) {
+                        alert("Membership Confirmed");
+                    }
+                    else {
+                        alert("Membership Confirmed");
+                    }
+                }
+            });
+    }
+    function Doodlidut4(idx) {
+            var url = '@Url.Action("ConfirmEmail", "Manage")';
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: { 'theId': idx },
+                success: function (data) {
+                    if (data == true) {
+                        alert("Email Confirmed");
+                    }
+                    else {
+                        alert("something is wrong");
+                    }
+                }
+            });
+        }
+
+</script>
+}

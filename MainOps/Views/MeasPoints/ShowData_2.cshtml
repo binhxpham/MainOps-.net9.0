@@ -1,0 +1,130 @@
+﻿<head>
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" href="@Url.Content("~/css/loadercess.css")" />
+</head>
+
+    <div id="theloader" class="loader" style="align-self:center;"></div>
+    <div class="container">
+        <div id="chart1"></div>
+    </div>
+    
+    <a asp-action="index">@SharedLocalizer.GetLocalizedHtmlString("Return to Index")</a>
+    <form asp-controller="MeasPoints" asp-action="ShowData_2">
+        <input type="hidden" id="graphname" name="theName" value="@ViewData["graphname"]" />
+        <input type="hidden" id="mpId" value="@ViewData["MeasPointId"]" />
+        @Html.DropDownList("theid", ViewData["MeasPoints"] as IEnumerable<SelectListItem>, SharedLocalizer.GetLocalizedHtmlString("Please Select Measurement Point"), new { id = "dropd", name = "theid", style = "width:250px;height:40px;" })
+        <button type="submit" class="btn-hoelscher" >@Localizer["Change Measurement Point"]</button>
+    </form>
+
+    @section scripts{
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js"></script>
+        <script>
+            var thename = document.getElementById('graphname').value;
+            var theid = document.getElementById('mpId').value;
+            var therealdata;
+            var columns = [];
+            var index = 0;
+            var datas = [];
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.load('visualization', '1.0', { 'packages': ['corechart'], 'callback': drawchart });
+            function toggleLoad() {
+                var x = document.getElementById("theloader");
+                if (x.style.display === "none") {
+                    x.style.display = "block";
+                } else {
+                    x.style.display = "none";
+                }
+            }
+            function calculateSeries(joinedData) {
+                var series = {};
+                for (var i = 0; i < joinedData.getNumberOfColumns() - 1; i++) {
+                    var thelabel = joinedData.getColumnLabel(i + 1);
+                    if (thelabel.toLowerCase().includes('flowrate') == 1) {
+                        series[i] = {
+                            type: "line",
+                            targetAxisIndex: 1
+                        };
+                    }
+                    else {
+                        series[i] = {
+                            type: "bars",
+                            targetAxisIndex: 0
+                        };
+                    }
+
+                }
+
+                return series;
+            }
+            function drawchart() {
+                
+                var data = new google.visualization.DataTable();
+                var data2 = new google.visualization.DataTable();
+                data.addColumn('datetime', 'TimeStamp');
+                data.addColumn('number', thename);
+                data2.addColumn('datetime', 'TimeStamp');
+                data2.addColumn('number', thename + ' flowrate');
+                
+                $.post('JsonDataTotalLitersPerDay/' + theid, function (d) { 
+                    alert("hi");
+                    for (i = 0; i < d.length; i++)
+                    {
+                       
+                        var timeStamp = new Date(d[i].timeStamp);
+                        var time = { v: timeStamp, f: moment(timeStamp).format('YYYY-MM-DD HH:mm:ss') };
+                        var val = d[i].dataValue;
+                        data.addRow([time, val]);
+                    }
+                    window.therealdata = data;
+                    $.post('JsonDataFlowRateMinutes/' + theid, function (d2) {
+                        toggleLoad();
+                        for (i = 0; i < d2.length; i++)
+                        {
+                            
+                            var timeStamp = new Date(d2[i].timeStamp);
+                            var time = { v: timeStamp, f: moment(timeStamp).format('YYYY-MM-DD HH:mm:ss') };
+                            var val = d2[i].dataValue;
+                            data2.addRow([time, val]);
+                        }
+                        index = index + 1;
+                        datas.push(index);
+                        var joinData = new google.visualization.data.join(data, data2, 'full', [[0, 0]], datas, [1]);
+                        var chart = new google.visualization.ComboChart(document.getElementById('chart1'));
+                        var options2 =
+                        {
+                            title: "Time Series Data Graph",
+                            width: 900,
+                            height: 650,
+                            interpolateNulls: true,
+                            legend: { position: 'top' },
+                            seriesType: 'bars',
+                            vAxes: {
+                                0: { title: "Liters per day" },
+                                1: { title: "Liters per minute" }
+                            },
+                            chartArea:
+                            {
+                                height: '80%', width: '85%', left: 100,
+                                backgroundColor: { stroke: "gray", strokeWidth: 1 },
+                            },
+                            series: calculateSeries(joinData),
+                            explorer:
+                            {
+                                actions: ['dragToZoom', 'rightClickToReset'],
+                                axis: 'both',
+                                keepInBounds: true,
+                                maxZoomIn: 20.0
+                            },
+                            pointSize: 10
+                        };
+                        
+                        chart.draw(joinData, options2);
+                        window.therealdata = joinData;
+                    }); 
+                    
+                });
+            }
+            
+        </script>
+    }

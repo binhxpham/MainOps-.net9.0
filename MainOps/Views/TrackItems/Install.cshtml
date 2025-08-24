@@ -1,0 +1,171 @@
+﻿@model MainOps.Models.ViewModels.InstallItem2VM
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Install");
+}
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Install Item")</h2>
+<div class="row">
+    <div class="col-xs-12">
+        <form asp-controller="TrackItems" asp-action="Install" method="post" enctype="multipart/form-data">
+            <table style="width:100%;table-layout:fixed;">
+                <tr>
+                    <td><label asp-for="Project">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.Project))</label></td>
+                    <td><select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillItems()"></select></td>
+                </tr>
+                <tr>
+                    <td><b>@Html.DisplayNameFor(x => x.SubProjectId)</b></td>
+                    <td>
+                        <select asp-for="SubProjectId" id="SubProjectId" style="width:100%;height:40px;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("No Sub Projects")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <b>@SharedLocalizer.GetLocalizedHtmlString("Type")</b>
+                    </td>
+                    <td>
+                        @Html.DropDownListFor(Model => Model.ItemTypeId, ViewData["ItemTypeId"] as SelectList, @SharedLocalizer.GetLocalizedHtmlString("All"))
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <b>@SharedLocalizer.GetLocalizedHtmlString("Unique ID(if applicable)")</b>
+                    </td>
+                    <td>
+                        <input asp-for="UniqueID" value="" style="width:100%;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label asp-for="Amount">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.Amount))</label>
+                    </td>
+                    <td>
+                        <input type="number" name="Amount" id="Amount" value="1" style="width:100%" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="TimeStamp" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.TimeStamp))</label></td>
+                    <td>
+                        <input type="text" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd")" asp-for="TimeStamp" id="thetime" style="width:100%;height:40px;" />
+                        <span asp-validation-for="TimeStamp" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <b>@Html.DisplayNameFor(x => x.LogText)</b>
+                    </td>
+                    <td>
+                        <textarea rows="4" cols="28" name="LogText" id="LogText" style="width:100%;"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label></td>
+                    <td><input type="file" name="files" multiple accept=".jpg,.jpeg,.png,.gif,.pdf" style="width:100%" /></td>
+                </tr>
+                <tr>
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Current Accuracy")</b></td>
+                    <td><input type="number" value="0" name="accuracy" id="accuracy" style="width:100%" /></td>
+                </tr>
+            </table>
+            
+            <input type="datetime" value="@DateTime.Now" name="TimeStamp" hidden="hidden" />
+            <input type="number" id="latinput" value="0" name="Latitude" hidden="hidden" />
+            <input type="number" id="longinput" value="0" name="Longitude" hidden="hidden" />
+            <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Update")</button>
+        </form>
+    </div>
+</div>
+<div>
+    <a asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        var myLat = 0, myLng = 0, myAcc = 0;
+        var id;
+        if (navigator.geolocation) {
+           id = navigator.geolocation.watchPosition(function (position) {
+               myLat = position.coords.latitude;
+               myLng = position.coords.longitude;
+               myAcc = position.coords.accuracy;
+               getPos(myLat, myLng,myAcc);
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                                                //alert("error");
+                    }
+
+                }, { maximumAge: 0, timeout: 8000, enableHighAccuracy: true });
+        }
+        function getPos(lat, lng,acc) {
+            $("#accuracy").val(acc);
+            $("#latinput").val(lat);
+            $("#longinput").val(lng);
+        }
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+        }
+        function FillItems() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetItemsProject", "ItemTypes")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                    'type' : "install"
+                },
+                success: function (data) {
+                    var s = '<option value="-1">Please Select</option>'; 
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["item_Type"] + '</option>';
+                    }
+                    $("#ItemTypeId").html(s);  
+                    document.getElementById("ItemTypeId").style.width = "100%";
+                    FillSubProjects();
+                }
+            });
+        }
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-2:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+                $('.date-picker').datepicker("setDate", new Date());
+                document.getElementById('ProjectId').options[1].selected = 'selected';
+                FillItems();
+            });
+        });
+
+    </script>
+}
+

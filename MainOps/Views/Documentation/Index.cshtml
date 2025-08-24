@@ -1,0 +1,125 @@
+﻿
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Documentation");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Documentation")</h2>
+
+<table>
+    <tr>
+        <td>
+            <form asp-action="Generator_Test" asp-controller="Documentation" method="get">
+                <button class="btn-hoelscher" style="width:200px;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Generator Test")</button>
+            </form>
+        </td>
+        <td>
+            <form asp-action="WTP_Test" asp-controller="Documentation" method="get">
+                <button class="btn-hoelscher" style="width:200px;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("WTP Test")</button>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form asp-action="Well_Installation" asp-controller="Documentation" method="get">
+                <button class="btn-hoelscher" style="width:200px;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Well Installation")</button>
+            </form>
+        </td>
+        <td>
+            <form asp-action="Well_Development" asp-controller="Documentation" method="get">
+                <button class="btn-hoelscher" style="width:200px;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Well Development")</button>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form asp-action="Pump_Installation" asp-controller="Documentation" method="get">
+                <button class="btn-hoelscher" style="width:200px;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Pump Installation")</button>
+            </form>
+        </td>
+        <td>
+            <form asp-action="Pump_Commission" asp-controller="Documentation" method="get">
+                <button class="btn-hoelscher" style="width:200px;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Pump Commissioning")</button>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form asp-action="Well_Drilling" asp-controller="Documentation" method="get">
+                <button class="btn-hoelscher" style="width:200px;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Well Drilling")</button>
+            </form>
+        </td>
+        <td>
+            <form asp-action="Daily_Report" asp-controller="Documentation" method="get">
+                    <button class="btn-hoelscher" style="width:200px;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Daily Report")</button>
+            </form>
+        </td>
+    </tr>
+</table>
+    <table>
+        <tr>
+            <td><label style="width:200px;">@SharedLocalizer.GetLocalizedHtmlString("Search Project")</label></td>
+            <td>@Html.DropDownList("MySkills", (IEnumerable<SelectListItem>)ViewData["MySkills"], new { @id = "kstypes",@style="width:200px;" })</td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Search Start date")</label></td>
+            <td><input type="datetime" class="date-picker" name="startdate" id="startdate" /></td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Search End date")</label></td>
+            <td><input type="datetime" class="date-picker" name="enddate" id="enddate" /></td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("User")</label></td>
+            <!-- <td>@Html.DropDownList("who", ViewData["userid"] as SelectList, @SharedLocalizer.GetLocalizedHtmlString("All"), new { @id = "who", @name = "who", @style = "width:200px;" })</td> -->
+            <td><input name="who" id="who" type="text" placeholder="search employee" /></td>
+        </tr>
+        <tr>
+            <td colspan="2"><button type="button" onclick="DisplayKS();">@SharedLocalizer.GetLocalizedHtmlString("Get Reports")</button></td>
+        </tr>
+    </table>
+<div id="data"></div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+100",
+                    dateFormat: 'dd-M-yy',
+                    controlType: 'select',
+                });
+                $("#startdate").datepicker("setDate", "01-Jan-2015");
+                $("#enddate").datepicker("setDate", "31-Dec-2099");
+
+            });
+    }
+        
+    );
+        
+        function DisplayKS() {
+            var startdate = $('#startdate').datepicker('getDate').toISOString();
+            var enddate = $('#enddate').datepicker('getDate').toISOString();
+            $.ajax({
+                type: 'post',
+                url: '@Url.Action("GetDocuments","Documentation")',
+                data: {
+                    'id': $("#kstypes").val(),
+                    'startdate': startdate,
+                    'enddate': enddate,
+                    'who': $("#who").val()
+                },
+                success: function (output) {
+                    $('#data').html(output);
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+        }
+
+    </script>
+}

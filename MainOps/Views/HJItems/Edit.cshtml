@@ -1,0 +1,157 @@
+﻿@model MainOps.Models.HJItem
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>HJItem</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="latitude" />
+            <input type="hidden" asp-for="longitude" />
+            <input type="hidden" asp-for="PathTo3DDrawing" />
+            <input type="hidden" asp-for="PathToPicture" />
+            <input type="hidden" asp-for="DivisionId" />
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="HJItemClassId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.HJItemClassId))</label>
+                @Html.DropDownListFor(Model => Model.HJItemClassId, ViewData["HJItemClassId"] as IEnumerable<SelectListItem>,
+                @SharedLocalizer.GetLocalizedHtmlString("Please Select Item Class"), new { name = "id", style = "width:250px;height:40px;" })
+            </div>
+            <div class="form-group">
+                <label asp-for="HJId" class="control-label"></label>
+                <input asp-for="HJId" class="form-control" />
+                <span asp-validation-for="HJId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="weight" class="control-label"></label>
+                <input asp-for="weight" class="form-control" />
+                <span asp-validation-for="weight" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ItemLength" class="control-label"></label>
+                <input asp-for="ItemLength" class="form-control" />
+                <span asp-validation-for="ItemLength" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ItemWidth" class="control-label"></label>
+                <input asp-for="ItemWidth" class="form-control" />
+                <span asp-validation-for="ItemWidth" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ItemHeight" class="control-label"></label>
+                <input asp-for="ItemHeight" class="form-control" />
+                <span asp-validation-for="ItemHeight" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Comments" class="control-label"></label>
+                <input asp-for="Comments" class="form-control" />
+                <span asp-validation-for="Comments" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Ownership" class="control-label"></label>
+                <input asp-for="Ownership" class="form-control" />
+                <span asp-validation-for="Ownership" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GPS_Tracker" class="control-label"></label>
+                <input asp-for="GPS_Tracker" class="form-control" />
+                <span asp-validation-for="GPS_Tracker" class="text-danger"></span>
+            </div>
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="form-group">
+                    <label asp-for="DivisionId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.DivisionId))</label>
+                    <select asp-for="DivisionId" asp-items="ViewBag.DivisionId"></select>
+                </div>
+            }
+            else
+            {
+                @Html.HiddenFor(Model => Model.DivisionId)
+            }
+            <div class="form-group">
+                <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString("Save")" class="btn btn-default" />
+            </div>
+        </form>
+
+        <table name="phototable1" style="width:100%;table-layout:fixed;">
+            @{ var rows = ViewBag.Photos.Count;
+                var rows2 = ViewBag.GeneralPhotos.Count;
+                var rows3 = ViewBag.Drawings.Count;}
+            @for (int i = 0; i < rows; i++)
+            {
+
+                <tr id="photo_@i">
+                    <td style="width:60%;"><img src="~/images/Items/Photos/@Model.Id/@ViewBag.Photos[i]" style="width:100%;" /></td>
+                    <td style="width:20%;">
+                        <button type="button" class="btn-hoelscher" id="button_@i" onclick="RemovePhoto(@Model.Id,@i);" picturename="@ViewBag.Photos[i]">@SharedLocalizer.GetLocalizedHtmlString("Delete Photo")</button>
+                    </td>
+                    <td style="width:20%;">
+                        <form asp-action="DownloadPhoto" asp-controller="HJItems" method="post">
+                            <input type="hidden" name="theid" value="@Model.Id" />
+                            <input type="hidden" name="thephoto" value="@ViewBag.Photos[i]" />
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Download Photo")</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: false,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: 'dd-M-yy',
+                    controlType: 'select',
+                });
+
+            });
+        });
+         function RemovePhoto(id, idx) {
+            var result = confirm("Are you sure you want to DELETE this photo?");
+            if (result) {
+                var toremove = $("#button_" + idx).attr('picturename');
+                var url = '@Url.Action("RemovePhoto", "HJItems")';
+                $.ajax({
+                    type: 'POST',
+                    url: url,
+                    data: {
+                        'theid': id,
+                        'thephoto': toremove
+                    },
+                    success: function (data) {
+                        document.getElementById('photo_' + idx).style.display = "none";
+                    },
+                    error: function (output) {
+                        alert("Error");
+                    }
+                });
+            }
+        }
+        
+
+    </script>
+}

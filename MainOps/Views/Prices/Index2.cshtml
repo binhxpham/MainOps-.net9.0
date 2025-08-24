@@ -1,0 +1,147 @@
+﻿@model IEnumerable<MainOps.Models.WTPClasses.MainClasses.Price>
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Index");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Prices")</h2>
+<hr class="col-md-11" />
+<br />
+<table>
+    <tr>
+        <td>
+            <a asp-action="Create">@SharedLocalizer.GetLocalizedHtmlString("Create New")</a>
+        </td>
+
+        @using (Html.BeginForm("Combsearch", "Prices", FormMethod.Post))
+        {
+            <td>
+                <div class="form-group">
+                    <div class="ui-widget">
+                        <form asp-controller="Prices" asp-action="Combsearch">
+                            @Html.DropDownList("filterchoice", ViewData["filterchoices"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("All"))
+                            <input id="search" type="text" name="searchstring" placeholder=@SharedLocalizer.GetLocalizedHtmlString("search..") data-url="@Url.Action("AutoComplete","Prices")" />
+                            <button type="submit" class="submit-with-icon">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </td>
+        }
+        <td>
+            <a asp-action="ShowMissingPrices">@Localizer["Show Prices with missing info"]</a>
+        </td>
+        <td>
+            <a asp-action="GetRentalIndex">@SharedLocalizer.GetLocalizedHtmlString("Show Prices from Rental shop")</a>
+        </td>
+    </tr>
+</table>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EkdT)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.size)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.unit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.unit_p)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.rent)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.unit_r)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.division)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EkdT)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.size)
+                </td>
+                <td>
+                    @Html.Raw(item.unit)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.price)
+                </td>
+                <td>
+                    @Html.Raw(item.unit_p)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.rent)
+                </td>
+                <td>
+                    @Html.Raw(item.unit_r)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.division)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> |
+                    <a asp-action="Details" asp-route-id="@item.id">@SharedLocalizer.GetLocalizedHtmlString("Details")</a> |
+                    <a asp-action="Delete" asp-route-id="@item.id">@SharedLocalizer.GetLocalizedHtmlString("Delete")</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section scripts{
+    <script>
+        $(function () {
+            $('#search').autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: $('#search').data("url"),
+                        type: "GET",
+                        dataType: "json",
+                        contentType: 'application/json, charset=utf-8',
+                        data: {
+                            search: $("#search").val()
+                        },
+                        success: function (data) {
+
+                            response($.map(data, function (item) {
+                                return {
+                                    value: item.value,
+                                    label: item.label
+
+                                };
+                            }));
+                        },
+
+                        error: function (xhr, status, error) {
+                            ShowError(error);
+                        }
+                    });
+                },
+                minLength: 1
+            });
+        });
+
+    </script>
+}

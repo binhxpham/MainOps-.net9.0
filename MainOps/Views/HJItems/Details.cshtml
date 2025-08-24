@@ -1,0 +1,123 @@
+﻿@model MainOps.Models.HJItem
+
+@{
+    ViewData["Title"] = "Details";
+}
+<br />
+<br />
+<br />
+<div class="col-xs-12">
+    <table style="width: 100%; border:1px black solid;">
+        <tbody>
+            <tr>
+                <td rowspan="2" align="left" style="width:35%;"><img src="~/images/Divisions/Photos/@Model.DivisionId.ToString()/@Model.Division.LogoPath" style="width:100%;" /></td>
+                <td colspan="2" align="center"  style="border-width:thin;border-style:solid;width:65%;">@Html.DisplayFor(model => model.Name)</td>
+            </tr>
+            <tr>
+                <td align="center" style="border-width:thin;border-style:solid;" >@Html.DisplayNameFor(model => model.HJId)</td>
+                <td align="center"  style="border-width:thin;border-style:solid;">@Html.DisplayFor(model => model.HJId)</td>
+            </tr>
+            <tr>
+                <td rowspan="2" align="left"><img src='@Url.Action("GetQR","HJItems",new { Id = Model.Id })' alt="" height="210" /></td>
+                <td align="center" style="border-width:thin;border-style:solid;" >@Html.DisplayNameFor(model => model.weight)</td>
+                <td align="center" style="border-width:thin;border-style:solid;">@Html.DisplayFor(model => model.weight)</td>
+            </tr>
+            <tr>
+                <td align="center" style="border-width:thin;border-style:solid;" >@Html.DisplayNameFor(model => model.Measures)</td>
+                <td align="center" style="border-width:thin;border-style:solid;word-break:break-word;">@Html.DisplayFor(model => model.Measures)</td>
+            </tr>
+            @*<tr>
+                <td rowspan="2" width="20%" align="left"><img src="~/images/Logos/Lille Logo-hölscher-jensen-sik-CMYK Zusatz_medAddresses.jpg" height="210" /></td>
+                <td colspan="2" align="center" width="80%" height="105" style="border-width:thin;border-style:solid;">@Html.DisplayFor(model => model.Name)</td>
+            </tr>
+            <tr>
+                <td align="center" width="20%" height="105">@Html.DisplayNameFor(model => model.HJId)</td>
+                <td align="center" height="105" style="border-width:thin;border-style:solid;">@Html.DisplayFor(model => model.HJId)</td>
+            </tr>
+            <tr>
+                <td rowspan="2" width="20%" align="left"><img src='@Url.Action("GetQR","HJItems",new { Id = Model.Id })' alt="" height="210" /></td>
+                <td align="center" width="20%" height="105">@Html.DisplayNameFor(model => model.weight)</td>
+                <td align="center" height="105" style="border-width:thin;border-style:solid;">@Html.DisplayFor(model => model.weight)</td>
+            </tr>
+            <tr>
+                <td align="center" width="20%" height="105">@Html.DisplayNameFor(model => model.Measures)</td>
+                <td align="center" height="105" style="border-width:thin;border-style:solid;">@Html.DisplayFor(model => model.Measures)</td>
+            </tr>*@
+        </tbody>
+    </table>
+    @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager") || User.IsInRole("StorageManager"))
+    {
+        <table>
+            <tr>
+                <td>
+                    <form asp-action="UploadPhotoHJItem" asp-controller="HJItems" enctype="multipart/form-data" method="post">
+                        <input type="file" name="files" accept="image/jpeg,image/gif,image/png" />
+                        <input hidden="hidden" name="id" value="@Model.Id" />
+                        <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload Photo")</button>
+                    </form>
+                </td>
+                <td>
+                    <form asp-action="UploadDrawingHJItem" asp-controller="HJItems" enctype="multipart/form-data" method="post">
+                        <input type="file" name="files" accept="image/jpeg,image/gif,image/png,application/pdf,image/x-eps" />
+                        <input hidden="hidden" name="id" value="@Model.Id" />
+                        <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload Drawing")</button>
+                    </form>
+                </td>
+            </tr>
+        </table>
+    }
+    @if (User.IsInRole("ProjectMember") || User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("Member"))
+    {
+        <div class="col-sm-12">
+            @if (ViewBag.GeneralPhotos.Count > 0)
+            {
+                <h3>@SharedLocalizer.GetLocalizedHtmlString("General Photos")</h3>
+                <table>
+                    @foreach (var item in ViewBag.GeneralPhotos)
+                    {
+                        <tr>
+                            <td>
+                                <img src="@String.Concat("/images/ItemClasses/Photos/",Model.HJItemClassId.ToString(),"/",item.ToString().Split("\\")[item.ToString().Split("\\").GetUpperBound(0)])" style="width:100%;" />
+                            </td>
+                        </tr>
+                    }
+                </table>
+            }
+            @if (ViewBag.Photos.Count > 0)
+            {
+                <h3>@SharedLocalizer.GetLocalizedHtmlString("Photos on Sites")</h3>
+                <table>
+                    @foreach (var item in ViewBag.Photos)
+                    {
+                        <tr>
+                            <td>
+                                <img src="@String.Concat("/images/Items/Photos/",Model.Id.ToString(),"/",item.ToString().Split("\\")[item.ToString().Split("\\").GetUpperBound(0)])" style="width:100%;" />
+                            </td>
+                        </tr>
+                    }
+                </table>
+            }
+            @if (ViewBag.Drawings.Count > 0)
+            {
+                <h3>@SharedLocalizer.GetLocalizedHtmlString("Drawings")</h3>
+                <table>
+                    @foreach (var item in ViewBag.Drawings)
+                    {
+                        <tr>
+                            <td>
+                                @if (item.ToString().EndsWith(".pdf"))
+                                {
+                                    <embed src="@String.Concat("/images/Items/Drawings/",Model.Id.ToString(),"/",item.ToString().Split("\\")[item.ToString().Split("\\").GetUpperBound(0)])" width="800" height="600" />
+                                }
+                                else
+                                {
+                                    <img src="@String.Concat("/images/Items/Drawings/",Model.Id.ToString(),"/",item.ToString().Split("\\")[item.ToString().Split("\\").GetUpperBound(0)])" style="width:100%;height:600px;" />
+                                }
+                            </td>
+                        </tr>
+                    }
+                </table>
+            }
+        </div>
+    }
+</div>

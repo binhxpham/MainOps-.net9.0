@@ -1,0 +1,88 @@
+﻿@model IEnumerable<MainOps.Models.WTPCheck>
+
+@{
+    ViewData["Title"] = "WTP Checks";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("WTP Checks")</h2>
+
+<table class="table" style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubProject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EnteredIntoDataBase)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            if (item.Valves == false || item.Pressures.Equals("No") || item.Valves.Equals("No")
+                || item.Water_Clear.Equals("No") || item.Tanks.Equals("No") || item.Suction_Tank == false
+                || item.FlowMeters == false)
+            {
+                <tr style="background-color:red;">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubProject.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TimeStamp)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EnteredIntoDataBase)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DoneBy)
+                    </td>
+                    <td>
+                        <form asp-controller="TrackItems" asp-action="WTPCheckReport_PDF" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            else
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubProject.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TimeStamp)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EnteredIntoDataBase)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DoneBy)
+                    </td>
+                    <td>
+                        <form asp-controller="TrackItems" asp-action="WTPCheckReport_PDF" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+<a asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>

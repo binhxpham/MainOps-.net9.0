@@ -1,0 +1,58 @@
+﻿@model IEnumerable<MainOps.Models.TrackItem>
+@{
+    ViewData["Title"] = "CategorySummary";
+}
+
+<h2>Oversigt</h2>
+<table>
+    <thead>
+        <tr>
+            <td><b>@SharedLocalizer.GetLocalizedHtmlString("Type")</b></td>
+            <td><b>@SharedLocalizer.GetLocalizedHtmlString("Group Dimension")</b></td>
+            <td><b>@SharedLocalizer.GetLocalizedHtmlString("Group TypeNr")</b></td>
+            <td><b>@SharedLocalizer.GetLocalizedHtmlString("Group Count")</b></td>
+            <td><b>@SharedLocalizer.GetLocalizedHtmlString("Group Tag")</b></td>
+            <td><b>@SharedLocalizer.GetLocalizedHtmlString("Description")</b></td>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderBy(x=>x.Category).GroupBy(x => x.Category))
+        {
+        <tr>
+            <td>
+                <b>@Html.DisplayFor(modelItem => item.First().Category)</b>
+            </td>
+        </tr>
+            foreach (var subitem in item.OrderBy(x=>x.Dimension).GroupBy(x => x.Dimension))
+            {
+                <tr>
+                    <td></td>
+                    <td>
+                        <b>@Html.DisplayFor(modelItem => subitem.First().Dimension)</b>
+                    </td>
+                </tr>
+                foreach (var subsubitem in subitem.OrderBy(x=>x.TypeNr).GroupBy(x => x.TypeNr))
+                {               
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <b>@Html.DisplayFor(modelItem => subsubitem.First().TypeNr)</b>
+                    </td>
+                    <td>
+                        @{ int groupsum = @Model.Count(x => x.Category.Equals(subsubitem.First().Category) && x.Dimension.Equals(subsubitem.First().Dimension) && x.TypeNr.Equals(subsubitem.First().TypeNr));}
+                        @groupsum
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => subsubitem.First().TAGnr)
+                    </td>
+
+                    <td>@Html.DisplayFor(modelItem => subsubitem.First().HOFOR_Description)</td>
+                </tr>
+                }
+            }
+
+         }
+
+    </tbody>
+</table>

@@ -1,0 +1,126 @@
+﻿@model MainOps.Models.TrackItem
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>TrackItem</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="TAGnr" class="control-label"></label>
+                <input asp-for="TAGnr" class="form-control" />
+                <span asp-validation-for="TAGnr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PIDnr" class="control-label"></label>
+                <input asp-for="PIDnr" class="form-control" />
+                <span asp-validation-for="PIDnr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RUMnr" class="control-label"></label>
+                <input asp-for="RUMnr" class="form-control" />
+                <span asp-validation-for="RUMnr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="HOFOR_Description" class="control-label"></label>
+                <input asp-for="HOFOR_Description" class="form-control" />
+                <span asp-validation-for="HOFOR_Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Producent" class="control-label"></label>
+                <input asp-for="Producent" class="form-control" />
+                <span asp-validation-for="Producent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Supplier" class="control-label"></label>
+                <input asp-for="Supplier" class="form-control" />
+                <span asp-validation-for="Supplier" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TypeNr" class="control-label"></label>
+                <input asp-for="TypeNr" class="form-control" />
+                <span asp-validation-for="TypeNr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TypeNr2" class="control-label"></label>
+                <input asp-for="TypeNr2" class="form-control" />
+                <span asp-validation-for="TypeNr2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EANnr" class="control-label"></label>
+                <input asp-for="EANnr" class="form-control" />
+                <span asp-validation-for="EANnr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Dimension" class="control-label"></label>
+                <input asp-for="Dimension" class="form-control" />
+                <span asp-validation-for="Dimension" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Certificate" class="control-label"></label>
+                <input asp-for="Certificate" class="form-control" />
+                <span asp-validation-for="Certificate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Comments" class="control-label"></label>
+                <input asp-for="Comments" class="form-control" />
+                <span asp-validation-for="Comments" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Packed" /> @Html.DisplayNameFor(model => model.Packed)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Sent" /> @Html.DisplayNameFor(model => model.Sent)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Received" /> @Html.DisplayNameFor(model => model.Received)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Installed" /> @Html.DisplayNameFor(model => model.Installed)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="IsError" /> @Html.DisplayNameFor(model => model.IsError)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select>
+                <span asp-validation-for="ProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

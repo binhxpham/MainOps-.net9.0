@@ -1,0 +1,223 @@
+﻿@model MainOps.Models.Install
+
+@{
+    ViewData["Title"] = "Edit_Install";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Edit Installation")</h2>
+
+<h4>Installation</h4>
+<hr />
+<div class="row">
+    <div class="col-xs-12">
+        <form asp-action="Edit_Install" method="post" enctype="multipart/form-data">
+            @Html.HiddenFor(Model => Model.Location)
+            @Html.HiddenFor(Model => Model.EnteredIntoDataBase)
+            @Html.HiddenFor(Model => Model.LastEditedInDataBase)
+            @Html.HiddenFor(Model => Model.IsInOperation)
+            <table style="width:100%;">
+                <tr>
+                    <td><label asp-for="ProjectId" class="control-label"></label></td>
+                    <td><select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="SubProjectId" class="control-label"></label></td>
+                    <td><select asp-for="SubProjectId" class="form-control" asp-items="ViewBag.SubProjectId"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select SubProject")</option></select></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="VariationOrderId" class="control-label"></label></td>
+                    <td><select asp-for="VariationOrderId" class="form-control" asp-items="ViewBag.VariationOrderId"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select VariationOrder")</option></select></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="ItemTypeId" class="control-label"></label></td>
+                    <td><select asp-for="ItemTypeId" class="form-control" asp-items="ViewBag.ItemTypeId"></select></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="UniqueID" class="control-label"></label></td>
+                    <td><input asp-for="UniqueID" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Install_Text" class="control-label"></label></td>
+                    <td><input asp-for="Install_Text" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="isInstalled" class="control-label"></label></td>
+                    <td><input asp-for="isInstalled" /> @Html.DisplayNameFor(model => model.isInstalled)</td>
+                </tr>
+                <tr>
+                    <td><label asp-for="DeinstallDate" class="control-label"></label></td>
+                    <td><input type="text" class="date-picker" asp-for="DeinstallDate" style="width:100%;height:40px;" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Amount" class="control-label"></label></td>
+                    <td><input asp-for="Amount" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="TimeStamp" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.TimeStamp))</label></td>
+                    <td>
+                        <input type="text" class="date-picker" asp-for="TimeStamp" id="thetime" style="width:100%;height:40px;" />
+                        <span asp-validation-for="TimeStamp" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="ToBePaid" class="control-label"></label>@SharedLocalizer.GetLocalizedHtmlString("Pay Installation Fee?")</td>
+                    <td><input asp-for="ToBePaid" /> @Html.DisplayNameFor(model => model.ToBePaid)</td>
+                </tr>
+                <tr>
+                    <td><label asp-for="RentalStartDate" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.RentalStartDate))</label></td>
+                    <td>
+                        <input type="text" class="date-picker" asp-for="RentalStartDate" style="width:100%;height:40px;" />
+                        <span asp-validation-for="RentalStartDate" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="InvoiceDate" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.InvoiceDate))</label></td>
+                    <td>
+                        <input type="text" class="date-picker" asp-for="InvoiceDate" style="width:100%;height:40px;" />
+                        <span asp-validation-for="InvoiceDate" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="PayedAmount" class="control-label"></label></td>
+                    <td><input asp-for="PayedAmount" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Latitude" class="control-label"></label></td>
+                    <td><input asp-for="Latitude" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Longitude" class="control-label"></label></td>
+                    <td><input asp-for="Longitude" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="DoneBy" class="control-label"></label></td>
+                    <td><input asp-for="DoneBy" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label>@SharedLocalizer.GetLocalizedHtmlString("Upload Photos")</label></td>
+                    <td><input name="files" type="file" multiple accept=".png,.jpg,.jpeg,.pdf" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Submit")</button></td>
+                </tr>
+            </table>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>            <input type="hidden" asp-for="Id" />
+
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript">
+        function FillSubProjects() {
+            var SubProjectId = $('#SubProjectId').val();
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                        var x = document.getElementById("SubProjectId");
+                        var i;
+                        for (i = 0; i < x.length; i++) {
+                            if (x.options[i].value == SubProjectId) {
+                                x.options[i].selected = true;
+                            }
+                        }
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                    FillVariationOrders();
+                }
+            });
+        }
+        function FillItems() {
+            var ProjectId = $('#ProjectId').val();
+            var itemTypeId = $('#ItemTypeId').val();
+            var url = '@Url.Action("GetItemsProject", "ItemTypes")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                    'type' : "installedit"
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["item_Type"] + '</option>';
+                    }
+                    $("#ItemTypeId").html(s);
+                    document.getElementById("ItemTypeId").style.width = "100%";
+                    var x = document.getElementById("ItemTypeId");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        if (x.options[i].value == itemTypeId) {
+                            x.options[i].selected = true;
+                        }
+                    }
+                    FillSubProjects();
+                }
+            });
+    }
+    function FillVariationOrders() {
+            var ProjectId = $('#ProjectId').val();
+            var variationOrderId = $('#VariationOrderId').val();
+            var url = '@Url.Action("GetVariationOrdersProject", "BoQHeadlines")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["headLine"] + '</option>';
+                    }
+                    $("#VariationOrderId").html(s);
+                    document.getElementById("VariationOrderId").style.width = "100%";
+                    var x = document.getElementById("VariationOrderId");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        if (x.options[i].value == variationOrderId) {
+                            x.options[i].selected = true;
+                        }
+                    }
+                }
+            });
+        }
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-2:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+                FillItems();
+            });
+        });
+
+</script>
+}

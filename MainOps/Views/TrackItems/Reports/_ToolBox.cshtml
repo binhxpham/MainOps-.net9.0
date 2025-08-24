@@ -1,0 +1,115 @@
+﻿@model MainOps.Models.ToolBox
+
+@{
+    Layout = null;
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("Daily Report")</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+
+
+<div class="row">
+    <div class="col-xs-12">
+        <table style="width:100%;">
+            <tr>
+                <td colspan="3">
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("Tool Box Talk")</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.Project.Name)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.Project.Name)
+                </td>
+                <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@Model.Project.Division.Id/@Model.Project.Division.LogoPath" width="151" height="66" /></td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.Project.ProjectNr)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.Project.ProjectNr)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.Project.Client)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.Project.Client)
+                </td>
+
+            </tr>
+
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.Report_Date)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.Report_Date)
+                </td>
+            </tr>
+        </table>
+        <table style="width:100%;">
+            <tr>
+                <td style="width:15%;"><b>@Html.DisplayNameFor(x => x.Work_Tasks)</b></td>
+                <td style="width:60%;"><textarea asp-for="Work_Tasks" cols="30" rows="10" readonly="readonly" style="width:100%;border:none;"></textarea></td>
+                <td style="width:15%;"><b>@Html.DisplayNameFor(x => x.Work_Instructed)</b></td>
+                <td style="width:10%;">@Html.DisplayFor(x => x.Work_Instructed)</td>
+            </tr>
+            <tr>
+                <td style="width:15%;"><b>@Html.DisplayNameFor(x => x.Safety_Aspects)</b></td>
+                <td style="width:60%;"><textarea asp-for="Safety_Aspects" cols="30" rows="10" readonly="readonly" style="width:100%;border:none;"></textarea></td>
+                <td style="width:15%;"><b>@Html.DisplayNameFor(x => x.Safety_Instructed)</b></td>
+                <td style="width:10%;">@Html.DisplayFor(x => x.Safety_Instructed)</td>
+            </tr>
+            <tr>
+                <td style="width:15%;"><b>@Html.DisplayNameFor(x => x.Dangerous_Work)</b></td>
+                <td style="width:60%;"><textarea asp-for="Dangerous_Work" cols="30" rows="10" readonly="readonly" style="width:100%;border:none;"></textarea></td>
+                <td style="width:15%;"><b>@Html.DisplayNameFor(x=>x.Dangerous_Work_Instructed)</b></td>
+                <td style="width:10%;">@Html.DisplayFor(x=>x.Dangerous_Work_Instructed)</td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(x => x.Comments)</b></td>
+                <td colspan="3"><textarea asp-for="Comments" cols="30" rows="6" readonly="readonly" style="width:100%;border:none;"></textarea></td>
+            </tr>
+        </table>
+        <table>
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.users.First().name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.users.First().signature)
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.users)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.name)
+                        </td>
+                        <td>
+                            <img src="data:image;base64,@item.signature" width="200" height="120" />
+                        </td>
+                    </tr>
+                 }
+            </tbody>
+        </table>
+    </div>
+</div>

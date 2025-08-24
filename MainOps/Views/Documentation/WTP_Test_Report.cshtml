@@ -1,0 +1,595 @@
+﻿@model MainOps.Models.ReportClasses.WTP_Test
+
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@Html.DisplayFor(model => model.Test_name)</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Water Treatment Plant Inspection");
+}
+<table>
+    <tr>
+        
+        <td align="left" style="width:60%"><b>@SharedLocalizer.GetLocalizedHtmlString("Project") : @Model.Project.Name</b></td>
+        <td rowspan="3" align="right"><img src="~/images/Divisions/Photos/@Model.Project.Division.Id/@Model.Project.Division.LogoPath"/></td>
+    </tr>
+    <tr>
+        <td><b>@SharedLocalizer.GetLocalizedHtmlString("Client") : @Model.Project.Client</b></td>
+    </tr>
+    <tr>
+        <td><b>@SharedLocalizer.GetLocalizedHtmlString("Ground Water Management")</b></td>
+    </tr>
+</table>
+
+
+<table>
+    <thead>
+        <tr>
+            <td style="width:60%">
+                <b>
+                    @SharedLocalizer.GetLocalizedHtmlString("Operation and inspection works")
+                </b>
+            </td>
+            <td style="width:10%">
+                <b>
+                    @SharedLocalizer.GetLocalizedHtmlString("Checked")
+                </b>
+            </td>
+            <td style="width:30%">
+                <b>
+                    @SharedLocalizer.GetLocalizedHtmlString("Comment")
+                </b>
+            </td>
+        </tr>
+    </thead>
+    <tr>
+        <td>
+            <b>
+                @Html.DisplayNameFor(x => x.Visual_Check)
+            </b>
+        </td>
+        <td>
+            @if (Model.Visual_Check)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.Visual_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @Html.DisplayNameFor(x => x.Organoleptic_Check)
+            </b>
+        </td>
+        <td>
+            @if (Model.Organoleptic_Check)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.Organoleptic_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @Html.DisplayNameFor(x => x.Filters_Check)
+            </b>
+        </td>
+        <td>
+            @if (Model.Filters_Check)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.Filters_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @Html.DisplayNameFor(x => x.Manifolds_Check)
+            </b>
+        </td>
+        <td>
+            @if (Model.Manifolds_Check)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.Manifolds_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @Html.DisplayNameFor(x => x.Valves_Check)
+            </b>
+        </td>
+        <td>
+            @if (Model.Valves_Check)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.Valves_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @Html.DisplayNameFor(x => x.Water_Levels_Check)
+            </b>
+        </td>
+        <td>
+            @if (Model.Water_Levels_Check)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.Water_Levels_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @Html.DisplayNameFor(x => x.Control_Cabinet_Check)
+            </b>
+        </td>
+        <td>
+            @if (Model.Control_Cabinet_Check)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.Control_Cabinet_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @Html.DisplayNameFor(x => x.Power_Check)
+            </b>
+        </td>
+        <td>
+            @if (Model.Power_Check)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.Power_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @Html.DisplayNameFor(x => x.Alarm_Check)
+            </b>
+        </td>
+        <td>
+            @if (Model.Alarm_Check)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.Alarm_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @Html.DisplayNameFor(x => x.Calibration_Check)
+            </b>
+        </td>
+        <td>
+            @if (Model.Calibration_Check)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.Calibration_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @Html.DisplayNameFor(x => x.Electrical_Check)
+            </b>
+        </td>
+        <td>
+            @if (Model.Electrical_Check)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.Electrical_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @Html.DisplayNameFor(x => x.Cleaing_Check)
+            </b>
+        </td>
+        <td>
+            @if (Model.Cleaing_Check)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.Cleaing_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @Html.DisplayNameFor(x => x.Sample_Check)
+            </b>
+        </td>
+        <td>
+            @if (Model.Sample_Check)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.Sample_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @if (Model.S1_Check > 0)
+                {
+                    @Html.DisplayNameFor(x => x.S1_Check) @SharedLocalizer.GetLocalizedHtmlString("Level :") @Html.DisplayFor(x => x.S1_Check)
+                }
+                else
+                {
+                    @Html.DisplayNameFor(x => x.S1_Check)
+                }
+            </b>
+        </td>
+        <td>
+            @if (Model.S1_Check_1)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.S1_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @if (Model.S2_Check > 0)
+                {
+                    @Html.DisplayNameFor(x => x.S2_Check) @SharedLocalizer.GetLocalizedHtmlString("Level :") @Html.DisplayFor(x => x.S2_Check)
+                }
+                else
+                {
+                    @Html.DisplayNameFor(x => x.S2_Check)
+                }
+            </b>
+        </td>
+        <td>
+            @if (Model.S2_Check_2)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.S2_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @if (Model.S3_Check > 0)
+                {
+                    @Html.DisplayNameFor(x => x.S3_Check) @SharedLocalizer.GetLocalizedHtmlString("Level :") @Html.DisplayFor(x => x.S3_Check)
+                }
+                else
+                {
+                    @Html.DisplayNameFor(x => x.S3_Check)
+                }
+            </b>
+        </td>
+        <td>
+            @if (Model.S3_Check_3)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.S3_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @Html.DisplayNameFor(x => x.F1_Check) : @Html.DisplayFor(x => x.F1_Check)
+            </b>
+            <br />
+            <b>
+                @Html.DisplayNameFor(x => x.F2_Check) : @Html.DisplayFor(x => x.F2_Check)
+            </b>
+            <br />
+            <b>
+                @Html.DisplayNameFor(x => x.F3_Check) : @Html.DisplayFor(x => x.F3_Check)
+            </b>
+        </td>
+        <td>
+            @if (Model.F_Check)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.F_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @Html.DisplayNameFor(x => x.AG1_Check) : @Html.DisplayFor(x => x.AG1_Check)
+            </b>
+            <br />
+            <b>
+                @Html.DisplayNameFor(x => x.AG2_Check) : @Html.DisplayFor(x => x.AG2_Check)
+            </b>
+            <br />
+            <b>
+                @Html.DisplayNameFor(x => x.AG3_Check) : @Html.DisplayFor(x => x.AG3_Check)
+            </b>
+        </td>
+        <td>
+            @if (Model.AG_Check)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.AG_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @Html.DisplayNameFor(x => x.Exchange_Check)
+            </b>
+        </td>
+        <td>
+            @if (Model.Exchange_Check)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.Exchange_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @if (Model.SandFilter_Amount > 0)
+                {
+                    @Html.DisplayNameFor(x => x.SandFilter_Check) @SharedLocalizer.GetLocalizedHtmlString("Amount :") @Html.DisplayFor(x => x.SandFilter_Amount)
+                }
+                else
+                {
+                    @Html.DisplayNameFor(x => x.SandFilter_Check)
+                }
+            </b>
+        </td>
+        <td>
+            @if (Model.SandFilter_Check)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.SandFilter_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <b>
+                @if (Model.GACFilter_Amount > 0)
+                {
+                    @Html.DisplayNameFor(x => x.GACFilter_Check) @SharedLocalizer.GetLocalizedHtmlString("Amount: ") @Html.DisplayFor(x => x.GACFilter_Amount)
+                }
+                else
+                {
+                    @Html.DisplayNameFor(x => x.GACFilter_Check)
+                }
+            </b>
+        </td>
+        <td>
+            @if (Model.GACFilter_Check)
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle>
+            }
+            else
+            {
+                <span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle>
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(x => x.GACFilter_Comment)
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">@Html.DisplayNameFor(x => x.Manganese_Inlet)</td>
+        <td>@Html.DisplayFor(x => x.Manganese_Inlet)</td>
+    </tr>
+    <tr>
+        <td colspan="2">@Html.DisplayNameFor(x => x.Manganese_outlet)</td>
+        <td>@Html.DisplayFor(x => x.Manganese_outlet)</td>
+    </tr>
+    <tr>
+        <td colspan="2">@Html.DisplayNameFor(x => x.pH_Inlet)</td>
+        <td>@Html.DisplayFor(x => x.pH_Inlet)</td>
+    </tr>
+    <tr>
+        <td colspan="2">@Html.DisplayNameFor(x => x.pH_outlet)</td>
+        <td>@Html.DisplayFor(x => x.pH_outlet)</td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <b>
+                @Html.DisplayNameFor(x => x.Executed_Works)
+            </b>
+        </td>
+
+    </tr>
+    <tr rowspan="3">
+        <td colspan="3">
+            @Html.DisplayFor(x => x.Executed_Works)
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <b>
+                @Html.DisplayNameFor(x => x.Coordination_Description)
+            </b>
+        </td>
+
+    </tr>
+    <tr rowspan="3">
+        <td colspan="3">
+            @Html.DisplayFor(x => x.Coordination_Description)
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2"><b>@Html.DisplayNameFor(x => x.Unusual_Event)</b></td>
+        <td><b>@Html.DisplayNameFor(x => x.Date_Done)</b></td>
+    </tr>
+    <tr rowspan="3">
+        <td colspan="2">@Html.DisplayFor(x => x.Unusual_Event)</td>
+        <td>@Html.DisplayFor(x => x.Date_Done)</td>
+    </tr>
+</table>
+      
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datetimepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+                $('.date-picker').datetimepicker("setDate", new Date());
+
+            });
+        });
+
+    </script>
+}

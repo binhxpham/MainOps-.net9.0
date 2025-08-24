@@ -1,0 +1,44 @@
+﻿@model MainOps.Models.WorkTaskEnd
+
+<form asp-action="EndTask" method="post" enctype="multipart/form-data">
+    @Html.HiddenFor(Model => Model.WorkTask.Comments_Office)
+    @Html.HiddenFor(Model => Model.WorkTask.DateToDo)
+    @Html.HiddenFor(Model => Model.WorkTask.InChargeId)
+    @Html.HiddenFor(Model => Model.WorkTask.SubProjectId)
+    @Html.HiddenFor(Model => Model.WorkTask.ProjectId)
+    @Html.HiddenFor(Model => Model.WorkTask.Id)
+    @Html.HiddenFor(Model => Model.WorkTask.IsStarted)
+    @Html.HiddenFor(Model => Model.WorkTask.TimeFinished)
+    @Html.HiddenFor(Model => Model.WorkTask.WorkerId)
+    <h2>@SharedLocalizer.GetLocalizedHtmlString("The Task"):@Html.DisplayFor(Model => Model.WorkTask.Comments_Office)</h2>
+    <h3>@SharedLocalizer.GetLocalizedHtmlString("Sub Tasks"):</h3>
+    @for(int i = 0; i < Model.WorkItems.Count; i++)
+    {
+        @Html.HiddenFor(Model => Model.WorkItems[i].Id)
+        @Html.HiddenFor(Model => Model.WorkItems[i].WorkTaskId)
+        @Html.HiddenFor(Model => Model.WorkItems[i].WorkTask)
+        @Html.HiddenFor(Model => Model.WorkItems[i].Photos)
+        @Html.HiddenFor(Model => Model.WorkItems[i].TimeFinished)
+        @Html.HiddenFor(Model => Model.WorkItems[i].Comment_Worker)
+        @Html.HiddenFor(Model => Model.WorkItems[i].Description)      
+        <table style="width:100%;table-layout:fixed;word-break:break-word;">
+            <tr>
+                <td style="width:85%;">@Html.DisplayFor(Model => Model.WorkItems[i].Description) </td>
+                <td style="width:15%;"><input asp-for="@Model.WorkItems[i].IsFinished" type="checkbox" value="@Model.WorkItems[i].IsFinished" onclick="$(this).val(this.checked ? true : false)" /></td>
+            </tr>
+        </table>
+    }
+    <table style="width:100%;table-layout:fixed;word-break:break-word;">
+        <tr>
+            <td style="width:30%"><label asp-for="WorkTask.Comments_Workers" class="control-label" style="width:100%;"></label></td>
+            <td style="width:70%;"><textarea asp-for="WorkTask.Comments_Workers" cols="40" rows="4" style="width:100%;" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Final Notes..")"></textarea></td>
+        </tr>
+        <tr>
+            <td style="width:30%"><label class="control-label" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Photos after end task")</label></td>
+            <td style="width:70%"><input name="files" type="file" multiple accept=".jpg,.jpeg,.png,.pdf" style="width:100%;" /></td>
+        </tr>
+        <tr>
+            <td colspan="2"><button class="btn-hoelscher" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("End Task")</button></td>
+        </tr>
+    </table>
+</form>

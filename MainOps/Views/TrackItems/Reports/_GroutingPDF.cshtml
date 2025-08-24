@@ -1,0 +1,190 @@
+﻿@model MainOps.Models.Grouting
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Grout Report</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM"></script>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+<body>
+    <table style="width:100%;">
+        <tr>
+            <td colspan="2" style="width:45%;"><h2>@SharedLocalizer.GetLocalizedHtmlString("Grout Report")</h2></td>
+            <td colspan="2" align="right" style="width:55%;"><img src="~/images/Divisions/Photos/@Model.Project.DivisionId/@Model.Project.Division.LogoPath" width="151" height="66" /></td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.Project.Name)</b></td>
+            <td>@Html.DisplayFor(Model => Model.Project.Name)</td>
+            <td colspan="2" rowspan="11">
+                <div class="continer">
+                    <img src="@String.Concat("https://maps.googleapis.com/maps/api/staticmap?center=",@Model.Latitude,",",@Model.Longitude,"&zoom=15&size=500x400&maptype=roadmap&scale=2&markers=size:mid%7Ccolor:red%7Clabel:P%7C",@Model.Latitude,",",@Model.Longitude,"&key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM")" style="width:500px;height:400px;" />
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.SubProjectId)</b></td>
+            <td>@Html.DisplayFor(Model => Model.SubProject.Name)</td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.StartTime)</b></td>
+            <td>
+                @Html.DisplayFor(Model => Model.StartTime)
+            </td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.EndTime)</b></td>
+            <td>
+                @Html.DisplayFor(Model => Model.EndTime)
+            </td>
+        </tr>
+
+        @if (Model.Totalm3_override != null)
+        {
+            <tr>
+                <td><b>@Html.DisplayNameFor(Model => Model.Totalm3_override)</b></td>
+                <td>@String.Format("{0:n3} m3", Model.Totalm3_override)</td>
+            </tr>
+        }
+        else
+        {
+            <tr>
+                <td><b>@Html.DisplayNameFor(Model => Model.Totalm3)</b></td>
+                <td>@String.Format("{0:n3} m3", Model.Totalm3)</td>
+            </tr>
+        }
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.WaterMeterStart)</b></td>
+            <td>@String.Format("{0:n3} m3", Model.WaterMeterStart)</td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.WaterMeterEnd)</b></td>
+            <td>@String.Format("{0:n3} m3", Model.WaterMeterEnd)</td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.Latitude)</b></td>
+            <td>
+                @Html.DisplayFor(Model => Model.Latitude)
+            </td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.Longitude)</b></td>
+            <td>
+                @Html.DisplayFor(Model => Model.Longitude)
+            </td>
+        </tr>
+        @if (Model.Location != "" && Model.Location != null)
+        {
+            <tr>
+                <td><b>@Html.DisplayNameFor(Model => Model.Location)</b></td>
+                <td>
+                    @Html.DisplayFor(Model => Model.Location)
+                </td>
+            </tr>
+        }
+        @if (Model.Comments != null && Model.Comments != "")
+        {
+            <tr>
+                <td><b>@Html.DisplayNameFor(Model => Model.Comments)</b></td>
+                <td>
+                    @Html.DisplayFor(Model => Model.Comments)
+                </td>
+            </tr>
+        }
+        else
+        {
+            <tr>
+                <td></td>
+                <td></td>
+            </tr>
+        }
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.DoneBy)</b></td>
+            <td>
+                @Html.DisplayFor(Model => Model.DoneBy)
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2" style="font-size:14px;"><b>@SharedLocalizer.GetLocalizedHtmlString("Before Photo")</b></td>
+            <td colspan="2" style="font-size:14px;"><b>@SharedLocalizer.GetLocalizedHtmlString("Before Sealing Photo")</b></td>
+        </tr>
+        <tr>
+            @try
+            {
+                <td colspan="2"><img src="@String.Concat("/AHAK/", @String.Concat(Model.Before_Photos.First().path.Split(".")[0], "_edit.", Model.Before_Photos.First().path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;height:300px;" /></td>
+            }
+            catch
+            {
+                <td colspan="2"></td>
+            }
+
+
+            @try
+            {
+                <td colspan="2">
+                    <img src="@String.Concat("/AHAK/", @String.Concat(Model.Grout_Photos.First().path.Split(".")[0], "_edit.", Model.Grout_Photos.First().path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width: 100%;height: 300px;" />
+                </td>
+            }
+            catch
+            {
+                <td colspan="2"></td>
+            }
+
+        </tr>
+        <tr>
+            <td colspan="2" style="font-size:14px;"><b>@SharedLocalizer.GetLocalizedHtmlString("After Sealing Photo")</b></td>
+            <td colspan="2" style="font-size:14px;"><b>@SharedLocalizer.GetLocalizedHtmlString("Time Series Flow-rate")</b></td>
+        </tr>
+        <tr>
+            @try
+            {
+                <td colspan="2">
+                    <img src="@String.Concat("/AHAK/", @String.Concat(Model.After_Photos.First().path.Split(".")[0], "_edit.", Model.After_Photos.First().path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width: 100%;height: 300px;" />
+                </td>
+            }
+            catch
+            {
+                <td colspan="2"></td>
+            }
+
+
+            @try
+            {
+                <td colspan="2"><img src="@Model.imagepath" style="width:100%;height:300px;" /></td>
+            }
+            catch
+            {
+                <td colspan="2"></td>
+            }
+
+        </tr>
+        @try
+        {
+            <tr>
+                <td colspan="2" style="font-size:14px;"><b>@SharedLocalizer.GetLocalizedHtmlString("Water Meter Before Photo")</b></td>
+                <td colspan="2" style="font-size:14px;"><b>@SharedLocalizer.GetLocalizedHtmlString("Water Meter After Photo")</b></td>
+            </tr>
+            <tr>
+                <td colspan="2"><img src="@String.Concat("/AHAK/", @String.Concat(Model.WM_Before_Photos.First().path.Split(".")[0], "_edit.", Model.WM_Before_Photos.First().path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;height:300px;" /></td>
+                <td colspan="2">
+                    <img src="@String.Concat("/AHAK/", @String.Concat(Model.WM_After_Photos.First().path.Split(".")[0], "_edit.", Model.WM_After_Photos.First().path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width: 100%;height: 300px;" />
+                </td>
+            </tr>
+        }
+        catch
+        {
+
+        }
+
+    </table>
+</body>
+</html>
+
+
+
+
+

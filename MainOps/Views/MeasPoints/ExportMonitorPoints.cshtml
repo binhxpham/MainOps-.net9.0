@@ -1,0 +1,59 @@
+﻿@model MainOps.Models.ExportMonitorPointsViewModel
+<link href="~/css/jquery-ui-timepicker-addon.min.css" rel="stylesheet" />
+
+
+<h2>@ViewData["Title"]</h2>
+
+<h4>@SharedLocalizer.GetLocalizedHtmlString("Measurement Points")</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="ExportMonitorPoints" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="projectNumber" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.projectNumber))</label>
+                @Html.DropDownListFor(m => m.projectNumber, ViewData["ProjectId"] as IEnumerable<SelectListItem>
+    ,
+    @SharedLocalizer.GetLocalizedHtmlString("Select Project (choose none if all)"), new { style = "width:250px;height:40px;" })
+                <span asp-validation-for="projectNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Delimiter" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.Delimiter))</label>
+                @Html.DropDownListFor(m => m.Delimiter, ViewData["delimiters"] as IEnumerable<SelectListItem>
+    , @SharedLocalizer.GetLocalizedHtmlString("Select CSV-Delimiter"), new { style = "width:250px;height:40px;" })
+                <span asp-validation-for="Delimiter" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="searchfield" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.searchfield))</label>
+                <input asp-for="searchfield" />
+                <span asp-validation-for="searchfield" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Kronos" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.Kronos))</label>
+                <input asp-for="Kronos" />
+                <span asp-validation-for="Kronos" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LaborWerte" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.LaborWerte))</label>
+                <input asp-for="LaborWerte" />
+                <span asp-validation-for="Kronos" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UseExternalCoords" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.UseExternalCoords))</label>
+                <input asp-for="UseExternalCoords" value="false" onchange="this.checked ? this.value = true : this.value = false;" />
+                <span asp-validation-for="UseExternalCoords" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString("Create")" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,93 @@
+﻿@model MainOps.Models.UploadSamples
+
+<div class="row">
+    <div class="col-xs-2">
+        <form asp-action="UploadSamples" asp-controller="WaterSampleTypes" enctype="multipart/form-data" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <table>
+                <tr>
+                    <td><label asp-for="ProjectId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.ProjectId))</label></td>
+                    <td><select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillWaterSamplePoints();" onload="FillWaterSamplePoints();"><option>@SharedLocalizer.GetLocalizedHtmlString("Please select Project")</option></select></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="WaterSamplePlaceId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.WaterSamplePlaceId)))</label></td>
+                    <td>
+                        <select asp-for="WaterSamplePlaceId" class="form-control" asp-items="ViewBag.WaterSamplePlaceId" onchange="FillMeasPoints();">
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label asp-for="Dato" class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Dato")</label>
+                    </td>
+                    <td>
+                        <input type="text" class="date-picker" name="Dato" id="Dato" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label asp-for="NextSample" class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Date Next Sample")</label>
+                    </td>
+                    <td>
+                        <input asp-for="NextSample" type="datetime-local" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label>@SharedLocalizer.GetLocalizedHtmlString("Choose file")</label></td>
+                    <td><input type="file" id="postedFile" name="postedFile" class="form-control" accept=".csv" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="submit" title="Upload" value="Upload" onclick="StartSpinner();" class="btn-hoelscher" />
+                    </td>
+                </tr>
+            </table>
+
+        </form>
+    </div>
+</div>
+<br />
+<br />
+<br />
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-2:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+                });
+                $('.date-picker').datepicker("setDate", new Date());
+
+            });
+        });
+        function FillWaterSamplePoints() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetWaterSamplePlacesProject", "WaterSampleTypes")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {'theId' : ProjectId},
+                success: function (data) {
+                    var s = '<option value="-1">Please Select</option>'; 
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                    }
+                    $("#WaterSamplePlaceId").html(s);  
+                    document.getElementById("WaterSamplePlaceId").style.width = "100%";
+                }
+            });
+        }
+    </script>
+}
+

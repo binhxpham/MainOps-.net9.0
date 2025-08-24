@@ -1,0 +1,53 @@
+﻿@using Microsoft.AspNetCore.Localization;
+<head>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM&sensor=false&libraries=places"></script>
+</head>
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Directions");
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var theculture = requestCulture.RequestCulture.UICulture.Name;
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Directions")</h2>
+<input id="theculturediv" value="@theculture" hidden="hidden">
+<div id="myDiv" style="width:100%;height:500px;"></div>
+
+
+@section Scripts {
+<script type="text/javascript">
+        $(document).ready(function () {
+            DisplayGoogleMap();
+        });
+    function DisplayGoogleMap() {
+        var theculturediv = document.getElementById("theculturediv").value;
+        
+        var myLatLng = { lat: 55.682936, lng: 12.3729016 };
+        if (theculturediv == "nl-NL") {
+            myLatLng = { lat: 51.8313073, lng: 4.5564272 };
+        }
+            //Create Options or set different Characteristics of Google Map
+            var mapOptions = {
+                center: myLatLng,
+                zoom: 15,
+                minZoom: 3,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            //Display the Google map in the div control with the defined Options
+            var map = new google.maps.Map(document.getElementById("myDiv"), mapOptions);
+            var marker = new google.maps.Marker({
+                  map: map,
+                  position: { lat: myLatLng.lat, lng: myLatLng.lng },
+                  title: "Hölscher Jensen A/S",
+            });
+            marker['infowindow'] = new google.maps.InfoWindow({
+                content: "Hölscher Jensen A/S : Fabriksparken 37, 2600 Glostrup"
+            });
+
+            google.maps.event.addListener(marker, 'click', function () {
+                this['infowindow'].open(map, this);
+            });
+            marker.setMap(map);
+        }
+</script>
+    }

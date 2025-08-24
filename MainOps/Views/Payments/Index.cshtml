@@ -1,0 +1,83 @@
+﻿@model IEnumerable<MainOps.Models.Payment>
+
+@{
+    ViewData["Title"] = "Index";
+}
+@if (User.IsInRole("International"))
+{
+    <div style="width:100%;">
+        <form asp-action="MainMenu_HIH" asp-controller="TrackItems">
+            <button class="btn-hoelscher" style="width:100%;height:36px;">
+                @SharedLocalizer.GetLocalizedHtmlString("Back to Main Menu")
+            </button>
+        </form>
+    </div>
+}
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Payments")</h2>
+
+<p>
+    <a asp-action="Create">@SharedLocalizer.GetLocalizedHtmlString("Add new Payment")</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubProject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PaymentID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PayDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Taxes)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Name)
+                </td>
+                <td>
+                    @if(item.SubProjectId != null)
+                {
+                    @Html.DisplayFor(modelItem => item.SubProject.Name)
+                }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PaymentID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Amount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PayDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TimeStamp)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Taxes)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Delete")</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,92 @@
+﻿
+@{
+    ViewData["Title"] = "WorkTaskText";
+}
+
+<h2>WorkTaskText</h2>
+
+<table style="width:100%;table-layout:fixed;">
+    <tr>
+        <td><input type="datetime-local" id="Report_date" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" style="width:100%;" /></td>
+        <td><select id="ProjectId" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();" style="width:100%;"></select></td>
+        <td><select id="SubProjectId" style="width:100%;"></select></td>
+        <td><input type="text" id="userid" value="7afbcfc6-5eea-4854-816b-4f716fe4e792" style="width:100%;" /></td>
+    </tr>
+    <tr>
+        <td colspan="4">            
+            <textarea cols="100" rows="20" id="thetext" name="thetext" style="width:100%;"></textarea>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="4"><button type="button" class="btn-hoelscher" onclick="GetText();" style="width:100%;">Get Text!</button></td>
+    </tr>
+</table>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                document.getElementById('ProjectId').options[1].selected = 'selected';
+                FillSubProjects();
+            });
+        });
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+        }
+        function GetText() {
+            var ProjectId = $("#ProjectId").val();
+            var SubProjectId = $("#SubProjectId").val();
+            var date = $('#Report_date').val();//datepicker("getDate");
+            var date2 = $("#Report_date").datepicker("getDate");
+            var date3 = date.substr(0,10);
+
+            //var date2 = new Date(date.getDate());
+            alert(date);
+            alert(date2);
+            alert(date3);
+            var userid = $("#userid").val();
+            var url = '@Url.Action("GetTaskText", "WorkTasks")';
+            alert("hiere");
+            $.ajax({
+                type: 'GET',
+                url: url,
+                contentType: "application/json; charset=utf-8",
+                data: {
+                    'ProjectId': ProjectId,
+                    'SubProjectId': SubProjectId,
+                    'dato2': date3,
+                    'userid': userid,},
+                success: function (data) {
+                    $("#thetext").val(data);
+                },
+                error: function (err) {
+                    alert(err);
+                }
+            });
+        }
+        
+
+    </script>
+}

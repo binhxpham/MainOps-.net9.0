@@ -1,0 +1,54 @@
+﻿@model IEnumerable<MainOps.Models.WaterSampleStandardLimit>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<p><a asp-action="Index" asp-controller="WaterSampleTypes">@SharedLocalizer.GetLocalizedHtmlString("Back to Main WaterSample Page")</a></p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.WaterSamplePlaceType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MaxLimit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MeanLimit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Komponent)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.WaterSamplePlaceType.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaxLimit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MeanLimit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Komponent)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

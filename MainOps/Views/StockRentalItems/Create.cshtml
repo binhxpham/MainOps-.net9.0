@@ -1,0 +1,183 @@
+﻿@model MainOps.Models.StockRentalItem
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h4>@SharedLocalizer.GetLocalizedHtmlString("Create Rental Item")</h4>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <table>
+            <tr>
+                <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Search Master Class")</label></td>
+                <td> <select id ="HJItemMasterClassId" name="HJItemMasterClassId" class="form-control" asp-items="ViewBag.HJItemMasterClassId" onchange="UpdateClasses();"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Search Master Category")</option></select></td>
+
+            </tr>
+            <tr>
+                <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Search Sub Class")</label></td>
+                <td> <select id ="HJItemClassId" name="HJItemClassId" class="form-control" asp-items="ViewBag.HJItemItemClassId" onchange="UpdateItems();"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Search Sub Category")</option></select></td>
+
+            </tr>
+        </table>
+        <form asp-action="Create" id="theform" onsubmit="retrieveData(event);" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="HJItemId" class="control-label"></label>
+                <select asp-for="HJItemId" class="form-control" asp-items="ViewBag.HJItemId" onchange="UpdateItemNumber();"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Item")</option></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="ItemNumber" class="control-label"></label>
+                <input asp-for="ItemNumber" class="form-control" />
+                <span asp-validation-for="ItemNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Company" class="control-label"></label>
+                <input asp-for="Company" class="form-control" />
+                <span asp-validation-for="Company" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ContactPerson" class="control-label"></label>
+                <input asp-for="ContactPerson" class="form-control" />
+                <span asp-validation-for="ContactPerson" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input type="email" asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PhoneNr" class="control-label"></label>
+                <input type="text" asp-for="PhoneNr" class="form-control" />
+                <span asp-validation-for="PhoneNr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StartTime" class="control-label"></label>
+                <input type="date" asp-for="StartTime" value="@DateTime.Now.Date.ToString("yyyy-MM-dd")" class="form-control" />
+                <span asp-validation-for="StartTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EndTime" class="control-label"></label>
+                <input type="date" asp-for="EndTime" class="form-control" />
+                <span asp-validation-for="EndTime" class="text-danger"></span>
+            </div>
+            <div class="form-group" hidden="hidden">
+                <label asp-for="TimeSetup" class="control-label"></label>
+                <input type="date" asp-for="TimeSetup" class="form-control" />
+                <span asp-validation-for="TimeSetup" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RentalFee" class="control-label"></label>
+                <input asp-for="RentalFee" class="form-control" />
+                <span asp-validation-for="RentalFee" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rental_UnitId" class="control-label"></label>
+                <select asp-for="Rental_UnitId" class="form-control" value="3" asp-items="ViewBag.Rental_UnitId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Photos_Delivery" class="control-label"></label>
+                <input name="Photos_before" type="file" multiple="multiple" accept=".jpg,.jpeg" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Photos_Return" class="control-label"></label>
+                <input name="Photos_after" type="file" multiple="multiple" accept=".jpg,.jpeg" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript">
+        $(document).ready(function () {
+            document.querySelector('#Rental_UnitId > option[value="3"]').setAttribute('selected', true);
+
+        });
+
+
+
+        function UpdateItemNumber() {
+            var selected_text = $('#HJItemId option:selected')
+                .toArray().map(item => item.text).join();
+            $("#ItemNumber").val(selected_text);
+        }
+
+
+        function retrieveData(e) {
+            var posting = false;
+            if ($("#theform").valid() == false) {
+                e.preventDefault();
+                posting = false;
+            }
+            else {
+                posting = true;
+            }
+            if (posting == true) {
+                StartSpinner();
+            }
+        }
+        function UpdateClasses() {
+            var MasterClassId = $('#HJItemMasterClassId').val();
+            var ClassId = $('#HJItemClassId').val();
+            var url = '@Url.Action("GetHJItemClassesJson", "StockRentalItems")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'MasterClass': MasterClassId
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["classNumber"] + ' : ' + data[prop]["className"] + '</option>';
+                    }
+                    $("#HJItemClassId").html(s);
+                    var x = document.getElementById("HJItemClassId");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        if (x.options[i].value == ClassId) {
+                            x.options[i].selected = true;
+                        }
+                    }
+                }
+            });
+    }
+    function UpdateItems() {
+            var ClassId = $('#HJItemClassId').val();
+            var ItemId = $('#HJItemId').val();
+            var url = '@Url.Action("GetHJItemsJson", "StockRentalItems")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'Class': ClassId
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["theid"] + ' : ' + data[prop]["name"] + '</option>';
+                    }
+                    $("#HJItemId").html(s);
+                    var x = document.getElementById("HJItemId");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        if (x.options[i].value == ItemId) {
+                            x.options[i].selected = true;
+                        }
+                    }
+                }
+            });
+        }
+</script>
+}

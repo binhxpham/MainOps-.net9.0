@@ -1,0 +1,334 @@
+﻿@model MainOps.Models.ViewModels.ArrivalItem3VM
+
+@{
+    ViewData["Title"] = "Arrival";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Arrival / Put on rent")</h2>
+
+<form asp-controller="TrackItems" asp-action="Arrival" method="post" enctype="multipart/form-data" onsubmit="StartSpinner();">
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td><label asp-for="Project">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.Project))</label></td>
+            <td><select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillItems()" style="width:100%;"></select></td>
+        </tr>
+        @if (User.IsInRole("International") && !User.IsInRole("Admin"))
+        {
+            <tr hidden="hidden">
+                <td><b>@Html.DisplayNameFor(x => x.SubProjectId)</b></td>
+                <td>
+                    <select asp-for="SubProjectId" id="SubProjectId" style="width:100%;height:40px;">
+                        <option value="">@SharedLocalizer.GetLocalizedHtmlString("No Sub Projects")</option>
+                    </select>
+                </td>
+            </tr>
+            <tr hidden="hidden">
+                <td>
+                    <label>@SharedLocalizer.GetLocalizedHtmlString("From")</label>
+                </td>
+                <td>
+                    <select asp-for="@Model.MobilisationId" style="width:100%;">
+                        <option value="3">Transport from Denmark</option>
+                        <option value="2">Transport from Germany</option>
+                    </select>
+
+                </td>
+            </tr>
+        }
+        else
+        {
+            <tr>
+                <td><b>@Html.DisplayNameFor(x => x.SubProjectId)</b></td>
+                <td>
+                    <select asp-for="SubProjectId" id="SubProjectId" style="width:100%;height:40px;">
+                        <option value="">@SharedLocalizer.GetLocalizedHtmlString("No Sub Projects")</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><label asp-for="VariationOrderId" class="control-label"></label></td>
+                <td><select asp-for="VariationOrderId" class="form-control" asp-items="ViewBag.VariationOrderId"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select VariationOrder")</option></select></td>
+            </tr>
+            <tr>
+                <td>
+                    <label>@SharedLocalizer.GetLocalizedHtmlString("From")</label>
+                </td>
+                <td>
+                    <select asp-for="@Model.MobilisationId" style="width:100%;">
+                        <option value="3">Transport from Denmark</option>
+                        <option value="2">Transport from Germany</option>
+                    </select>
+
+                </td>
+            </tr>
+        }
+        <tr>
+            <td><label asp-for="TimeStamp" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.TimeStamp))</label></td>
+            <td>
+                <input type="text" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd")" asp-for="TimeStamp" id="thetime" style="width:100%;height:40px;" />
+                <span asp-validation-for="TimeStamp" class="text-danger"></span>
+            </td>
+        </tr>
+        @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+        {
+            <tr>
+                <td><label asp-for="InvoiceDate" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.InvoiceDate))</label></td>
+                <td>
+                    <input type="text" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd")" asp-for="InvoiceDate" style="width:100%;height:40px;" />
+                    <span asp-validation-for="InvoiceDate" class="text-danger"></span>
+                </td>
+            </tr>
+        }
+        <tr>
+            <td>
+                <b>@Html.DisplayNameFor(x => x.LogText)</b>
+            </td>
+            <td>
+                <textarea rows="4" cols="28" name="LogText" id="LogText" style="width:100%"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label></td>
+            <td><input type="file" name="files" multiple accept=".jpg,.jpeg,.png,.gif,.pdf" style="width:100%" /></td>
+        </tr>
+        <tr>
+            <td><b>@SharedLocalizer.GetLocalizedHtmlString("Current Accuracy")</b></td>
+            <td><input type="number" value="0" name="accuracy" id="accuracy" style="width:100%" /></td>
+        </tr>
+        <tr>
+            <td>
+                <b>@SharedLocalizer.GetLocalizedHtmlString("Type")</b>
+            </td>
+            <td>
+                @Html.DropDownList("itemtypeid", ViewData["ItemTypeId"] as SelectList, @SharedLocalizer.GetLocalizedHtmlString("All"), new { @id = "ItemTypeId", @onchange = "FindUnit();" })
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>@SharedLocalizer.GetLocalizedHtmlString("Unique ID")</label>
+            </td>
+            <td>
+                <input type="text" name="UniqueID" id="UniqueID" value="N/A" style="width:100%" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>@SharedLocalizer.GetLocalizedHtmlString("Amount")</label>
+            </td>
+            <td>
+                <input type="number" name="Amount" id="Amount" value="1" style="width:100%" />
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <label>@SharedLocalizer.GetLocalizedHtmlString("Unit")</label>
+            </td>
+            <td>
+                <input type="text" disabled="disabled" id="TheUnit" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><input type="button" onclick="AddItem();" value="@SharedLocalizer.GetLocalizedHtmlString("Add Item to Arrival List")" class="btn-hoelscher" style="width:100%;height:50px;" /></td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Item IDs")</td>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Item Unique IDs")</td>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Item Names")</td>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Item Amounts")</td>
+        </tr>
+        <tr>
+            <td><textarea cols="20" rows="6" id="itemtypes" name="ItemTypeIds" value="" style="width:100%;"></textarea></td>
+            <td><textarea cols="20" rows="6" id="UniqueIDs" name="UniqueIDs" value="" style="width:100%;"></textarea></td>
+            <td><textarea cols="20" rows="6" id="itemtypenames" name="itemtypenames" value="" style="width:100%;"></textarea></td>
+            <td><textarea cols="20" rows="6" id="amounts" name="Amounts" value="" style="width:100%;"></textarea></td>
+        </tr>
+    </table>
+    <input type="number" id="latinput" value="0" name="Latitude" hidden="hidden" />
+    <input type="number" id="longinput" value="0" name="Longitude" hidden="hidden" />
+    <button type="submit" class="btn-hoelscher" style="width:200px;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Submit Arrivals!")</button>
+</form>
+
+<div>
+    <a asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript">
+        var myLat = 0, myLng = 0, myAcc = 0;
+        var id;
+        if (navigator.geolocation) {
+           id = navigator.geolocation.watchPosition(function (position) {
+               myLat = position.coords.latitude;
+               myLng = position.coords.longitude;
+               myAcc = position.coords.accuracy;
+               getPos(myLat, myLng,myAcc);
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                                                //alert("error");
+                    }
+
+                }, { maximumAge: 0, timeout: 8000, enableHighAccuracy: true });
+        }
+        function getPos(lat, lng,acc) {
+            $("#accuracy").val(acc);
+            $("#latinput").val(lat);
+            $("#longinput").val(lng);
+
+        }
+        function FindUnit() {
+            var itemid = $("#ItemTypeId option:selected").val();
+            var url = '@Url.Action("GetUnit", "ItemTypes")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: {
+                    'theId': itemid
+                },
+                success: function (data) {
+                    if (data == "pr. l") {
+                        $("#TheUnit").val("Liter");
+                    }
+                    else if (data == "pr. m") {
+                        $("#TheUnit").val("Meter");
+                    }
+                    else {
+                        $("#TheUnit").val(data);
+                    }
+
+                }
+            });
+        }
+        function AddItem() {
+            var itemid = $("#ItemTypeId option:selected").val();
+            var itemname = $("#ItemTypeId option:selected").text();
+            var amount = $("#Amount").val();
+            var uniqueid = $("#UniqueID").val();
+            if ($("#itemtypes").val() == "") {
+                $("#itemtypes").val(itemid);
+            }
+            else {
+                $("#itemtypes").val($("#itemtypes").val() + "," + itemid)
+            }
+            if ($("#itemtypenames").val() == "") {
+                $("#itemtypenames").val(itemname);
+            }
+            else {
+                $("#itemtypenames").val($("#itemtypenames").val() + "," + itemname)
+            }
+            if ($("#amounts").val() == "") {
+                $("#amounts").val(amount);
+            }
+            else {
+                $("#amounts").val($("#amounts").val() + "," + amount)
+            }
+            if ($("#UniqueIDs").val() == "") {
+                $("#UniqueIDs").val(uniqueid);
+            }
+            else {
+                $("#UniqueIDs").val($("#UniqueIDs").val() + "," + uniqueid)
+            }
+            $("#Amount").val("1");
+
+        }
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                    FillVariationOrders();
+                }
+            });
+        }
+        function FillVariationOrders() {
+            var ProjectId = $('#ProjectId').val();
+            var variationOrderId = $('#VariationOrderId').val();
+            var url = '@Url.Action("GetVariationOrdersProject", "BoQHeadlines")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["headLine"] + '</option>';
+                    }
+                    $("#VariationOrderId").html(s);
+                    document.getElementById("VariationOrderId").style.width = "100%";
+                    var x = document.getElementById("VariationOrderId");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        if (x.options[i].value == variationOrderId) {
+                            x.options[i].selected = true;
+                        }
+                    }
+                }
+            });
+        }
+        function FillItems() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetItemsProject", "ItemTypes")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                    'type' : "arrival"
+                },
+                success: function (data) {
+                    var s = '<option value="-1">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["item_Type"] + '</option>';
+                    }
+                    $("#ItemTypeId").html(s);
+                    document.getElementById("ItemTypeId").style.width = "100%";
+                    FillSubProjects();
+                }
+            });
+        }
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-2:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select',
+                    firstDay: 1
+
+                });
+                $('.date-picker').datepicker("setDate", new Date());
+                //document.getElementById('ProjectId').options[0].selected = 'selected';
+                FillItems();
+            });
+        });
+
+</script>
+}
+
+

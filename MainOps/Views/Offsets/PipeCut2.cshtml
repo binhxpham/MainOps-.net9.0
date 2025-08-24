@@ -1,0 +1,82 @@
+﻿@model MainOps.Models.PipeCutViewModel2
+@{
+    ViewData["Title"] = "PipeCut";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Cut / Extend Pipe")</h2>
+
+
+<div class="row">
+    <div class="col-xs-12">
+        <form asp-action="PipeCut2" asp-controller="Offsets" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <table style="width:100%;">
+                <tr>
+                    <td><label asp-for="ProjectId" class="control-label"></label></td>
+                    <td><select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillMeasPoints();"></select></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="MeasPointId" class="control-label"></label></td>
+                    <td><select asp-for="MeasPointId" class="form-control" asp-items="ViewBag.MeasPointId"></select></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="meters_cut" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.meters_cut))</label></td>
+                    <td><input asp-for="meters_cut" type="number" step="0.01" min="-10000" max="999999" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="start_time" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.start_time))</label></td>
+                    <td><input type="datetime" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd HH:mm")" asp-for="start_time" style="width:250px;height:40px;" /></td>
+                </tr>
+                <tr>
+                    <td><label>@SharedLocalizer.GetLocalizedHtmlString("Upload Photos")</label></td>
+                    <td><input type="file" multiple accept=".jpg,.jpeg,.png" name="files" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><button class="btn-hoelscher" style="width:100%;height:50px;">@SharedLocalizer.GetLocalizedHtmlString("Cut/Extend the pipe")</button></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</div>
+<br />
+<div>
+    <form asp-action="AHAK" asp-controller="TrackItems"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Back To List")</button></form>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+                $('.date-picker').datepicker("setDate", new Date("dd-MM-yy"));
+
+            });
+        }); 
+        function FillMeasPoints() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetMeasPointsWLProject", "MeasPoints")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {'theId' : ProjectId},
+                success: function (data) {
+                    var s = '<option value="-1">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                    }
+                    $("#MeasPointId").html(s);
+                    document.getElementById("MeasPointId").style.width = "100%";
+                }
+            });
+        }
+    </script>
+}

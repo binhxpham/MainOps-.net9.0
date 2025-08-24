@@ -1,0 +1,221 @@
+﻿@model MainOps.Models.Grouting
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Grout Graph</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js"></script>
+</head>
+<body>
+    <table style="width:100%;">
+        <tr>
+            <td colspan="2" style="width:40%;"><h2>@SharedLocalizer.GetLocalizedHtmlString("Grout Report")</h2></td>
+            <td colspan="2" align="right" style="width:60%;"><img src="~/images/Divisions/Photos/@Model.Project.DivisionId/@Model.Project.Division.LogoPath" width="151" height="66" /></td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.Project.Name)</b></td>
+            <td>@Html.DisplayFor(Model => Model.Project.Name)</td>
+            <td colspan="2" rowspan="11">
+                <div class="continer">
+                    <img src="@String.Concat("https://maps.googleapis.com/maps/api/staticmap?center=",@Model.Latitude,",",@Model.Longitude,"&zoom=15&size=600x400&maptype=roadmap&scale=2&markers=size:mid%7Ccolor:red%7Clabel:P%7C",@Model.Latitude,",",@Model.Longitude,"&key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM")" style="width:600px;height:400px;" />
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.SubProjectId)</b></td>
+            <td>@Html.DisplayFor(Model => Model.SubProject.Name)</td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.StartTime)</b></td>
+            <td>
+                @Html.DisplayFor(Model => Model.StartTime)
+            </td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.EndTime)</b></td>
+            <td>
+                @Html.DisplayFor(Model => Model.EndTime)
+            </td>
+        </tr>
+
+        @if (Model.Totalm3_override != null)
+        {
+            <tr>
+                <td><b>@Html.DisplayNameFor(Model => Model.Totalm3_override)</b></td>
+                <td>@String.Format("{0:n3} m3", Model.Totalm3_override)</td>
+            </tr>
+        }
+        else
+        {
+            <tr>
+                <td><b>@Html.DisplayNameFor(Model => Model.Totalm3)</b></td>
+                <td>@String.Format("{0:n3} m3", Model.Totalm3)</td>
+            </tr>
+        }
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.WaterMeterStart)</b></td>
+            <td>
+                @String.Format("{0:n3} m3", Model.WaterMeterStart)
+            </td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.WaterMeterEnd)</b></td>
+            <td>
+                @String.Format("{0:n3} m3", Model.WaterMeterEnd)
+            </td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.Latitude)</b></td>
+            <td>
+                @Html.DisplayFor(Model => Model.Latitude)
+            </td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.Longitude)</b></td>
+            <td>
+                @Html.DisplayFor(Model => Model.Longitude)
+            </td>
+        </tr>
+        @if(Model.Location != "" && Model.Location != null) { 
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.Location)</b></td>
+            <td>
+                @Html.DisplayFor(Model => Model.Location)
+            </td>
+        </tr>
+        }
+        <tr><td><b>@Html.DisplayNameFor(Model => Model.DoneBy)</b></td><td>@Html.DisplayFor(Model => Model.DoneBy)</td></tr>
+        @if (Model.Comments != null)
+        {
+            <tr><td colspan="2"><b>@Html.DisplayNameFor(Model => Model.Comments)</b></td></tr>
+            <tr><td colspan="2">@Html.DisplayFor(Model => Model.Comments)</td></tr>
+        }
+        else
+        {
+            <tr><td colspan="2"></td></tr>
+            <tr><td colspan="2"></td></tr>
+        }
+
+    </table>
+
+    <div class="container">
+        <div id="chart1" style="width:90%;"></div>
+    </div>
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td style="font-size:14px;"><b>@SharedLocalizer.GetLocalizedHtmlString("Before Photo")</b></td>
+            <td style="font-size:14px;"><b>@SharedLocalizer.GetLocalizedHtmlString("Before Sealing Photo")</b></td>
+            <td style="font-size:14px;"><b>@SharedLocalizer.GetLocalizedHtmlString("After Sealing Photo")</b></td>
+        </tr>
+        <tr>
+
+            @try
+            {
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(Model.Before_Photos.First().path.Split(".")[0], "_edit.", Model.Before_Photos.First().path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+            }
+            catch
+            {
+                <td></td>
+            }
+
+
+            @try
+            {
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(Model.Grout_Photos.First().path.Split(".")[0], "_edit.", Model.Grout_Photos.First().path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+            }
+            catch
+            {
+                <td></td>
+            }
+            @try
+            {
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(Model.After_Photos.First().path.Split(".")[0], "_edit.", Model.After_Photos.First().path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+            }
+            catch
+            {
+                <td></td>
+            }
+        </tr>
+        @try
+        {
+            <tr>
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(Model.WM_Before_Photos.First().path.Split(".")[0], "_edit.", Model.WM_Before_Photos.First().path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(Model.WM_After_Photos.First().path.Split(".")[0], "_edit.", Model.WM_After_Photos.First().path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                <td></td>
+            </tr>
+        }
+        catch
+        {
+
+        }
+
+    </table>
+    <div>
+        <form asp-action="Grouting_PDF" asp-controller="TrackItems" asp-route-id="@Model.Id" method="post" target="_blank" onsubmit="saveimage();">
+            <input hidden="hidden" id="imageid" name="theimage" />
+            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Get PDF")</button>
+        </form>
+    </div>
+    <script>
+        var chart;
+            google.charts.load('current', { 'packages': ['corechart'] });
+            google.load('visualization', '1.0', { 'packages': ['corechart'], 'callback': drawchart });
+        function saveImage() {
+                $('#imageid').val(chart.getImageURI());
+            }
+            function drawchart() {
+                chart = new google.visualization.LineChart(document.getElementById('chart1'));
+                var data = new google.visualization.DataTable();
+                data.addColumn('datetime', 'time');
+                data.addColumn('number', 'Flow Rate');
+                var options = {
+                    title: "Time Series Grout Graph",
+                    width: 1000,
+                    height: 750,
+                    interpolateNulls: true,
+                    legend: { position: 'top' },
+                    vAxes: {
+                        0: { title: "m3 / h" }
+                    },
+                    chartArea: {
+                        height: '80%', width: '85%', left: 100,
+                        backgroundColor: { stroke: "gray", strokeWidth: 1 },
+                    },
+                    series: {
+                        0: {
+                            type: "line",
+                            targetAxisIndex: 0
+                        }
+                    },
+                    explorer: {
+                        actions: ['dragToZoom', 'rightClickToReset'],
+                        axis: 'both',
+                        keepInBounds: true,
+                        maxZoomIn: 20.0
+                    },
+                    pointSize: 8
+                };
+
+
+                @foreach (var item in Model.Data.OrderBy(x=>x.TimeStamp))
+                {
+                 <text>
+                     var val = @item.FlowData;
+                    var date = new Date('@item.TimeStamp.ToString("yyyy-MM-ddTHH:mm:ss")');
+                    data.addRow([date,val]);
+                  </text>
+                }
+                chart.draw(data, options);
+                saveImage();
+            }
+
+    </script>
+</body>
+</html>
+
+
+
+
+

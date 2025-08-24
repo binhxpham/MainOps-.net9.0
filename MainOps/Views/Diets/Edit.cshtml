@@ -1,0 +1,406 @@
+﻿@model MainOps.Models.Diet
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Allowances - Accommodation")</h2>
+
+<hr />
+
+<form asp-action="Edit" method="post" onsubmit="retrieveData(event);">
+    <input asp-for="UserId" hidden="hidden" />
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td style="width:100%;"><label asp-for="FullName" class="control-label" style="width:100%;"></label></td>
+            <td style="width:100%;"><input asp-for="FullName" class="form-control" style="width:100%;" readonly="readonly" /></td>
+            <td style="width:100%;"><label asp-for="EmployeeNumber" class="control-label" style="width:100%;"></label></td>
+            <td style="width:100%;"><input asp-for="EmployeeNumber" class="form-control" style="width:100%;" readonly="readonly" /></td>
+        </tr>
+        <tr>
+            <td style="width:100%;"><label asp-for="PayPeriod" class="control-label" style="width:100%;"></label></td>
+            <td style="width:100%;"><input asp-for="PayPeriod" class="form-control" style="width:100%;" /></td>
+            <td style="width:100%;"><label asp-for="ProjectId" class="control-label" style="width:100%;"></label></td>
+            <td style="width:100%;">
+                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" style="width:100%;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select Project")</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td style="width:100%;"><label asp-for="HourlyPaid" class="control-label" style="width:100%;"></label></td>
+            <td style="width:100%;">@Html.EditorFor(Model => Model.HourlyPaid)</td>
+            <td style="width:100%;"></td>
+            <td style="width:100%;"></td>
+        </tr>
+    </table>
+    <br />
+    <table style="width:100%;table-layout:fixed;border:1px solid black;">
+        <thead>
+            <tr>
+                <th>@SharedLocalizer.GetLocalizedHtmlString("Start Date/Time")</th>
+                <th>@SharedLocalizer.GetLocalizedHtmlString("End Date/Time")</th>
+                <th>@SharedLocalizer.GetLocalizedHtmlString("Site name")</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="width:100%;"> <input type="datetime" class="date-picker" value="@Convert.ToDateTime(@Model.Day1_start).ToString("yyyy-MM-dd HH:mm")" asp-for="Day1_start" onchange="CalculateDaysAndHours();" style="width:100%;height:36px;" /></td>
+                <td style="width:100%;"> <input type="datetime" class="date-picker" value="@Convert.ToDateTime(@Model.Day1_end).ToString("yyyy-MM-dd HH:mm")" asp-for="Day1_end" onchange="CalculateDaysAndHours();" style="width:100%;height:36px;" /></td>
+                <td style="width:100%;"><input asp-for="WorkPlaceName1" class="form-control" style="width:100%;" /></td>
+            </tr>
+            <tr>
+                <td style="width:100%;"> <input type="datetime" class="date-picker" asp-for="Day2_start" onchange="CalculateDaysAndHours();" style="width:100%;height:36px;" /></td>
+                <td style="width:100%;"> <input type="datetime" class="date-picker" asp-for="Day2_end" onchange="CalculateDaysAndHours();" style="width:100%;height:36px;" /></td>
+                <td style="width:100%;"><input asp-for="WorkPlaceName2" class="form-control" style="width:100%;" /></td>
+            </tr>
+            <tr>
+                <td style="width:100%;"> <input type="datetime" class="date-picker" asp-for="Day3_start" onchange="CalculateDaysAndHours();" style="width:100%;height:36px;" /></td>
+                <td style="width:100%;"> <input type="datetime" class="date-picker" asp-for="Day3_end" onchange="CalculateDaysAndHours();" style="width:100%;height:36px;" /></td>
+                <td style="width:100%;"><input asp-for="WorkPlaceName3" class="form-control" style="width:100%;" /></td>
+            </tr>
+            <tr>
+                <td style="width:100%;"> <input type="datetime" class="date-picker" asp-for="Day4_start" onchange="CalculateDaysAndHours();" style="width:100%;height:36px;" /></td>
+                <td style="width:100%;"> <input type="datetime" class="date-picker" asp-for="Day4_end" onchange="CalculateDaysAndHours();" style="width:100%;height:36px;" /></td>
+                <td style="width:100%;"><input asp-for="WorkPlaceName4" class="form-control" style="width:100%;" /></td>
+            </tr>
+            <tr>
+                <td style="width:100%;"> <input type="datetime" class="date-picker" asp-for="Day5_start" onchange="CalculateDaysAndHours();" style="width:100%; height:36px;" /></td>
+                <td style="width:100%;"> <input type="datetime" class="date-picker" asp-for="Day5_end" onchange="CalculateDaysAndHours();" style="width:100%; height:36px;" /></td>
+                <td style="width:100%;"><input asp-for="WorkPlaceName5" class="form-control" style="width:100%;" /></td>
+            </tr>
+            <tr>
+                <td style="width:100%;"> <input type="datetime" class="date-picker" asp-for="Day6_start" style="width:100%; height:36px;" /></td>
+                <td style="width:100%;"> <input type="datetime" class="date-picker" asp-for="Day6_end" style="width:100%; height:36px;" /></td>
+                <td style="width:100%;"><input asp-for="WorkPlaceName6" class="form-control" style="width:100%;" /></td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+    <h4>
+        @SharedLocalizer.GetLocalizedHtmlString("Allowance is calculated with reference to the section about allowances in the pamflet 'Hourly paid in HJ'")
+    </h4>
+    <br />
+    <table style="border:2px solid black;width:100%;table-layout:fixed;">
+        <thead style="background-color:lightgrey;">
+            <tr>
+                <th>
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("Calculation of Allowance")</b>
+                </th>
+                <th>
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("Amount of days")</b>
+                </th>
+                <th>
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("Unit")</b>
+                </th>
+                <th>
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("Rate pr. day")</b>
+                </th>
+                <th>
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("Subtotal")</b>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="5"><b>@SharedLocalizer.GetLocalizedHtmlString("Accomodation")</b></td>
+            </tr>
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.SelfContainedExpenses)</td>
+                <td><input asp-for="SelfContainedExpenses" onchange="CalculateSelfContainedExpenses();" style="width:100%;" /></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("days x")</td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("kr. ") @String.Format("{0:n2}", @Model.SelfContainedExpensesRate) =</td>
+                <td><input asp-for="SelfContainedExpensesSubTotal" readonly="readonly" style="width:100%;" /></td>
+            </tr>
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.LivingInCamperWagon)</td>
+                <td><input asp-for="LivingInCamperWagon" onchange="CalculateLivingInCamper();" style="width:100%;" /></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("days x")</td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("kr. ") @String.Format("{0:n2}", @Model.LivingInCamperWagonRate) =</td>
+                <td><input asp-for="LivingInCamperWagonSubTotal" readonly="readonly" style="width:100%;" /></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="5">
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("Diets")</b>
+                </td>
+            </tr>
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.CalculationOfDietsAndSmallNecessities)</td>
+                <td><input asp-for="CalculationOfDietsAndSmallNecessities" onchange="CalculateCalculations();" style="width:100%;" /></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("days x")</td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("kr. ") @String.Format("{0:n2}", @Model.CalculationOfDietsAndSmallNecessitiesRate) =</td>
+                <td><input asp-for="CalculationOfDietsAndSmallNecessitiesSubTotal" readonly="readonly" style="width:100%;" /></td>
+            </tr>
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.HourAddon)</td>
+                <td><input asp-for="HourAddon" onchange="CalculateHours();" style="width:100%;" /></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("hours x")</td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("kr. ") @String.Format("{0:n2}", @Model.HourAddonRate) =</td>
+                <td><input asp-for="HourAddonSubTotal" readonly="readonly" style="width:100%;" /></td>
+            </tr>
+            <tr>
+                <td colspan="5">
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("Deductions")</b>
+                </td>
+            </tr>
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.DeductionBreakFast)</td>
+                <td><input asp-for="DeductionBreakFast" onchange="CalculateBreakFast();" style="width:100%;" /></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("days x")</td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("kr. ") @String.Format("{0:n2}", @Model.DeductionBreakFastRate) =</td>
+                <td><input asp-for="DeductionBreakFastSubTotal" readonly="readonly" style="width:100%;" /></td>
+            </tr>
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.DeductionLunch)</td>
+                <td><input asp-for="DeductionLunch" onchange="CalculateLunch();" style="width:100%;" /></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("days x")</td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("kr. ") @String.Format("{0:n2}", @Model.DeductionLunchRate) =</td>
+                <td><input asp-for="DeductionLunchSubTotal" readonly="readonly" style="width:100%;" /></td>
+            </tr>
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.DeductionDinner)</td>
+                <td><input asp-for="DeductionDinner" onchange="CalculateDinner();" style="width:100%;" /></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("days x")</td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("kr. ") @String.Format("{0:n2}", @Model.DeductionDinnerRate) =</td>
+                <td><input asp-for="DeductionDinnerSubTotal" readonly="readonly" style="width:100%;" /></td>
+            </tr>
+            <tr>
+                <td colspan="4" style="text-align:left;"><b><label asp-for="Total"></label></b></td>
+                <td>
+                    <input asp-for="Total" readonly="readonly" style="width:100%;" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td colspan="2"><b>@SharedLocalizer.GetLocalizedHtmlString("Signature Supervisor")</b></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <canvas width="480" height="185" id="signature" style="border:1px solid blue;"></canvas>
+                <span asp-validation-for="SignatureSupervisor" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td style="width:45%">
+                <button type="button" id="accept" class="btn-hoelscher" style="width:100%;height:40px;">@SharedLocalizer.GetLocalizedHtmlString("Accept signature")</button>
+            </td>
+            <td style="width:45%">
+                <button type="button" id="clear" class="btn-hoelscher" style="width:100%;height:40px;">@SharedLocalizer.GetLocalizedHtmlString("Clear signature")</button>
+                <input type="text" id="signaturedata" hidden="hidden" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <img width="80" height="60" id="savetarget" hidden="hidden" style="border:1px solid black">
+            </td>
+        </tr>
+
+    </table>
+    <input asp-for="SignatureSupervisor" value="" hidden="hidden" />
+    <input asp-for="SignatureEmployee" value="@Model.SignatureEmployee" hidden="hidden" />
+    <input asp-for="DeductionDinnerRate" value="@Model.DeductionDinnerRate" hidden="hidden" />
+    <input asp-for="DeductionLunchRate" value="@Model.DeductionLunchRate" hidden="hidden" />
+    <input asp-for="DeductionBreakFastRate" value="@Model.DeductionBreakFastRate" hidden="hidden" />
+    <input asp-for="HourAddonRate" value="@Model.HourAddonRate" hidden="hidden" />
+    <input asp-for="CalculationOfDietsAndSmallNecessitiesRate" value="@Model.CalculationOfDietsAndSmallNecessitiesRate" hidden="hidden" />
+    <input asp-for="LivingInCamperWagonRate" value="@Model.LivingInCamperWagonRate" hidden="hidden" />
+    <input asp-for="SelfContainedExpensesRate" value="@Model.SelfContainedExpensesRate" hidden="hidden" />
+    <br />
+    <button class="btn-hoelscher" type="submit" style="width:100%;height:50px;">@SharedLocalizer.GetLocalizedHtmlString("Submit")</button>
+
+</form>
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/mvc/3.0/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/js/signature_pad.min.js"></script>
+    <script type="text/javascript">
+        var pad = null;
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datetimepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-2:+0",
+                    dateFormat: "dd-MM-yy",
+                    timeFormat: "HH:mm",
+                    showSecond: false,
+                    showMillisec: false,
+                    showMicrosec: false,
+                    showTimezone: false,
+                    controlType: 'select'
+
+                });
+
+
+            });
+        });
+        $(document).ready(function () {
+            $(function () {
+                var canvas = document.querySelector("#signature");
+                pad = new SignaturePad(canvas);
+                $('#accept').click(function () {
+                    var data = pad.toDataURL();
+                    $('#savetarget').attr('src', data);
+                    var base64signature = data.split(',')[1];
+                    $('#signaturedata').val(base64signature);
+                });
+                $('#clear').click(function () {
+                    pad.clear();
+                })
+
+            })
+        });
+
+        function retrieveData(e) {
+            var posting = true;
+            var s1 = document.getElementById("SignatureSupervisor");
+            var signature = "";
+            signature = document.getElementById("signaturedata").value;
+            s1.value = signature;
+            if (signature == "") {
+                posting = false;
+                e.preventDefault();
+                alert("Please sign the report!");
+            }
+            if ($("#theform").valid() == false) {
+                e.preventDefault();
+                posting = false;
+            }
+            if (posting == true) {
+                StartSpinner();
+            }
+        }
+
+        function CalculateDinner() {
+            var subtotal = $("#DeductionDinner").val() * $("#DeductionDinnerRate").val();
+            $("#DeductionDinnerSubTotal").val(subtotal.toFixed(2));
+            CalculateTotal();
+        }
+        function CalculateLunch() {
+            var subtotal = $("#DeductionLunch").val() * $("#DeductionLunchRate").val();
+            $("#DeductionLunchSubTotal").val(subtotal.toFixed(2));
+            CalculateTotal();
+        }
+        function CalculateHours() {
+            var subtotal = $("#HourAddon").val() * $("#HourAddonRate").val();
+            $("#HourAddonSubTotal").val(subtotal.toFixed(2));
+            CalculateTotal();
+        }
+        function CalculateCalculations() {
+            var subtotal = $("#CalculationOfDietsAndSmallNecessities").val() * $("#CalculationOfDietsAndSmallNecessitiesRate").val();
+            $("#CalculationOfDietsAndSmallNecessitiesSubTotal").val(subtotal.toFixed(2));
+            CalculateTotal();
+        }
+        function CalculateLivingInCamper() {
+            var subtotal = $("#LivingInCamperWagon").val() * $("#LivingInCamperWagonRate").val();
+            $("#LivingInCamperWagonSubTotal").val(subtotal.toFixed(2));
+            CalculateTotal();
+        }
+        function CalculateBreakFast() {
+            var subtotal = $("#DeductionBreakFast").val() * $("#DeductionBreakFastRate").val();
+            $("#DeductionBreakFastSubTotal").val(subtotal.toFixed(2));
+            CalculateTotal();
+        }
+        function CalculateSelfContainedExpenses() {
+            var subtotal = $("#SelfContainedExpenses").val() * $("#SelfContainedExpensesRate").val();
+            $("#SelfContainedExpensesSubTotal").val(subtotal.toFixed(2));
+            CalculateTotal();
+        }
+        function CalculateTotal() {
+            var total = +$("#SelfContainedExpensesSubTotal").val()
+                + +$("#LivingInCamperWagonSubTotal").val()
+                + +$("#CalculationOfDietsAndSmallNecessitiesSubTotal").val()
+                + +$("#HourAddonSubTotal").val()
+                - +$("#DeductionBreakFastSubTotal").val()
+                - +$("#DeductionLunchSubTotal").val()
+                - +$("#DeductionDinnerSubTotal").val();
+            $("#Total").val(total.toFixed(2));
+        }
+        function CalculateDaysAndHours() {
+            var total = 0;
+
+            var start_d1 = $('#Day1_start').val(); // assuming this is a date
+            var end_d1 = $('#Day1_end').val(); // assuming this is a date
+            var start_d2 = $('#Day2_start').val(); // assuming this is a date
+            var end_d2 = $('#Day2_end').val(); // assuming this is a date
+            var start_d3 = $('#Day3_start').val(); // assuming this is a date
+            var end_d3 = $('#Day3_end').val(); // assuming this is a date
+            var start_d4 = $('#Day4_start').val(); // assuming this is a date
+            var end_d4 = $('#Day4_end').val(); // assuming this is a date
+            var start_d5 = $('#Day5_start').val(); // assuming this is a date
+            var end_d5 = $('#Day5_end').val(); // assuming this is a date
+            var start_d6 = $('#Day6_start').val(); // assuming this is a date
+            var end_d6 = $('#Day6_end').val(); // assuming this is a date
+            if (start_d1 != "" && end_d1 != "") {
+                var start_date1 = new Date(start_d1); // assuming the format is correct
+                var end_date1 = new Date(end_d1); // assuming the format is correct
+                var diff_ms1 = end_date1.getTime() - start_date1.getTime(); // assuming both dates exist
+                var diff_hours1 = diff_ms1 / 1000.0 / 60.0 / 60.0;
+                total += diff_hours1;
+            }
+            if (start_d2 != "" && end_d2 != "") {
+                var start_date2 = new Date(start_d2); // assuming the format is correct
+                var end_date2 = new Date(end_d2); // assuming the format is correct
+                var diff_ms2 = end_date2.getTime() - start_date2.getTime(); // assuming both dates exist
+                var diff_hours2 = diff_ms2 / 1000.0 / 60.0 / 60.0;
+                total += diff_hours2;
+            }
+            if (start_d3 != "" && end_d3 != "") {
+                var start_date3 = new Date(start_d3); // assuming the format is correct
+                var end_date3 = new Date(end_d3); // assuming the format is correct
+                var diff_ms3 = end_date3.getTime() - start_date3.getTime(); // assuming both dates exist
+                var diff_hours3 = diff_ms3 / 1000.0 / 60.0 / 60.0;
+                total += diff_hours3;
+            }
+            if (start_d4 != "" && end_d4 != "") {
+                var start_date4 = new Date(start_d4); // assuming the format is correct
+                var end_date4 = new Date(end_d4); // assuming the format is correct
+                var diff_ms4 = end_date4.getTime() - start_date4.getTime(); // assuming both dates exist
+                var diff_hours4 = diff_ms4 / 1000.0 / 60.0 / 60.0;
+                total += diff_hours4;
+            }
+            if (start_d5 != "" && end_d5 != "") {
+                var start_date5 = new Date(start_d5); // assuming the format is correct
+                var end_date5 = new Date(end_d5); // assuming the format is correct
+                var diff_ms5 = end_date5.getTime() - start_date5.getTime(); // assuming both dates exist
+                var diff_hours5 = diff_ms5 / 1000.0 / 60.0 / 60.0;
+                total += diff_hours5;
+            }
+            if (start_d6 != "" && end_d6 != "") {
+                var start_date6 = new Date(start_d6); // assuming the format is correct
+                var end_date6 = new Date(end_d6); // assuming the format is correct
+                var diff_ms6 = end_date6.getTime() - start_date6.getTime(); // assuming both dates exist
+                var diff_hours6 = diff_ms6 / 1000.0 / 60.0 / 60.0;
+                total += diff_hours6;
+            }
+            var intdays = Math.floor(total / 24.0);
+            var hours = total % 24;
+            $("#CalculationOfDietsAndSmallNecessities").val(intdays.toFixed(2));
+            if (hours == 0) {
+                $("#HourAddon").val("");
+            }
+            else {
+                $("#HourAddon").val(hours.toFixed(2));
+            }
+            var subtotal = $("#CalculationOfDietsAndSmallNecessities").val() * $("#CalculationOfDietsAndSmallNecessitiesRate").val();
+            CalculateCalculations();
+            CalculateHours();
+            CalculateTotal();
+        }
+    </script>
+}

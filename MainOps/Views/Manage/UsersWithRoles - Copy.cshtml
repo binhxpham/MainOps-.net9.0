@@ -1,0 +1,290 @@
+﻿@model IEnumerable<MainOps.Models.ManageViewModels.ApplicationUserListViewModel>
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@inject IViewLocalizer Localizer
+
+
+@{
+    ViewBag.Title = Localizer["Users With Roles"];
+}
+@inject UserManager<ApplicationUser> UserManager
+
+<h3 class="box-title">
+    <b>@Localizer["Users with Roles"]</b>
+</h3>
+
+<div class="row">
+    <div class="col-xs-12">
+
+        <table class="table table-hover table-bordered table-condensed" id="example1" style="width:100%;table-layout:fixed;">
+            <thead>
+                <tr style="background-color:cornflowerblue;">
+                    <th>
+                        @Html.DisplayNameFor(model => model.Username)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Email)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Role)
+                    </th>
+
+                    <th>@SharedLocalizer.GetLocalizedHtmlString("Commands")</th>
+                    <th>@SharedLocalizer.GetLocalizedHtmlString("Commands")</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int counter = 0;
+                    foreach (var item in Model)
+                    {
+                        counter++;
+                        string theformAid = String.Concat("form_A_", counter.ToString());
+                        string thebuttonAid = String.Concat("button_A_", counter.ToString());
+                        string theformBid = String.Concat("form_B_", counter.ToString());
+                        string thebuttonBid = String.Concat("button_B_", counter.ToString());
+                        string theformCid = String.Concat("form_C_", counter.ToString());
+                        string thebuttonCid = String.Concat("button_C_", counter.ToString());
+                        string theformDid = String.Concat("form_D_", counter.ToString());
+                        string thebuttonDid = String.Concat("button_D_", counter.ToString());
+                        string theformEid = String.Concat("form_E_", counter.ToString());
+                        string thebuttonEid = String.Concat("button_E_", counter.ToString());
+                        string theformFid = String.Concat("form_F_", counter.ToString());
+                        string thebuttonFid = String.Concat("button_F_", counter.ToString());
+                        string theformGid = String.Concat("form_G_", counter.ToString());
+                        string thebuttonGid = String.Concat("button_G_", counter.ToString());
+                        string theformHid = String.Concat("form_H_", counter.ToString());
+                        string thebuttonHid = String.Concat("button_H_", counter.ToString());
+                        string theformIid = String.Concat("form_I_", counter.ToString());
+                        string thebuttonIid = String.Concat("button_I_", counter.ToString());
+                        string theformJid = String.Concat("form_J_", counter.ToString());
+                        string thebuttonJid = String.Concat("button_J_", counter.ToString());
+                        string theformKid = String.Concat("form_K_", counter.ToString());
+                        string thebuttonKid = String.Concat("button_K_", counter.ToString());
+                        string theformLid = String.Concat("form_L_", counter.ToString());
+                        string thebuttonLid = String.Concat("button_L_", counter.ToString());
+                        string theformMid = String.Concat("form_M_", counter.ToString());
+                        string thebuttonMid = String.Concat("button_M_", counter.ToString());
+                        string theformNid = String.Concat("form_N_", counter.ToString());
+                        string thebuttonNid = String.Concat("button_N_", counter.ToString());
+                        string theformOid = String.Concat("form_O_", counter.ToString());
+                        string thebuttonOid = String.Concat("button_O_", counter.ToString());
+                        string theformPid = String.Concat("form_P_", counter.ToString());
+                        string thebuttonPid = String.Concat("button_P_", counter.ToString());
+                        string theformQid = String.Concat("form_Q_", counter.ToString());
+                        string thebuttonQid = String.Concat("button_Q_", counter.ToString());
+                        string theformRid = String.Concat("form_R_", counter.ToString());
+                        string thebuttonRid = String.Concat("button_R_", counter.ToString());
+                        string theformSid = String.Concat("form_S_", counter.ToString());
+                        string thebuttonSid = String.Concat("button_S_", counter.ToString());
+                        string theformTid = String.Concat("form_T_", counter.ToString());
+                        string thebuttonTid = String.Concat("button_T_", counter.ToString());
+                        string theformUid = String.Concat("form_U_", counter.ToString());
+                        string thebuttonUid = String.Concat("button_U_", counter.ToString());
+                        string theformVid = String.Concat("form_V_", counter.ToString());
+                        string thebuttonVid = String.Concat("button_V_", counter.ToString());
+                        string theformWid = String.Concat("form_W_", counter.ToString());
+                        string thebuttonWid = String.Concat("button_W_", counter.ToString());
+
+                        @Html.HiddenFor(modelItem => item.UserId)
+                        <tr>
+                            <td style="word-wrap: break-word;">
+                                @Html.DisplayFor(modelItem => item.Username)
+                            </td>
+                            <td style="word-wrap: break-word;">
+                                @Html.DisplayFor(modelItem => item.Email)
+                            </td>
+                            <td style="word-wrap: break-word;">
+                                @Html.DisplayFor(modelItem => item.Role)
+                            </td>
+
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <td>
+
+                                        <form asp-action="PromoteMember" id=@theformAid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonAid>@Localizer["Promote Member"]</button>
+                                        </form>
+                                        <form asp-action="RemoveMember" id=@theformBid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonBid>@Localizer["Demote Member"]</button>
+                                        </form>
+                                        <form asp-action="PromoteAdmin" id=@theformEid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonEid>@Localizer["Promote Admin"]</button>
+                                        </form>
+                                        <form asp-action="RemoveAdmin" id=@theformFid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonFid>@Localizer["Demote Admin"]</button>
+                                        </form>
+                                        <form asp-action="MakeStorageManager" id=@theformLid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonLid>@Localizer["Promote Storage"]</button>
+                                        </form>
+                                        <form asp-action="RemoveStorageManager" id=@theformMid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonMid>@Localizer["Demote Storage"]</button>
+                                        </form>
+
+                                        <form asp-action="MakeGuest" id=@theformHid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonHid>@Localizer["Make Guest User"]</button>
+                                        </form>
+                                        <form asp-action="RemoveGuest" id=@theformIid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonIid>@Localizer["Remove Guest User"]</button>
+                                        </form>
+                                        <form asp-action="PromoteDivisionAdmin" id=@theformJid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonJid>@Localizer["Promote Division Admin"]</button>
+                                        </form>
+                                        <form asp-action="RemoveDivisionAdmin" id=@theformKid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonKid>@Localizer["Demote Division Admin"]</button>
+                                        </form>
+                                        <form asp-action="RemoveUser" id=@theformGid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonGid>@Localizer["Delete User"]</button>
+                                        </form>
+                                        <form asp-action="MakeMemberGuest" id=@theformNid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonNid>@Localizer["Make MemberGuest User"]</button>
+                                        </form>
+                                        <form asp-action="RemoveMemberGuest" id=@theformOid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonOid>@Localizer["Remove MemberGuest User"]</button>
+                                        </form>
+                                        <form asp-action="MakeProjectMember" id=@theformPid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonPid>@Localizer["Make ProjectMember User"]</button>
+                                        </form>
+                                        <form asp-action="RemoveProjectMember" id=@theformQid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonQid>@Localizer["Remove ProjectMember User"]</button>
+                                        </form>
+                                        <form asp-action="MakeManager" id=@theformRid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonRid>@Localizer["Make Manager"]</button>
+                                        </form>
+                                        <form asp-action="RemoveManager" id=@theformSid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonSid>@Localizer["Remove Manager"]</button>
+                                        </form>
+                                        <form asp-action="MakeInternational" id=@theformTid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonTid>@Localizer["Make International"]</button>
+                                        </form>
+                                        <form asp-action="RemoveInternational" id=@theformUid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonUid>@Localizer["Remove International"]</button>
+                                        </form>
+                                        <form asp-action="MakeSupervisor" id=@theformVid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonVid>@Localizer["Make Supervisor"]</button>
+                                        </form>
+                                        <form asp-action="RemoveSupervisor" id=@theformWid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonWid>@Localizer["Remove Supervisor"]</button>
+                                        </form>
+
+                                    </td>
+                                }
+                                @if (User.IsInRole("DivisionAdmin"))
+                                {
+                                    <td>
+
+                                        <form asp-action="PromoteMember" id=@theformAid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonAid>@Localizer["Promote Member"]</button>
+                                        </form>
+                                        <form asp-action="RemoveMember" id=@theformBid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonBid>@Localizer["Demote Member"]</button>
+                                        </form>
+                                        <form asp-action="MakeGuest" id=@theformHid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonHid>@Localizer["Make Guest User"]</button>
+                                        </form>
+                                        <form asp-action="RemoveGuest" id=@theformIid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonIid>@Localizer["Remove Guest User"]</button>
+                                        </form>
+                                        <form asp-action="RemoveUser" id=@theformGid method="post" asp-route-id=@item.Email>
+                                            <button type="button" class="btn btn-default" data-id=@thebuttonGid>@Localizer["Delete User"]</button>
+                                        </form>
+                                    </td>
+                                }
+
+                            }
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+        
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        //Promote Member
+        $(document).on('click', 'button[data-id]', function (e) {
+            var name = $(this).attr('data-id').split("_")[1];
+            var result = false;
+            if (name + "" == "A") {
+                result = confirm('@Localizer["Are you sure you want to promote this user to be a member?"]');
+            }
+            if (name + "" == "B") {
+                result = confirm('@Localizer["Are you sure you no longer want the user profile to be a member?"]');
+            }
+            if (name + "" == 'C') {
+                result = confirm('@Localizer["Are you sure you want to promote this user to be a manager?"]');
+            }
+            if (name + "" == 'D') {
+                result = confirm('@Localizer["Are you sure you no longer want the user profile to be a manager?"]');
+            }
+            if (name + "" == 'E') {
+                result = confirm('@Localizer["Are you sure you no longer want the user profile to be an administrator?"]');
+            }
+            if (name + "" == 'F') {
+                result = confirm('@Localizer["Are you sure you want to promote this user to be an administrator?"]');
+            }
+            if (name + "" == 'G') {
+                result = confirm('@Localizer["Are you sure you want to delete this user profile?"]');
+            }
+            if (name + "" == 'H') {
+                result = confirm('@Localizer["Are you sure you want to make this user guest?"]');
+            }
+            if (name + "" == 'I') {
+                result = confirm('@Localizer["Are you sure you want to remove role guest?"]');
+            }
+            if (name + "" == 'J') {
+                result = confirm('@Localizer["Are you sure you want to make this user Division Admin?"]');
+            }
+            if (name + "" == 'K') {
+                result = confirm('@Localizer["Are you sure you want to remove role Division Admin?"]');
+            }
+            if (name + "" == 'L') {
+                result = confirm('@Localizer["Are you sure you want to make this user Storage Manager?"]');
+            }
+            if (name + "" == 'M') {
+                result = confirm('@Localizer["Are you sure you want to remove role Storage Manager?"]');
+            }
+            if (name + "" == 'N') {
+                result = confirm('@Localizer["Are you sure you want to make this user MemberGuest?"]');
+            }
+            if (name + "" == 'O') {
+                result = confirm('@Localizer["Are you sure you want to remove role MemberGuest?"]');
+            }
+            if (name + "" == 'P') {
+                result = confirm('@Localizer["Are you sure you want to make this user ProjectMember?"]');
+            }
+            if (name + "" == 'Q') {
+                result = confirm('@Localizer["Are you sure you want to remove role ProjectMember?"]');
+            }
+            if (name + "" == 'R') {
+                result = confirm('@Localizer["Are you sure you want to make this user Manager?"]');
+            }
+            if (name + "" == 'S') {
+                result = confirm('@Localizer["Are you sure you want to remove role Manager?"]');
+            }
+            if (name + "" == 'T') {
+                result = confirm('@Localizer["Are you sure you want to make this user International?"]');
+            }
+            if (name + "" == 'U') {
+                result = confirm('@Localizer["Are you sure you want to remove role International?"]');
+            }
+            if (name + "" == 'V') {
+                result = confirm('@Localizer["Are you sure you want to make this user Supervisor?"]');
+            }
+            if (name + "" == 'W') {
+                result = confirm('@Localizer["Are you sure you want to remove role Supervisor?"]');
+            }
+            if (result) {
+                var thetype = $(this).attr('data-id').split("_")[0];
+                var id = $(this).attr('data-id').split("_")[2]
+                $('#' + 'form_' + name + '_' + id).submit();
+            }
+        })
+    </script>
+}

@@ -1,0 +1,134 @@
+﻿@model MainOps.Models.ViewModels.ItemBilledActivities
+
+@{
+    Layout = null;
+}
+
+<table style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th colspan="3" style="border-right:3px solid black;">
+                <h3>@SharedLocalizer.GetLocalizedHtmlString("Well Activities (NEW)")</h3>
+            </th>
+            <th colspan="3">
+                <h3>@SharedLocalizer.GetLocalizedHtmlString("Well Activities (Existing)")</h3>
+            </th>
+        </tr>
+        <tr style="border-bottom:2px solid blue;">
+            <th>WellName</th>
+            <th>Date</th>
+            <th style="border-right:3px solid black;">other info</th>
+            <th>WellName</th>
+            <th>Date</th>
+            <th>other info</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="border-top:1px solid blue;"><td colspan="3" style="border-right:3px solid black;"><h4>@SharedLocalizer.GetLocalizedHtmlString("Pre-Excavations")</h4></td><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Pre-Excavations")</h4></td></tr>
+        @foreach (var item in Model.PreExcavations.OrderBy(x => x.TimeStamp))
+        {
+    <tr>
+
+        <td><a asp-action="Details" asp-controller="Preexcavations" asp-route-id="@item.Id" target="_blank">@item.wellname</a></td>
+        <td>@String.Format("{0:yyyy-MM-dd}", item.TimeStamp)</td>
+        <td style="border-right:3px solid black;">Cables found: @item.CablesFound</td>
+        <td colspan="3" ></td>
+    </tr>
+        }
+    <tr style="border-top:1px solid blue;"><td colspan="3" style="border-right:3px solid black;"><h4>@SharedLocalizer.GetLocalizedHtmlString("Drillings")</h4></td><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Drillings")</h4></td></tr>
+        @foreach (var item in Model.Drillings.OrderBy(x => x.Drill_Date_End))
+        {
+    <tr>
+
+        <td><a asp-action="BoreProfile" asp-controller="WellDrilling" asp-route-id="@item.Id" target="_blank">@item.WellName</a></td>
+        <td>@String.Format("{0:yyyy-MM-dd}", item.Drill_Date_End)</td>
+        <td style="border-right:3px solid black;"></td>
+        <td colspan="3" ></td>
+    </tr>
+        }
+    <tr style="border-top:1px solid blue;"><td colspan="3" style="border-right:3px solid black;"><h4>@SharedLocalizer.GetLocalizedHtmlString("Clear Pumpings")</h4></td><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Clear Pumpings")</h4></td></tr>
+        @foreach (var item in Model.ClearPumpTests.OrderBy(x => x.Report_Date))
+        {
+    <tr>
+
+        <td><a asp-action="ClearPumpTestReport" asp-controller="TrackItems" asp-route-id="@item.Id" target="_blank">@item.Wellname</a></td>
+        <td>@String.Format("{0:yyyy-MM-dd}", item.Report_Date)</td>
+        <td style="border-right:3px solid black;"></td>
+        <td colspan="3" ></td>
+    </tr>
+        }
+    <tr style="border-top:1px solid blue;"><td colspan="3" style="border-right:3px solid black;"><h4>@SharedLocalizer.GetLocalizedHtmlString("Well Checks")</h4></td><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Well Checks")</h4></td></tr>
+        @foreach (var item in Model.WellChecks.OrderBy(x => x.TimeStamp))
+        {
+    <tr>
+        <td colspan="3" style="border-right:3px solid black;"></td>
+        <td><a asp-action="Details" asp-controller="WellChecks" asp-route-id="@item.Id" target="_blank">@item.WellName</a></td>
+        <td>@String.Format("{0:yyyy-MM-dd}", item.TimeStamp)</td>
+        <td ></td>
+
+    </tr>
+        }
+    <tr style="border-top:1px solid blue;"><td colspan="3" style="border-right:3px solid black;"><h4>@SharedLocalizer.GetLocalizedHtmlString("Air Lifts")</h4></td><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Air Lifts")</h4></td></tr>
+        @foreach (var item in Model.Airlifts.OrderBy(x => x.TimeStamp))
+        {
+    <tr>
+        <td colspan="3" style="border-right:3px solid black;"></td>
+        <td><a asp-action="Details" asp-controller="WellChecks" asp-route-id="@item.Id" target="_blank">@item.MeasPoint.Name</a></td>
+        <td>@String.Format("{0:yyyy-MM-dd}", item.TimeStamp)</td>
+        <td></td>
+
+    </tr>
+        }
+    <tr style="border-top:1px solid blue;"><td colspan="3" style="border-right:3px solid black;"><h4>@SharedLocalizer.GetLocalizedHtmlString("Traffic Diversions")</h4></td><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Traffic Diversions")</h4></td></tr>
+        @foreach (var item in Model.TrafficDivs.OrderBy(x => x.TimeStamp))
+        {
+    <tr>
+
+        <td><a asp-action="Details_Install" asp-controller="TrackItems" asp-route-id="@item.Id" target="_blank">@item.UniqueID</a></td>
+        <td>@String.Format("{0:yyyy-MM-dd}", item.TimeStamp)</td>
+        <td style="border-right:3px solid black;"></td>
+        <td colspan="3"></td>
+    </tr>
+        }
+    <tr style="border-top:1px solid blue;"><td colspan="3" style="border-right:3px solid black;"><h4>@SharedLocalizer.GetLocalizedHtmlString("Water Samples")</h4></td><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Water Samples")</h4></td></tr>
+        @foreach (var item in Model.WaterSamples.OrderBy(x => x.TimeStamp))
+        {
+
+
+    <tr>
+        @if (item.UniqueID.Contains("(A)"))
+        {
+
+            <td><a asp-action="Details_Install" asp-controller="TrackItems" asp-route-id="@item.Id" target="_blank">@item.UniqueID</a></td>
+            <td>@String.Format("{0:yyyy-MM-dd}", item.TimeStamp)</td>
+            <td style="border-right:3px solid black;"></td>
+            <td colspan="3"></td>
+
+        }
+        else
+        {
+            <td colspan="3" style="border-right:3px solid black;"></td>
+            <td><a asp-action="Details_Install" asp-controller="TrackItems" asp-route-id="@item.Id" target="_blank">@item.UniqueID</a></td>
+            <td>@String.Format("{0:yyyy-MM-dd}", item.TimeStamp)</td>
+            <td ></td>
+
+        }
+    </tr>
+        }
+    <tr style="border-top:1px solid blue;"><td colspan="3" style="border-right:3px solid black;"><h4>@SharedLocalizer.GetLocalizedHtmlString("Decommissions")</h4></td><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Decommissions")</h4></td></tr>
+        @foreach (var item in Model.Decommissions.OrderBy(x => x.TimeStamp))
+        {
+    <tr>
+        <td><a asp-action="DecommissionReport_PDF" asp-controller="TrackItems" asp-route-id="@item.Id" target="_blank">@item.Wellname</a></td>
+        <td>@String.Format("{0:yyyy-MM-dd}", item.TimeStamp)</td>
+        <td style="border-right:3px solid black;"></td>
+        <td><a asp-action="DecommissionReport_PDF" asp-controller="TrackItems" asp-route-id="@item.Id" target="_blank">@item.Wellname</a></td>
+        <td>@String.Format("{0:yyyy-MM-dd}", item.TimeStamp)</td>
+        <td></td>
+    </tr>
+        }
+
+
+       
+    </tbody>
+</table>

@@ -1,0 +1,76 @@
+﻿@model IEnumerable<MainOps.Models.ThreeStepTest>
+
+@{
+    ViewData["Title"] = "View";
+}
+
+<h2>Pump tests</h2>
+
+<table style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubProject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Wellname)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MeasPointId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Report_Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.starttime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.endtime)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+            </td>
+            
+            <td>
+                @if (item.SubProjectId != null) { 
+                    @Html.DisplayFor(modelItem => item.SubProject.Id)
+                }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Wellname)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Report_Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.starttime)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.endtime)
+            </td>
+           
+            <td>
+                <form asp-action="StepTestReport" asp-route-id="@item.Id" method="get" target="_blank">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                </form>
+                @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+                {
+                    <a asp-action="UploadTestData" asp-route-id="@item.Id">Upload Data</a>
+                    <form asp-action="DeleteDataPumpTest" asp-controller="TrackItems" asp-route-id="@item.Id" method="post">
+                        <button class="btn-hoelscher" onclick="confirm('Do you really want to delete the data?');">@SharedLocalizer.GetLocalizedHtmlString("Delete Data")</button>
+                    </form>
+                }
+                </td>
+        </tr>
+}
+    </tbody>
+</table>

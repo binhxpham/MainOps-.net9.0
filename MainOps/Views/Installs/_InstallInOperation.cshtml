@@ -1,0 +1,96 @@
+﻿@model IEnumerable<MainOps.Models.InstallInOperation>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Operational Open Dew.</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Unique ID")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("KM mark")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Date")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Operational")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Installation Date")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("DeInstallation Date")
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            if (item.operational == true)
+            {
+        <tr style="background-color:lightgreen;">
+            <td>
+                @item.install.UniqueID
+            </td>
+            <td>
+                @item.install.Location
+            </td>
+            <td>
+                @String.Format("{0:yyyy-MM-dd}", item.TheDate)
+            </td>
+            <td>
+                @item.operational
+            </td>
+            <td>
+                @String.Format("{0:yyyy-MM-dd}",item.install.TimeStamp)
+            </td>
+            <td>
+                @if(item.install.DeinstallDate != null)
+                    {
+                    <text>
+                        @String.Format("{0:yyyy-MM-dd}",item.install.DeinstallDate)
+                    </text>
+                    }
+            </td>
+        </tr>
+            }
+            else
+            {
+    <tr style="background-color:indianred;">
+        <td>
+            @item.install.UniqueID
+        </td>
+        <td>
+            @item.install.Location
+        </td>
+        <td>
+            @String.Format("{0:yyyy-MM-dd}", item.TheDate)
+        </td>
+        <td>
+            @item.operational
+        </td>
+        <td>
+            @String.Format("{0:yyyy-MM-dd}", item.install.TimeStamp)
+        </td>
+        <td>
+            @if (item.install.DeinstallDate != null)
+            {
+                <text>
+                    @String.Format("{0:yyyy-MM-dd}", item.install.DeinstallDate)
+                </text>
+            }
+        </td>
+    </tr>
+            }
+        }
+    </tbody>
+</table>

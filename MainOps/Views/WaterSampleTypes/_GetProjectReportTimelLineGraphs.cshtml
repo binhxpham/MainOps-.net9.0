@@ -1,0 +1,184 @@
+﻿@model IEnumerable<MainOps.Models.WaterSampleMeasVM>
+@{
+    var searchplacetext = "Samlemanifold";
+}
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("Water Analysis Report")</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+    @*<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>*@
+    <script src="https://www.google.com/jsapi"></script>
+    <script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Footer.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Different.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Sidebarmenu.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/PicturesHeader.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/RandomCss.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/RandomCss.min.css" asp-append-version="true">
+    @*<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+        function init() {
+            //the latest version who worked for me was the 44. 45 and above not worked anymore.
+            google.load("visualization", "44", { packages: ["corechart"] });
+            var interval = setInterval(function () {
+                if (google.visualization !== undefined && google.visualization.DataTable !== undefined && google.visualization.PieChart !== undefined) {
+                    clearInterval(interval);
+                    window.status = 'ready';
+                    drawCharts(); //call here your callback who will render the chart
+                }
+            }, 100);
+        }
+    </script>*@
+<script type="text/javascript">
+        $(document).ready(function () {
+            google.charts.load("visualization", "44", { packages: ["corechart"] });
+            //google.charts.load('current', { 'packages': ['corechart'] });
+            google.charts.setOnLoadCallback(drawCharts);
+            /*google.load('visualization', '1.0', { 'packages': ['corechart'], 'callback': drawCharts });*/
+            var options;
+
+            function drawCharts() {
+                            @foreach (var place in Model.Where(x => x.WaterSamplePlace.Name.Contains(searchplacetext)).Select(x => x.WaterSamplePlace).Distinct())
+                            {
+                                        <text>
+
+                                    </text>
+                                foreach (var type in Model.Where(x => x.WaterSamplePlaceId.Equals(place.Id)).Select(x => x.WaterSampleType).Distinct())
+                                {
+                                    <text>
+                var data = new google.visualization.DataTable();
+                data.addColumn('datetime', 'TimeStamp');
+                data.addColumn('number', '@type.Komponent');
+                data.addColumn('number', 'Mean Limit');
+                data.addColumn('number', 'Max Limit');
+                //var datas = new Array();
+                                    </text>
+                    foreach (var dat in Model.Where(x => x.WaterSamplePlaceId.Equals(place.Id) && x.WaterSampleTypeId.Equals(type.Id)))
+                    {
+                            <text>
+                var maxdata = "@Model.Where(x => x.WaterSamplePlaceId.Equals(place.Id) && x.WaterSampleTypeId.Equals(type.Id)).Select(x => x.value).Max()";
+                var timeStamp = new Date("@dat.Dato.ToString()");
+
+                var time = { v: timeStamp, f: moment(timeStamp).format('YYYY-MM-DD HH:mm:ss') };
+
+                var val = @dat.value;
+                var meanlim;
+                var maxlim;
+                @if (dat.theMeanLimit != null)
+                {
+                      <text>
+                meanlim = @dat.theMeanLimit;
+                 </text>
+                }
+                else
+                {
+                         <text>
+                    meanlim = null;
+                     </text>
+                }
+                @if (dat.theLimit != null)
+                {
+                          <text>
+                    maxlim = @dat.theLimit;
+                     </text>
+                }
+                else
+                {
+                     <text>
+                        maxlim = null;
+                    </text>
+                }
+                    data.addRow([time, val,meanlim,maxlim]);
+
+                            </text>
+                                       // @:datas.push(["@dat.Dato.ToString("yyyy-MM-dd")", "@dat.value"]);@*, "@dat.theMeanLimit","@dat.theLimit"]);*@
+                                    }
+                                    <text>
+                //data.addRows(datas);
+                options = {
+                    chart: {
+                        "title": "@String.Concat(place.Name," : ", type.Komponent)",
+                        width: 1300,
+                        height: 750,
+                        legend: { position: 'top' },
+                        interpolateNulls: true,
+                        chartArea: {
+                            height: '700px', width: '1200px',
+                            backgroundColor: { stroke: "gray", strokeWidth: 1 }
+                        },
+                        vAxis: {
+                            viewWindow: {
+                                min: 0,
+                                max: maxdata
+                            }
+                        },
+                        pointSize: 10
+                    }
+                };
+                var chart = new google.visualization.LineChart(document.getElementById("@String.Concat(place.Id,"_",type.Id)"));
+
+                //google.visualization.events.addListener(chart, 'ready', myReadyHandler);
+                chart.draw(data, options);
+                //function myReadyHandler() {
+                //    window.status = "ready";
+                //}
+                        </text>
+
+                    }
+                }
+                //window.status = "ready";
+            }
+
+        });
+</script>
+    <style>
+        thead, tfoot {
+            display: table-row-group
+        }
+
+        table {
+            font-size: 9px;
+        }
+
+        td, th {
+            padding: 0;
+        }
+
+            th > span {
+                -ms-writing-mode: tb-rl;
+                -webkit-writing-mode: vertical-rl;
+                writing-mode: vertical-rl;
+                transform: rotate(180deg);
+                white-space: nowrap;
+                display: table;
+                border-spacing: 0;
+                font-size: 8px;
+            }
+
+        
+    </style>
+</head>
+<body>
+
+    @foreach (var place in Model.Where(x => x.WaterSamplePlace.Name.Contains(searchplacetext)).Select(x => x.WaterSamplePlace).Distinct())
+    {
+        foreach (var type in Model.Where(x => x.WaterSamplePlaceId.Equals(place.Id)).Select(x => x.WaterSampleType).Distinct())
+        {
+
+        <table style="width:1400px;height:800px;padding-bottom:10px;">
+            <tr style="height:40px;padding-bottom:0px;margin-bottom:0px;">
+                <td style="font-size:16px;text-align:center;"><b>@String.Concat(place.Name, " : ", type.Komponent)</b></td>
+            </tr>
+            <tr style="height:750px;padding-top:0px;margin-top:0px;">
+                <td id="@String.Concat(place.Id,"_",type.Id)"></td>
+            </tr>
+        </table>
+        }
+
+    }
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+﻿@model MainOps.Models.Meas
+
+
+
+<h2>@ViewData["Title"]</h2>
+
+<div>
+    <h4>@SharedLocalizer.GetLocalizedHtmlString("Measurements")</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.MeasPoint)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MeasPoint.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TheMeasurement)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TheMeasurement)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TheComment.comment)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TheComment.comment)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.When)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.When)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DoneBy)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DoneBy)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Latitude)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Latitude)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Longitude)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Longitude)
+        </dd>
+
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> |
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>

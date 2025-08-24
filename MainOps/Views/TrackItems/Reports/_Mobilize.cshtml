@@ -1,0 +1,157 @@
+﻿@model MainOps.Models.ViewModels.MobVM
+
+@{
+    Layout = null;
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("All Documenation")</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+
+<table style="page-break-inside:avoid;">
+    <tr>
+        <td colspan="3">
+            <b>@SharedLocalizer.GetLocalizedHtmlString("Mobilisation")</b>
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Mobilize.Project.Name)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Mobilize.Project.Name)
+        </td>
+        <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@Model.Mobilize.Project.Division.Id/@Model.Mobilize.Project.Division.LogoPath" width="151" height="66" /></td>
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Mobilize.Project.ProjectNr)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Mobilize.Project.ProjectNr)
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Mobilize.Project.Client)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Mobilize.Project.Client)
+        </td>
+
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Mobilize.TimeStamp)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Mobilize.TimeStamp.Date)
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Mobilize.ItemType.Item_Type)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Mobilize.ItemType.Item_Type)
+        </td>
+    </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(Model => Model.Mobilize.Amount)
+                </b>
+            </td>
+
+            @if (Model.Mobilize.ItemType.Install_Unit.TheUnit.Equals("pr. l"))
+            {
+                <td>@Html.DisplayFor(Model => Model.Mobilize.Amount) @SharedLocalizer.GetLocalizedHtmlString("l")</td>
+            }
+            else if (Model.Mobilize.ItemType.Install_Unit.TheUnit.Equals("pr. m"))
+            {
+                <td>@Html.DisplayFor(Model => Model.Mobilize.Amount) @SharedLocalizer.GetLocalizedHtmlString("m")</td>
+            }
+            else
+            {
+                <td>@Html.DisplayFor(Model => Model.Mobilize.Amount) @Html.DisplayFor(Model => Model.Mobilize.ItemType.Install_Unit.TheUnit)</td>
+            }
+        </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.Mobilize.Latitude)</b></td>
+        <td>@Html.DisplayFor(Model => Model.Mobilize.Latitude)</td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.Mobilize.Longitude)</b></td>
+        <td>@Html.DisplayFor(Model => Model.Mobilize.Longitude)</td>
+    </tr>
+    
+    <tr>
+        <td colspan="3"><b>@Html.DisplayNameFor(Model => Model.Mobilize.MobilizeText_Text)</b></td>
+    </tr>
+    <tr rowspan="20">
+        <td colspan="3">
+            <textarea rows="8" cols="64" class="form-control" style="width:100%;">@Html.DisplayFor(Model => Model.Mobilize.MobilizeText_Text)</textarea>
+        </td>
+    </tr>
+</table>
+
+<table name="phototable" style="page-break-inside:avoid;">
+    @{ var rows = 0;}
+    @if (Model.Mob_Photos.Count() % 3 == 0)
+    {
+        rows = Model.Mob_Photos.Count() / 3;
+    }
+    else
+    {
+        rows = Convert.ToInt32(Model.Mob_Photos.Count() / 3) + 1;
+    }
+    @{ var totalpics = Model.Mob_Photos.Count();}
+    @for (int i = 0; i < rows; i++)
+    {
+
+        @if (totalpics - 3 >= 0) //enough room to add whole row
+        {
+            var photo1 = Model.Mob_Photos.ElementAt((i + 1) * 3 - 3);
+            var photo2 = Model.Mob_Photos.ElementAt((i + 1) * 3 - 3 + 1);
+            var photo3 = Model.Mob_Photos.ElementAt((i + 1) * 3 - 3 + 2);
+
+            <tr>
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo3.Path.Split(".")[0], "_edit.", photo3.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+            </tr>
+            totalpics -= 3;
+        }
+        else if (totalpics - 2 >= 0)
+        {
+            var photo1 = Model.Mob_Photos.ElementAt((i + 1) * 3 - 3);
+            var photo2 = Model.Mob_Photos.ElementAt((i + 1) * 3 - 3 + 1);
+            <tr>
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                <td></td>
+            </tr>
+            totalpics -= 2;
+        }
+        else //enough room to add 1 picture in row
+        {
+            var photo1 = Model.Mob_Photos.ElementAt((i + 1) * 3 - 3);
+            <tr>
+                <td colspan="3"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+            </tr>
+            totalpics -= 1;
+        }
+
+    }
+</table>

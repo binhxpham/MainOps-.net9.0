@@ -1,0 +1,156 @@
+﻿@model MainOps.Models.ReportClasses.Well_Installation
+
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@Html.DisplayFor(model => model.Test_name)</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+<div class="row">
+    <div class="col-xs-8">
+        <table>
+            <tr>
+                <td colspan="2">
+                    <b>
+                        @Html.DisplayNameFor(x => x.Project.Name)
+                    </b>
+                </td>
+                <td colspan="2">
+                    @Html.DisplayFor(x => x.Project.Name)
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <b>
+                        @Html.DisplayNameFor(x => x.ProjectLocation)
+                    </b>
+                </td>
+                <td colspan="2">
+                    @Html.DisplayFor(x => x.ProjectLocation)
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <b>
+                        @Html.DisplayNameFor(x => x.HD_ProjectNr)
+                    </b>
+                </td>
+                <td colspan="2">
+                    @Html.DisplayFor(x => x.HD_ProjectNr)
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <b>
+                        @Html.DisplayNameFor(x => x.CustomerName)
+                    </b>
+                </td>
+                <td colspan="2">
+                    @Html.DisplayFor(x => x.CustomerName)
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <b>
+                        @Html.DisplayNameFor(x => x.WellName)
+                    </b>
+                </td>
+                <td colspan="2">
+                    @Html.DisplayFor(x => x.WellName)
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <b>
+                        @Html.DisplayNameFor(x => x.VersionNr)
+                    </b>
+                </td>
+                <td colspan="2">
+                    @Html.DisplayFor(x => x.VersionNr)
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <b>
+                        @Html.DisplayNameFor(x => x.RevisionReason)
+                    </b>
+                </td>
+                <td colspan="2">
+                    @Html.DisplayFor(x => x.RevisionReason)
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4"><img src="~/images/Divisions/wellinstallations/@Model.Project.DivisionId/@Model.Id/@Model.Scetch_path" height="600" /></td>
+            </tr>
+            <tr>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("")</td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Design")</td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Actual")</td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Pass/Fail")</td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(x => x.resting_water_level)</b></td>
+                <td>@Html.DisplayFor(x => x.resting_water_level)</td>
+                <td>@Html.DisplayFor(x => x.resting_water_level_actual)</td>
+                <td style="text-align:center;">
+                    @Html.DisplayFor(x => x.resting_water_level_pass)
+                </td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(x => x.Base_depth)</b></td>
+                <td>@Html.DisplayFor(x => x.Base_depth)</td>
+                <td>@Html.DisplayFor(x => x.Base_depth_actual)</td>
+                <td style="text-align:center;">
+                    @Html.DisplayFor(x => x.Base_depth_pass)
+                </td>
+            </tr>
+            <tr>
+                <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Coordinates")</label></td>
+                <td>x:@Html.DisplayFor(x => x.x_coord)y:@Html.DisplayFor(x => x.y_coord)z:@Html.DisplayFor(x => x.z_coord)</td>
+                <td>x:@Html.DisplayFor(x => x.x_coord_actual)y:@Html.DisplayFor(x => x.y_coord_actual)z:@Html.DisplayFor(x => x.z_coord_actual)</td>
+                <td style="text-align:center;">
+                    @Html.DisplayFor(x => x.coord_pass)
+                </td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(x => x.Drill_Method)</b></td>
+                <td>@Html.DisplayFor(x => x.Drill_Method)</td>
+                <td>@Html.DisplayFor(x => x.Drill_Method_actual)</td>
+                <td style="text-align:center;">
+                    @Html.DisplayFor(x => x.Drill_Method_pass)
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4"><b>@Html.DisplayNameFor(x => x.Notes)</b></td>
+            </tr>
+            <tr rowspan="20">
+                <td colspan="4">
+                    <textarea rows="8" cols="64" class="form-control">@Html.DisplayFor(x=>x.Notes)</textarea>
+                </td>
+            </tr>
+            <tr>
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Name")</b></td>
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Position")</b></td>
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Date")</b></td>
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Signature")</b></td>
+            </tr>
+            <tr>
+                <td>@Html.DisplayFor(x => x.Name)</td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Hoelscher Operative")</td>
+                <td>@Html.DisplayFor(x => x.Date_Done)</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Hoelscher Project Manager")</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Client")</td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+</div>

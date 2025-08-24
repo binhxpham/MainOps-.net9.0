@@ -1,0 +1,148 @@
+﻿@model MainOps.Models.WorkTaskVM
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Create Task")</h2>
+
+<form asp-action="Create" asp-controller="WorkTasks" method="post" onsubmit="retrieveData(event);" enctype="multipart/form-data" id="thetaskform">
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td><label asp-for="ProjectId" class="control-label"></label></td>
+            <td>
+                <select asp-for="ProjectId" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();" style="width:100%;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please choose Project")</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><label asp-for="SubProjectId" class="control-label"></label></td>
+            <td>
+                <select asp-for="SubProjectId" asp-items="ViewBag.SubProjectId" style="width:100%;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select SubProject")</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><label asp-for="DateToDo" class="control-label"></label></td>
+            <td>
+                <input type="datetime" class="date-picker" asp-for="DateToDo" value="@DateTime.Now.AddDays(1).Date" style="width:100%;" />
+                <span asp-validation-for="DateToDo" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td><label asp-for="Comments_Office" class="control-label"></label></td>
+            <td><textarea asp-for="Comments_Office" cols="30" rows="4" style="width:100%;"></textarea></td>
+        </tr>
+        <tr>
+            <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Add workers to task")</label></td>
+            <td><textarea id="listusers" cols="30" rows="3" style="width:100%;"></textarea></td>
+        </tr>
+        <tr>
+            <td><button type="button" onclick="AddUser();" class="btn-hoelscher control-label">@SharedLocalizer.GetLocalizedHtmlString("Add Worker")</button></td>
+            <td><select id="userid" asp-items="ViewBag.Users" style="width:100%;"></select></td>
+        </tr>
+        <tr hidden="hidden">
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Users added:")</td>
+            <td> <input asp-for="users" value="" /></td>
+        </tr>
+    </table>
+    <table id="workitems" style="width:100%;table-layout:fixed;">
+        <tr>
+            <td><b>@SharedLocalizer.GetLocalizedHtmlString("Task")</b></td>
+            <td><b>@SharedLocalizer.GetLocalizedHtmlString("Add Photos")</b></td>
+        </tr>
+        @{ int counter = 1;}
+        @for (int i = 0; i < Model.WorkItems.Count; i++)
+        {
+            @Html.HiddenFor(Model => Model.WorkItems[i].Id)
+            @Html.HiddenFor(Model => Model.WorkItems[i].WorkTaskId)
+            @Html.HiddenFor(Model => Model.WorkItems[i].TimeFinished)
+            @Html.HiddenFor(Model => Model.WorkItems[i].Comment_Worker)
+            <tr>
+                <td><textarea asp-for="@Model.WorkItems[i].Description" cols="40" rows="3" style="width:100%;"></textarea></td>
+                <td><input type="file" multiple accept=".jpg,.jpeg,.png,.pdf" name="Photos_@counter" style="width:100%;" /></td>
+            </tr>
+            counter += 1;
+        }
+        <tr>
+            <td colspan="3"><button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Create Task")</button></td>
+        </tr>
+    </table>
+   
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-20:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+                //$('.date-picker').datepicker("setDate", new Date("dd-MM-yy"));
+                FillSubProjects();
+            });
+        });
+        function retrieveData(e) {
+            var posting = true;
+            var listusers = document.getElementById("listusers").value;
+            if (listusers == "") {
+                posting = false;
+                e.preventDefault();
+                alert("Please add a user!");
+            }
+            var description = document.getElementById("WorkItems_0__Description").value;
+            if (description == "") {
+                posting = false;
+                e.preventDefault();
+                alert("Please write a description for the first task");
+            }
+            
+            if ($("#thetaskform").valid() == false) {
+                e.preventDefault();
+                posting = false;
+            }
+            if (posting == true) {
+                StartSpinner();
+            }
+        }
+        function AddUser() {
+            var selectedItem = $("#userid option:selected").val();
+            var selectedText = $("#userid option:selected").text();
+            $("#users").val($("#users").val() + selectedItem + " ");
+            $("#listusers").val($("#listusers").val() + selectedText + " ");
+        }
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "90%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+            
+        }
+    </script>
+}

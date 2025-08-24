@@ -1,0 +1,74 @@
+﻿@model MainOps.Models.ViewModels.ExternalWellTagVM
+@*<head>
+        <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM&sensor=false&libraries=places"></script>
+    </head>*@
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Create External Well Tag");
+}
+
+<form asp-action="ExternalWellTag" method="post" asp-controller="MeasPoints" enctype="multipart/form-data">
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td style="width:40%;"><label asp-for="ProjectId"></label></td>
+            <td style="width:60%;"><select asp-for="ProjectId" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select Project")</option></select></td>
+        </tr>
+        <tr>
+            <td><label asp-for="SubProjectId"></label></td>
+            <td><select asp-for="SubProjectId" asp-items="ViewBag.SubProjectId"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select SubProject")</option></select></td>
+        </tr>
+        <tr>
+            <td><label asp-for="searchtext"></label></td>
+            <td><input asp-for=searchtext></td>
+        </tr>
+        <tr>
+            <td><label asp-for="OnlyAsBuilt"></label></td>
+            <td>@Html.EditorFor(Model => Model.OnlyAsBuilt) </td>
+        </tr>
+        <tr>
+            <td><label asp-for="PrintSecondaries"></label></td>
+            <td>@Html.EditorFor(Model => Model.PrintSecondaries) </td>
+        </tr>
+        <tr>
+            <td><label asp-for="TextForTag"></label></td>
+            <td><textarea asp-for="TextForTag" cols="30" rows="6"></textarea></td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Upload logo (not required)")</label></td>
+            <td><input type="file" asp-for="logo" accept=".jpg,.jpeg,.png" /></td>
+        </tr>
+        <tr><td colspan="2"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Submit")</button></td></tr>
+    </table>
+
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        function FillSubProjects()
+        {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+    }
+    </script>
+}

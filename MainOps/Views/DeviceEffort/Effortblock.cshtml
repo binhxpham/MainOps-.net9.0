@@ -1,0 +1,226 @@
+﻿@model MainOps.Models.WTPClasses.MixedClasses.DeviceEffort
+
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Effortblock");
+}
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Actions Required")</h2>
+<div>
+    <table>
+        <tr>
+            <td>
+                <form asp-action="Create">
+                    @Html.HiddenFor(model => model.wtp_block_id)
+                    @Html.HiddenFor(model => model.wtp_block_name)
+                    @Html.HiddenFor(model => model.wtp_block_size)
+                    <table>
+                        <tr>
+                            <td>
+                                @Html.LabelFor(model => model.efx.Name)
+                            </td>
+                            <td>
+                                @Html.TextBoxFor(model => model.efx.Name, new { @class = "Name-autocomplete", data_url = Url.Action("NameAutoComplete", "DeviceEffort") })
+                            </td>
+                            <td>
+                                @Html.ValidationMessageFor(model => model.efx.Name)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.LabelFor(model => model.efx.Category.category)
+                            </td>
+                            <td>
+                                @Html.DropDownListFor(model => model.efx.CategoryId, ViewData["Category_choices"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                            </td>
+                            <td>
+                                @Html.ValidationMessageFor(x => x.efx.CategoryId, "", new { @class = "text-danger" })
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.LabelFor(model => model.efx.effort)
+                            </td>
+                            <td>
+                                @Html.EditorFor(model => model.efx.effort)
+                            </td>
+                            <td>
+                                @Html.ValidationMessageFor(model => model.efx.effort)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.LabelFor(model => model.efx.WTPUnit.the_unit)
+                            </td>
+                            <td>
+                                @Html.DropDownListFor(model => model.efx.WTPUnitId, ViewData["Unit_choices"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                            </td>
+                            <td>
+                                @Html.ValidationMessageFor(x => x.efx.WTPUnitId, "", new { @class = "text-danger" })
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.LabelFor(model => model.efx.Temp_section.section)
+                            </td>
+                            <td>
+                                @Html.DropDownListFor(model => model.efx.Temp_sectionid, ViewData["Temporal_sections"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                            </td>
+                            <td>
+                                @Html.ValidationMessageFor(x => x.efx.Temp_sectionid, "", new { @class = "text-danger" })
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.LabelFor(model => model.efx.Division)
+                            </td>
+                            <td>
+                                @Html.DropDownListFor(model => model.efx.DivisionId, ViewData["Country_choices"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                            </td>
+                            <td>
+                                @Html.ValidationMessageFor(x => x.efx.DivisionId, "", new { @class = "text-danger" })
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @Html.LabelFor(model => model.efx.Wtp_luxurity.wtp_luxurity)
+                            </td>
+                            <td>
+                                @Html.DropDownListFor(model => model.efx.Wtp_luxurityId, ViewData["Luxurity_choices"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                            </td>
+                            <td>
+                                @Html.ValidationMessageFor(x => x.efx.Wtp_luxurityId, "", new { @class = "text-danger" })
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <input type="submit" value=@SharedLocalizer.GetLocalizedHtmlString("Create") class="btn btn-hoelscher" />
+                            </td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </form>
+            </td>
+            <td>
+                <form asp-action="CopyFrom">
+                    @Html.HiddenFor(model => model.wtp_block_id)
+                    <table>
+                        <tr>
+                            <td>
+                                <button type="submit" class="btn btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Copy Efforts From")</button>
+                            </td>
+                            <td>
+                                @Html.DropDownList("posWtpBlock", ViewData["WTPblocknames"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+                <form asp-action="CopyTo">
+                    @Html.HiddenFor(model => model.wtp_block_id)
+                    <table>
+                        <tr>
+                            <td>
+                                <button type="submit" class="btn btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Copy Efforts To")</button>
+                            </td>
+                            <td>
+                                @Html.DropDownList("posWtpBlock", ViewData["WTPblocknames"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </td>
+        </tr>
+    </table>
+
+
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.wtp_block_name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.efx.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.efx.Category.category)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.efx.effort)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.efx.WTPUnit.the_unit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.efx.Temp_section.section)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.efx.Division.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.efx.Wtp_luxurity.wtp_luxurity)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (var i = 0; i < Model.effortslist.Count; i++)
+        {
+            <tr>
+                @Html.HiddenFor(modelItem => Model.effortslist[i].Id)
+                <td>
+                    @Html.DisplayFor(modelItem => Model.effortslist[i].WTP_block_name)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => Model.effortslist[i].Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.effortslist[i].Category.category)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.effortslist[i].effort)
+                </td>
+                <td>
+                    @Html.Raw(Model.effortslist[i].WTPUnit.the_unit)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.effortslist[i].Temp_section.section)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.effortslist[i].Division.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.effortslist[i].Wtp_luxurity.wtp_luxurity)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@Model.effortslist[i].Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> |
+                    <a asp-action="Details" asp-route-id="@Model.effortslist[i].Id">@SharedLocalizer.GetLocalizedHtmlString("Details")</a> |
+                    <a asp-action="Delete" asp-route-id="@Model.effortslist[i].Id">@SharedLocalizer.GetLocalizedHtmlString("Delete")</a> |
+                    <a asp-action="GetPrice" asp-route-id="@Model.effortslist[i].Id">@SharedLocalizer.GetLocalizedHtmlString("See Price")</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(function () {
+            $('.Name-autocomplete').autocomplete({
+                minLength: 1,
+                source: function (request, response) {
+                    var url = $(this.element).data('url');
+
+                    $.getJSON(url,
+                        { term: request.term },
+                        function(data) {
+                            response(data);
+                        });
+                }
+            });
+        })
+    </script>
+}

@@ -1,0 +1,49 @@
+﻿@model MainOps.Models.BoQHeadLine
+@{
+    Layout = null;
+}
+
+<table style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th style="width:12%">
+                @SharedLocalizer.GetLocalizedHtmlString("Original BoQ")
+            </th>
+            <th style="width:12%">
+                @SharedLocalizer.GetLocalizedHtmlString("Applied BoQ")
+            </th>
+            <th style="width:25%">
+                @Html.DisplayFor(Model => Model.HeadLine)
+            </th>
+            <th style="width:51%">
+                @SharedLocalizer.GetLocalizedHtmlString("Descriptive text")
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ewbq in Model.ExtraWorkBoQs)
+        {
+            <tr>
+                <td colspan="3" style="font-size:16px;"><b>@Html.DisplayFor(modelItem => ewbq.ExtraWorkSubTitle)</b></td>
+            </tr>
+            foreach (var header in ewbq.Headers)
+            {
+                <tr>
+                    <td colspan="3"><b><text>@Html.DisplayFor(modelItem => header.Number) - @Html.DisplayFor(modelItem => header.Title) </text></b></td>
+                </tr>
+                foreach (var item in header.BoQItems.OrderBy(x => x.NewBoQNr))
+                    {
+
+                        <tr style="border-top: 2px solid blue;">
+                            <td>@Html.DisplayFor(modelItem => item.BoQnr) / @Html.DisplayFor(modelItem => item.BoQnr_Rental)</td>
+                            <td>@Html.DisplayFor(modelItem => item.NewBoQNr) / @Html.DisplayFor(modelItem => item.NewRentalBoQNr)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Item_Type)</td>
+                            <td>@Html.DisplayFor(modelItem => item.BoQItemDescription)</td>
+                        </tr>
+                        
+                    }
+                }
+            }
+
+    </tbody>
+</table>

@@ -1,0 +1,43 @@
+﻿
+@{
+    ViewData["Title"] = "Classes";
+}
+
+<table>
+    <tr>
+        <td><form asp-action="ExportClassesPDF" asp-controller="HJItems" target="_blank" method="get"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("PDF")</button></form></td>
+        <td><form asp-action="ExportClassesPDFWithCosts" asp-controller="HJItems" target="_blank" method="get"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("PDF with costs")</button></form></td>
+        <td><form asp-action="ExportClassesCSV" asp-controller="HJItems" method="get"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("CSV")</button></form></td>
+        <td><form asp-action="ExportClassesCSVWithCosts" asp-controller="HJItems" method="get"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("CSV with costs")</button></form></td>
+    </tr>
+</table>
+
+<table style="width:90%;table-layout:fixed;">
+    @foreach (var master in (List<HJItemMasterClass>)ViewBag.masters)
+    {
+        <tr>
+            <td>
+                -@master.NameAndNumber
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+        </tr>
+        @foreach (var subclass in (List<HJItemClass>)ViewData["subclasses"])
+        {
+             if (subclass.HJItemMasterClassId.Equals(master.Id)) { 
+                    <tr class="@String.Concat("cat",master.Id.ToString())" style="width:100%;">
+                        <td></td>
+                        <td style="width:20%;">
+                            -@subclass.NameAndNumber
+                        </td>
+                        <td style="text-align:right;"><a asp-action="Edit" asp-controller="HJItemClasses" asp-route-id="@subclass.Id">@string.Format("{0:N2}", subclass.Internal_Rent)</a></td>
+                    </tr>
+            }
+        }
+
+    }
+</table>
+
+

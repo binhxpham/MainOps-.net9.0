@@ -1,0 +1,249 @@
+﻿@model MainOps.Models.ViewModels.InstallVM
+
+@{
+    Layout = null;
+    var path = "";
+    if(Model.Install.Coordinates.Where(x => x.TypeCoord.Equals("Coord Measure")).Count() > 1)
+    {
+        foreach (var coord in Model.Install.Coordinates.Where(x => x.TypeCoord.Equals("Coord Measure")))
+        {
+            path = String.Concat(path, coord.Latitude, ",", coord.Longitude, "|");
+        }
+        path = path.Remove(path.Length - 1);
+    }
+
+
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("All Documenation")</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM"></script>
+</head>
+<table style="page-break-inside:avoid;">
+    <tr>
+        <td colspan="3">
+            <b>@SharedLocalizer.GetLocalizedHtmlString("Installation")</b>
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Install.Project.Name)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Install.Project.Name)
+        </td>
+        <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@Model.Install.Project.Division.Id/@Model.Install.Project.Division.LogoPath" width="151" height="66" /></td>
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Install.Project.ProjectNr)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Install.Project.ProjectNr)
+        </td>
+    </tr>
+    @if (Model.Install.SubProjectId != null)
+    {
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(Model => Model.Install.SubProject.Name)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.Install.SubProject.Name) : @Html.DisplayFor(Model => Model.Install.SubProject.SubProjectNr)
+            </td>
+        </tr>
+    }
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Install.Project.Client)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Install.Project.Client)
+        </td>
+
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Install.TimeStamp)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Install.TimeStamp.Date)
+        </td>
+        <td rowspan="7">
+            <div class="continer">
+                @if(Model.Install.Coordinates.Where(x => x.TypeCoord.Equals("Coord Measure")).Count() > 1) { 
+                    <img src="@String.Concat("https://maps.googleapis.com/maps/api/staticmap?size=400x400&path=", path, "&maptype=roadmap&&sensor=false", "&key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM")" style="width:500px;height:400px" />
+                }
+            else {                  
+                <img src="@String.Concat("https://maps.googleapis.com/maps/api/staticmap?center=",@Model.Install.Latitude,",",@Model.Install.Longitude,"&zoom=17&size=400x400&maptype=roadmap&scale=2&markers=size:mid%7Ccolor:red%7Clabel:P%7C",@Model.Install.Latitude,",",@Model.Install.Longitude,"&key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM")" style="width:400px;height:400px;" />
+                }
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Install.ItemType.Item_Type)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Install.ItemType.Item_Type)
+        </td>
+    </tr>
+    @if (Model.Install.UniqueID != null && Model.Install.UniqueID != "")
+    {
+        <tr>
+            <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.Install.UniqueID)</b></td>
+            <td>@Html.DisplayFor(Model => Model.Install.UniqueID)</td>
+        </tr>
+    }
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Install.Amount)
+            </b>
+        </td>
+
+        @if (Model.Install.ItemType.Install_Unit.TheUnit.Equals("pr. l"))
+        {
+            <td>@Html.DisplayFor(Model => Model.Install.Amount) @SharedLocalizer.GetLocalizedHtmlString("l")</td>
+        }
+        else if (Model.Install.ItemType.Install_Unit.TheUnit.Equals("pr. m"))
+        {
+            <td>@Html.DisplayFor(Model => Model.Install.Amount) @SharedLocalizer.GetLocalizedHtmlString("m")</td>
+        }
+        else
+        {
+            <td>@Html.DisplayFor(Model => Model.Install.Amount) @Html.DisplayFor(Model => Model.Install.ItemType.Install_Unit.TheUnit)</td>
+        }
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.Install.Location)</b></td>
+        <td>@Html.DisplayFor(Model => Model.Install.Location)</td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.Install.Latitude)</b></td>
+        <td>@Html.DisplayFor(Model => Model.Install.Latitude)</td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.Install.Longitude)</b></td>
+        <td>@Html.DisplayFor(Model => Model.Install.Longitude)</td>
+    </tr>
+    <tr>
+        <td colspan="3"><b>@Html.DisplayNameFor(Model => Model.Install.Install_Text)</b></td>
+    </tr>
+    <tr rowspan="20">
+        <td colspan="3">
+            <textarea rows="8" cols="64" class="form-control" style="width:100%;">@Html.DisplayFor(Model => Model.Install.Install_Text)</textarea>
+        </td>
+    </tr>
+</table>
+
+<table name="phototable" style="width:100%;page-break-inside:avoid;table-layout:fixed;">
+    @{ var rows = 0;}
+    @if (Model.Install_Photos.Count() % 3 == 0)
+    {
+        rows = Model.Install_Photos.Count() / 3;
+    }
+    else
+    {
+        rows = Convert.ToInt32(Model.Install_Photos.Count() / 3) + 1;
+    }
+    @{ var totalpics = Model.Install_Photos.Count();}
+    @for (int i = 0; i < rows; i++)
+    {
+
+        @if (totalpics - 3 >= 0) //enough room to add whole row
+        {
+            var photo1 = Model.Install_Photos.ElementAt((i + 1) * 3 - 3);
+            var photo2 = Model.Install_Photos.ElementAt((i + 1) * 3 - 3 + 1);
+            var photo3 = Model.Install_Photos.ElementAt((i + 1) * 3 - 3 + 2);
+
+
+
+            <tr>
+                @if (photo1.Path.Contains(".png"))
+                {
+                    <td style="width:100%"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0],".", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%" /></td>
+                }
+                else
+                {
+                    <td style="width:100%"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%" /></td>
+                }
+                @if (photo2.Path.Contains(".png"))
+                {
+                    <td style="width:100%"><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0],".", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%" /></td>
+                }
+                else
+                {
+                    <td style="width:100%"><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%" /></td>
+                }
+                @if (photo3.Path.Contains(".png"))
+                {
+                    <td style="width:100%"><img src="@String.Concat("/AHAK/", @String.Concat(photo3.Path.Split(".")[0],".", photo3.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%" /></td>
+                }
+                else
+                {
+                    <td style="width:100%"><img src="@String.Concat("/AHAK/", @String.Concat(photo3.Path.Split(".")[0], "_edit.", photo3.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%" /></td>
+                }
+
+            </tr>
+           
+            totalpics -= 3;
+        }
+        else if (totalpics - 2 >= 0)
+        {
+            var photo1 = Model.Install_Photos.ElementAt((i + 1) * 3 - 3);
+            var photo2 = Model.Install_Photos.ElementAt((i + 1) * 3 - 3 + 1);
+            <tr>
+                @if (photo1.Path.Contains(".png"))
+                {
+                    <td style="width:100%"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0],".", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%" /></td>
+                }
+                else
+                {
+                    <td style="width:100%"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%" /></td>
+                }
+                @if (photo2.Path.Contains(".png"))
+                {
+                    <td style="width:100%"><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0],".", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%" /></td>
+                }
+                else
+                {
+                    <td style="width:100%"><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%" /></td>
+                }
+                <td></td>
+            </tr>
+           
+            totalpics -= 2;
+        }
+        else //enough room to add 1 picture in row
+        {
+            var photo1 = Model.Install_Photos.ElementAt((i + 1) * 3 - 3);
+            <tr>
+                @if (photo1.Path.Contains(".png"))
+                {
+                    <td colspan="3" style="width:100%"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0],".", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                }
+                else
+                {
+                    <td colspan="3" style="width:100%"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                }
+
+            </tr>
+            totalpics -= 1;
+        }
+
+    }
+</table>

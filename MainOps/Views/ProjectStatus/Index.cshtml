@@ -1,0 +1,1151 @@
+﻿@model MainOps.Models.ProjectStatusVM
+@using Microsoft.AspNetCore.Localization
+@{
+    var annualamounts = Model.AnnualAmount;
+    var annualamountswithoutcancels = Model.AnnualAmountWithoutCancels;
+    var annualwin = Model.AnnualWinPercent;
+    var wonprojects = Model.WonProjects;
+    var annualoptions = Model.AnnualOptions;
+    var annualoptionsoveryears = Model.AnnualActualWorkOverYears;
+    var annualtotal = Model.AnnualTotal;
+    var annualtotaloveryears = Model.AnnualTotalOverYears;
+    var AnnualCategoryTotalWorth = Model.AnnualCategoryTotalWorth;
+    var AnnualCategoryOptionsWorth = Model.AnnualCategoryOptionsWorth;
+    var AnnualCategoryTotalWorthOverYears = Model.AnnualCategoryTotalWorthOverYears;
+    var AnnualCategoryOptionsWorthOverYears = Model.AnnualCategoryOptionsWorthOverYears;
+    var AnnualWorthWonProjects = Model.AnnualWorthWonProjects;
+    var AnnualWorthWonProjectsOverYears = Model.AnnualWorthWonProjectsOverYears;
+    var AnnualWorthOpenProjects = Model.AnnualWorthOpenProjects;
+    var AnnualWorthOpenProjectsOverYears = Model.AnnualWorthOpenProjectsOverYears;
+    var AnnualWorthLostProjects = Model.AnnualWorthLostProjects;
+    var AnnualWorthLostProjectsOverYears = Model.AnnualAverageWorthLostProjectsOverYears;
+    var AnnualWorthAverageWonProjects = Model.AnnualAverageWorthWonProjects;
+    var AnnualWorthAverageWonProjectsOverYears = Model.AnnualAverageWorthWonProjectsOverYears;
+    var AnnualWorthAverageLostProjects = Model.AnnualAverageWorthLostProjects;
+    var AnnualWorthAverageLostProjectsOverYears = Model.AnnualAverageWorthLostProjectsOverYears;
+    var AnnualEstimatedWork = Model.AnnualEstimatedWork;
+    var AnnualEstimatedWorkOverYears = Model.AnnualEstimatedWorkOverYears;
+    var AnnualActualWork = Model.AnnualActualWork;
+    var AnnualActualWorkOverYears = Model.AnnualActualWorkOverYears;
+    DateTime? start = ViewBag.Startdate;
+    DateTime? end = ViewBag.Enddate;
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var lang = requestCulture.RequestCulture.UICulture;
+    var ganttheight = "50px";
+    try {
+        ganttheight = String.Concat(Model.Projects.Where(x => !x.StatusDescriptionId.Equals(9) && !x.StatusDescriptionId.Equals(12) && x.EndDate != x.StartDate && x.EndDate.Date >= DateTime.Now.Date).ToList().Count * 41, "px");
+    }
+    catch
+    {
+        
+    }
+
+
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Tender Overview");
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" href="@Url.Content("~/css/loadercess.css")" />
+</head>
+<div id="theloader" class="loader" hidden="hidden" style="align-self:center;"></div>
+<div class="row">
+    <form asp-controller="ProjectStatus" asp-action="Index" method="get">
+        <div class="col-xs-12">
+            <table style="width:100%;table-layout:fixed;">
+                <tr>
+                    <td style="width:100%;"><label>@SharedLocalizer.GetLocalizedHtmlString("Start Date")</label></td>
+                    <td style="width:100%;"><label>@SharedLocalizer.GetLocalizedHtmlString("End Date")</label></td>
+                    <td style="width:100%;"><label>@SharedLocalizer.GetLocalizedHtmlString("Category")</label></td>
+                    <td style="width:100%;"><label>@SharedLocalizer.GetLocalizedHtmlString("Project Status")</label></td>
+                    <td style="width:100%;"><label>@SharedLocalizer.GetLocalizedHtmlString("Client")</label></td>
+                </tr>
+                <tr>
+                    <td><input type="datetime-local" value="@String.Format("{0:yyyy-MM-ddT00:00}",start)" name="Start" id="Start1" onchange="SetStart2();" style="width:100%;" /></td>
+                    <td><input type="datetime-local" value="@String.Format("{0:yyyy-MM-ddT00:00}",end)" name="End" id="End1" onchange="SetEnd2();" style="width:100%;" /></td>
+                    <td><select id="ProjectCategoryId" name="ProjectCategoryId" asp-items="ViewBag.ProjectCategoryId" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Category")</option></select></td>
+                    <td><select id="StatusDescriptionId" name="StatusDescriptionId" asp-items="ViewBag.StatusDescriptionId" style="width:100%;"><option value="" >@SharedLocalizer.GetLocalizedHtmlString("Choose Status")</option></select></td>
+                    <td><select id="ClientName" name="ClientName" asp-items="ViewBag.Clients" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Client")</option></select></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><button type="submit" class="btn-hoelscher"><span class="glyphicon glyphicon-search"></span></button></td>
+                </tr>
+            </table>
+        </div>
+    </form>
+
+</div>
+<span onclick="hideshowgraphsdiv();" style="cursor:pointer;">+@SharedLocalizer.GetLocalizedHtmlString("Hide/Show Graphs")</span>
+@if(Model.Projects.Count > 0)
+            {
+
+            
+<div id="graphsdiv">   
+    <table style="width:100%;table-layout:fixed;">
+        <thead>
+            <tr>
+                <th style="text-align:center;">@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Values when startdate defines the year").Value)</th>
+                <th style="text-align:center;">@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Values after spreading correctly from start->end").Value)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr style="border-top:1px solid black;border-left:1px solid black;border-right:1px solid black;">
+                <td colspan="2" style="text-align:center;">
+                    <p>@SharedLocalizer.GetLocalizedHtmlString("Blue: Here we see the worth of all projects that were/are tendered for in the following 5 phases: Won,Lost,Tender Phase, Budget Phase, Annulled")</p>
+                    <p>@SharedLocalizer.GetLocalizedHtmlString("Red: Here we see the worth of all projects that have been defined as 'won'")</p>
+                    <p>@SharedLocalizer.GetLocalizedHtmlString("Orange: Here we see the worth of all projects that are in 'Tender Phase' or 'Budget Price' - so still open to win")</p>
+                    <p>@SharedLocalizer.GetLocalizedHtmlString("Green: The expected value of projects in that given year")</p>
+                </td>
+            </tr>
+            <tr style="border-bottom:1px solid black;border-left:1px solid black;border-right:1px solid black;">
+                <td>
+                    <div class="container" style="width:100%;">
+                        <div id="chart2" style="width: 95%; height: 400px;"></div>
+                    </div>
+                </td>
+                <td>
+                    <div class="container" style="width:100%;">
+                        <div id="chart22" style="width: 95%; height: 400px;"></div>
+                    </div>
+                </td>
+
+            </tr>
+            <tr style="border-top:1px solid black;border-left:1px solid black;border-right:1px solid black;">
+                <td colspan="2" style="text-align:center;">
+                    <p>@SharedLocalizer.GetLocalizedHtmlString("Blue: # of all projects that were/are tendered for in the following 5 phases: Won,Lost,Tender Phase, Budget Phase, Annulled")</p>
+                    <p>@SharedLocalizer.GetLocalizedHtmlString("Red: # of all projects that were/are tendered for in the following 4 phases: Won,Lost,Tender Phase, Budget Phase")</p>
+                    <p>@SharedLocalizer.GetLocalizedHtmlString("Orange: # of won projects with startdate in that year")</p>
+                    <p>@SharedLocalizer.GetLocalizedHtmlString("Green: Win-% of Blue")</p>
+                    <p>@SharedLocalizer.GetLocalizedHtmlString("Purle: Win-% of Red")</p>
+                </td>
+            </tr>
+            <tr style="border-bottom:1px solid black;border-left:1px solid black;border-right:1px solid black;">
+                <td colspan="2">
+                    <div class="container" style="width:100%;">
+                        <div id="chart1" style="width: 95%; height: 400px;"></div>
+                    </div>
+                </td>
+
+            </tr>
+            <tr style="border-top:1px solid black;border-left:1px solid black;border-right:1px solid black;">
+                <td colspan="2" style="text-align:center;">
+                    <p>@SharedLocalizer.GetLocalizedHtmlString("Distribution of contract value of each category of work within HJ. This only shows for projects which have had ANY categories marked. Value is distributed evenly among chosen categories")</p>
+                </td>
+            </tr>
+            <tr style="border-bottom:1px solid black;border-left:1px solid black;border-right:1px solid black;">
+                <td>
+                    <div class="container" style="width:100%;">
+                        <div id="chart3" style="width: 95%; height: 400px;"></div>
+                    </div>
+                </td>
+                <td>
+                    <div class="container" style="width:100%;">
+                        <div id="chart32" style="width: 95%; height: 400px;"></div>
+                    </div>
+                </td>
+
+            </tr>
+            <tr style="border-top:1px solid black;border-left:1px solid black;border-right:1px solid black;">
+                <td colspan="2" style="text-align:center;">
+                    <p>@SharedLocalizer.GetLocalizedHtmlString("Blue: Average value of won projects for the given year")</p>
+                    <p>@SharedLocalizer.GetLocalizedHtmlString("Red: Average value of lost projects for the given year")</p>
+                    <p>@SharedLocalizer.GetLocalizedHtmlString("Only projecst marked specifically as WON or LOST are accounted for")</p>
+                </td>
+            </tr>
+            <tr style="border-bottom:1px solid black;border-left:1px solid black;border-right:1px solid black;">
+                <td>
+                    <div class="container" style="width:100%;">
+                        <div id="chart4" style="width: 95%; height: 400px;"></div>
+                    </div>
+                </td>
+                <td>
+                    <div class="container" style="width:100%;">
+                        <div id="chart42" style="width: 95%; height: 400px;"></div>
+                    </div>
+                </td>
+            </tr>
+            <tr style="border-top:1px solid black;border-left:1px solid black;border-right:1px solid black;">
+                <td colspan="2" style="text-align:center;">
+                    <p>@SharedLocalizer.GetLocalizedHtmlString("Gantt diagram of projects not yet finalized")</p>
+                </td>
+            </tr>
+            <tr style="border-bottom:1px solid black;border-left:1px solid black;border-right:1px solid black;">
+                <td colspan="2">
+                    <div class="container" style="width:100%;">
+                        <div id="ganttdiv" style="width:95%; height:@ganttheight;overflow-y:scroll;overflow-x:scroll;"></div>
+                    </div>
+                </td>
+            </tr>
+            <tr style="border-top:1px solid black;border-left:1px solid black;border-right:1px solid black;">
+                <td colspan="2" style="text-align:center;">
+                    <p>@SharedLocalizer.GetLocalizedHtmlString("Timeline including contract worths for projects not yet finalized")</p>
+                </td>
+            </tr>
+            <tr style="border-bottom:1px solid black;border-left:1px solid black;border-right:1px solid black;">
+                <td colspan="2">
+                    <div class="container" style="width:100%;">
+                        <div id="timeline"></div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+}
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Tenders")</h2>
+
+<p>
+    <a asp-action="Create">@SharedLocalizer.GetLocalizedHtmlString("Enter new Tender")</a>
+</p>
+@if (Model.Projects.Count > 0)
+{
+    <table class="table" style="width:100%;table-layout:fixed;word-break:break-word;border:2px solid black;">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Projects.First().StatusDescription.Description)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Projects.First().QuoteNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Projects.First().ProjectName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Projects.First().Client)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Projects.First().ClientContact)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Projects.First().TenderManager)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Projects.First().StartDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Projects.First().EndDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Projects.First().TenderDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Projects.First().ClientTenderDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Projects.First().DateSubmitted)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Projects.First().ProjectDescription)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Projects.First().TotalContractValue)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Projects.First().OptionsValue)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Projects.First().Comments)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Projects)
+            {
+            <tr>
+                <td>
+                    @SharedLocalizer.GetLocalizedHtmlString(item.StatusDescription.Description).Value
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.QuoteNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProjectName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Client)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ClientContact)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TenderManager)
+                </td>
+                <td>
+                    @item.StartDate.ToString("yyyy-MM-dd")
+                </td>
+                <td>
+                    @item.EndDate.ToString("yyyy-MM-dd")
+                </td>
+                <td>
+                    @if (item.TenderDate == null)
+                    {
+
+                    }
+                    else
+                    {
+                        @Html.Raw(Convert.ToDateTime(item.TenderDate).ToString("yyyy-MM-dd"))
+                    }
+                </td>
+                <td>
+                    @if (item.ClientTenderDate == null)
+                    {
+
+                    }
+                    else
+                    {
+                        @Html.Raw(Convert.ToDateTime(item.ClientTenderDate).ToString("yyyy-MM-dd"))
+                    }
+                </td>
+                <td>
+                    @if (item.DateSubmitted == null)
+                    {
+
+                    }
+                    else
+                    {
+                        @Html.Raw(Convert.ToDateTime(item.DateSubmitted).ToString("yyyy-MM-dd"))
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProjectDescription)
+                </td>
+                <td>
+                    @String.Format("{0:C2}", item.TotalContractValue)
+                </td>
+                <td>
+                    @String.Format("{0:C2}", item.OptionsValue)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Comments)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@section scripts{
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load("current", { packages: ['corechart', 'gantt'] }); // google.charts.load('current', {'packages':['gantt']});
+        google.charts.load('current', {  packages: ['timeline']   });
+        google.charts.setOnLoadCallback(drawCharts);
+        $(window).resize(drawCharts);
+        var container = document.getElementById('timeline');
+        var dataTableGroup;
+        var dateRangeStart;
+        var dateRangeEnd;
+        var formatDate;
+        var rowHeight;
+        var options;
+        var datas = [];
+        function toggleLoad() {
+            var x = document.getElementById("theloader");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            }
+            else {
+                x.style.display = "none";
+            }
+        }
+        function calculateSeries(joinedData) {
+            var series = {};
+            for (var i = 0; i < joinedData.getNumberOfColumns() - 1; i++) {
+                if (i == 0) {
+                    series[i] = {
+                        targetAxisIndex: 0
+                    };
+                }
+                else {
+                    series[i] = {
+                        targetAxisIndex: 1
+                    };
+                }
+
+            }
+
+            return series;
+        }
+        function drawChart1() {
+            var data = new google.visualization.DataTable();
+            var datas = new Array();
+            data.addColumn('string', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Year").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Projects").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Projects w/o cancels").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Won Projects").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Win %").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Win % #2").Value)');
+            //data.addColumn({ type: 'string', role: 'style' });
+            //data.addColumn('number', 'Won Projects');
+            //data.addColumn({ type: 'string', role: 'style' });
+            //data.addColumn('number', 'Win %');
+            //data.addColumn({ type: 'string', role: 'style' });
+             @foreach (var d in annualamounts.OrderBy(x => x.Year))
+             {
+                 var actualvalue = annualamountswithoutcancels.FirstOrDefault(x => x.Year.Equals(d.Year));
+                 var wonvalue = Model.WonProjects.Where(x => x.StartDate.Year.Equals(d.Year)).Count();
+                 var winpercent = (wonvalue / d.Value);
+                 var winpercent2 = (wonvalue / actualvalue.Value);
+
+                         <text>
+                        </text>
+                 @:datas.push(["@d.Year",@d.Value,@actualvalue.Value,@wonvalue,@(winpercent*100),@(winpercent2*100)]);
+
+
+
+            }
+             data.addRows(datas);
+            var options = {
+                chart: {
+                    title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Projects").Value)',
+                    subtitle: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Win-rate").Value)',
+                    width: '100%',
+                    height: 400,
+                    bar: { groupWidth: "90%" },
+                    legend: { position: "top" },
+                },
+                hAxis: {
+                    title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Year").Value)',
+                    format: 'yyyy'
+                },
+                vAxes: {
+                    0: { targetAxisIndex: 0, title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Total Projects").Value)' },
+                    1: { targetAxisIndex: 0, title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Total Won Projects").Value)' },
+                    2: { targetAxisIndex: 1, title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Winrate").Value)' },
+                },
+            };
+            var chart = new google.visualization.ColumnChart(document.getElementById("chart1"));
+            chart.draw(data, options);
+        }
+        function drawChart2() {
+            var data = new google.visualization.DataTable();
+            var datas = new Array();
+            data.addColumn('string', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("year").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Total Value All Projects pr. year").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Total Value Won Projects pr. year").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Total Value Open Projects pr. year").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Expected Total Value pr. year").Value)');
+
+            @foreach (var d in annualtotal.OrderBy(x => x.Year))
+            {
+                var wonvalue = AnnualWorthWonProjects.FirstOrDefault(x => x.Year.Equals(d.Year));
+                var openvalue = AnnualWorthOpenProjects.FirstOrDefault(x => x.Year.Equals(d.Year));
+                var estimatevalue = AnnualEstimatedWork.FirstOrDefault(x => x.Year.Equals(d.Year));
+                <text>
+                </text>
+                @:datas.push(["@d.Year",@(Convert.ToInt32(d.Value/1000)*1000),@(Convert.ToInt32(wonvalue.Value/1000)*1000),@(Convert.ToInt32(openvalue.Value/1000)*1000),@(Convert.ToInt32(estimatevalue.Value/1000)*1000)]);
+            }
+            data.addRows(datas);
+            var options = {
+                chart: {
+                    title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Project Value").Value)',
+                    subtitle: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Installation Value").Value)',
+                    width: '100%',
+                    height: 400,
+                    bar: { groupWidth: "90%" },
+                    legend: { position: "top" },
+                },
+                hAxis: {
+                    title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Year").Value)',
+                    format: 'yyyy'
+                },
+                vAxis: {
+                    title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Value [DKK]").Value)'
+                }
+            };
+            var chart = new google.visualization.ColumnChart(document.getElementById("chart2"));
+            chart.draw(data, options);
+        }
+        function drawChart22() {
+            var data = new google.visualization.DataTable();
+            var datas = new Array();
+            data.addColumn('string', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Year").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Total Value All Projects pr. year").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Total Value Won Projects pr. year").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Total Value Open Projects pr. year").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Expected Total Value pr. year").Value)');
+
+            @foreach (var d in annualtotaloveryears.OrderBy(x => x.Year))
+            {
+                var wonvalue = AnnualWorthWonProjectsOverYears.FirstOrDefault(x => x.Year.Equals(d.Year));
+                var openvalue = AnnualWorthOpenProjectsOverYears.FirstOrDefault(x => x.Year.Equals(d.Year));
+                var estimatevalue = AnnualEstimatedWorkOverYears.FirstOrDefault(x => x.Year.Equals(d.Year));
+                <text>
+                </text>
+                @:datas.push(["@d.Year",@(Convert.ToInt32(d.Value/1000)*1000),@(Convert.ToInt32(wonvalue.Value/1000)*1000),@(Convert.ToInt32(openvalue.Value/1000)*1000),@(Convert.ToInt32(estimatevalue.Value/1000)*1000)]);
+            }
+            data.addRows(datas);
+            var options = {
+                chart: {
+                    title: '@SharedLocalizer.GetLocalizedHtmlString("Project Value").Value',
+                    subtitle: '@SharedLocalizer.GetLocalizedHtmlString("Installation Value").Value',
+                    width: '100%',
+                    height: 400,
+                    bar: { groupWidth: "90%" },
+                    legend: { position: "top" },
+                },
+                hAxis: {
+                    title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Year").Value)',
+                    format: 'yyyy'
+                },
+                vAxis: {
+                    title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Value [DKK]").Value)'
+                }
+            };
+            var chart = new google.visualization.ColumnChart(document.getElementById("chart22"));
+            chart.draw(data, options);
+        }
+        function drawChart3() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("year").Value)');
+            var datarow = [];
+            @foreach(var c in Model.Categories)
+            {
+                <text>
+                data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString(@c.Text).Value)');
+                </text>
+            }
+            @foreach(var year in AnnualCategoryTotalWorth.OrderBy(y => y.Year).Select(x => x.Year).Distinct())
+                {
+                    <text>
+                        datarow.push("@year");
+                    </text>
+                 @foreach (var c in Model.Categories)
+                 {
+                     var amount = AnnualCategoryTotalWorth.Where(x => x.Year.Equals(year) && x.Category.Equals(c.Text)).SingleOrDefault();
+                     var numcategories = AnnualCategoryTotalWorth.Where(x => x.Year.Equals(year)).Count();
+                     if (amount != null) {
+                         <text>
+                             datarow.push(parseFloat("@(Convert.ToInt32(amount.Value / numcategories / 1000.0)*1000.0)"));
+                         </text>
+                     }
+                     else
+                     {
+                         <text>
+                            datarow.push(parseFloat("0.00"));
+                         </text>
+                     }
+                 }
+                <text>
+            data.addRows([datarow]);
+                datarow = [];
+                </text>
+                 }
+            //var data = google.visualization.arrayToDataTable([datas]);
+
+            var options = {
+                chart: {
+                    title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Value by Category").Value)',
+                    width: '100%',
+                    height: 400,
+                    bar: { groupWidth: "90%" },
+                    legend: { position: "top" },
+                },
+                hAxis: {
+                    title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Year").Value)',
+                    format: 'yyyy'
+                },
+                //vAxes: {
+                //    0: { title: "Total value dewatering" },
+                //    1: { title: "Total value others"}
+                //},
+                vAxes: {
+                    0: {title: "@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Value [DKK]").Value)"},
+                }
+                /*series: calculateSeries(data)*/
+
+            };
+            var chart = new google.visualization.ColumnChart(document.getElementById('chart3'));
+                chart.draw(data, options);
+            }
+        function drawChart32() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Year").Value)');
+            var datarow = [];
+            @foreach(var c in Model.Categories)
+            {
+                <text>
+                data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString(@c.Text).Value)');
+                </text>
+            }
+            @foreach(var year in AnnualCategoryTotalWorthOverYears.OrderBy(y => y.Year).Select(x => x.Year).Distinct())
+                {
+                    <text>
+                        datarow.push("@year");
+                    </text>
+                 @foreach (var c in Model.Categories)
+                 {
+                     var amount = AnnualCategoryTotalWorthOverYears.Where(x => x.Year.Equals(year) && x.Category.Equals(c.Text)).SingleOrDefault();
+                     var numcategories = AnnualCategoryTotalWorthOverYears.Where(x => x.Year.Equals(year)).Count();
+                     if (amount != null) {
+                         <text>
+                             datarow.push(parseFloat("@(Convert.ToInt32(amount.Value / numcategories / 1000.0)*1000.0)"));
+                         </text>
+                     }
+                     else
+                     {
+                         <text>
+                            datarow.push(parseFloat("0.00"));
+                         </text>
+                     }
+                 }
+                <text>
+            data.addRows([datarow]);
+                datarow = [];
+                </text>
+                 }
+            //var data = google.visualization.arrayToDataTable([datas]);
+
+            var options = {
+                chart: {
+                    title: '@SharedLocalizer.GetLocalizedHtmlString("Value by Category").Value',
+                    width: '100%',
+                    height: 400,
+                    bar: { groupWidth: "90%" },
+                    legend: { position: "top" },
+                },
+                hAxis: {
+                    title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Year").Value)',
+                    format: 'yyyy'
+                },
+                //vAxes: {
+                //    0: { title: "Total value dewatering" },
+                //    1: { title: "Total value others"}
+                //},
+                vAxes: {
+                    0: {title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Value [DKK]").Value)'},
+                }
+                /*series: calculateSeries(data)*/
+
+            };
+            var chart = new google.visualization.ColumnChart(document.getElementById('chart32'));
+                chart.draw(data, options);
+            }
+    function drawCharts() {
+    /*toggleLoad();*/
+        drawChart1();
+        drawChart2();
+        drawChart3();
+        drawChart4();
+        //drawChart5();
+        drawChart22();
+        drawChart32();
+        drawChart42();
+        //drawChart52();
+        drawGantt();
+        drawTimeLine();
+    /*toggleLoad();*/
+    }
+
+        function drawChart4() {
+            var data = new google.visualization.DataTable();
+            var datas = new Array();
+            data.addColumn('string', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Year").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Won Projects Average Value").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Lost Projects Average Value").Value)');
+           @foreach (var d in AnnualWorthAverageWonProjects.OrderBy(x => x.Year))
+           {
+               var lostvalue = AnnualWorthAverageLostProjects.FirstOrDefault(x => x.Year.Equals(d.Year));
+
+                <text>
+                </text>
+                @:datas.push(["@d.Year",@d.Value,@lostvalue.Value]);
+            }
+            data.addRows(datas);
+            var options = {
+                chart: {
+                    title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Value by Category").Value)',
+                    width: '100%',
+                    height: 400,
+                    bar: { groupWidth: "90%" },
+                    legend: { position: "top" },
+                },
+                hAxis: {
+                    title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Year").Value)',
+                    format: 'yyyy'
+                },
+                vAxes: {
+                    0: { title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Average Value [DKK]").Value)' },
+                }
+            }
+                var chart = new google.visualization.ColumnChart(document.getElementById("chart4"));
+                chart.draw(data, options);
+
+        }
+        function drawChart42() {
+            var data = new google.visualization.DataTable();
+            var datas = new Array();
+            data.addColumn('string', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Year").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Won Projects Average Value").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Lost Projects Average Value").Value)');
+           @foreach (var d in AnnualWorthAverageWonProjectsOverYears.OrderBy(x => x.Year))
+           {
+               var lostvalue = AnnualWorthAverageLostProjectsOverYears.FirstOrDefault(x => x.Year.Equals(d.Year));
+
+                <text>
+                </text>
+                @:datas.push(["@d.Year",@d.Value,@lostvalue.Value]);
+            }
+            data.addRows(datas);
+            var options = {
+                chart: {
+                    title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Average Values of Projects").Value)',
+                    width: '100%',
+                    height: 400,
+                    bar: { groupWidth: "90%" },
+                    legend: { position: "top" },
+                },
+                hAxis: {
+                    title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Year").Value)',
+                    format: 'yyyy'
+                },
+                vAxes: {
+                    0: { title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Average Value [DKK]").Value)' },
+                }
+            }
+                var chart = new google.visualization.ColumnChart(document.getElementById("chart42"));
+                chart.draw(data, options);
+
+        }
+        function drawChart5() {
+            var data = new google.visualization.DataTable();
+            var datas = new Array();
+            data.addColumn('string', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Year").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Estimated Work").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Actual Work").Value)');
+
+            @foreach (var d in AnnualEstimatedWork.OrderBy(x => x.Year))
+            {
+                var win = AnnualActualWork.FirstOrDefault(x => x.Year.Equals(d.Year));
+                <text>
+                </text>
+                if(win != null) {
+                @:datas.push(["@d.Year",@d.Value,@win.Value]);
+                }
+                    else
+                    {
+                    @:datas.push(["@d.Year",@d.Value,0.00]);
+                    }
+            }
+            data.addRows(datas);
+            var options = {
+                chart: {
+                    title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Forecast vs Reality").Value)',
+                    subtitle: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Project Values").Value)',
+                    width: '100%',
+                    height: 400,
+                    bar: { groupWidth: "90%" },
+                    legend: { position: "top" },
+                },
+                hAxis: {
+                    title: 'Year',
+                    format: 'yyyy'
+                },
+                vAxis: {
+                    title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Value of estimated work <> Value of Won Work").Value)'
+                }
+            };
+            var chart = new google.visualization.ColumnChart(document.getElementById("chart5"));
+            chart.draw(data, options);
+            // callback after draw (afterDraw() function is called after chart is drawn)
+            google.visualization.events.addListener(chart, 'ready', afterDraw);
+
+
+        }
+        function drawChart52() {
+            var data = new google.visualization.DataTable();
+            var datas = new Array();
+            data.addColumn('string', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Year").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Estimated Work").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Actual Work").Value)');
+
+            @foreach (var d in AnnualEstimatedWorkOverYears.OrderBy(x => x.Year))
+            {
+                var win = AnnualActualWorkOverYears.FirstOrDefault(x => x.Year.Equals(d.Year));
+                <text>
+                </text>
+                if(win != null) {
+                @:datas.push(["@d.Year",@d.Value,@win.Value]);
+                }
+                    else
+                    {
+                    @:datas.push(["@d.Year",@d.Value,0.00]);
+                    }
+            }
+            data.addRows(datas);
+            var options = {
+                chart: {
+                    title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Forecast vs Reality").Value)',
+                    subtitle: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Project Values").Value)',
+                    width: '100%',
+                    height: 400,
+                    bar: { groupWidth: "90%" },
+                    legend: { position: "top" },
+                },
+                hAxis: {
+                    title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Year").Value)',
+                    format: 'yyyy'
+                },
+                vAxis: {
+                    title: '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Value of estimated work <> Value of Won Work").Value)'
+                }
+            };
+            var chart = new google.visualization.ColumnChart(document.getElementById("chart52"));
+            chart.draw(data, options);
+            // callback after draw (afterDraw() function is called after chart is drawn)
+            google.visualization.events.addListener(chart, 'ready', afterDraw);
+
+
+        }
+        function afterDraw() {
+
+            // the container element to append our generated DIVs (with the labels)
+            // it has to be outside the SVG element, but inside the chart container
+            var toContainer = $('#chart_div > div > div');
+
+            // in order to create DIVs to place them on top of the bars, we first need to get bars SVG/RECTs positions and sizes
+            // in my case, the RECT elements with the necessary top/left/width/height are in the 6th G element
+            $("#chart_div g:eq(5) rect").each(function () {
+                toContainer.append("<div style='top:" + $(this).attr('y') + "px; left: " + $(this).attr('x') + "px; width: " + $(this).attr('width') + "px; height: " + $(this).attr('height') + "px;text-align: center;position:absolute;line-height:2' >Some text</div>");
+            });
+
+        }
+        function drawGantt() {
+            var data = new google.visualization.DataTable();
+            var datas = new Array();
+            data.addColumn('string', 'Task ID');
+            data.addColumn('string', 'Task Name');
+            data.addColumn("string", '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Resource").Value)');
+            data.addColumn('date', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Start Date").Value)');
+            data.addColumn('date', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("End Date").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Duration").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Percent Complete").Value)');
+            data.addColumn('string', 'Dependencies');
+
+
+            @foreach (var p in Model.Projects.Where(x => x.EndDate.Date >= DateTime.Now.Date && !x.StatusDescriptionId.Equals(12) && !x.StatusDescriptionId.Equals(9) && x.EndDate != x.StartDate).OrderByDescending(x => x.QuoteNumber))
+            {
+                <text>
+            var submitexists = false;
+            var tenderexists = false;
+            var clienttenderexists = false;
+            @*if ("@p.DateSubmitted" != "") {
+                var submitdate1 = new Date(@Convert.ToDateTime(p.DateSubmitted).Year,@Convert.ToDateTime(p.DateSubmitted).Month-1,@Convert.ToDateTime(p.DateSubmitted).Day);
+                var submitdate2 = new Date(@Convert.ToDateTime(p.DateSubmitted).Year,@Convert.ToDateTime(p.DateSubmitted).Month-1,@Convert.ToDateTime(p.DateSubmitted).Day + 1);
+                datas.push(["@p.QuoteNumber Submit", "@Html.Raw(p.ProjectName) -Submit","@p.QuoteNumber", submitdate1, submitdate2, daysToMilliseconds(1),iscompleted(submitdate1,submitdate2), null]);
+                submitexists = true;
+            }
+            if ("@p.TenderDate" != "") {
+                var tenderdate1 = new Date(@Convert.ToDateTime(p.TenderDate).Year,@Convert.ToDateTime(p.TenderDate).Month-1,@Convert.ToDateTime(p.TenderDate).Day);
+                var tenderdate2 = new Date(@Convert.ToDateTime(p.TenderDate).Year,@Convert.ToDateTime(p.TenderDate).Month-1,@Convert.ToDateTime(p.TenderDate).Day + 1);
+                if (submitexists == true) {
+                    datas.push(["@p.QuoteNumber Tender", "@Html.Raw(p.ProjectName) -Tender", "@p.QuoteNumber", tenderdate1, tenderdate2, daysToMilliseconds(1), iscompleted(tenderdate1, tenderdate2), "@p.QuoteNumber Submit"]);
+                }
+                else {
+                    datas.push(["@p.QuoteNumber Tender", "@Html.Raw(p.ProjectName) -Tender", "@p.QuoteNumber", tenderdate1, tenderdate2, daysToMilliseconds(1), iscompleted(tenderdate1, tenderdate2), null]);
+                }
+                tenderexists = true;
+
+            }
+            if ("@p.ClientTenderDate" != "") {
+                var clienttenderdate1 = new Date(@Convert.ToDateTime(p.ClientTenderDate).Year,@Convert.ToDateTime(p.ClientTenderDate).Month-1,@Convert.ToDateTime(p.ClientTenderDate).Day);
+                var clienttenderdate2 = new Date(@Convert.ToDateTime(p.ClientTenderDate).Year,@Convert.ToDateTime(p.ClientTenderDate).Month-1,@Convert.ToDateTime(p.ClientTenderDate).Day + 1);
+                if (tenderexists == true) {
+                    datas.push(["@p.QuoteNumber Client Tender", "@Html.Raw(p.ProjectName) -Client Tender", "@p.QuoteNumber", clienttenderdate1, clienttenderdate2, daysToMilliseconds(1), iscompleted(clienttenderdate1, clienttenderdate2), "@p.QuoteNumber Tender"]);
+                }
+                else if (submitexists == true) {
+                    datas.push(["@p.QuoteNumber Client Tender", "@Html.Raw(p.ProjectName) -Client Tender", "@p.QuoteNumber", clienttenderdate1, clienttenderdate2, daysToMilliseconds(1), iscompleted(clienttenderdate1, clienttenderdate2), "@p.QuoteNumber Submit"]);
+                }
+                else {
+                    datas.push(["@p.QuoteNumber Client Tender", "@Html.Raw(p.ProjectName) -Client Tender", "@p.QuoteNumber", clienttenderdate1, clienttenderdate2, daysToMilliseconds(1), iscompleted(clienttenderdate1, clienttenderdate2), null]);
+                }
+                clienttenderexists = true;
+
+            }*@
+                var startdate = new Date(@p.StartDate.Year,@p.StartDate.Month-1,@p.StartDate.Day);
+                var enddate = new Date(@p.EndDate.Year,@p.EndDate.Month-1,@p.EndDate.Day);
+                var datediffmilli = enddate - startdate;
+                if (clienttenderexists == true) {
+                     datas.push(["@p.QuoteNumber", "@Html.Raw(p.ProjectName)","@p.QuoteNumber", startdate, enddate, datediffmilli, iscompleted(startdate, enddate), "@p.QuoteNumber Client Tender"]);
+                }
+                else if (tenderexists == true) {
+                     datas.push(["@p.QuoteNumber", "@Html.Raw(p.ProjectName)","@p.QuoteNumber", startdate, enddate, datediffmilli, iscompleted(startdate, enddate), "@p.QuoteNumber Tender"]);
+                }
+                else if (submitexists == true) {
+                     datas.push(["@p.QuoteNumber", "@Html.Raw(p.ProjectName)","@p.QuoteNumber", startdate, enddate, datediffmilli, iscompleted(startdate, enddate), "@p.QuoteNumber Submit"]);
+                }
+                else {
+                     datas.push(["@p.QuoteNumber", "@Html.Raw(p.ProjectName)","@p.QuoteNumber", startdate, enddate, datediffmilli, iscompleted(startdate, enddate), null]);
+                }
+
+                </text>
+
+                // her var de alle med @:
+
+            }
+            data.addRows(datas);
+            var options = {
+                gantt: {
+                    labelStyle: {
+                        fontSize: 11,
+                    },
+                    /*palette: getPalette(),*/
+                    criticalPathEnabled: false,
+                    innerGridHorizLine: {
+                        stroke: '#009EFF',
+                        strokeWidth: 2
+                    },
+
+                },
+                //hAxis: {
+                //    scaleType: 'log'
+                //},
+                width: '100%',
+                height: '100%',
+            };
+            var chart = new google.visualization.Gantt(document.getElementById('ganttdiv'));
+            chart.draw(data, options);
+        }
+        function drawTimeLine() {
+                var container = document.getElementById('timeline');
+                var chart = new google.visualization.Timeline(container);
+                var dataTable = new google.visualization.DataTable();
+                var datas = new Array();
+                dataTable.addColumn({ type: 'string', id: 'Project' });
+                dataTable.addColumn({ type: 'string', id: 'Value' });
+                dataTable.addColumn({ type: 'date', id: 'Start' });
+            dataTable.addColumn({ type: 'date', id: 'End' });
+            google.visualization.events.addListener(chart, 'ready', function () {
+                addMarker(new Date());
+            });
+            @foreach (var p in Model.Projects.Where(x => x.EndDate.Date >= DateTime.Now.Date && !x.StatusDescriptionId.Equals(12) && !x.StatusDescriptionId.Equals(9) && x.EndDate != x.StartDate))
+            {
+                <text>
+                        var startdate = new Date(@p.StartDate.Year,@p.StartDate.Month-1,@p.StartDate.Day);
+                        var enddate = new Date(@p.EndDate.Year,@p.EndDate.Month-1,@p.EndDate.Day);
+                        datas.push(["@Html.Raw(p.ProjectName)", "@String.Format("{0:###,###,###} DKK", Convert.ToInt32(p.TotalContractValue/1000)*1000)", startdate, enddate]);
+                </text>
+            }
+            dataTable.addRows(datas);
+            dataTableGroup = google.visualization.data.group(dataTable, [0]);
+            dateRangeStart = dataTable.getColumnRange(2);
+            dateRangeEnd = dataTable.getColumnRange(3);
+            formatDate = new google.visualization.DateFormat({
+                pattern: 'MM/dd/yyyy'
+            });
+            rowHeight = 44;
+            options = {
+                height: (dataTableGroup.getNumberOfRows() * rowHeight) + rowHeight
+            };
+
+            window.addEventListener('resize', drawCharts, false);
+            chart.draw(dataTable,options);
+            }
+        function iscompleted(datecheckstart, datecheckend) {
+            var today = new Date();
+            if (datecheckend <= today) {
+                return 100;
+            }
+            else if (datecheckstart > today) {
+                return 0;
+            }
+            else if(datecheckstart <= today && datecheckend > today)
+            {
+                var duration = datecheckend - datecheckstart;
+                var donepart = today - datecheckstart;
+                var percentdone = donepart / duration * 100;
+                return percentdone;
+            }
+            else {
+                return 0;
+            }
+        }
+        function SetStart1() {
+            document.getElementById("Start1").value = document.getElementById("Start2").value;
+        }
+        function SetEnd1() {
+            document.getElementById("End1").value = document.getElementById("End2").value;
+        }
+        function SetStart2() {
+            document.getElementById("Start2").value = document.getElementById("Start1").value;
+        }
+        function SetEnd2() {
+            document.getElementById("End2").value = document.getElementById("End1").value;
+        }
+        function daysToMilliseconds(days) {
+            return days * 24 * 60 * 60 * 1000;
+        }
+        function hideshowgraphsdiv()
+        {
+            $("#graphsdiv").toggle();
+        }
+        //function getPalette() {
+        //    return [
+        //        {
+        //            "color": "#5e97f6",
+        //            "dark": "#2a56c6",
+        //            "light": "#c6dafc"
+        //        },
+        //        {
+        //            "color": "#db4437",
+        //            "dark": "#a52714",
+        //            "light": "#f4c7c3"
+        //        },
+        //        {
+        //            "color": "#f2a600",
+        //            "dark": "#ee8100",
+        //            "light": "#fce8b2"
+        //        },
+        //        {
+        //            "color": "#0f9d58",
+        //            "dark": "#0b8043",
+        //            "light": "#b7e1cd"
+        //        },
+        //        {
+        //            "color": "#ab47bc",
+        //            "dark": "#6a1b9a",
+        //            "light": "#e1bee7"
+        //        },
+        //        {
+        //            "color": "#00acc1",
+        //            "dark": "#00838f",
+        //            "light": "#b2ebf2"
+        //        },
+        //        {
+        //            "color": "#ff7043",
+        //            "dark": "#e64a19",
+        //            "light": "#ffccbc"
+        //        },
+        //        {
+        //            "color": "#9e9d24",
+        //            "dark": "#827717",
+        //            "light": "#f0f4c3"
+        //        },
+        //        {
+        //            "color": "#5c6bc0",
+        //            "dark": "#3949ab",
+        //            "light": "#c5cae9"
+        //        },
+        //        {
+        //            "color": "#f06292",
+        //            "dark": "#e91e63",
+        //            "light": "#f8bbd0"
+        //        },
+        //        {
+        //            "color": "#00796b",
+        //            "dark": "#004d40",
+        //            "light": "#b2dfdb"
+        //        },
+        //        {
+        //            "color": "#c2185b",
+        //            "dark": "#880e4f",
+        //            "light": "#f48fb1"
+        //        }
+        //    ];
+        //}
+        function addMarker(markerDate) {
+            var baseline;
+            var baselineBounds;
+            var chartElements;
+            var markerLabel;
+            var markerLine;
+            var markerSpan;
+            var svg;
+            var timeline;
+            var timelineUnit;
+            var timelineWidth;
+            var timespan;
+
+            baseline = null;
+            timeline = null;
+            svg = null;
+            markerLabel = null;
+            chartElements = container.getElementsByTagName('svg');
+            if (chartElements.length > 0) {
+                svg = chartElements[0];
+            }
+            //for (j = 0; j < chartElements.length; j++) {
+            //    chartElements[j].setAttribute('y', parseFloat(chartElements[j].getAttribute('y')) + 50);
+            //}
+            chartElements = container.getElementsByTagName('rect');
+            if (chartElements.length > 0) {
+                timeline = chartElements[0];
+            }
+            //for (j = 0; j < chartElements.length; j++) {
+            //    chartElements[j].setAttribute('y', parseFloat(chartElements[j].getAttribute('y')) + 50);
+            //}
+            chartElements = container.getElementsByTagName('path');
+            if (chartElements.length > 0) {
+                baseline = chartElements[0];
+            }
+            //for (j = 0; j < chartElements.length; j++) {
+            //    chartElements[j].setAttribute('y', parseFloat(chartElements[j].getAttribute('y')) + 50);
+            //}
+            chartElements = container.getElementsByTagName('text');
+
+            //var y;
+            //var ele_y;
+            //var offset;
+            //for (i = 0; i < chartElements.length; i++) {
+            //    if (chartElements[i].getAttribute('font-weight') == "bold") {
+
+            //        y = parseFloat(chartElements[i].getAttribute('y'));
+            //        offset = y;
+            //        break;
+            //    }
+            //}
+            //for (j = 0; j < chartElements.length; j++) {
+            //    ele_y = parseFloat(chartElements[j].getAttribute('y'));
+            //    if (y + 50 > ele_y || y - 50 < ele_y) {
+            //        chartElements[j].setAttribute('y', parseFloat(chartElements[j].getAttribute('y')) - offset + 25);
+            //    }
+            //}
+
+            if (chartElements.length > 0) {
+                markerLabel = chartElements[0].cloneNode(true);
+            }
+            if ((svg === null) || (timeline === null) || (baseline === null) || (markerLabel === null) ||
+                (markerDate.getTime() < dateRangeStart.min.getTime()) ||
+                (markerDate.getTime() > dateRangeEnd.max.getTime())) {
+                return;
+            }
+
+            // calculate placement
+            timelineWidth = parseFloat(timeline.getAttribute('width'));
+            baselineBounds = baseline.getBBox();
+            timespan = dateRangeEnd.max.getTime() - dateRangeStart.min.getTime();
+            timelineUnit = (timelineWidth - baselineBounds.x) / timespan;
+            markerSpan = markerDate.getTime() - dateRangeStart.min.getTime();
+
+            // add label
+            markerLabel.setAttribute('fill', '#e91e63');
+            markerLabel.setAttribute('y', options.height);
+            markerLabel.setAttribute('x', (baselineBounds.x + (timelineUnit * markerSpan) - 4));
+            markerLabel.textContent = formatDate.formatValue(markerDate);
+            svg.appendChild(markerLabel);
+
+            // add line
+            markerLine = timeline.cloneNode(true);
+            markerLine.setAttribute('y', 0);
+            markerLine.setAttribute('x', (baselineBounds.x + (timelineUnit * markerSpan)));
+            markerLine.setAttribute('height', options.height);
+            markerLine.setAttribute('width', 1);
+            markerLine.setAttribute('stroke', 'none');
+            markerLine.setAttribute('stroke-width', '0');
+            markerLine.setAttribute('fill', '#e91e63');
+            svg.appendChild(markerLine);
+        }
+        $(document).ready(function () {
+            SetStart2();
+            SetEnd2();
+            drawCharts();
+    });
+    </script>
+}
+

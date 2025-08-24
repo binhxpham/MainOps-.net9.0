@@ -1,0 +1,15 @@
+﻿@model MainOps.Models.WTPClasses.MainClasses.Contamination
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Details");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Details")</h2>
+
+<div>
+    @Html.DisplayForModel()
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">@Localizer["Edit"]</a> |
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>

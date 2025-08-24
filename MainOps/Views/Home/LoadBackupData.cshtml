@@ -1,0 +1,9 @@
+﻿
+Upload Daily Reports from CSV file
+
+<form asp-action="LoadBackupData" method="post" enctype="multipart/form-data">
+    <input name="postedFile" type="file" accept=".csv" />
+    <button>Load</button>
+</form>
+<br />
+<a asp-action="Index">ABORT</a>

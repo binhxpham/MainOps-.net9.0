@@ -1,0 +1,106 @@
+﻿@model MainOps.Models.WTPClasses.ViewModels.VMWTP
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Design WTP")</h2>
+<hr class="col-md-11" />
+<br />
+@using (Html.BeginForm("Add_Concentrations", "WtpBuilder"))
+{
+    <table>
+        <tr>
+            <td>
+                <label asp-for="flow" class="control-label"></label>
+            </td>
+            <td>
+                @SharedLocalizer.GetLocalizedHtmlString(Html.DisplayNameFor(m => m.typeofdew))
+            </td>
+            <td>
+                @SharedLocalizer.GetLocalizedHtmlString(Html.DisplayNameFor(m => m.wtp_luxury))
+            </td>
+            <td>
+                @SharedLocalizer.GetLocalizedHtmlString(Html.DisplayNameFor(m => m.Duration_days))
+            </td>
+            <td>
+                @SharedLocalizer.GetLocalizedHtmlString(Html.DisplayNameFor(m => m.distance))
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input asp-for="flow" class="form-control"/>
+                <span asp-validation-for="flow" class="text-danger"></span>
+            </td>
+            <td>
+                @Html.DropDownListFor(m => m.typeofdew, ViewData["watertype choices"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { style = "width:200px;height:40px;" })
+                <span asp-validation-for="typeofdew" class="text-danger"></span>
+            </td>
+            <td>
+                @Html.DropDownListFor(m => m.wtp_luxury, ViewData["luxurity choices"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { style = "width:200px;height:40px;" })
+                <span asp-validation-for="wtp_luxury" class="text-danger"></span>
+            </td>
+            <td>
+                <input asp-for="Duration_days" class="form-control" />
+                <span asp-validation-for="Duration_days" class="text-danger"></span>
+            </td>
+            <td>
+                <input asp-for="distance" class="form-control"/>
+                <span asp-validation-for="distance" class="text-danger"></span>
+            </td>
+        </tr>
+    </table>
+
+    <div class="col-lg-12">
+        <div class="col-lg-5">
+            <div class="form-group">
+                <label asp-for="Available_Contas" class="control-label"></label>
+                @Html.ListBoxFor(m => m.Available_Contas, Model.Select_Contas, new { style = "min-width:100%;min-height:100%;", size = 30 })
+            </div>
+        </div>
+        <div class="col-lg-2">
+            <div class="form-group">
+                <input id="btnAllRight" type="button" class=" btn btn-hoelscher" value=" >> " onclick="addallItems();" /><br />
+                <input id="btnRight" type="button" class=" btn btn-hoelscher" value=" > " onclick="addItem();" /><br />
+                <input id="btnLeft" type="button" class=" btn btn-hoelscher" value=" < " onclick="removeItem();" /><br />
+                <input id="btnAllLeft" type="button" class=" btn btn-hoelscher" value=" << " onclick="removeallItems();" />
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="form-group">
+                <label asp-for="Selected_Contas" class="control-label"></label>
+                @Html.ListBoxFor(m => m.Selected_Contas, Model.Chosen_Contas, new { id = "Selected_Contas", style = "min-width:100%;min-height:100%;", size = 30 })
+                <span asp-validation-for="Selected_Contas" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-10 col-sm-offset-0">
+            <button class="btn btn-hoelscher" id="btnCreate" name="CreateButton" type="submit" onclick="selectAllitems();">
+                @SharedLocalizer.GetLocalizedHtmlString("Create WTP")
+            </button>
+        </div>
+    </div>
+
+}
+
+<script type="text/javascript">
+
+    function addItem() {
+        $("#Available_Contas option:selected").appendTo("#Selected_Contas");
+        $("#Selected_Contas option").attr("selected", false);
+    }
+
+    function addallItems() {
+        $("#Available_Contas option").appendTo("#Selected_Contas");
+        $("#Selected_Contas option").attr("selected", false);
+    }
+    function removeItem() {
+        $("#Selected_Contas option:selected").appendTo("#Available_Contas");
+        $("#Available_Contas option").attr("selected", false);
+    }
+    function removeallItems() {
+        $("#Selected_Contas option").appendTo("#Available_Contas");
+        $("#Available_Contas option").attr("selected", false);
+    }
+    function selectAllitems() {
+        $("#Selected_Contas option").prop("selected", true);
+    }
+</script>
+

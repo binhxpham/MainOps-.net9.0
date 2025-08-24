@@ -1,0 +1,159 @@
+﻿@model MainOps.Models.WTPClasses.MainClasses.WTP_block
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Edit");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Edit")</h2>
+
+<h4>@SharedLocalizer.GetLocalizedHtmlString("WTP-block")</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <table class="col-md-12">
+                <tr>
+                    <td>
+                        <label asp-for="name" class="control-label">@SharedLocalizer.GetLocalizedHtmlString("English Name")</label>
+                    </td>
+                    <td>
+                        <input asp-for="name" class="form-control" />
+                    </td>
+                    <td>
+                        <span asp-validation-for="name" class="text-danger"></span>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <label asp-for="size" class="control-label"></label>
+                    </td>
+                    <td>
+                        <input asp-for="size" class="form-control" />
+                    </td>
+                    <td>
+                        <span asp-validation-for="size" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.LabelFor(model => model.unit_size.the_unit)
+                    </td>
+                    <td>
+                        @Html.DropDownListFor(model => model.unit_sizeid, ViewData["units"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                    </td>
+                    <td>
+                        @Html.ValidationMessageFor(model => model.unit_sizeid, "", new { @class = "text-danger" })
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label asp-for="weight" class="control-label"></label>
+                    </td>
+                    <td>
+                        <input asp-for="weight" class="form-control" />
+                    </td>
+                    <td>
+                        <span asp-validation-for="weight" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label asp-for="length" class="control-label"></label>
+                    </td>
+                    <td>
+                        <input asp-for="length" class="form-control" />
+                    </td>
+                    <td>
+                        <span asp-validation-for="length" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label asp-for="width" class="control-label"></label>
+                    </td>
+                    <td>
+                        <input asp-for="width" class="form-control" />
+                    </td>
+                    <td>
+                        <span asp-validation-for="width" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label asp-for="height" class="control-label"></label>
+                    </td>
+                    <td>
+                        <input asp-for="height" class="form-control" />
+                    </td>
+                    <td>
+                        <span asp-validation-for="height" class="text-danger"></span>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        <label asp-for="Pow_Con" class="control-label"></label>
+                    </td>
+                    <td>
+                        <input asp-for="Pow_Con" class="form-control" />
+                    </td>
+                    <td>
+                        <span asp-validation-for="Pow_Con" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label asp-for="WTPUnit" class="control-label"></label>
+                    </td>
+                    <td>
+                        @Html.DropDownListFor(model => model.WTPUnitId, ViewData["units"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                    </td>
+                    <td>
+                        @Html.ValidationMessageFor(model => model.WTPUnitId, "", new { @class = "text-danger" })
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label asp-for="Description" class="control-label">@SharedLocalizer.GetLocalizedHtmlString("English Description")</label>
+                    </td>
+                    <td>
+                        <input asp-for="Description" class="form-control" />
+                    </td>
+                    <td>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        @Html.LabelFor(model => model.Division.Name)
+                    </td>
+                    <td>
+                        @Html.DropDownListFor(model => model.DivisionId, ViewData["divisions"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                    </td>
+                    <td>
+                        @Html.ValidationMessageFor(model => model.DivisionId, "", new { @class = "text-danger" })
+                    </td>
+                </tr>
+                
+               
+                <tr>
+                    <td>
+                        <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString("Save")" class="btn btn-hoelscher" />
+                    </td>
+                    <td>
+                        <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+                    </td>
+                    <td></td>
+                </tr>
+            </table>
+            <div class="form-group" style="visibility: hidden">
+                <label asp-for="necessity" class="control-label"></label>
+                <input asp-for="necessity" class="form-control" />
+                <span asp-validation-for="necessity" class="text-danger"></span>
+            </div>
+        </form>
+    </div>
+</div>

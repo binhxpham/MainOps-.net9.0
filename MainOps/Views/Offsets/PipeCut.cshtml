@@ -1,0 +1,69 @@
+﻿@model MainOps.Models.PipeCutViewModel
+@{
+    ViewData["Title"] = "PipeCut";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Cut / Extend Pipe")</h2>
+
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="PipeCut" asp-controller="Offsets" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Offset.measpoint.Project.Name" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.Offset.measpoint.Project.Name))</label>
+                <input asp-for="Offset.measpoint.Project.Name" class="form-control" disabled="disabled" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Offset.measpoint.Name" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.Offset.measpoint.Name))</label>
+                <input asp-for="Offset.measpoint.Name" class="form-control" disabled="disabled" />
+            </div>
+            <div class="form-group">
+                <label asp-for="meters_cut" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.meters_cut))</label>
+                <input asp-for="meters_cut" class="form-control" />
+                <span asp-validation-for="meters_cut" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input asp-for="Offset.MeasPointId" hidden="hidden" />
+                <input asp-for="OffsetId" hidden="hidden" />
+                <label asp-for="Offset.offset" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.Offset.offset))</label>
+                <input asp-for="Offset.offset" disabled="disabled" value="@Model.Offset.offset" />
+            </div>
+            <br />
+            <br />
+            <br />
+            <div class="form-group">
+                <label asp-for="start_time" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.start_time))</label>
+                <input type="datetime" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd HH:mm")" asp-for="start_time" style="width:250px;height:40px;" />
+                <span asp-validation-for="start_time" class="text-danger"></span>
+            </div>
+            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Cut/Extend the pipe")</button>
+        </form>
+    </div>
+</div>
+
+<div>
+    <form asp-action="Index" asp-controller="Offsets"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Baack To List")</button></form>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datetimepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    timeFormat: "HH:mm",
+                    controlType: 'select'
+
+                });
+                $('.date-picker').datetimepicker("setDate", new Date());
+
+            });
+        });
+
+    </script>
+}

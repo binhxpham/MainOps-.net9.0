@@ -1,0 +1,51 @@
+﻿<div class="container">
+    <div id="chart1"></div>
+</div>
+
+@section scripts{
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js"></script>
+    <script>
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(callback);
+
+        function callback() {
+            var option = {
+                title: "Real-Time Chart",
+                width: 900,
+                height: 650,
+                legend: { position: 'none' },
+                chartArea: {
+                    height: '80%', width: '85%', left: 100,
+                    backgroundColor: { stroke: "gray", strokeWidth: 1 }
+                },
+                pointSize: 10
+            };
+            var chart = new google.visualization.LineChart(document.getElementById('chart1'));
+            var data = new google.visualization.DataTable();
+            data.addColumn('datetime', 'TimeStamp');
+            data.addColumn('number', 'Value');
+
+            drawChart();
+
+            function drawChart() {
+                $.get('JsonData', function (d) {
+                    alert(JSON.stringify(d));
+                    alert(d.length);
+                    for (i = 0; i < d.length; i++) {
+                        alert(i);
+                        var timeStamp = new Date(d[i].timeStamp);
+                        alert(timeStamp);
+                        var time = { v: timeStamp, f: moment(timeStamp).format('HH:mm:ss') };
+                        alert(time);
+                        var val = d[i].dataValue;
+                        alert(val);
+                        data.addRow([time, val]);
+                    }
+
+                    chart.draw(data, option);
+                });
+            }
+        }
+    </script>
+}

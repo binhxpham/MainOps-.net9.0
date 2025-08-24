@@ -1,0 +1,177 @@
+﻿@model IEnumerable<MainOps.Models.TruckIndexVM>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<form asp-action="Search">
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Start Date")</td>
+            <td><input type="datetime" name="starttime" id="startid" value="@DateTime.Now.AddMonths(-1)" class="date-picker"></td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("End Date")</td>
+            <td><input type="datetime" name="endtime" id="endid" value="@DateTime.Now" class="date-picker"></td>
+        </tr>
+        <tr>
+            <td colspan="2"><button class="btn-hoelscher" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Search")</button></td>
+        </tr>
+    </table>
+</form>
+
+@{ 
+    var DistinctHJItems = Model.GroupBy(x => x.HJItemId).Select(y => y.First());
+    var DistinctItems = Model.GroupBy(x => x.Project).Select(y => y.First());
+    var totalhours = Model.Sum(x => x.Hours.TotalHours);
+    var totalkm = Model.Sum(x => (x.KM_end - x.KM_start));
+}
+<table style="width:100%;table-layout:fixed;">
+    <tr>
+        <td style="width:70%;">
+            <table style="width:100%;table-layout:fixed;">
+                <tr style="border-bottom:2px dashed blue;">
+                    <td>@SharedLocalizer.GetLocalizedHtmlString("Project")</td>
+                    <td>@SharedLocalizer.GetLocalizedHtmlString("Total Hours:")</td>
+                    <td><b>@String.Format("{0:n2}",totalhours) @SharedLocalizer.GetLocalizedHtmlString("Hours")</b></td>
+                    <td>@SharedLocalizer.GetLocalizedHtmlString("Total Km:")</td>
+                    <td><b>@String.Format("{0:n2}",totalkm) @SharedLocalizer.GetLocalizedHtmlString("Km")</b></td>
+                </tr>
+                @foreach (var truck in DistinctHJItems)
+                {
+                    totalhours = Model.Where(x => x.HJItemId.Equals(truck.HJItemId)).Sum(x => x.Hours.TotalHours);
+                    totalkm = Model.Where(x => x.HJItemId.Equals(truck.HJItemId)).Sum(x => (x.KM_end - x.KM_start));
+            <tr>
+                @if (truck.HJItem != null)
+                {
+
+
+                    <td colspan="2"><b><big>@truck.HJItem.Name</big></b></td>
+                    <td><b>@String.Format("{0:n2}", totalhours) @SharedLocalizer.GetLocalizedHtmlString("Hours")</b></td>
+                    <td></td>
+                    <td><b>@String.Format("{0:n2}", totalkm) @SharedLocalizer.GetLocalizedHtmlString("Km")</b></td>
+                }
+                else
+                {
+                    <td colspan="2"><b><big>N/A</big></b></td>
+                    <td><b>@String.Format("{0:n2}", totalhours) @SharedLocalizer.GetLocalizedHtmlString("Hours")</b></td>
+                    <td></td>
+                    <td><b>@String.Format("{0:n2}", totalkm) @SharedLocalizer.GetLocalizedHtmlString("Km")</b></td>
+                }
+            </tr>
+                    @foreach (var proj in DistinctItems)
+                    {
+                        if(Model.Any(x => x.HJItemId.Equals(truck.HJItemId) && x.ProjectId.Equals(proj.ProjectId))) { 
+                        var hoursonproj = Model.Where(x => x.ProjectId.Equals(proj.ProjectId) && x.HJItemId.Equals(truck.HJItemId)).Sum(y => y.Hours.TotalHours);
+                        var kmonproj = Model.Where(x => x.ProjectId.Equals(proj.ProjectId) && x.HJItemId.Equals(truck.HJItemId)).Sum(y => (y.KM_end - y.KM_start));
+                        var proportion = hoursonproj / totalhours * 100;
+                        <tr>
+                            <td colspan="2">@proj.Project.ProjectNr : @proj.Project.Name</td>
+                            <td>@String.Format("{0:n2}",hoursonproj) @SharedLocalizer.GetLocalizedHtmlString("Hours")</td>
+                            <td>@String.Format("{0:n2}",kmonproj) @SharedLocalizer.GetLocalizedHtmlString("Km")</td>
+                            <td>@String.Format("{0:n2}%", proportion)</td>
+                        </tr>
+                        }
+
+                    }
+                }
+            </table>
+        </td>
+        <td style="width:30%;">
+            <form asp-action="Create" method="get">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Create Truck Daily Report")</button>
+            </form>
+        </td>
+    </tr>
+    
+    </table>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Project)
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString("SubProject")
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Dato)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.DoneBy)
+                </th>
+                <th>@SharedLocalizer.GetLocalizedHtmlString("Hours")</th>
+                <th>@SharedLocalizer.GetLocalizedHtmlString("Km")</th>
+                <th>@SharedLocalizer.GetLocalizedHtmlString("Description")</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                var dist = item.KM_end - item.KM_start;
+            <tr>
+
+                <td>@String.Concat(item.Project.ProjectNr, " : ", item.Project.Name)</td>
+                @if (item.SubProjectId != null)
+                {
+                    <td>@String.Concat(item.SubProject.SubProjectNr, " : ", item.SubProject.Name)</td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                <td>
+                    @String.Format("{0:yyyy-MM-dd}",item.Dato)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DoneBy)
+                </td>
+                <td>
+                    @String.Format("{0:n2}",item.Hours.TotalHours)
+                </td>
+                <td>
+                    @String.Format("{0:n2}", dist)
+                </td>
+                <td>
+                    @item.Description
+                </td>
+                <td>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-action="DeleteSite" asp-route-id="@item.TruckSiteId">Delete Site</a>
+                        <a asp-action="DeleteReport" asp-route-id="@item.TruckDailyReportId">Delete Whole Report</a>
+                        <a asp-action="Edit" asp-route-id="@item.TruckDailyReportId">Edit Whole Report</a>
+                    }
+                    else
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.TruckDailyReportId">Edit Whole Report</a>
+                    }
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+        <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function () {
+                $(function () {
+                    $(".date-picker").datepicker({
+                        changeMonth: true,
+                        changeYear: true,
+                        yearRange: "-100:+0",
+                        dateFormat: "dd-MM-yy",
+                        controlType: 'select'
+
+                    });
+                });
+            });
+
+
+        </script>
+    }

@@ -1,0 +1,202 @@
+﻿@model MainOps.Models.Arrival
+
+@{
+    ViewData["Title"] = "Edit Arrival";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Edit Arrival")</h2>
+
+<h4>@SharedLocalizer.GetLocalizedHtmlString("Arrival")</h4>
+<hr />
+<div class="row">
+    <div class="col-xs-12">
+        <form asp-action="Edit_Arrival" method="post">
+            @Html.HiddenFor(Model => Model.EnteredIntoDataBase)
+            @Html.HiddenFor(Model => Model.LastEditedInDataBase)
+            <table style="width:100%;">
+                <tr>
+                    <td><label asp-for="ProjectId" class="control-label"></label></td>
+                    <td><select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="SubProjectId" class="control-label"></label></td>
+                    <td><select asp-for="SubProjectId" class="form-control" asp-items="ViewBag.SubProjectId"></select></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="VariationOrderId" class="control-label"></label></td>
+                    <td><select asp-for="VariationOrderId" class="form-control" asp-items="ViewBag.VariationOrderId"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select VariationOrder")</option></select></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="ItemTypeId" class="control-label"></label></td>
+                    <td><select asp-for="ItemTypeId" class="form-control" asp-items="ViewBag.ItemTypeId"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Item Type")</option></select></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="UniqueID" class="control-label"></label></td>
+                    <td><input asp-for="UniqueID" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="MobilisationId" class="control-label"></label></td>
+                    <td><select asp-for="MobilisationId" class="form-control" asp-items="ViewBag.ItemTypeId2"></select></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Arrival_Text" class="control-label"></label></td>
+                    <td><input asp-for="Arrival_Text" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Amount" class="control-label"></label></td>
+                    <td><input asp-for="Amount" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="TimeStamp" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.TimeStamp))</label></td>
+                    <td>
+                        <input type="date" asp-for="TimeStamp" id="thetime" style="width:100%;height:40px;" />
+                        <span asp-validation-for="TimeStamp" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="EndStamp" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.EndStamp))</label></td>
+                    <td>
+                        <input type="date" asp-for="EndStamp" id="thetime2" style="width:100%;height:40px;" />
+                        <span asp-validation-for="EndStamp" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="InvoiceDate" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.InvoiceDate))</label></td>
+                    <td>
+                        <input type="date" asp-for="InvoiceDate" id="thetime2" style="width:100%;height:40px;" />
+                        <span asp-validation-for="InvoiceDate" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="PayedAmount" class="control-label"></label></td>
+                    <td><input asp-for="PayedAmount" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Latitude" class="control-label"></label></td>
+                    <td><input asp-for="Latitude" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Longitude" class="control-label"></label></td>
+                    <td><input asp-for="Longitude" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="ToBePaid" class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Should rental be paid?")</label></td>
+                    <td><input asp-for="ToBePaid" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Submit")</button></td>
+                </tr>
+            </table>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>            
+            <input type="hidden" asp-for="Id" />
+
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript">
+        function FillSubProjects() {
+            var SubProjectId = $('#SubProjectId').val();
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                        var x = document.getElementById("SubProjectId");
+                        var i;
+                        for (i = 0; i < x.length; i++) {
+                            if (x.options[i].value == SubProjectId) {
+                                x.options[i].selected = true;
+                            }
+                        }
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                    FillVariationOrders();
+                }
+            });
+    }
+    function FillVariationOrders() {
+            var ProjectId = $('#ProjectId').val();
+            var variationOrderId = $('#VariationOrderId').val();
+            var url = '@Url.Action("GetVariationOrdersProject", "BoQHeadlines")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["headLine"] + '</option>';
+                    }
+                    $("#VariationOrderId").html(s);
+                    document.getElementById("VariationOrderId").style.width = "100%";
+                    var x = document.getElementById("VariationOrderId");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        if (x.options[i].value == variationOrderId) {
+                            x.options[i].selected = true;
+                        }
+                    }
+                }
+            });
+        }
+        function FillItems() {
+            var ProjectId = $('#ProjectId').val();
+            var itemTypeId = $('#ItemTypeId').val();
+            var url = '@Url.Action("GetItemsProject", "ItemTypes")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                    'type' : "arrivaledit"
+                },
+                success: function (data) {
+                    var s = '<option value="-1">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["item_Type"] + '</option>';
+                    }
+                    $("#ItemTypeId").html(s);
+                    document.getElementById("ItemTypeId").style.width = "100%";
+                    var x = document.getElementById("ItemTypeId");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        if (x.options[i].value == itemTypeId) {
+                            x.options[i].selected = true;
+                        }
+                    }
+                    FillSubProjects();
+                }
+            });
+        }
+        $(document).ready(function () {
+            $(function () {
+                FillItems();
+            });
+        });
+
+</script>
+}

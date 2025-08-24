@@ -1,0 +1,37 @@
+﻿@model MainOps.Models.UploadPackageViewModel
+
+<div class="row">
+    <div class="col-xs-12">
+        <form asp-action="UploadSamplePackage" asp-controller="WaterSampleTypes" enctype="multipart/form-data" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <table>
+                <tr>
+                    <td><label asp-for="ProjectId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.ProjectId))</label></td>
+                    <td><select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" style="width:100%;"><option>@SharedLocalizer.GetLocalizedHtmlString("Please select Project")</option></select></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Annotation" class="form-label"></label></td>
+                    <td><input asp-for="Annotation" class="form-control" /></td>
+                </tr>
+                <tr>
+                    <td><label>@SharedLocalizer.GetLocalizedHtmlString("Choose file")</label></td>
+                    <td><input type="file" id="postedFile" name="postedFile" class="form-control" accept=".csv" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="submit" title="Upload" value="Upload" onclick="StartSpinner();" class="btn-hoelscher" />
+                    </td>
+                </tr>
+            </table>
+
+        </form>
+    </div>
+</div>
+<br />
+<br />
+<br />
+<div>
+    <a asp-action="Packages">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+

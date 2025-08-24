@@ -1,0 +1,141 @@
+﻿@model IEnumerable<MainOps.Models.DeInstall>
+
+@{
+    ViewData["Title"] = "DeInstallations";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("DeInstallations")</h2>
+<form asp-controller="TrackItems" asp-action="ExportDeInstall" method="post">
+    <table>
+        <tr>
+            <td>
+                @SharedLocalizer.GetLocalizedHtmlString("Export to csv")
+            </td>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Project"):</label></td>
+            <td>
+                <select id="ProjectId" name="ProjectId" class="form-control" asp-items="ViewBag.ProjectId">
+                    <option value="@null">@SharedLocalizer.GetLocalizedHtmlString("All")</option>
+                </select>
+            </td>
+            <td>
+                <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Export")</button>
+            </td>
+        </tr>
+    </table>
+</form>
+<form asp-controller="TrackItems" asp-action="CombsearchDeInstall">
+    <table>
+        <tr>
+            <td>
+                <label>@SharedLocalizer.GetLocalizedHtmlString("Installation Item / BoQ nr"):</label>
+            </td>
+            <td>
+                @Html.DropDownList("filterchoice", ViewData["ItemTypeId"] as IEnumerable<SelectListItem>, @SharedLocalizer.GetLocalizedHtmlString("All"), new { @class = "form-control" })
+            </td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Project"):</label></td>
+            <td>
+                <select id="ProjectId" name="filterchoice2" class="form-control" asp-items="ViewBag.ProjectId">
+                    <option value="@null">@SharedLocalizer.GetLocalizedHtmlString("All")</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoCompleteDeInstall","TrackItems")" /></td>
+            <td>
+                <button type="submit" class="btn-hoelscher">
+                    <span class="glyphicon glyphicon-search"></span>
+                </button>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<table style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemType)
+            </th>
+            <th>
+                Unique ID
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DeInstall_Text)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Total Amount De-Installed")
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Coordinates")
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Name)
+            </td>
+            <td>
+                @if (item.InstallId != null)
+                {
+                    <form asp-action="Details_Install" asp-controller="TrackItems" asp-route-id="@item.InstallId" method="get" target="_blank">
+                        <button class="btn-hoelscher">@Html.DisplayFor(modelItem => item.ItemType.Item_Type)</button>
+                    </form>
+                }
+                else
+                {
+                    @Html.DisplayFor(modelItem => item.ItemType.Item_Type)
+                }
+
+            </td>
+            @if (item.InstallId != null)
+            {
+        <td> @Html.DisplayFor(modelItem => item.Install.UniqueID)</td>
+            }
+                else
+                {
+                    <td></td>
+                }
+
+            <td>
+                @Html.DisplayFor(modelItem => item.DeInstall_Text)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Amount)
+            </td>
+            <td>
+                @Model.Where(x => x.ItemTypeId.Equals(item.ItemTypeId)).Sum(x => x.Amount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeStamp)
+            </td>
+            <td>
+                [@Html.DisplayFor(modelItem => item.Latitude);@Html.DisplayFor(modelItem => item.Longitude)]
+            </td>
+            <td>
+                @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+                {
+                    <a asp-action="Edit_DeInstall" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
+
+                    <form asp-action="CancelDeInstall" asp-controller="TrackItems" asp-route-id="@item.Id" method="post">
+                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Cancel DeInstall")</button>
+                    </form>
+                }
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

@@ -1,0 +1,31 @@
+﻿@model MainOps.Models.UploadDips
+
+<div class="row">
+    <div class="col-xs-2">
+        <form asp-action="UploadDips" asp-controller="Meas" enctype="multipart/form-data" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <table>
+                <tr>
+                    <td><label asp-for="MeasPointId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.MeasPointId))</label></td>
+                    <td>@Html.DropDownListFor(m => m.MeasPointId, ViewData["MeasPointId"] as IEnumerable<SelectListItem>, new { style = "width:250px;height:40px;" })</td>
+                </tr>
+                <tr>
+                    <td>@SharedLocalizer.GetLocalizedHtmlString("Choose file")</td>
+                    <td><input type="file" id="postedFile" name="postedFile" class="form-control" accept=".csv" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <input type="submit" title="Upload" value="Upload" class="btn-hoelscher" />
+                    </td>
+                </tr>
+            </table>
+            
+        </form>
+    </div>
+</div>
+<br />
+<br />
+<br />
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>

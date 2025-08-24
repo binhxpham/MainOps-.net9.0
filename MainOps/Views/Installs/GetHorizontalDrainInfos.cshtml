@@ -1,0 +1,70 @@
+﻿@model IEnumerable<MainOps.Controllers.InstallsController.InstallArrival>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Horizontal drain information (install and arrival)</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Install ID
+            </th>
+            <th>
+                Install UNIQUE ID
+            </th>
+            <th>
+                start rental insatll
+            </th>
+            <th>
+                deinstall date
+            </th>
+            <th>
+                start rental arrival
+            </th>
+            <th>
+                end rental arrival
+            </th>
+            <th>
+                amount install
+            </th>
+            <th>
+                amount arrival
+            </th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                   @item.ins.Id
+                </td>
+                <td>
+                    @item.ins.UniqueID
+                </td>
+                <td>
+                    @item.ins.RentalStartDate
+                </td>
+                <td>
+                    @item.ins.DeinstallDate
+                </td>
+                <td>
+                    @item.ars.TimeStamp
+                </td>
+                <td>
+                    @item.ars.EndStamp
+                </td>
+                <td>
+                    @item.ins.Amount
+                </td>
+                <td>
+                    @item.ars.Amount
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

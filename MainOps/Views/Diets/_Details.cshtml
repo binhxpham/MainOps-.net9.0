@@ -1,0 +1,269 @@
+﻿@model MainOps.Models.Diet
+
+@{
+    Layout = null;
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("Diet")</title>
+</head>
+
+<div style="text-align:right;">
+    <img src="~/images/Divisions/Photos/@Model.Project.Division.Id/@Model.Project.Division.LogoPath" width="151" height="66" />
+</div>
+<br />
+<br />
+@if (Model.HourlyPaid.Equals(true))
+{
+    <h2>
+        @SharedLocalizer.GetLocalizedHtmlString("Blue Collar Allowances - Accommodation Form")
+    </h2>
+}
+else
+{
+    <h2>
+        @SharedLocalizer.GetLocalizedHtmlString("White Collar Allowances - Accommodation Form")
+    </h2>
+}
+<br />
+<table border="1" style="width:100%;table-layout:fixed;">
+    <tr>
+        <td style="width:100%;"><label asp-for="FullName" class="control-label" style="width:100%;"></label></td>
+        <td style="width:100%;"><b>@Html.DisplayFor(Model => Model.FullName)</b></td>
+        <td style="width:100%;"><label asp-for="EmployeeNumber" class="control-label" style="width:100%;"></label></td>
+        <td style="width:100%;"><b>@Html.DisplayFor(Model => Model.EmployeeNumber)</b></td>
+    </tr>
+    <tr>
+        <td style="width:100%;"><label asp-for="PayPeriod" class="control-label" style="width:100%;"></label></td>
+        <td style="width:100%;"><b>@Html.DisplayFor(Model => Model.PayPeriod)</b></td>
+        <td style="width:100%;"><label asp-for="ProjectId" class="control-label" style="width:100%;"></label></td>
+        <td style="width:100%;"><b>@Html.DisplayFor(Model => Model.Project.ProjectNr)</b></td>
+    </tr>
+</table>
+<br />
+<table border="1" style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th>@SharedLocalizer.GetLocalizedHtmlString("Start Date/Time")</th>
+            <th>@SharedLocalizer.GetLocalizedHtmlString("End Date/Time")</th>
+            <th>@SharedLocalizer.GetLocalizedHtmlString("Site name")</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="width:100%;text-align:center;"> @Html.DisplayFor(Model => Model.Day1_start)</td>
+            <td style="width: 100%; text-align: center;"> @Html.DisplayFor(Model => Model.Day1_end)</td>
+            <td style="width: 100%; text-align: center;">@Html.DisplayFor(Model => Model.WorkPlaceName1)</td>
+        </tr>
+        @if (Model.Day2_start != null)
+        {
+            <tr>
+                <td style="width: 100%; text-align: center;"> @Html.DisplayFor(Model => Model.Day2_start)</td>
+                <td style="width: 100%; text-align: center;"> @Html.DisplayFor(Model => Model.Day2_end)</td>
+                <td style="width: 100%; text-align: center;">@Html.DisplayFor(Model => Model.WorkPlaceName2)</td>
+            </tr>
+        }
+        @if (Model.Day3_start != null)
+        {
+            <tr>
+                <td style="width: 100%; text-align: center;"> @Html.DisplayFor(Model => Model.Day3_start)</td>
+                <td style="width: 100%; text-align: center;"> @Html.DisplayFor(Model => Model.Day3_end)</td>
+                <td style="width: 100%; text-align: center;">@Html.DisplayFor(Model => Model.WorkPlaceName3)</td>
+            </tr>
+        }
+        @if (Model.Day4_start != null)
+        {
+            <tr>
+                <td style="width: 100%; text-align: center;"> @Html.DisplayFor(Model => Model.Day4_start)</td>
+                <td style="width: 100%; text-align: center;"> @Html.DisplayFor(Model => Model.Day4_end)</td>
+                <td style="width: 100%; text-align: center;">@Html.DisplayFor(Model => Model.WorkPlaceName4)</td>
+            </tr>
+        }
+        @if (Model.Day5_start != null)
+        {
+            <tr>
+                <td style="width: 100%; text-align: center; "> @Html.DisplayFor(Model => Model.Day5_start)</td>
+                <td style="width: 100%; text-align: center;"> @Html.DisplayFor(Model => Model.Day5_end)</td>
+                <td style="width: 100%; text-align: center;">@Html.DisplayFor(Model => Model.WorkPlaceName5)</td>
+            </tr>
+        }
+        @if (Model.Day6_start != null)
+        {
+
+            <tr>
+                <td style="width: 100%; text-align: center;"> @Html.DisplayFor(Model => Model.Day6_start)</td>
+                <td style="width: 100%; text-align: center;"> @Html.DisplayFor(Model => Model.Day6_end)</td>
+                <td style="width: 100%; text-align: center;">@Html.DisplayFor(Model => Model.WorkPlaceName6)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<br />
+<h4>
+    @SharedLocalizer.GetLocalizedHtmlString("Allowances are calculated with reference to the section about posting in the pamflet 'Hourly paid in HJ'")
+</h4>
+<br />
+<table border="1" style="border:2px solid black;width:100%;table-layout:fixed;">
+    <thead style="background-color:lightgrey;">
+        <tr>
+            <th>
+                <b>@SharedLocalizer.GetLocalizedHtmlString("Calculation of posting")</b>
+            </th>
+            <th>
+                <b>@SharedLocalizer.GetLocalizedHtmlString("Amount of days")</b>
+            </th>
+            <th>
+                <b>@SharedLocalizer.GetLocalizedHtmlString("Unit")</b>
+            </th>
+            <th>
+                <b>@SharedLocalizer.GetLocalizedHtmlString("Rate pr. day")</b>
+            </th>
+            <th>
+                <b>@SharedLocalizer.GetLocalizedHtmlString("Subtotal")</b>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td colspan="5"><b>@SharedLocalizer.GetLocalizedHtmlString("Accomodation")</b></td>
+        </tr>
+        <tr>
+            <td><label asp-for="SelfContainedExpenses"></label></td>
+            <td style="text-align:center;">@Html.DisplayFor(Model => Model.SelfContainedExpenses)</td>
+            <td style="text-align:center;">@SharedLocalizer.GetLocalizedHtmlString("days x")</td>
+            <td style="text-align:center;">@SharedLocalizer.GetLocalizedHtmlString("kr. ") @String.Format("{0:n2}", @Model.SelfContainedExpensesRate) =</td>
+            @if (Model.SelfContainedExpensesSubTotal != null)
+            {
+                <td style="text-align:center;">@String.Format("{0:n2} DKK", Model.SelfContainedExpensesSubTotal)</td>
+            }
+            else
+            {
+                <td style="text-align:center;"></td>
+            }
+        </tr>
+        <tr>
+            <td><label asp-for="LivingInCamperWagon"></label></td>
+            <td style="text-align:center;">@Html.DisplayFor(Model => Model.LivingInCamperWagon)</td>
+            <td style="text-align:center;">@SharedLocalizer.GetLocalizedHtmlString("days x")</td>
+            <td style="text-align:center;">@SharedLocalizer.GetLocalizedHtmlString("kr. ") @String.Format("{0:n2}", @Model.LivingInCamperWagonRate) =</td>
+            @if (Model.LivingInCamperWagonSubTotal != null)
+            {
+                <td style="text-align:center;">@String.Format("{0:n2} DKK", Model.LivingInCamperWagonSubTotal)</td>
+            }
+            else
+            {
+                <td style="text-align:center;"></td>
+            }
+        </tr>
+        <tr>
+            <td colspan="5">
+                <b>@SharedLocalizer.GetLocalizedHtmlString("Diets")</b>
+            </td>
+        </tr>
+        <tr>
+            <td><label asp-for="CalculationOfDietsAndSmallNecessities"></label></td>
+            <td style="text-align:center;">@Html.DisplayFor(Model => Model.CalculationOfDietsAndSmallNecessities)</td>
+            <td style="text-align:center;">@SharedLocalizer.GetLocalizedHtmlString("days x")</td>
+            <td style="text-align:center;">@SharedLocalizer.GetLocalizedHtmlString("kr. ") @String.Format("{0:n2}", @Model.CalculationOfDietsAndSmallNecessitiesRate) =</td>
+            @if (Model.CalculationOfDietsAndSmallNecessitiesSubTotal != null)
+            {
+                <td style="text-align:center;">@String.Format("{0:n2} DKK", Model.CalculationOfDietsAndSmallNecessitiesSubTotal)</td>
+            }
+            else
+            {
+                <td style="text-align:center;"></td>
+            }
+
+        </tr>
+        <tr>
+            <td><label asp-for="HourAddon"></label></td>
+            <td style="text-align:center;">@Html.DisplayFor(Model => Model.HourAddon)</td>
+            <td style="text-align:center;">@SharedLocalizer.GetLocalizedHtmlString("hours x")</td>
+            <td style="text-align:center;">@SharedLocalizer.GetLocalizedHtmlString("kr. ") @String.Format("{0:n2}", @Model.HourAddonRate) =</td>
+            @if (Model.HourAddonSubTotal != null)
+            {
+                <td style="text-align:center;">@String.Format("{0:n2} DKK", Model.HourAddonSubTotal)</td>
+            }
+            else
+            {
+                <td style="text-align:center;"></td>
+            }
+
+        </tr>
+        <tr>
+            <td colspan="5">
+                <b>@SharedLocalizer.GetLocalizedHtmlString("Deductions")</b>
+            </td>
+        </tr>
+        <tr>
+            <td><label asp-for="DeductionBreakFast"></label></td>
+            <td style="text-align:center;">@Html.DisplayFor(Model => Model.DeductionBreakFast)</td>
+            <td style="text-align:center;">@SharedLocalizer.GetLocalizedHtmlString("days x")</td>
+            <td style="text-align:center;">@SharedLocalizer.GetLocalizedHtmlString("kr. ") @String.Format("{0:n2}", @Model.DeductionBreakFastRate) =</td>
+            @if (Model.DeductionBreakFastSubTotal != null)
+            {
+                <td style="text-align:center;">@String.Format("{0:n2} DKK", Model.DeductionBreakFastSubTotal)</td>
+            }
+            else
+            {
+                <td style="text-align:center;"></td>
+            }
+
+        </tr>
+        <tr>
+            <td><label asp-for="DeductionLunch"></label></td>
+            <td style="text-align:center;">@Html.DisplayFor(Model => Model.DeductionLunch)</td>
+            <td style="text-align:center;">@SharedLocalizer.GetLocalizedHtmlString("days x")</td>
+            <td style="text-align:center;">@SharedLocalizer.GetLocalizedHtmlString("kr. ") @String.Format("{0:n2}", @Model.DeductionLunchRate) =</td>
+            @if (Model.DeductionLunchSubTotal != null)
+            {
+                <td style="text-align:center;">@String.Format("{0:n2} DKK", Model.DeductionLunchSubTotal)</td>
+            }
+            else
+            {
+                <td style="text-align:center;"></td>
+            }
+        </tr>
+        <tr>
+            <td><label asp-for="DeductionDinner"></label></td>
+            <td style="text-align:center;">@Html.DisplayFor(Model => Model.DeductionDinner)</td>
+            <td style="text-align:center;">@SharedLocalizer.GetLocalizedHtmlString("days x")</td>
+            <td style="text-align:center;">@SharedLocalizer.GetLocalizedHtmlString("kr. ") @String.Format("{0:n2}", @Model.DeductionDinnerRate) =</td>
+            @if (Model.DeductionDinnerSubTotal != null)
+            {
+                <td style="text-align:center;">@String.Format("{0:n2} DKK", Model.DeductionDinnerSubTotal)</td>
+            }
+            else
+            {
+                <td style="text-align:center;"></td>
+            }
+        </tr>
+        <tr style="border-top: 1px dashed black; background-color: lightgrey;">
+            <td colspan="4" style="text-align:left;"><b><label asp-for="Total"></label></b></td>
+            <td style="text-align:center;">
+                @String.Format("{0:n2} DKK", Model.Total)
+            </td>
+        </tr>
+    </tbody>
+</table>
+<br />
+<table style="width:45%;height:150px;float:left;margin-right:5%;">
+    <tr>
+        <td>
+            <img src="data:image/jpg;base64, @Model.SignatureEmployee" style="width:100%;height:120px;">
+        </td>
+    </tr>
+    <tr>
+        <td style="width:30%;border-top:dashed;margin-right:3%">Underskrift Medarbejder</td>
+    </tr>
+</table>
+<table style="width:45%;height:150px;float:left;margin-right:5%;">
+    <tr>
+        <td>
+            <img src="data:image/jpg;base64, @Model.SignatureSupervisor" style="width:100%;height:120px;">
+        </td>
+    </tr>
+    <tr>
+        <td style="width:30%;border-top:dashed;margin-right:3%">Underskrift Overordnede</td>
+    </tr>
+</table>

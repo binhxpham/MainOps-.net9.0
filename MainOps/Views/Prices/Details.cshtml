@@ -1,0 +1,72 @@
+﻿@model MainOps.Models.WTPClasses.MainClasses.Price
+
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Details");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Details")</h2>
+<br />
+<div>
+    <h4>@SharedLocalizer.GetLocalizedHtmlString("Price")</h4>
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.EkdT)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.EkdT.category)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.size)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.size)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.unit)
+        </dt>
+        <dd>
+            @Html.Raw(SharedLocalizer.GetLocalizedHtmlString(Model.unit.the_unit))
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.price)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.price)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.unit_p)
+        </dt>
+        <dd>
+            @Html.Raw(SharedLocalizer.GetLocalizedHtmlString(Model.unit_p.the_unit))
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.rent)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.rent)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.unit_r)
+        </dt>
+        <dd>
+            @Html.Raw(SharedLocalizer.GetLocalizedHtmlString(Model.unit_r.the_unit))
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.division)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.division.Name)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.id">@Localizer["Edit"]</a> |
+    <a asp-action="Index">@Localizer["Back to List"]</a>
+</div>

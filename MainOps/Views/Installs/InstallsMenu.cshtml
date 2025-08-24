@@ -1,0 +1,119 @@
+﻿
+@{
+    ViewData["Title"] = "Main Menu";
+}
+@inject UserManager<ApplicationUser> _userManager;
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Special Menu")</h2>
+<div class="row">
+    <div class="col-xs-12">
+        @if ((await _userManager.GetUserAsync(User)).DivisionId.Equals(4))
+        {
+            <table style="width:100%;table-layout:fixed;font-size:18px;">
+                <tr>
+                    <td colspan="2">
+                        <form asp-action="ProjectOverView" asp-controller="Projects" method="get">
+                            <button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Projects Overview")</button>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+        }
+    <table style="width:100%;table-layout:fixed;font-size:18px;">
+        @if (User.IsInRole("Admin") || (User.IsInRole("Manager") || User.IsInRole("DivisionAdmin")))
+        {
+            <tr>
+                <td>
+                    <form asp-action="UploadTrencherCoords" asp-controller="Installs" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Add Trencher Coordinates")</button>
+                    </form>
+                </td>
+                <td>
+                    <form asp-action="UploadSurveyorCoords" asp-controller="TrackItems" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Add Well Point Coordinates")</button>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+
+                <td colspan="2" style="width:100%;"><b>@SharedLocalizer.GetLocalizedHtmlString("GPS Activity Menu")</b></td>
+            </tr>
+            <tr>
+                <td>
+                    <form asp-action="AddActivity" asp-controller="ItemActivities" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Add GPS activity Manually")</button>
+                    </form>
+                </td>
+            </tr>
+
+
+
+            <tr>
+                <td>
+                    <form asp-action="GetArrivalsOrdered" asp-controller="TrackItems" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Add Arrivals to all with #")</button>
+                    </form>
+                </td>
+                <td>
+                    <form asp-action="InstallsWithoutArrival" asp-controller="Installs" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Installations without Arrivals")</button>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <form asp-action="InstallInOperation" asp-controller="Installs" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Operating Days")</button>
+                    </form>
+                </td>
+                <td>
+                    <form asp-action="Index" asp-controller="Installs" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Find Installation Problems")</button>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <form asp-action="InstallsWithoutSubProject" asp-controller="Installs" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Installations without Sub-Project")</button>
+                    </form>
+                </td>
+                <td>
+                    <form asp-action="OperationOverView" asp-controller="Installs" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("CSV. file with operation time")</button>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <form asp-action="InstallOverView" asp-controller="Installs" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("CSV. file with installations/deinstallations")</button>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <form asp-action="Index" asp-controller="Invoices" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Invoices")</button>
+                    </form>
+                </td>
+                <td>
+                    <form asp-action="Index" asp-controller="Payments" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Payments")</button>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <form asp-action="GetHorizontalDrainInfos" asp-controller="Installs" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Horizontal drain install / arrival info")</button>
+                    </form>
+                </td>
+            </tr>
+
+
+
+        }
+
+    </table>
+    </div>
+</div>

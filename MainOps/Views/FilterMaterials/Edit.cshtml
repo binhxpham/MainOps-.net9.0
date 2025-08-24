@@ -1,0 +1,72 @@
+﻿@model MainOps.Models.WTPClasses.MainClasses.FilterMaterial
+
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Edit");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Edit")</h2>
+
+<h4 class="form-group">@SharedLocalizer.GetLocalizedHtmlString("Filter Material")</h4>
+<hr />
+
+
+<form asp-action="Edit" class="form-group">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="id" />
+    <table>
+        <tr>
+            <td>
+                <label asp-for="Name" class="control-label"></label>
+            </td>
+            <td>
+                <input asp-for="Name" class="form-control" />
+            </td>
+            <td>
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label asp-for="contaminations" class="control-label"></label>
+            </td>
+            <td>
+                <input asp-for="contaminations" class="form-control" />
+            </td>
+            <td>
+                <span asp-validation-for="contaminations" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label asp-for="device" class="control-label"></label>
+            </td>
+            <td>
+                @Html.DropDownListFor(model => model.device, ViewData["WTPblocknames"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+            </td>
+            <td>
+                <span asp-validation-for="device" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label asp-for="water_type" class="control-label"></label>
+            </td>
+            <td>
+                @Html.DropDownListFor(model => model.water_typeid, ViewData["water_types"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+            </td>
+            <td>
+                <span asp-validation-for="water_type" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString("Save")" class="btn btn-hoelscher" />
+            </td>
+            <td>
+                <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+            </td>
+            <td></td>
+        </tr>
+    </table>
+</form>

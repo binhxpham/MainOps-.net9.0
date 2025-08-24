@@ -1,0 +1,369 @@
+﻿@model MainOps.Models.SensorsCheck
+@{
+    ViewData["Title"] = "SensorsCheck";
+}
+<div class="row">
+    <div class="col-xs-12">
+        <form asp-action="SensorsCheck" asp-controller="TrackItems" method="post" onsubmit="retrieveData(event);" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            
+            <table style="width:100%;table-layout:fixed;">
+                <tr>
+                    <td colspan="2">
+                        <h2>@SharedLocalizer.GetLocalizedHtmlString("Inlet")</h2>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="ProjectId" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select Project")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="SubProjectId" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="SubProjectId" class="form-control">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("No Sub Projects")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="TimeStamp" class="control-label"></label></td>
+                    <td><input asp-for="TimeStamp" type="datetime" class="date-picker" value="@DateTime.Now" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Turbidity_SCADA_Inlet" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="Turbidity_SCADA_Inlet" class="form-control" style="width:100%;" />
+                        <span asp-validation-for="Turbidity_SCADA_Inlet" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="PH_SCADA_Inlet" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="PH_SCADA_Inlet" class="form-control" style="width:100%;" />
+                        <span asp-validation-for="PH_SCADA_Inlet" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Conductivity_SCADA_Inlet" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="Conductivity_SCADA_Inlet" class="form-control" style="width:100%;" />
+                        <span asp-validation-for="Conductivity_SCADA_Inlet" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Turbidity_Cleaned_Inlet" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="Turbidity_Cleaned_Inlet" class="form-control">
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="PH_Cleaned_Inlet" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="PH_Cleaned_Inlet" class="form-control">
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Conductivity_Cleaned_Inlet" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="Conductivity_Cleaned_Inlet" class="form-control">
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Turbidity_SCADA_Inlet_After" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="Turbidity_SCADA_Inlet_After" class="form-control" style="width:100%;" />
+                        <span asp-validation-for="Turbidity_SCADA_Inlet_After" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="PH_SCADA_Inlet_After" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="PH_SCADA_Inlet_After" class="form-control" style="width:100%;" />
+                        <span asp-validation-for="PH_SCADA_Inlet_After" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Conductivity_SCADA_Inlet_After" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="Conductivity_SCADA_Inlet_After" class="form-control" style="width:100%;" />
+                        <span asp-validation-for="Conductivity_SCADA_Inlet_After" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="PH_Calibrated_Inlet" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="PH_Calibrated_Inlet" class="form-control">
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Closed_Bypass_Valve_Inlet" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="Closed_Bypass_Valve_Inlet" class="form-control">
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><h2>@SharedLocalizer.GetLocalizedHtmlString("Outlet")</h2></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Turbidity_SCADA_Outlet" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="Turbidity_SCADA_Outlet" class="form-control" style="width:100%;" />
+                        <span asp-validation-for="Turbidity_SCADA_Outlet" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="PH_SCADA_Outlet" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="PH_SCADA_Outlet" class="form-control" style="width:100%;" />
+                        <span asp-validation-for="PH_SCADA_Outlet" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Conductivity_SCADA_Outlet" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="Conductivity_SCADA_Outlet" class="form-control" style="width:100%;" />
+                        <span asp-validation-for="Conductivity_SCADA_Outlet" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Turbidity_Cleaned_Outlet" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="Turbidity_Cleaned_Outlet" class="form-control">
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="PH_Cleaned_Outlet" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="PH_Cleaned_Outlet" class="form-control">
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Conductivity_Cleaned_Outlet" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="Conductivity_Cleaned_Outlet" class="form-control">
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Turbidity_SCADA_Outlet_After" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="Turbidity_SCADA_Outlet_After" class="form-control" style="width:100%;" />
+                        <span asp-validation-for="Turbidity_SCADA_Outlet_After" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="PH_SCADA_Outlet_After" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="PH_SCADA_Outlet_After" class="form-control" style="width:100%;" />
+                        <span asp-validation-for="PH_SCADA_Outlet_After" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Conductivity_SCADA_Outlet_After" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="Conductivity_SCADA_Outlet_After" class="form-control" style="width:100%;" />
+                        <span asp-validation-for="Conductivity_SCADA_Outlet_After" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="PH_Calibrated_Outlet" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="PH_Calibrated_Outlet" class="form-control">
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Closed_Bypass_Valve_Outlet" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="Closed_Bypass_Valve_Outlet" class="form-control">
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><h2>@SharedLocalizer.GetLocalizedHtmlString("Misc")</h2></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <label asp-for="GeneralComments" class="control-label" style="width:100%;"></label>
+                    </td>
+                </tr>
+                <tr rowspan="20">
+                    <td colspan="2">
+                        <textarea rows="6" cols="50" class="form-control" asp-for="GeneralComments" style="width:100%;"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label></td>
+                    <td><input type="file" name="files" multiple accept=".jpg,.jpeg,.png" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Latitude" class="control-label"></label></td>
+                    <td><input asp-for="Latitude" id="latinput" readonly="readonly" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Longitude" class="control-label"></label></td>
+                    <td><input asp-for="Longitude" id="longinput" readonly="readonly" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><b>@SharedLocalizer.GetLocalizedHtmlString("Signature")</b></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <canvas width="330" height="150" id="signature" style="border:1px solid blue;"></canvas>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:45%">
+                        <button type="button" id="accept" class="btn-hoelscher" style="width:100%;height:40px;">@SharedLocalizer.GetLocalizedHtmlString("Accept signature")</button>
+                    </td>
+                    <td style="width:45%">
+                        <button type="button" id="clear" class="btn-hoelscher" style="width:100%;height:40px;">@SharedLocalizer.GetLocalizedHtmlString("Clear signature")</button>
+                        <input type="text" id="signaturedata" hidden="hidden" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <img width="80" height="60" id="savetarget" hidden="hidden" style="border:1px solid black">
+                    </td>
+                </tr>
+            </table>
+            <div class="form-group">
+                <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString("Submit")" class="btn-hoelscher" style="width:100%;height:70px;" />
+            </div>
+            <input asp-for="Signature" value="" hidden="hidden" />
+        </form>
+    </div>
+</div>
+<div>
+    <a asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script src="~/js/signature_pad.min.js"></script>
+    <script type="text/javascript">
+        var pad = null;
+        var id;
+        var myLat;
+        var myLng;
+
+        if (navigator.geolocation) {
+            id = navigator.geolocation.watchPosition(function (position) {
+                myLat = position.coords.latitude;
+                myLng = position.coords.longitude;
+                getPos(myLat, myLng);
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                        //alert("error");
+                    }
+
+                }, { maximumAge: 0, timeout: 8000, enableHighAccuracy: true });
+        }
+        function getPos(lat, lng) {
+            $("#latinput").val(lat);
+            $("#longinput").val(lng);
+        }
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select',
+                    firstDay: 1
+                });
+                $('.date-picker').datepicker("setDate", new Date("dd-MM-yy"));
+                FillSubProjects();
+            });
+        });
+        $(document).ready(function () {
+            $(function () {
+                var canvas = document.querySelector("#signature");
+                pad = new SignaturePad(canvas);
+                $('#accept').click(function () {
+                    var data = pad.toDataURL();
+                    $('#savetarget').attr('src', data);
+                    var base64signature = data.split(',')[1];
+                    $('#signaturedata').val(base64signature);
+                    });
+                    $('#clear').click(function () {
+                        pad.clear();
+                    })
+
+            })
+        });
+        function retrieveData(e) {
+            var posting = true;
+            var s1 = document.getElementById("Signature");
+            var signature = "";
+            signature = document.getElementById("signaturedata").value;
+            s1.value = signature;
+            if (signature == "") {
+                posting = false;
+                e.preventDefault();
+                alert("Please sign the report!");
+            }
+            if (posting == true) {
+                StartSpinner();
+            }
+        }
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+        }
+    </script>
+}

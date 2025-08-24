@@ -1,0 +1,118 @@
+﻿@model MainOps.Models.WTPClasses.MixedClasses.MediaEfficiency
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Edit");
+}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#NeedDosing").change(function () {
+            checkedthebox = $("#NeedDosing").is(":checked");
+            if (checkedthebox == true) {
+                $("#dosinginputs").show();
+            }
+            else {
+                $("#dosinginputs").hide();
+            }
+        });
+        $("#NeedAeration").change(function () {
+            checkedthebox = $("#NeedAeration").is(":checked");
+            if (checkedthebox == true) {
+                $("#aerationinputs").show();
+            }
+            else {
+                $("#aerationinputs").hide();
+            }
+        });
+        $("#NeedpH").change(function () {
+            checkedthebox = $("#NeedpH").is(":checked");
+            if (checkedthebox == true) {
+                $("#pHinputs").show();
+            }
+            else {
+                $("#pHinputs").hide();
+            }
+        });
+        $("#HasConc").change(function () {
+            checkedthebox = $("#HasConc").is(":checked");
+            if (checkedthebox == true) {
+                $("#concentrationinputs").show();
+            }
+            else {
+                $("#concentrationinputs").hide();
+            }
+        });
+    });
+</script>
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Edit")</h2>
+
+<h4>@SharedLocalizer.GetLocalizedHtmlString("Filtermaterial and Contamination (Mediaefficiency)")</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="filtermaterialid" />
+            <input type="hidden" asp-for="contaminationId" />
+
+            <div class="form-group">
+                @Localizer["Filtermaterial"] :
+                @Html.DisplayFor(model => model.filtermaterial.Name)
+            </div>
+            <div class="form-group">
+                @Localizer["Contamination"] :
+                @Html.DisplayFor(model => model.Contamination.Name)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.efficiency)
+                @Html.EditorFor(model => model.efficiency)
+                @Html.ValidationMessageFor(model => model.efficiency)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.need_dosing)
+                @Html.CheckBoxFor(model => model.need_dosing, new { id = "NeedDosing" })
+                <div id="dosinginputs">
+                    @Html.LabelFor(model => model.dosing_of.dosing)
+                    @Html.DropDownListFor(model => model.dosing_ofid, ViewData["Dosing Choices"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.dosing_ofid)
+                    @Html.LabelFor(model => model.dosing_relation)
+                    @Html.EditorFor(model => model.dosing_relation)
+                    @Html.ValidationMessageFor(model => model.dosing_relation)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.need_Aeration)
+                @Html.CheckBoxFor(model => model.need_Aeration, new { id = "NeedAeration" })
+                <div id="aerationinputs">
+                    @Html.EditorFor(model => model.lower_limit_aeration)
+                    @Html.EditorFor(model => model.upper_limit_aeration)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.need_pH_control)
+                @Html.CheckBoxFor(model => model.need_pH_control, new { id = "NeedpH" })
+                <div id="pHinputs">
+                    @Html.EditorFor(model => model.lower_limit_pH)
+                    @Html.EditorFor(model => model.upper_limit_aeration)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.has_concentration_effect)
+                @Html.CheckBoxFor(model => model.has_concentration_effect, new { id = "HasConc" })
+                <div id="concentrationinputs">
+                    @Html.LabelFor(model => model.effect_type.description)
+                    @Html.DropDownListFor(model => model.effect_typeid, ViewData["Effect Choices"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value=@SharedLocalizer.GetLocalizedHtmlString("Save") class="btn btn-hoelscher" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+

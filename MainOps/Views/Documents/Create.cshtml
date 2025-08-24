@@ -1,0 +1,150 @@
+﻿@model MainOps.Models.Document
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+
+<h4>Document</h4>
+<hr />
+<div class="row">
+    <div class="col-xs-12">
+        <h2>@SharedLocalizer.GetLocalizedHtmlString("Upload File")</h2>
+        <h3>@SharedLocalizer.GetLocalizedHtmlString("Please choose a Measurement Point if the document is for a given well / measurement point. Else - choose a project for general project files")</h3>
+    <h3>@SharedLocalizer.GetLocalizedHtmlString("You can also add an external link to view a file from another destination")</h3>
+    </div>
+    <div class="col-xs-2">
+        <form method="post" enctype="multipart/form-data" asp-controller="Documents" asp-action="Create">
+            @Html.HiddenFor(Model => Model.DivisionId)
+            <table>
+                <tr>
+                    <td><label asp-for="Name" class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Document Name")</label></td>
+                    <td><input asp-for="Name" type="text" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="MeasPointId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.MeasPointId))</label></td>
+                    <td>
+                        @Html.DropDownListFor(Model => Model.MeasPointId, ViewData["MeasPointId"] as IEnumerable<SelectListItem>,
+                                        @SharedLocalizer.GetLocalizedHtmlString("Please Select Measurement Point"), new { name = "id", style = "width:250px;height:40px;" })
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="ProjectId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.ProjectId))</label></td>
+                    <td>
+                        <select asp-for="ProjectId" asp-items="ViewBag.ProjectId" style="width:250px;height:40px;" onchange="FillSubProjects();">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Project")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="SubProjectId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.SubProjectId))</label></td>
+                    <td>
+                        <select asp-for="SubProjectId" style="width:250px;height:40px;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Select SubProject")</option>
+                        </select>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="DocumentType" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.DocumentType))</label><span asp-validation-for="DocumentTypeId" class="text-danger"></span></td>
+                    <td>
+                        @Html.DropDownListFor(Model => Model.DocumentTypeId, ViewData["DocumentTypeId"] as IEnumerable<SelectListItem>,
+                                        @SharedLocalizer.GetLocalizedHtmlString("Please Select DocumentType"), new { name = "id", style = "width:250px;height:40px;" })
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @SharedLocalizer.GetLocalizedHtmlString("Choose File")
+                    </td>
+                    <td>
+                        <input type="file" name="files" accept="pdf" multiple="multiple" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @SharedLocalizer.GetLocalizedHtmlString("External Link")
+                    </td>
+                    <td>
+                        <input asp-for="ExternalUrl" type="url" />
+                    </td>
+                </tr>
+            </table>
+            <div class="form-group">
+                <div class="col-xs-2">
+                    <input type="submit" class="btn btn-hoelscher" value="@SharedLocalizer.GetLocalizedHtmlString("Upload")" style="width:150px;height:60px;" />
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>
+<br />
+<br />
+<br />
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                    FillMeasPoints();
+                }
+            });
+        }
+        function FillMeasPoints() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetMeasPointsProject", "TrackItems")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select Maintained Item</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["value"] + '">' + data[prop]["text"] + '</option>';
+                    }
+                    $("#MeasPointId").html(s);
+                    document.getElementById("MeasPointId").style.width = "100%";
+                }
+            });
+        }
+        
+        
+        
+        
+        
+        
+     
+
+
+    </script>
+}
+
+

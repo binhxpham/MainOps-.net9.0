@@ -1,0 +1,85 @@
+﻿@model MainOps.Models.WorkTask
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>WorkTask</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select>
+                <span asp-validation-for="ProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SubProjectId" class="control-label"></label>
+                <select asp-for="SubProjectId" class="form-control" asp-items="ViewBag.SubProjectId"></select>
+                <span asp-validation-for="SubProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="IsStarted" /> @Html.DisplayNameFor(model => model.IsStarted)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="IsFinished" /> @Html.DisplayNameFor(model => model.IsFinished)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="TimeFinished" class="control-label"></label>
+                <input asp-for="TimeFinished" class="form-control" />
+                <span asp-validation-for="TimeFinished" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TimeStarted" class="control-label"></label>
+                <input asp-for="TimeStarted" class="form-control" />
+                <span asp-validation-for="TimeStarted" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateToDo" class="control-label"></label>
+                <input asp-for="DateToDo" class="form-control" />
+                <span asp-validation-for="DateToDo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Comments_Office" class="control-label"></label>
+                <input asp-for="Comments_Office" class="form-control" />
+                <span asp-validation-for="Comments_Office" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Comments_Workers" class="control-label"></label>
+                <input asp-for="Comments_Workers" class="form-control" />
+                <span asp-validation-for="Comments_Workers" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="InChargeId" class="control-label"></label>
+                <input asp-for="InChargeId" class="form-control" />
+                <span asp-validation-for="InChargeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WorkerId" class="control-label"></label>
+                <input asp-for="WorkerId" class="form-control" />
+                <span asp-validation-for="WorkerId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

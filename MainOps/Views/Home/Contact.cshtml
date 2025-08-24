@@ -1,0 +1,55 @@
+﻿
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@inject LocService SharedLocalizer
+@{
+    ViewData["Title"] = Localizer["Contact"];
+}
+
+<h2>@Localizer["Contact"]</h2>
+
+    <table>
+        <tr>
+            <td>
+                <h4 class="contactPersonTitle">Thomas Nielsen</h4>
+            </td>
+            <td></td>
+            <td>
+                <h4 class="contactPersonTitle">Jan Vognbjerg</h4>
+            </td>
+            <td></td>
+
+        </tr>
+        <tr>
+            <td rowspan="6">
+                <img src="~/images/People/Thomas_Nielsen.jpg" style="width: 120px" />
+            </td>
+            <td>@Localizer["CEO"]</td>
+            <td rowspan="6">
+                <img src="~/images/People/Jan_Vognbjerg.jpg" style="width: 120px" />
+            </td>
+            <td>@Localizer["Project manager"]</td>
+        </tr>
+        <tr>
+            <td>@Localizer["Hölscher Jensen A/S"]</td>
+            <td>@Localizer["Hölscher Jensen A/S"]</td>
+        </tr>
+        <tr>
+            <td>Fabriksparken 37</td>
+            <td>Fabriksparken 37</td>
+        </tr>
+        <tr>
+            <td>2600 Glostrup</td>
+            <td>2600 Glostrup</td>
+        </tr>
+        <tr>
+            <td><a href="mailto:thn@hj-as.dk"><span class="glyphicon glyphicon-envelope"> THN@hj-as.dk</span></a></td>
+            <td><a href="mailto:jav@hj-as.dk"><span class="glyphicon glyphicon-envelope"> JAV@hj-as.dk</span></a></td>
+        </tr>
+        <tr>
+            <td>Telefon +45 27256549</td>
+            <td>Telefon +45 41771406</td>
+        </tr>
+    </table>
+
+

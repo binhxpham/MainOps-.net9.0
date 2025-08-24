@@ -1,0 +1,91 @@
+﻿@model IEnumerable<MainOps.Models.ReportClasses.Daily_Report>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.short_Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MeasPoint)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Report_Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StartHour)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EndHour)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Machinery)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Work_Performed)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Extra_Works)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WasAlarmCall)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.short_Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MeasPoint.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Report_Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.StartHour)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EndHour)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Machinery)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Work_Performed)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Extra_Works)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WasAlarmCall)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DoneBy)
+            </td>
+            <td>
+                <form asp-action="Daily_Report_DetailsPdf" asp-controller="Documentation" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("View")</button></form>
+            </td>
+            <td>
+                <form asp-action="DownLoadPhotos" asp-controller="Documentation" asp-route-id="@item.Id" method="post" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Download Photos")</button></form>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

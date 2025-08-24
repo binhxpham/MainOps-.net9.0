@@ -1,0 +1,187 @@
+﻿@model MainOps.Models.ReportClasses.Daily_Report
+@{
+    Layout = null;
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@Html.DisplayFor(model => model.Report_name)</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+
+
+<div class="row">
+    <div class="col-xs-8">
+        <table>
+            <tr>
+                <td colspan="3">
+                <b>@SharedLocalizer.GetLocalizedHtmlString("Daily Report")</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.Project.Name)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.Project.Name)
+                </td>
+                <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@Model.Project.Division.Id/@Model.Project.Division.LogoPath" width="151" height="66" /></td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.Project.ProjectNr)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.Project.ProjectNr)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.Project.Client)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.Project.Client)
+                </td>
+                
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.short_Description)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.short_Description)
+                </td>
+            </tr>
+            <tr>
+                @if (Model.MeasPointId != null)
+                {
+                    <td style="text-align:left;">
+                        <b>
+                            @Html.DisplayNameFor(x => x.MeasPoint.Name)
+                        </b>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(x => x.MeasPoint.Name)
+                    </td>
+                }
+                else
+                {
+                    <td style="text-align:left;">
+                        <b>
+                            @SharedLocalizer.GetLocalizedHtmlString("Well Name")
+                        </b>
+                    </td>
+                    <td>
+                        @SharedLocalizer.GetLocalizedHtmlString("No Well")
+                    </td>
+                }
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.Report_Date)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.Report_Date)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.StartHour)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.StartHour)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.EndHour)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.EndHour)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.Machinery)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.Machinery)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.WasAlarmCall)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.WasAlarmCall)
+                </td>
+            </tr>
+
+            <tr>
+                <td colspan="3"><b>@Html.DisplayNameFor(x => x.Work_Performed)</b></td>
+            </tr>
+            <tr rowspan="20">
+                <td colspan="3">
+                    <textarea rows="8" cols="64" class="form-control" style="width:100%;">@Html.DisplayFor(x => x.Work_Performed)</textarea>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3"><b>@Html.DisplayNameFor(x => x.Extra_Works)</b></td>
+            </tr>
+            <tr rowspan="20" >
+                <td colspan="3">
+                    <textarea rows="8" cols="64" class="form-control" style="width:100%;">@Html.DisplayFor(x => x.Extra_Works)</textarea>
+                </td>
+            </tr>
+        </table>
+        
+        <table name="phototable" style="page-break-inside:avoid;">
+            @{ var rows = 0;}
+            @if (Model.pictures.Count % 2 == 0)
+            {
+                rows = Model.pictures.Count() / 2;
+            }
+            else
+            {
+                rows = Convert.ToInt32(Model.pictures.Count() / 2) + 1;
+            }
+            @{ var totalpics = Model.pictures.Count();}
+            @for (int i = 0; i < rows; i++)
+            {
+                @if (totalpics - (i + 1) * 2 >= 0) //enough room to add whole row
+                {
+                    <tr>
+                        <td><img src="~/images/Divisions/Daily_Reports/@Model.Project.Division.Id.ToString()/@Model.Id.ToString()/@Model.pictures[(i+1)*2 - 2]" style="width:400px;height:300px;" /></td>
+                        <td><img src="~/images/Divisions/Daily_Reports/@Model.Project.Division.Id.ToString()/@Model.Id.ToString()/@Model.pictures[(i+1)*2 - 2 +1]" style="width:400px;height:300px;" /></td>
+                    </tr>
+                        }
+
+                else //enough room to add 1 picture in row
+                {
+                    <tr>
+                        <td><img src="~/images/Divisions/Daily_Reports/@Model.Project.Division.Id.ToString()/@Model.Id.ToString()/@Model.pictures[(i+1)*2 - 2]" style="width:400px;height:300px;" /></td>
+                        <td></td>
+                    </tr>
+                }
+
+            }
+        </table>
+    </div>
+</div>

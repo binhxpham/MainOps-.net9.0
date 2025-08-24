@@ -1,0 +1,129 @@
+﻿@model MainOps.Models.ReportClasses.AllDocumentation
+@{ 
+    Layout = null;
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("All Documenation")</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+<div class="row">
+    <div class="col-xs-12">
+        @foreach (var item in Model.Deinstallations)
+        {
+        <table style="page-break-inside:avoid;">
+            <tr>
+                <td colspan="3">
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("Deinstallation of Item")</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Project.Name)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Name)
+                </td>
+                <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@item.Project.Division.Id/@item.Project.Division.LogoPath" width="151" height="66" /></td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Project.ProjectNr)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.ProjectNr)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Project.Client)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Client)
+                </td>
+
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.TimeStamp)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TimeStamp.Date)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.ItemType.Item_Type)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ItemType.Item_Type)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;"><b>@Html.DisplayNameFor(modelItem => item.Latitude)</b></td>
+                <td>@Html.DisplayFor(modelItem => item.Latitude)</td>
+            </tr>
+            <tr>
+                <td style="text-align:left;"><b>@Html.DisplayNameFor(modelItem => item.Longitude)</b></td>
+                <td>@Html.DisplayFor(modelItem => item.Longitude)</td>
+            </tr>
+            <tr>
+                <td colspan="3"><b>@Html.DisplayNameFor(modelItem => item.DeInstall_Text)</b></td>
+            </tr>
+            <tr rowspan="20">
+                <td colspan="3">
+                    <textarea rows="8" cols="64" class="form-control" style="width:100%;">@Html.DisplayFor(modelItem => item.DeInstall_Text)</textarea>
+                </td>
+            </tr>
+        </table>
+
+            <table name="phototable" style="page-break-inside:avoid;">
+                @{ var rows = 0;}
+                @if (Model.Deinstall_Photos.Where(x => x.DeinstallId.Equals(item.Id)).Count() % 2 == 0)
+                {
+                    rows = Model.Deinstall_Photos.Where(x => x.DeinstallId.Equals(item.Id)).Count() / 2;
+                }
+                else
+                {
+                    rows = Convert.ToInt32(Model.Deinstall_Photos.Where(x => x.DeinstallId.Equals(item.Id)).Count() / 2) + 1;
+                }
+                @{ var totalpics = Model.Deinstall_Photos.Where(x => x.DeinstallId.Equals(item.Id)).Count();}
+                @for (int i = 0; i < rows; i++)
+                {
+
+                    @if (totalpics - (i + 1) * 2 >= 0) //enough room to add whole row
+                    {
+                        var photo1 = Model.Deinstall_Photos.Where(x => x.DeinstallId.Equals(item.Id)).ElementAt((i + 1) * 2 - 2);
+                        var photo2 = Model.Deinstall_Photos.Where(x => x.DeinstallId.Equals(item.Id)).ElementAt((i + 1) * 2 - 2 + 1);
+
+                        <tr>
+                            <td><img src="@photo1.Path" style="width:400px;height:300px;" /></td>
+                            <td><img src="@photo2.Path" style="width:400px;height:300px;" /></td>
+                        </tr>
+                    }
+
+                    else //enough room to add 1 picture in row
+                    {
+
+                            var photo1 = Model.Deinstall_Photos.Where(x => x.DeinstallId.Equals(item.Id)).ElementAt((i + 1) * 2 - 2);
+                            <tr>
+                                <td><img src="~/AHAK/DeinstallPhotos/@photo1.Path.Split("\\")[@photo1.Path.Split("\\").Length -2]/@photo1.Path.Split("\\")[@photo1.Path.Split("\\").Length -1]" style="width:400px;height:300px;" /></td>
+                                <td></td>
+                            </tr>
+                    }
+
+                }
+            </table>
+        }
+    </div>
+</div>

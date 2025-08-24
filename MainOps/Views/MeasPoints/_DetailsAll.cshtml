@@ -1,0 +1,62 @@
+﻿@model IEnumerable<MainOps.Models.MeasPoint>
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Items</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+<body>
+    @foreach(var item in Model){
+    <font size="4">
+        <table style="margin-bottom:4cm;">
+            <tbody>
+                <tr>
+                    <td rowspan="3" width="20%" align="left"><img src="~/images/Divisions/Photos/@item.Project.Division.Id/@item.Project.Division.LogoPath" height="210" /></td>
+                    <td align="center" width="20%" height="70">@Html.DisplayNameFor(modelItem => item.Project.Name)</td>
+                    <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.Project.Name)</td>
+                </tr>
+                <tr>
+                    <td align="center" width="20%" height="70">@Html.DisplayNameFor(model => model.Name)</td>
+                    <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.getBaseName)</td>
+                </tr>
+
+                <tr>
+                    <td align="center" width="20%" height="70">@SharedLocalizer.GetLocalizedHtmlString("Coordinates")</td>
+                    <td align="center" height="70" style="border-width:thin;border-style:solid;">@String.Concat("{", item.Coordx, " ; ", item.Coordy, "}")</td>
+                </tr>
+                <tr>
+                    <td rowspan="3" width="20%" align="left"><img src='@Url.Action("GetQR2","HJItems",new { Id = item.Id })' alt="" height="210" /></td>
+                    <td align="center" width="20%" height="70">@Html.DisplayNameFor(modelItem => item.Coordz)</td>
+                    <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.Coordz)</td>
+                </tr>
+                @if (item.DGUnr != null && item.DGUnr != "")
+                {
+
+                    <tr>
+                        <td align="center" width="20%" height="70">@Html.DisplayNameFor(modelItem => item.DGUnr)</td>
+                        <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.DGUnr)</td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td align="center" width="20%" height="70"></td>
+                        <td align="center" height="70" style="border-width:thin;border-style:solid;"></td>
+                    </tr>
+                }
+                <tr>
+                    <td align="center" width="20%" height="70">@SharedLocalizer.GetLocalizedHtmlString("Owner")</td>
+                    <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.Project.Division.Name)</td>
+                </tr>
+            </tbody>
+        </table>
+        </font>
+        }
+</body>
+</html>

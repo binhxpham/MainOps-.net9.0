@@ -1,0 +1,82 @@
+﻿@model IEnumerable<MainOps.Models.HJItemMaintenaceVM>
+@{
+    ViewData["Title"] = "ServiceToDo";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Service To Do")</h2>
+
+<table style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(x => x.HJItem.HJId)</th>
+            <th>@Html.DisplayNameFor(x => x.HJItem.Name)</th>
+            <th>@Html.DisplayNameFor(x => x.Next_Check)</th>
+            <th>@Html.DisplayNameFor(x => x.Last_Service)</th>
+            <th>@Html.DisplayNameFor(x => x.Last_Safety)</th>
+            <th>@Html.DisplayNameFor(x => x.Last_Electrical)</th>
+            <th>@Html.DisplayNameFor(x => x.Next_Service)</th>
+            <th>@Html.DisplayNameFor(x => x.Next_Safety)</th>
+            <th>@Html.DisplayNameFor(x => x.Next_Electrical)</th>
+            <th>@Html.DisplayNameFor(x => x.Service_Maintenance_Freq)</th>
+            <th>@Html.DisplayNameFor(x => x.Safety_Maintenance_Freq)</th>
+            <th>@Html.DisplayNameFor(x => x.Electrical_Maintenance_Freq)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            @if (item.Next_Check > DateTime.Now.AddDays(30))
+            {
+                <tr style="background-color:lightgreen">
+                    <td>@Html.DisplayFor(modelItem => item.HJItem.HJId)</td>
+                    <td>@Html.DisplayFor(modelItem => item.HJItem.Name)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Next_Check)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Last_Service)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Last_Safety)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Last_Electrical)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Next_Service)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Next_Safety)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Next_Electrical)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Service_Maintenance_Freq)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Safety_Maintenance_Freq)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Electrical_Maintenance_Freq)</td>
+                </tr>
+            }
+            else if (item.Next_Check.Date > DateTime.Now.Date)
+            {
+                <tr style="background-color:lightyellow">
+                    <td>@Html.DisplayFor(modelItem => item.HJItem.HJId)</td>
+                    <td>@Html.DisplayFor(modelItem => item.HJItem.Name)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Next_Check)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Last_Service)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Last_Safety)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Last_Electrical)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Next_Service)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Next_Safety)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Next_Electrical)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Service_Maintenance_Freq)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Safety_Maintenance_Freq)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Electrical_Maintenance_Freq)</td>
+                </tr>
+            }
+            else
+            {
+                <tr style="background-color:lightcoral">
+                    <td>@Html.DisplayFor(modelItem => item.HJItem.HJId)</td>
+                    <td>@Html.DisplayFor(modelItem => item.HJItem.Name)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Next_Check)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Last_Service)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Last_Safety)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Last_Electrical)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Next_Service)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Next_Safety)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Next_Electrical)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Service_Maintenance_Freq)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Safety_Maintenance_Freq)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Electrical_Maintenance_Freq)</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+

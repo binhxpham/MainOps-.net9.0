@@ -1,0 +1,182 @@
+﻿@model IEnumerable<MainOps.Models.Grouting>
+
+@{
+    ViewData["Title"] = "Groutings";
+}
+
+<h2>Groutings</h2>
+@if (User.IsInRole("Admin"))
+{
+    <form asp-action="UpdateAndCreateGroutInstallations" asp-controller="TrackItems" method="get">
+        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Update Grout Installations to Invoice!")</button>
+    </form>
+}
+@if (User.IsInRole("Admin"))
+{
+    <form asp-action="RemoveDoubleGroutings" asp-controller="TrackItems" method="get">
+        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("If DOUBLE invoice items of groutinsg exist, then press this button!!")</button>
+    </form>
+}
+<form asp-action="SearchGrouting" asp-controller="TrackItems" method="get">
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Start Date")</td>
+            @if (ViewBag.startdate != null)
+            {
+                <td><input type="date" name="starttime" id="startid" value="@ViewBag.startdate.ToString("yyyy-MM-dd")"></td>
+            }
+            else
+            {
+                <td><input type="date" name="starttime" id="startid" value="@DateTime.Now.AddMonths(-1).ToString("yyyy-MM-dd")"></td>
+            }
+
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("End Date")</td>
+            @if (ViewBag.enddate != null)
+            {
+                <td><input type="date" name="endtime" id="endid" value="@ViewBag.enddate.ToString("yyyy-MM-dd")"></td>
+            }
+            else
+            {
+                <td><input type="date" name="endtime" id="endid" value="@DateTime.Now.ToString("yyyy-MM-dd")"></td>
+            }
+
+        </tr>
+        <tr>
+            <td colspan="2"><button class="btn-hoelscher" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Search")</button></td>
+        </tr>
+    </table>
+</form>
+
+@{ var subprojects = Model.Select(x => x.SubProjectId).Distinct();}
+<table style="width:100%;table-layout:fixed;word-break:break-word;">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubProject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StartTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EndTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Totalm3)
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Total Days + SCADA data uploaded?")
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+
+        @foreach (var proj in Model.Where(x => x.SubProjectId == null).Select(x => x.ProjectId).Distinct())
+        {
+            <tr style="border-bottom: 1px solid blue; border-top: 1px solid blue;">
+                <td><b>@Model.Where(x => x.ProjectId.Equals(proj)).First().Project.Name</b></td>
+                @if (Model.Where(x => x.ProjectId.Equals(proj)).First().SubProjectId != null)
+                {
+                    <td><b>@Model.Where(x => x.ProjectId.Equals(proj)).First().SubProject.Name</b></td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                <td><b>@Model.Where(x => x.ProjectId.Equals(proj)).OrderBy(x => x.StartTime).First().StartTime</b></td>
+                <td><b>@Model.Where(x => x.ProjectId.Equals(proj)).OrderByDescending(x => x.EndTime).First().EndTime</b></td>
+                <td><b>@String.Format("{0:n3} m3 total", Model.Where(x => x.ProjectId.Equals(proj)).ToList().Sum(x => x.Totalm3))</b></td>
+                <td><b>@String.Format("{0:n} total days", Model.Where(x => x.ProjectId.Equals(proj)).Select(x => x.StartTime.Date).Distinct().Count())</b></td>
+            </tr>
+        }
+        @if (subprojects != null)
+        {
+            @foreach (var proj in Model.Where(x => x.SubProjectId != null).Select(x => x.SubProjectId).Distinct())
+            {
+                <tr style="border-bottom: 1px solid blue; border-top: 1px solid blue;">
+                    <td><b>@Model.Where(x => x.SubProjectId.Equals(proj)).First().Project.Name</b></td>
+                    @if (Model.Where(x => x.SubProjectId.Equals(proj)).First().SubProjectId != null)
+                    {
+                        <td><b>@Model.Where(x => x.SubProjectId.Equals(proj)).First().SubProject.Name</b></td>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+                    <td><b>@Model.Where(x => x.SubProjectId.Equals(proj)).OrderBy(x => x.StartTime).First().StartTime</b></td>
+                    <td><b>@Model.Where(x => x.SubProjectId.Equals(proj)).OrderByDescending(x => x.EndTime).First().EndTime</b></td>
+                    <td><b>@String.Format("{0:n3} m3 total", Model.Where(x => x.SubProjectId.Equals(proj)).ToList().Sum(x => x.Totalm3))</b></td>
+                    <td><b>@String.Format("{0:n} total days", Model.Where(x => x.SubProjectId.Equals(proj)).Select(x => x.StartTime.Date).Distinct().Count())</b></td>
+                </tr>
+            }
+        }
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Name)
+                </td>
+                @if (item.SubProjectId != null)
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubProject.Name)
+                    </td>
+                }
+                else
+                {
+                    <td>
+                    </td>
+                }
+                <td>
+                    @Html.DisplayFor(modelItem => item.StartTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EndTime)
+                </td>
+                <td>
+                    @String.Format("{0:n3} m3", item.Totalm3)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.HasData)
+                </td>
+                <td>
+                    <a asp-action="Edit_Grouting" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
+                    <form asp-action="GroutingReport" asp-route-id="@item.Id" method="get" target="_blank">
+                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                    </form>
+                    <a asp-action="UploadGroutTestData" asp-controller="TrackItems" asp-route-id="@item.Id" method="get">Upload Data</a>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <form asp-action="Delete_Grouting" asp-route-id="@item.Id" method="post">
+                            <button class="btn-hoelscher" onclick="return confirm('Are you sure you want to delete?');">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button>
+                        </form>
+                    }
+                    @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DivisionAdmin"))
+                    {
+                        @if (item.Exclude_From_Invoice == true)
+                        {
+                            @Html.DisplayNameFor(modelItem => item.Exclude_From_Invoice) <input type="checkbox" checked="checked" readonly="readonly" />
+                        }
+                        else
+                        {
+                            @Html.DisplayNameFor(modelItem => item.Exclude_From_Invoice) <input type="checkbox" readonly="readonly" />
+                        }
+
+                        <form asp-action="Toggle_Exclude_Grout" asp-route-id="@item.Id" method="post">
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Toggle Exclusion from invoice")</button>
+                        </form>
+                        <form asp-action="DeleteDataGrouting" asp-route-id="@item.Id" method="post">
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Delete Data")</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+

@@ -1,0 +1,100 @@
+﻿@model IEnumerable<MainOps.Models.WaterSamplePackage>
+
+@{
+    ViewData["Title"] = "Packages";
+    //var result = Model.Where(m => m.WaterSampleTypeWaterSamplePackages.Count > 0)
+    //.OrderByDescending(v => v.WaterSampleTypeWaterSamplePackages.Count())
+    //.Take(1);
+    var result = (List<string>)ViewBag.WaterSampleTypesAll;
+    var widthparam = String.Concat((100.0 / Model.Count()).ToString(),"%;");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Water Sample Packages")</h2>
+
+<p>
+    <a asp-action="CreatePackage">@SharedLocalizer.GetLocalizedHtmlString("Create New")</a>
+</p>
+<p>
+    <a asp-action="UploadSamplePackage">@SharedLocalizer.GetLocalizedHtmlString("Upload Package Template")</a>
+</p>
+<p>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to main page")</a>
+</p>
+<form asp-action="PDFSamples" method="get">
+    <input hidden="hidden" value="" id="PDFProjectId" name="PDFProjectId" />
+    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("PDF version")</button>
+</form>
+
+<p>
+    <select id="ProjectId" asp-items="ViewBag.ProjectId" onchange="FilterProject();"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Filter Project")</option></select>
+</p>
+<table style="width:auto;table-layout:fixed;border:3px solid blue">
+    <thead style="border:2px solid blue;">
+        <tr style="border:2px solid blue">
+            @foreach (var package in Model)
+            {
+            <th class="@package.ProjectId celltd" style="border: 2px solid blue; text-align: center;width:@widthparam">@Html.DisplayFor(modelItem => package.Project.Name)</th>
+            }
+        </tr>
+        <tr style="border:2px solid blue">
+            @foreach (var package in Model)
+            {
+            <th class="@package.ProjectId celltd" style="border: 2px solid blue; text-align:center;width:@widthparam">@Html.DisplayFor(modelItem => package.Annotation)</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var sample in result)
+        {
+            <tr class="@sample" >
+                @foreach (var package in Model)
+                {
+                <td class="@package.ProjectId celltd" style="border: 2px solid blue; text-align: center; height:32px;width:@widthparam">
+                    @if (package.ListOfComponents.Contains(sample))
+                    {
+                        <text>
+                            @sample
+                        </text>
+                    }
+                </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        
+        function FilterProject() {
+            var ProjectId = $("#ProjectId").val();
+            $("#PDFProjectId").val(ProjectId);
+            var allcells = document.getElementsByClassName('celltd');
+            if (ProjectId == "") {
+                for (i = 0; i < allcells.length; i++) {
+                    allcells[i].style.display = '';
+                }
+            }
+            else {
+                for (i = 0; i < allcells.length; i++) {
+                    if (!allcells[i].classList.contains(ProjectId)) {
+                        allcells[i].style.display = 'none';
+                    }
+                    else {
+                        allcells[i].style.display = '';
+                    }
+                }
+            }
+            
+        }
+        
+
+
+
+
+
+
+    </script>
+}

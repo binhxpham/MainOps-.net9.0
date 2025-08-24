@@ -1,0 +1,137 @@
+﻿@model IEnumerable<MainOps.Models.Install>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<form asp-action="Index" asp-controller="Installs">
+    <table style="width:80%;table-layout:fixed;">
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Trouble Date")</label></td>
+            <td><input name="DateOfTrouble" type="date" value="@ViewBag.DateOfTrouble" /></td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Project")</label></td>
+            <td><select name="ProjectId" id="ProjectId" asp-items="ViewBag.ProjectId" onchange="FillItems();" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Project")</option></select></td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Item Type")</label></td>
+            <td><select name="ItemTypeId" id="ItemTypeId" asp-items="ViewBag.ItemTypeId" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Item")</option></select></td>
+        </tr>
+        <tr>
+            <td colspan="2"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Find")</button></td>
+        </tr>
+    </table>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UniqueID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.isInstalled)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RentalStartDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DeinstallDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Install_Text)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Name)
+                    @if (item.SubProjectId != null)
+                    {
+                        <text>
+                            @item.SubProject.Name
+                        </text>
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ItemType.Item_Type) X @Html.DisplayFor(modelItem => item.Amount) : @Html.DisplayFor(modelItem => item.Location)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UniqueID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.isInstalled)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TimeStamp)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RentalStartDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DeinstallDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Install_Text)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DoneBy)
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript"
+            src="http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/i18n/jquery-ui-i18n.min.js">
+    </script>
+    <script type="text/javascript">
+        
+        function FillItems() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetItemsProject", "ItemTypes")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                    'type' : "install"
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["item_Type"] + '</option>';
+                    }
+                    $("#ItemTypeId").html(s);
+                    document.getElementById("ItemTypeId").style.width = "100%";
+                }
+            });
+        }
+        
+
+    </script>
+}
+
+

@@ -1,0 +1,65 @@
+﻿@model IEnumerable<MainOps.Models.DataLoggerInstall>
+
+@{
+    ViewData["Title"] = "Data Logger Installations";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Data Logger Installations")</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubProject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DataLoggerNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WellName)
+            </th>            
+            <th>
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Name)
+            </td>
+            <td>
+                @if(item.SubProjectId != null) { 
+                    @Html.DisplayFor(modelItem => item.SubProject.Name)
+                }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeStamp)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DataLoggerNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WellName)
+            </td>            
+            <td>
+                @Html.DisplayFor(modelItem => item.DoneBy)
+            </td>
+            <td>
+                @if (!User.IsInRole("Guest")) {
+                <a asp-action="Edit_DataLoggerInstallation" asp-controller="TrackItems" asp-route-id="@item.Id" target="_blank">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
+                }
+                <a asp-action="DataLoggerInstall_PDF" asp-controller="TrackItems" asp-route-id="@item.Id" target="_blank">@SharedLocalizer.GetLocalizedHtmlString("View")</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

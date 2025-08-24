@@ -1,0 +1,637 @@
+﻿@model MainOps.Models.SummaryReport
+
+
+<div class="row">
+    <div class="col-xs-12">
+
+        <table style="page-break-inside:avoid;width:100%;">
+            <tr>
+                <td>
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("Daily Report Summary") @Html.DisplayFor(x => x.Report_Date)</b>
+                </td>
+            </tr>
+
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => Model.Project.Name) 
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.Project.Name) @if (Model.SubProjectId != null)
+                    {<text> - @Html.DisplayFor(Model => Model.SubProject.Name)</text>}
+                </td>
+                <td rowspan="3" align="right"><img src="~/images/Divisions/Photos/@Model.Project.Division.Id/@Model.Project.Division.LogoPath" width="151" height="66" /></td>
+            </tr>
+            
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => Model.Project.ProjectNr)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.Project.ProjectNr)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => Model.Project.Client)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.Project.Client)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(Model => Model.Report_Date)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(Model => Model.Report_Date)
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => Model.People)
+                    </b>
+                </td>
+                <td>
+                    @{
+                        int count = 0;
+                    }
+                    @foreach (var item in Model.People.Split(Environment.NewLine))
+                    {
+                        count += 1;
+                    }
+                    <textarea id="lol2" cols="30" rows="@count.ToString()" onChange="setText2(event);">@Model.People</textarea>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <textarea id="lol" cols="120" rows="40" style="width:100%;" onChange="setText(event);">@Model.TheDailyText</textarea>
+                </td>
+            </tr>
+        </table>
+        <table style="width:100%;page-break-inside:avoid">
+            @if (Model.Daily_Reports.Count > 0)
+            {
+                <tr><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Daily Reports")</h4></td></tr>
+                <tr style="border-bottom:solid">
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Title")</b></td>
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Hours")</b></td>
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Machinery")</b></td>
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Downtime")</b></td>
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("The Report")</b></td>
+                </tr>
+
+                @foreach (var item in Model.Daily_Reports)
+                {
+
+
+                    //var machinery = item.Machinery;
+                    <tr>
+                        <td>@item.Amount X @item.Title.TheTitle</td>
+                        <td>@item.StartHour - @item.EndHour </td>
+                        @if (item.Machinery != null)
+                        {
+                            <td>@item.Machinery.Replace("None", "")</td>
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+                        @if (item.StandingTime != null)
+                        {
+                            @if (item.StandingTime.Value.TotalMinutes > 0)
+                            {
+                                <td>@item.StandingTime</td>
+                            }
+                            else
+                            {
+                                <td></td>
+                            }
+                        }
+                        else
+                        {
+                            <td></td>
+                        }
+
+                        <td>
+                            <form asp-controller="TrackItems" asp-action="Daily_Report_2_DetailsPdf" asp-route-id="@item.Id" method="get" target="_blank">
+                                <button class="btn-hoelscher">
+                                    @SharedLocalizer.GetLocalizedHtmlString("View")
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            @if (Model.AlarmCalls.Count > 0)
+            {
+                <tr><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Alarm Calls")</h4></td></tr>
+                <tr style="border-bottom:solid">
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Alarm Time")</b></td>
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Hours")</b></td>
+                    <td colspan="2"><b></b></td>
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("The Report")</b></td>
+                </tr>
+
+                @foreach (var item in Model.AlarmCalls)
+                {
+
+                    <tr>
+                        <td>@item.Alarm_Time</td>
+                        <td>@item.Hours</td>
+                        <td colspan="2"></td>
+                        <td>
+                            <form asp-controller="TrackItems" asp-action="AlarmCall_Pdf" asp-route-id="@item.Id" method="get" target="_blank">
+                                <button class="btn-hoelscher">
+                                    @SharedLocalizer.GetLocalizedHtmlString("View")
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            @if (Model.Mobilizations.Count > 0)
+            {
+                <tr><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Mobilisations")</h4></td></tr>
+                <tr style="border-bottom:solid">
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Equipment")</b></td>
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Amount")</b></td>
+                    <td colspan="2"></td>
+                    <td></td>
+                </tr>
+                @foreach (var item in Model.Mobilizations.GroupBy(x => x.ItemTypeId))
+                {
+                    var thecount = Model.Mobilizations.Where(x => x.ItemTypeId.Equals(item.First().ItemTypeId)).Sum(x => x.Amount);
+                    <tr>
+                        <td>@item.First().ItemType.Item_Type</td>
+                        <td>@thecount @item.First().ItemType.Install_Unit.TheUnit.Replace("pr.", "")</td>
+                        <td colspan="2"></td>
+                        <td>
+                            <form asp-controller="TrackItems" asp-action="SaveMobilizationAsPdf" method="get">
+                                <input name="starttime" value="@Model.Report_Date.Date" hidden="hidden" />
+                                <input name="endtime" value="@Model.Report_Date.Date" hidden="hidden" />
+                                <input name="ProjectId" value="@Model.ProjectId" hidden="hidden" />
+                                <button class="btn-hoelscher">
+                                    @SharedLocalizer.GetLocalizedHtmlString("View")
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            @if (Model.Arrivals.Count > 0)
+            {
+                <tr><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Arrivals")</h4></td></tr>
+                <tr style="border-bottom:solid">
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Equipment")</b></td>
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Amount")</b></td>
+                    <td colspan="2"><b>@SharedLocalizer.GetLocalizedHtmlString("IDs")</b></td>
+                    <td></td>
+                </tr>
+                @foreach (var item in Model.Arrivals.GroupBy(x => x.ItemTypeId))
+                {
+                    var thecount = Model.Arrivals.Where(x => x.ItemTypeId.Equals(item.First().ItemTypeId)).Sum(x => x.Amount);
+                    <tr>
+                        <td>@item.First().ItemType.Item_Type</td>
+                        <td>@thecount @item.First().ItemType.Install_Unit.TheUnit.Replace("pr.", "")</td>
+                        <td colspan="2">@String.Join(",", Model.Arrivals.Where(x => x.ItemTypeId.Equals(item.First().ItemTypeId) && x.UniqueID != "N/A").Select(y => y.UniqueID).ToArray())</td>
+                        <td>
+                            <form asp-controller="TrackItems" asp-action="SaveArrivalAsPdf" method="get">
+                                <input name="starttime" value="@Model.Report_Date.Date" hidden="hidden" />
+                                <input name="endtime" value="@Model.Report_Date.Date" hidden="hidden" />
+                                <input name="ProjectId" value="@Model.ProjectId" hidden="hidden" />
+                                <button class="btn-hoelscher">
+                                    @SharedLocalizer.GetLocalizedHtmlString("View")
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            @if (Model.Installations.Count > 0)
+            {
+                <tr><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Installations")</h4></td></tr>
+                <tr style="border-bottom:solid">
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Equipment")</b></td>
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Amount")</b></td>
+                    <td colspan="2"><b>@SharedLocalizer.GetLocalizedHtmlString("IDs")</b></td>
+                    <td></td>
+                </tr>
+                @foreach (var item in Model.Installations.GroupBy(x => x.ItemTypeId))
+                {
+                    var thecount = Model.Installations.Where(x => x.ItemTypeId.Equals(item.First().ItemTypeId)).Sum(x => x.Amount);
+                    <tr>
+                        <td>@item.First().ItemType.Item_Type</td>
+                        <td>@thecount @item.First().ItemType.Install_Unit.TheUnit.Replace("pr.", "")</td>
+                        <td colspan="2">@String.Join(",", Model.Installations.Where(x => x.ItemTypeId.Equals(item.First().ItemTypeId) && x.UniqueID != "N/A").Select(y => y.UniqueID).ToArray())</td>
+                        <td>
+                            <form asp-controller="TrackItems" asp-action="SaveInstallAsPdf" method="get">
+                                <input name="starttime" value="@Model.Report_Date.Date" hidden="hidden" />
+                                <input name="endtime" value="@Model.Report_Date.Date" hidden="hidden" />
+                                <input name="ProjectId" value="@Model.ProjectId" hidden="hidden" />
+                                <button class="btn-hoelscher">
+                                    @SharedLocalizer.GetLocalizedHtmlString("View")
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            @if (Model.Deinstallations.Count > 0)
+            {
+                <tr><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("DeInstallations")</h4></td></tr>
+                <tr style="border-bottom:solid">
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Equipment")</b></td>
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Amount")</b></td>
+                    <td colspan="2"><b>@SharedLocalizer.GetLocalizedHtmlString("IDs")</b></td>
+                    <td></td>
+                </tr>
+                @foreach (var item in Model.Deinstallations.GroupBy(x => x.ItemTypeId))
+                {
+                    var thecount = Model.Deinstallations.Where(x => x.ItemTypeId.Equals(item.First().ItemTypeId)).Sum(x => x.Amount);
+                    <tr>
+                        <td>@item.First().ItemType.Item_Type</td>
+                        <td>@thecount @item.First().ItemType.Install_Unit.TheUnit.Replace("pr.", "")</td>
+                        <td colspan="2">@String.Join(",", Model.Deinstallations.Where(x => x.ItemTypeId.Equals(item.First().ItemTypeId) && x.Install.UniqueID != "N/A").Select(y => y.Install.UniqueID).ToArray())</td>
+                        <td>
+                            <form asp-controller="TrackItems" asp-action="SaveDeInstallAsPdf" method="get">
+                                <input name="starttime" value="@Model.Report_Date.Date" hidden="hidden" />
+                                <input name="endtime" value="@Model.Report_Date.Date" hidden="hidden" />
+                                <input name="ProjectId" value="@Model.ProjectId" hidden="hidden" />
+                                <button class="btn-hoelscher">
+                                    @SharedLocalizer.GetLocalizedHtmlString("View")
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            } 
+        </table>
+
+        @if (!Model.ProjectId.Equals(418))
+        {
+    <table style="width:100%;page-break-inside:avoid">
+        @if (Model.Maintenances.Count > 0)
+        {
+            <tr><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Maintenance & Repairs")</h4></td></tr>
+            <tr style="border-bottom:solid">
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Equipment")</b></td>
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Amount")</b></td>
+                <td></td>
+                <td></td>
+            </tr>
+            @foreach (var item in Model.Maintenances)
+            {
+                foreach (var main in item.MaintenanceEntries)
+                {
+                    <tr>
+                        @if (item.MaintenancePoint.Split(":").Length > 2)
+                        {
+                            <td><b>@item.MaintenancePoint.Split(":")[2]</b></td>
+                        }
+                        else if (item.MaintenancePoint.Split(":").Length > 1)
+                        {
+                            <td><b>@item.MaintenancePoint.Split(":")[1]</b></td>
+                        }
+                        else
+                        {
+                            <td><b>@item.MaintenancePoint</b></td>
+                        }
+                        <td>@main.MaintenanceType.Type : @main.MaintenanceSubType.Type</td>
+                        <td></td>
+                        <td>
+                            <form asp-controller="TrackItems" asp-action="MaintenanceReport_PDF" asp-route-id="@item.Id" method="get" target="_blank">
+                                <button class="btn-hoelscher">
+                                    @SharedLocalizer.GetLocalizedHtmlString("View")
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+        }
+
+
+        @if (Model.GeneratorChecks.Count > 0)
+        {
+            <tr><td colspan="4"><h4>@SharedLocalizer.GetLocalizedHtmlString("Generator Tests")</h4></td></tr>
+            @foreach (var item in Model.GeneratorChecks)
+            {
+                <tr>
+                    @if (item.SubProjectId != null)
+                    {
+                        <td>@item.Project.Name : @item.SubProject.Name</td>
+                    }
+                    else
+                    {
+                        <td>@item.Project.Name</td>
+                    }
+                    <td>@item.TimeStamp</td>
+                    <td colspan="2"></td>
+                    <td>
+                        <form asp-controller="TrackItems" asp-action="GeneratorCheckReport_PDF" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button class="btn-hoelscher">
+                                @SharedLocalizer.GetLocalizedHtmlString("View")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        @if (Model.WTPChecks.Count > 0)
+        {
+            <tr><td colspan="4"><h4>@SharedLocalizer.GetLocalizedHtmlString("WTP Checks")</h4></td></tr>
+            @foreach (var item in Model.WTPChecks)
+            {
+                <tr>
+                    @if (item.SubProjectId != null)
+                    {
+                        <td>@item.Project.Name : @item.SubProject.Name</td>
+                    }
+                    else
+                    {
+                        <td>@item.Project.Name</td>
+                    }
+                    <td>@item.TimeStamp</td>
+                    <td colspan="2"></td>
+                    <td>
+                        <form asp-controller="TrackItems" asp-action="WTPCheckReport_PDF" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button class="btn-hoelscher">
+                                @SharedLocalizer.GetLocalizedHtmlString("View")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+
+        @if (Model.SensorsChecks.Count > 0)
+        {
+            <tr><td colspan="4"><h4>@SharedLocalizer.GetLocalizedHtmlString("Sensors Checks")</h4></td></tr>
+            @foreach (var item in Model.SensorsChecks)
+            {
+                <tr>
+                    @if (item.SubProjectId != null)
+                    {
+                        <td>@item.Project.Name : @item.SubProject.Name</td>
+                    }
+                    else
+                    {
+                        <td>@item.Project.Name</td>
+                    }
+                    <td>@item.TimeStamp</td>
+                    <td colspan="2"></td>
+                    <td>
+                        <form asp-controller="TrackItems" asp-action="SensorsCheckReport_PDF" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button class="btn-hoelscher">
+                                @SharedLocalizer.GetLocalizedHtmlString("View")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        @if (Model.ConstructionSiteChecks.Count > 0)
+        {
+            <tr><td colspan="4"><h4>@SharedLocalizer.GetLocalizedHtmlString("Site Checks")</h4></td></tr>
+            @foreach (var item in Model.SiteChecks)
+            {
+                <tr>
+                    @if (item.SubProjectId != null)
+                    {
+                        <td>@item.Project.Name : @item.SubProject.Name</td>
+                    }
+                    else
+                    {
+                        <td>@item.Project.Name</td>
+                    }
+                    <td>@item.TimeStamp</td>
+                    <td colspan="2"></td>
+                    <td>
+                        <form asp-controller="TrackItems" asp-action="SiteCheckReport_PDF" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button class="btn-hoelscher">
+                                @SharedLocalizer.GetLocalizedHtmlString("View")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        @if (Model.ConstructionSiteChecks.Count > 0)
+        {
+            <tr><td colspan="4"><h4>@SharedLocalizer.GetLocalizedHtmlString("Construction Site Checks")</h4></td></tr>
+            @foreach (var item in Model.ConstructionSiteChecks)
+            {
+                <tr>
+                    @if (item.SubProjectId != null)
+                    {
+                        <td>@item.Project.Name : @item.SubProject.Name</td>
+                    }
+                    else
+                    {
+                        <td>@item.Project.Name</td>
+                    }
+                    <td>@item.TimeStamp</td>
+                    <td colspan="2"></td>
+                    <td>
+                        <form asp-controller="TrackItems" asp-action="ConstructionSiteInspectionReport_PDF" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button class="btn-hoelscher">
+                                @SharedLocalizer.GetLocalizedHtmlString("View")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        @if (Model.Decommissions.Count > 0)
+        {
+            <tr><td colspan="4"><h4>@SharedLocalizer.GetLocalizedHtmlString("Decommissionings")</h4></td></tr>
+            @foreach (var item in Model.Decommissions)
+            {
+                <tr>
+                    @if (item.SubProjectId != null)
+                    {
+                        <td>@item.Project.Name : @item.SubProject.Name</td>
+                    }
+                    else
+                    {
+                        <td>@item.Project.Name</td>
+                    }
+                    <td>@item.TimeStamp : @item.Wellname</td>
+                    <td colspan="2"></td>
+                    <td>
+                        <form asp-controller="TrackItems" asp-action="DecommissionReport_PDF" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button class="btn-hoelscher">
+                                @SharedLocalizer.GetLocalizedHtmlString("View")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        @if (Model.ThreeStepTests.Count > 0)
+        {
+            <tr><td colspan="4"><h4>@SharedLocalizer.GetLocalizedHtmlString("Three Step Tests")</h4></td></tr>
+            @foreach (var item in Model.ThreeStepTests)
+            {
+                <tr>
+                    @if (item.SubProjectId != null)
+                    {
+                        <td>@item.Project.Name : @item.SubProject.Name</td>
+                    }
+                    else
+                    {
+                        <td>@item.Project.Name</td>
+                    }
+                    <td>@item.Report_Date : @item.Wellname</td>
+                    <td colspan="2"></td>
+                    <td>
+                        <form asp-controller="TrackItems" asp-action="StepTestReport_PDF" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button class="btn-hoelscher">
+                                @SharedLocalizer.GetLocalizedHtmlString("View")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+        @if (Model.ClearPumpTests.Count > 0)
+        {
+            <tr><td colspan="4"><h4>@SharedLocalizer.GetLocalizedHtmlString("Clear Pump Tests")</h4></td></tr>
+            @foreach (var item in Model.ClearPumpTests)
+            {
+                <tr>
+                    @if (item.SubProjectId != null)
+                    {
+                        <td>@item.Project.Name : @item.SubProject.Name</td>
+                    }
+                    else
+                    {
+                        <td>@item.Project.Name</td>
+                    }
+                    <td>@item.Report_Date : @item.Wellname</td>
+                    <td colspan="2"></td>
+                    <td>
+                        <form asp-controller="TrackItems" asp-action="ClearPumpTestReport_PDF" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button class="btn-hoelscher">
+                                @SharedLocalizer.GetLocalizedHtmlString("View")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+    </table>
+                }
+                <form id="theuberform" asp-action="ApproveDailySummary" asp-controller="TrackItems" method="post" onsubmit="retrieveData(event);">
+                    @Html.HiddenFor(Model => Model.ProjectId)
+                    @Html.HiddenFor(Model => Model.SubProjectId)
+                    @Html.HiddenFor(Model => Model.Id)
+                    @Html.HiddenFor(Model => Model.Report_Date)
+                    <table style="width:100%;">
+                        <tr style="border-top:solid;border-bottom:solid">
+                            <td><label asp-for="signatureHJ"></label></td>
+                            <td><label asp-for="SignatureHJDateTime"></label></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <canvas width="440" height="150" id="signature" style="border:1px solid blue;"></canvas>
+                            </td>
+                            <td><input asp-for="SignatureHJDateTime" type="text" class="date-picker" /></td>
+                        </tr>
+                        <tr>
+                            <td style="width:50%">
+                                <button type="button" id="accept" class="btn-hoelscher" style="width:100%;height:40px;">@SharedLocalizer.GetLocalizedHtmlString("Accept signature")</button>
+                            </td>
+                            <td style="width:50%">
+                                <button type="button" id="clear" class="btn-hoelscher" style="width:100%;height:40px;">@SharedLocalizer.GetLocalizedHtmlString("Clear signature")</button>
+                                <input asp-for="signatureHJ" type="text" id="signaturedata" hidden="hidden" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <img width="80" height="60" id="savetarget" hidden="hidden" style="border:1px solid black">
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>@SharedLocalizer.GetLocalizedHtmlString("Show All Daily Reprots on Summary pdf?:")</td><td>@Html.EditorFor(Model => Model.ShowDailyReports) </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                @SharedLocalizer.GetLocalizedHtmlString("Send to email:")
+                            </td>
+                            <td><input asp-for="ClientEmail" type="email" width="40" /><span asp-validation-for="ClientEmail" class="text-danger"></span></td>
+                            <td><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Send Summary")</button></td>
+                        </tr>
+                    </table>
+                    <textarea asp-for="TheDailyText" cols="120" rows="40" hidden="hidden"></textarea>
+                    <textarea asp-for="People" hidden="hidden" cols="30" rows="@count.ToString()"></textarea>
+                </form>
+        </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script src="~/js/signature_pad.min.js"></script>
+    <script type="text/javascript">
+        var pad = null;
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+                $('.date-picker').datepicker("setDate", new Date("dd-MM-yy"));
+            });
+        });
+        $(document).ready(function () {
+            $(function () {
+                var canvas = document.querySelector("#signature");
+                pad = new SignaturePad(canvas);
+                $('#accept').click(function () {
+                    var data = pad.toDataURL();
+                    $('#savetarget').attr('src', data);
+                    var base64signature = data.split(',')[1];
+                    $('#signaturedata').val(base64signature);
+                    document.getElementById("Signature").value = document.getElementById("signaturedata").value;
+                });
+                $('#clear').click(function () {
+                    pad.clear();
+                    document.getElementById("Signature").value = "";
+                })
+
+            })
+        });
+        function setText(e) {
+            document.getElementById("TheDailyText").value = e.target.value;
+        }
+        function setText2(e) {
+            document.getElementById("People").value = e.target.value;
+        }
+        function retrieveData(e) { 
+            //document.getElementById("Signature").value = document.getElementById("signaturedata").value;
+            
+            if (document.getElementById("Signature").value == "") {
+                e.preventDefault();
+                alert("Please sign the report!");
+            }
+        }
+
+    </script>
+}

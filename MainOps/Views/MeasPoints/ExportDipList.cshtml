@@ -1,0 +1,714 @@
+﻿@model MainOps.Models.ExportDipListsViewModel
+<link href="~/css/jquery-ui-timepicker-addon.min.css" rel="stylesheet" />
+<style>
+    #thetable {
+        width: 100%;
+        table-layout: fixed;
+    }
+
+        #thetable td {
+            text-align: center;
+            word-break: break-all;
+            width: 100%;
+        }    
+</style>
+@inject UserManager<ApplicationUser> _userManager;
+<h2>@ViewData["Title"]</h2>
+@{ var theuser = await _userManager.GetUserAsync(User);}
+<h4>@SharedLocalizer.GetLocalizedHtmlString("Dip List")</h4>
+<hr />
+<input type="hidden" value="0" id="latinput" />
+<input type="hidden" value="0" id="longinput" />
+<div class="row">
+    <div class="col-xs-4">
+        <form asp-action="ExportDipList" method="post" asp-route-returnurl="@ViewData["ReturnUrl"]">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.ProjectId))</label>
+                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();"></select>
+                <span asp-validation-for="ProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SubProjectId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.SubProjectId))</label>
+                <select asp-for="SubProjectId" class="form-control">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Select SubProject")</option>
+                </select>
+                <span asp-validation-for="SubProjectId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="wholeSite" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.wholeSite))</label>
+                <input asp-for="wholeSite" />
+                <span asp-validation-for="wholeSite" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AddFlowMeters" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.AddFlowMeters))</label>
+                <input asp-for="AddFlowMeters" />
+                <span asp-validation-for="AddFlowMeters" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="searchfield" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.searchfield))</label>
+                <input asp-for="searchfield" value="All" />
+                <span asp-validation-for="searchfield" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString("Create")" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+        @if(Model.DipList != null) { 
+        <table border="1" id="thetable" style="width:100%;table-layout:fixed;">
+                @for (int i = 0; i < Model.DipList.Count; i++)
+                {
+                    @if (Model.DipList[i].MeasPoint.LoggerActive == true)
+                    {
+                        if (Model.DipList[i].LastMeas != null)
+                        {
+                            @if (Convert.ToInt32((DateTime.Now - Model.DipList[i].LastMeas.When).TotalDays) >= Model.DipList[i].MeasPoint.MonitorType.frequency)
+                            {
+                                <tr>
+                                    <td>
+                                        <form asp-action="Create" asp-controller="Meas" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" target="_blank">
+                                            <input type="hidden" name="MeasPointId" value="@Model.DipList[i].MeasPoint.Id" />
+                                            <input name="Latitude" hidden class="latitudes" />
+                                            <input name="Longitude" hidden class="longitudes" />
+                                            <input name="DoneBy" value="@theuser.full_name()" hidden />
+                                            <table border="1" style="width:100%;table-layout:fixed;">
+                                                <tr>
+                                                    <td style="background-color:red;">
+                                                        <b>@Model.DipList[i].MeasPoint.Name</b>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" class="offset" id="offset_@i" value="@Model.DipList[i].Offset.offset" style="width:100%;" />
+                                                        <button type="button" onclick="UpdateOffset(@i,@Model.DipList[i].MeasPoint.Id)" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Update Ref.")</button>
+                                                    </td>
+                                                    <td>
+                                                        <b>@Model.DipList[i].MeasPoint.MonitorType.MonitorTypeName</b>
+                                                    </td>
+                                                    @*<td rowspan="5"><button type="button" id="@i" onclick="addMeasurement(@Model.DipList[i].MeasPoint.Id,@i)" style="width:100%;height:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement")</button></td>*@
+                                                    <td rowspan="5"><button style="width:100%;height:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement")</button></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Last Measurement</b></td>
+                                                    <td><b>Last Time</b></td>
+                                                    <td><b>Days until Next</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        @if (Model.DipList[i].LastMeas != null)
+                                                        {
+                                                            @Model.DipList[i].LastMeas.TheMeasurement
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (Model.DipList[i].LastMeas != null)
+                                                        {
+                                                            @Model.DipList[i].LastMeas.When.ToString()
+                                                        }
+                                                    </td>
+                                                    <td>0</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Time</b></td>
+                                                    <td><b>Measurement</b></td>
+                                                    <td><b>Comment</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><input type="datetime" class="date-picker" value="@DateTime.Now" id="time_@i" name="When" style="width:100%;" /></td>
+                                                    <td><input type="number" step="0.01" name="TheMeasurement" id="meas_@i" style="width:100%;" /></td>
+                                                    <td><input type="text" name="NewComment" id="com_@i" style="width:100%;" /></td>
+                                                </tr>
+                                            </table>
+                                        </form>
+                                    </td>
+                                </tr>
+
+
+                            }
+                            else if (Convert.ToInt32((DateTime.Now - Model.DipList[i].LastMeas.When).TotalDays) >= Model.DipList[i].MeasPoint.MonitorType.alertfrequency)
+                            {
+                                <tr>
+                                    <td>
+                                        <form asp-action="Create" asp-controller="Meas" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" target="_blank">
+                                            <input type="hidden" name="MeasPointId" value="@Model.DipList[i].MeasPoint.Id" />
+                                            <input name="Latitude" hidden class="latitudes" />
+                                            <input name="Longitude" hidden class="longitudes" />
+                                            <input name="DoneBy" value="@theuser.full_name()" hidden />
+
+                                            <table border="1" style="width:100%;table-layout:fixed;">
+                                                <tr>
+                                                    <td style="background-color:orange;">
+                                                        <b>@Model.DipList[i].MeasPoint.Name</b>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" class="offset" id="offset_@i" value="@Model.DipList[i].Offset.offset" style="width:100%;" />
+                                                        <button type="button" onclick="UpdateOffset(@i,@Model.DipList[i].MeasPoint.Id)" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Update Ref.")</button>
+                                                    </td>
+                                                    <td>
+                                                        <b>@Model.DipList[i].MeasPoint.MonitorType.MonitorTypeName</b>
+                                                    </td>
+                                                    @*<td rowspan="5"><button type="button" id="@i" onclick="addMeasurement(@Model.DipList[i].MeasPoint.Id,@i)" style="width:100%;height:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement")</button></td>*@
+                                                    <td rowspan="5"><button style="width:100%;height:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement")</button></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Last Measurement</b></td>
+                                                    <td><b>Last Time</b></td>
+                                                    <td><b>Days until Next</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        @if (Model.DipList[i].LastMeas != null)
+                                                        {
+                                                            @Model.DipList[i].LastMeas.TheMeasurement
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (Model.DipList[i].LastMeas != null)
+                                                        {
+                                                            @Model.DipList[i].LastMeas.When.ToString()
+                                                        }
+                                                    </td>
+                                                    <td>@(Convert.ToInt32((Model.DipList[i].MeasPoint.MonitorType.frequency)) - Convert.ToInt32((DateTime.Now - Model.DipList[i].LastMeas.When).TotalDays))</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Time</b></td>
+                                                    <td><b>Measurement</b></td>
+                                                    <td><b>Comment</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><input type="datetime" class="date-picker" value="@DateTime.Now" id="time_@i" name="When" style="width:100%;" /></td>
+                                                    <td><input type="number" step="0.01" name="TheMeasurement" id="meas_@i" style="width:100%;" /></td>
+                                                    <td><input type="text" name="NewComment" id="com_@i" style="width:100%;" /></td>
+                                                </tr>
+                                            </table>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td>
+                                        <form asp-action="Create" asp-controller="Meas" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" target="_blank">
+                                            <input type="hidden" name="MeasPointId" value="@Model.DipList[i].MeasPoint.Id" />
+                                            <input name="Latitude" hidden class="latitudes" />
+                                            <input name="Longitude" hidden class="longitudes" />
+                                            <input name="DoneBy" value="@theuser.full_name()" hidden />
+
+                                            <table border="1" style="width:100%;table-layout:fixed;">
+                                                <tr>
+                                                    <td style="background-color:lightgreen;">
+                                                        <b>@Model.DipList[i].MeasPoint.Name</b>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" class="offset" id="offset_@i" value="@Model.DipList[i].Offset.offset" style="width:100%;" />
+                                                        <button type="button" onclick="UpdateOffset(@i,@Model.DipList[i].MeasPoint.Id)" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Update Ref.")</button>
+                                                    </td>
+                                                    <td>
+                                                        <b>@Model.DipList[i].MeasPoint.MonitorType.MonitorTypeName</b>
+                                                    </td>
+                                                    @*<td rowspan="5"><button type="button" id="@i" onclick="addMeasurement(@Model.DipList[i].MeasPoint.Id,@i)" style="width:100%;height:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement")</button></td>*@
+                                                    <td rowspan="5"><button style="width:100%;height:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement")</button></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Last Measurement</b></td>
+                                                    <td><b>Last Time</b></td>
+                                                    <td><b>Days until Next</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        @if (Model.DipList[i].LastMeas != null)
+                                                        {
+                                                            @Model.DipList[i].LastMeas.TheMeasurement
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (Model.DipList[i].LastMeas != null)
+                                                        {
+                                                            @Model.DipList[i].LastMeas.When.ToString()
+                                                        }
+                                                    </td>
+                                                    <td>@(Convert.ToInt32((Model.DipList[i].MeasPoint.MonitorType.frequency)) - Convert.ToInt32((DateTime.Now - Model.DipList[i].LastMeas.When).TotalDays))</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Time</b></td>
+                                                    <td><b>Measurement</b></td>
+                                                    <td><b>Comment</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><input type="datetime" class="date-picker" value="@DateTime.Now" id="time_@i" name="When" style="width:100%;" /></td>
+                                                    <td><input type="number" step="0.01" name="TheMeasurement" id="meas_@i" style="width:100%;" /></td>
+                                                    <td><input type="text" name="NewComment" id="com_@i" style="width:100%;" /></td>
+                                                </tr>
+                                            </table>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td>
+                                    <form asp-action="Create" asp-controller="Meas" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" target="_blank">
+                                        <input type="hidden" name="MeasPointId" value="@Model.DipList[i].MeasPoint.Id" />
+                                        <input name="Latitude" hidden class="latitudes" />
+                                        <input name="Longitude" hidden class="longitudes" />
+                                        <input name="DoneBy" value="@theuser.full_name()" hidden />
+                                        <table border="1" style="width:100%;table-layout:fixed;">
+                                            <tr>
+                                                <td style="background-color:red;">
+                                                    <b>@Model.DipList[i].MeasPoint.Name</b>
+                                                </td>
+                                                <td>
+                                                    <input type="number" class="offset" id="offset_@i" value="@Model.DipList[i].Offset.offset" style="width:100%;" />
+                                                    <button type="button" onclick="UpdateOffset(@i,@Model.DipList[i].MeasPoint.Id)" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Update Ref.")</button>
+                                                </td>
+                                                <td>
+                                                    <b>@Model.DipList[i].MeasPoint.MonitorType.MonitorTypeName</b>
+                                                </td>
+                                                @*<td rowspan="5"><button type="button" id="@i" onclick="addMeasurement(@Model.DipList[i].MeasPoint.Id,@i)" style="width:100%;height:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement")</button></td>*@
+                                                <td rowspan="5"><button style="width:100%;height:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement")</button></td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>Last Measurement</b></td>
+                                                <td><b>Last Time</b></td>
+                                                <td><b>Days until Next</b></td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    @if (Model.DipList[i].LastMeas != null)
+                                                    {
+                                                        @Model.DipList[i].LastMeas.TheMeasurement
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (Model.DipList[i].LastMeas != null)
+                                                    {
+                                                        @Model.DipList[i].LastMeas.When.ToString()
+                                                    }
+                                                </td>
+                                                <td>0</td>
+                                            </tr>
+                                            <tr>
+                                                <td><b>Time</b></td>
+                                                <td><b>Measurement</b></td>
+                                                <td><b>Comment</b></td>
+                                            </tr>
+                                            <tr>
+                                                <td><input type="datetime" class="date-picker" value="@DateTime.Now" id="time_@i" name="When" style="width:100%;" /></td>
+                                                <td><input type="number" step="0.01" name="TheMeasurement" id="meas_@i" style="width:100%;" /></td>
+                                                <td><input type="text" name="NewComment" id="com_@i" style="width:100%;" /></td>
+                                            </tr>
+                                        </table>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        //logger inactive
+
+                        @if (Model.DipList[i].LastMeas != null)
+                        {
+                            @if (Convert.ToInt32((DateTime.Now - Model.DipList[i].LastMeas.When).TotalDays) >= Model.DipList[i].MeasPoint.MonitorType.frequency / 7)
+                            {
+                                <tr>
+                                    <td>
+                                        <form asp-action="Create" asp-controller="Meas" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" target="_blank">
+                                            <input type="hidden" name="MeasPointId" value="@Model.DipList[i].MeasPoint.Id" />
+                                            <input name="Latitude" hidden class="latitudes" />
+                                            <input name="Longitude" hidden class="longitudes" />
+                                            <input name="DoneBy" value="@theuser.full_name()" hidden />
+                                            <table border="1" style="width:100%;table-layout:fixed;">
+                                                <tr>
+                                                    <td style="background-color:red;">
+                                                        <b>@Model.DipList[i].MeasPoint.Name</b>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" class="offset" id="offset_@i" value="@Model.DipList[i].Offset.offset" style="width:100%;" />
+                                                        <button type="button" onclick="UpdateOffset(@i,@Model.DipList[i].MeasPoint.Id)" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Update Ref.")</button>
+                                                    </td>
+                                                    <td>
+                                                        <b>@Model.DipList[i].MeasPoint.MonitorType.MonitorTypeName</b>
+                                                    </td>
+                                                    @*<td rowspan="5"><button type="button" id="@i" onclick="addMeasurement(@Model.DipList[i].MeasPoint.Id,@i)" style="width:100%;height:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement")</button></td>*@
+                                                    <td rowspan="5"><button style="width:100%;height:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement")</button></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Last Measurement</b></td>
+                                                    <td><b>Last Time</b></td>
+                                                    <td><b>Days until Next</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        @if (Model.DipList[i].LastMeas != null)
+                                                        {
+                                                            @Model.DipList[i].LastMeas.TheMeasurement
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (Model.DipList[i].LastMeas != null)
+                                                        {
+                                                            @Model.DipList[i].LastMeas.When.ToString()
+                                                        }
+                                                    </td>
+                                                    <td>0</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Time</b></td>
+                                                    <td><b>Measurement</b></td>
+                                                    <td><b>Comment</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><input type="datetime" class="date-picker" value="@DateTime.Now" id="time_@i" name="When" style="width:100%;" /></td>
+                                                    <td><input type="number" step="0.01" name="TheMeasurement" id="meas_@i" style="width:100%;" /></td>
+                                                    <td><input type="text" name="NewComment" id="com_@i" style="width:100%;" /></td>
+                                                </tr>
+                                            </table>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                            else if (Convert.ToInt32((DateTime.Now - Model.DipList[i].LastMeas.When).TotalDays) >= Model.DipList[i].MeasPoint.MonitorType.alertfrequency / 7)
+                            {
+                                <tr>
+                                    <td>
+                                        <form asp-action="Create" asp-controller="Meas" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" target="_blank">
+                                            <input type="hidden" name="MeasPointId" value="@Model.DipList[i].MeasPoint.Id" />
+                                            <input name="Latitude" hidden class="latitudes" />
+                                            <input name="Longitude" hidden class="longitudes" />
+                                            <input name="DoneBy" value="@theuser.full_name()" hidden />
+                                            <table border="1" style="width:100%;table-layout:fixed;">
+                                                <tr>
+                                                    <td style="background-color:orange;">
+                                                        <b>@Model.DipList[i].MeasPoint.Name</b>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" class="offset" id="offset_@i" value="@Model.DipList[i].Offset.offset" style="width:100%;" />
+                                                        <button type="button" onclick="UpdateOffset(@i,@Model.DipList[i].MeasPoint.Id)" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Update Ref.")</button>
+                                                    </td>
+                                                    <td>
+                                                        <b>@Model.DipList[i].MeasPoint.MonitorType.MonitorTypeName</b>
+                                                    </td>
+                                                    @*<td rowspan="5"><button type="button" id="@i" onclick="addMeasurement(@Model.DipList[i].MeasPoint.Id,@i)" style="width:100%;height:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement")</button></td>*@
+                                                    <td rowspan="5"><button style="width:100%;height:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement")</button></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Last Measurement</b></td>
+                                                    <td><b>Last Time</b></td>
+                                                    <td><b>Days until Next</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        @if (Model.DipList[i].LastMeas != null)
+                                                        {
+                                                            @Model.DipList[i].LastMeas.TheMeasurement
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (Model.DipList[i].LastMeas != null)
+                                                        {
+                                                            @Model.DipList[i].LastMeas.When.ToString()
+                                                        }
+                                                    </td>
+                                                    <td>@(Convert.ToInt32((Model.DipList[i].MeasPoint.MonitorType.alertfrequency) / 7) - Convert.ToInt32((DateTime.Now - Model.DipList[i].LastMeas.When).TotalDays))</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Time</b></td>
+                                                    <td><b>Measurement</b></td>
+                                                    <td><b>Comment</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><input type="datetime" class="date-picker" value="@DateTime.Now" id="time_@i" name="When" style="width:100%;" /></td>
+                                                    <td><input type="number" step="0.01" name="TheMeasurement" id="meas_@i" style="width:100%;" /></td>
+                                                    <td><input type="text" name="NewComment" id="com_@i" style="width:100%;" /></td>
+                                                </tr>
+                                            </table>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td>
+                                        <form asp-action="Create" asp-controller="Meas" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post" target="_blank">
+                                            <input type="hidden" name="MeasPointId" value="@Model.DipList[i].MeasPoint.Id" />
+                                            <input name="Latitude" hidden class="latitudes" />
+                                            <input name="Longitude" hidden class="longitudes" />
+                                            <input name="DoneBy" value="@theuser.full_name()" hidden />
+                                            <table border="1" style="width:100%;table-layout:fixed;">
+                                                <tr>
+                                                    <td style="background-color:lightgreen;">
+                                                        <b>@Model.DipList[i].MeasPoint.Name</b>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" class="offset" id="offset_@i" value="@Model.DipList[i].Offset.offset" style="width:100%;" />
+                                                        <button type="button" onclick="UpdateOffset(@i,@Model.DipList[i].MeasPoint.Id)" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Update Ref.")</button>
+                                                    </td>
+                                                    <td>
+                                                        <b>@Model.DipList[i].MeasPoint.MonitorType.MonitorTypeName</b>
+                                                    </td>
+                                                    @*<td rowspan="5"><button type="button" id="@i" onclick="addMeasurement(@Model.DipList[i].MeasPoint.Id,@i)" style="width:100%;height:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement")</button></td>*@
+                                                    <td rowspan="5"><button style="width:100%;height:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement")</button></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Last Measurement</b></td>
+                                                    <td><b>Last Time</b></td>
+                                                    <td><b>Days until Next</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        @if (Model.DipList[i].LastMeas != null)
+                                                        {
+                                                            @Model.DipList[i].LastMeas.TheMeasurement
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (Model.DipList[i].LastMeas != null)
+                                                        {
+                                                            @Model.DipList[i].LastMeas.When.ToString()
+                                                        }
+                                                    </td>
+                                                    <td>@(Convert.ToInt32((Model.DipList[i].MeasPoint.MonitorType.alertfrequency) / 7) - Convert.ToInt32((DateTime.Now - Model.DipList[i].LastMeas.When).TotalDays))</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Time</b></td>
+                                                    <td><b>Measurement</b></td>
+                                                    <td><b>Comment</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><input type="datetime" class="date-picker" value="@DateTime.Now" id="time_@i" name="When" style="width:100%;" /></td>
+                                                    <td><input type="number" step="0.01" name="TheMeasurement" id="meas_@i" style="width:100%;" /></td>
+                                                    <td><input type="text" name="NewComment" id="com_@i" style="width:100%;" /></td>
+                                                </tr>
+                                            </table>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                                <tr>
+                                    <td>
+                                        <form asp-action="Create" asp-controller="Meas" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                                            <input type="hidden" name="MeasPointId" value="@Model.DipList[i].MeasPoint.Id" />
+                                            <input name="Latitude" hidden class="latitudes" />
+                                            <input name="Longitude" hidden class="longitudes" />
+                                            <input name="DoneBy" value="@theuser.full_name()" hidden />
+                                            <table border="1" style="width:100%;table-layout:fixed;">
+                                                <tr>
+                                                    <td style="background-color:red;">
+                                                        <b>@Model.DipList[i].MeasPoint.Name</b>
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" class="offset" id="offset_@i" value="@Model.DipList[i].Offset.offset" style="width:100%;" />
+                                                        <button type="button" onclick="UpdateOffset(@i,@Model.DipList[i].MeasPoint.Id)" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Update Ref.")</button>
+                                                    </td>
+                                                    <td>
+                                                        <b>@Model.DipList[i].MeasPoint.MonitorType.MonitorTypeName</b>
+                                                    </td>
+                                                    @*<td rowspan="5"><button type="button" id="@i" onclick="addMeasurement(@Model.DipList[i].MeasPoint.Id,@i)" style="width:100%;height:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement")</button></td>*@
+                                                    <td rowspan="5"><button style="width:100%;height:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement")</button></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Last Measurement</b></td>
+                                                    <td><b>Last Time</b></td>
+                                                    <td><b>Days until Next</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        @if (Model.DipList[i].LastMeas != null)
+                                                        {
+                                                            @Model.DipList[i].LastMeas.TheMeasurement
+                                                        }
+                                                    </td>
+                                                    <td>
+                                                        @if (Model.DipList[i].LastMeas != null)
+                                                        {
+                                                            @Model.DipList[i].LastMeas.When.ToString()
+                                                        }
+                                                    </td>
+                                                    <td>0</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><b>Time</b></td>
+                                                    <td><b>Measurement</b></td>
+                                                    <td><b>Comment</b></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><input type="datetime" class="date-picker" value="@DateTime.Now" id="time_@i" name="When" style="width:100%;" /></td>
+                                                    <td><input type="number" step="0.01" name="TheMeasurement" id="meas_@i" style="width:100%;" /></td>
+                                                    <td><input type="text" name="NewComment" id="com_@i" style="width:100%;" /></td>
+                                                </tr>
+                                            </table>
+                                        </form>
+                                    </td>
+                                </tr>
+                        }
+                    }
+                }
+            </table>
+}
+
+
+
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        var myLat = 0, myLng = 0;
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                myLat = position.coords.latitude;
+                myLng = position.coords.longitude;
+                getPos(myLat, myLng);
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                        //alert("error");
+                    }
+
+                }, { maximumAge: 200000, timeout: 8000, enableHighAccuracy: true });
+        }
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+        }
+        //function getPos(lat, lng) {
+        //    $("#latinput").val(lat);
+        //    $("#longinput").val(lng);
+        //}
+        function getPost(lat, lng) {
+            $(".latitudes").each(function () {
+                $(this).val(lat);
+            })
+            $(".longitudes").each(function () {
+                $(this).val(lng);
+            })
+        }
+
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datetimepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    timeFormat: "HH:mm",
+                    controlType: 'select'
+                    
+                });
+                $('.date-picker').datetimepicker("setDate", new Date());
+                FillSubProjects();
+            });
+        });
+        function UpdateOffset(i,id) {
+            $.ajax({
+                type: 'post',
+                url: '@Url.Action("UpdateOffset","MeasPoints")',
+                data: {
+                    'theoffset': $("#offset_" + i).val(),
+                    'theId': id
+                },
+                success: function (data) {
+                    alert("Updated");
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+        }
+        function addMeasurement(theid, thecounter) {
+            var themeas = $('#meas_' + thecounter).val();
+            var thetime = $('#time_' + thecounter).datepicker('getDate').toUTCString();
+            var thecom = $('#com_' + thecounter).val();
+            var latitude = document.getElementById("latinput").value
+            var longitude = document.getElementById("longinput").value
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    myLat = position.coords.latitude;
+                    myLng = position.coords.longitude;
+                    getPos(myLat, myLng);
+                },
+                    function (error) {
+                        if (error.code == error.PERMISSION_DENIED) {
+                            //alert("error");
+                        }
+
+                    }, { maximumAge: 200000, timeout: 8000, enableHighAccuracy: true });
+            }
+            $.ajax({
+                type: 'post',
+                url: '/Meas/CreateDip',
+                data: {
+                    'theid':theid,
+                    'themeasurement': themeas,
+                    'thetime': thetime,
+                    'thecom': thecom,
+                    'thelat': latitude,
+                    'thelong': longitude
+                },
+                success: function (response) {
+                    $('#meas_' + thecounter).val('');
+                    $('.date-picker').datetimepicker("setDate", new Date());
+                    $('#time_' + thecounter).datetimepicker("setDate", new Date());
+                    $('#com_' + thecounter).val('');
+                    location.href = '@Url.Action("ExportDipList", "MeasPoints")';
+                },
+                error: function () {
+                    $.ajax({
+                        type: 'post',
+                        url: '/Meas/CreateDip2',
+                        data: {
+                            'theid': theid,
+                            'themeasurement': themeas,
+                            'thetime': thetime,
+                            'thecom': thecom
+                        },
+                        success: function (response) {
+                            $('#meas_' + thecounter).val('');
+                            $('#time_' + thecounter).datetimepicker("setDate", new Date());
+                            $('#com_' + thecounter).val('');
+                            location.href = '@Url.Action("ExportDipList", "MeasPoints")';
+                            
+                        },
+                        error: function () {
+                            alert("ERROR");
+                        }
+                    })
+                }
+            });
+        }
+        
+    </script>
+}
+

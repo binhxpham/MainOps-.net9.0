@@ -1,0 +1,108 @@
+﻿@model IEnumerable<MainOps.Models.WaterSampleMeasVM>
+@{
+    Layout = null;
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("Water Sample Measures")</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Project))
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.WaterSamplePlace))
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.WaterSampleType))
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.value))
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.method))
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Dato))
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            @if (item.holdslimit == 1)
+            {
+                <tr class="rowid" style="background-color:lawngreen;">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WaterSamplePlace.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WaterSampleType.Komponent)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.value)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.method)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Dato)
+                    </td>
+                </tr>
+            }
+            else if (item.holdslimit == 2)
+            {
+                <tr class="rowid" style="background-color:orangered;">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WaterSamplePlace.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WaterSampleType.Komponent)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.value)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.method)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Dato)
+                    </td>
+                </tr>
+            }
+            else
+            {
+                <tr class="rowid" style="background-color:yellow;">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WaterSamplePlace.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WaterSampleType.Komponent)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.value)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.method)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Dato)
+                    </td>
+                </tr>
+            }
+
+        }
+    </tbody>
+</table>

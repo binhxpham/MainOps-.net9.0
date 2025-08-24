@@ -1,0 +1,179 @@
+﻿@model MainOps.Models.ReportClasses.Well_Development
+@{
+    Layout = null;
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@Html.DisplayFor(model => model.Test_name)</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+<div class="row">
+    <div class="col-xs-8">
+        <table>
+            <tr>
+                <td colspan="2">
+                    <b>
+                        @Html.DisplayNameFor(x => x.Project.Name)
+                    </b>
+                </td>
+                <td style="text-align:left;">
+                    @Html.DisplayFor(x => x.Project.Name)
+                </td>
+                <td rowspan="3" align="right"><img src="~/images/Divisions/Photos/@Model.Project.Division.Id/@Model.Project.Division.LogoPath" /></td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.ProjectLocation)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.ProjectLocation)
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.HD_ProjectNr)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.HD_ProjectNr)
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.CustomerName)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.CustomerName)
+                </td>
+                <td rowspan="4"><b>@Html.DisplayFor(x => x.Test_name)</b></td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.WellName)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.WellName)
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.VersionNr)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.VersionNr)
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.RevisionReason)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.RevisionReason)
+                </td>
+            </tr>
+            <tr><td colspan="4"></td></tr>
+            <tr>
+                <td colspan="4"><img src="~/images/Divisions/welldevelopments/@Model.Project.DivisionId/@Model.Id/@Model.Scetch_path" height="500" /></td>
+            </tr>
+            <tr><td colspan="4"></td></tr>
+            <tr>
+                
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("")</b></td>
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Before")</b></td>
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("After")</b></td>
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Pass/Fail")</b></td>
+            </tr>
+            <tr>
+                <td style="text-align:left;"><b>@Html.DisplayNameFor(x => x.resting_water_level_before)</b></td>
+                <td>@Html.DisplayFor(x => x.resting_water_level_before)</td>
+                <td>@Html.DisplayFor(x => x.resting_water_level_after)</td>
+                <td style="text-align:center;">
+                    @Html.DisplayFor(x => x.resting_water_level_pass)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;"><b>@Html.DisplayNameFor(x => x.Base_depth_before)</b></td>
+                <td>@Html.DisplayFor(x => x.Base_depth_before)</td>
+                <td>@Html.DisplayFor(x => x.Base_depth_after)</td>
+                <td style="text-align:center;">
+                    @Html.DisplayFor(x => x.Base_depth_pass)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;"><b>@Html.DisplayNameFor(x => x.Colour_before)</b></td>
+                <td>@Html.DisplayFor(x => x.Colour_before)</td>
+                <td>@Html.DisplayFor(x => x.Colour_after)</td>
+                <td style="text-align:center;">
+                    @Html.DisplayFor(x => x.Colour_pass)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;"><b>@Html.DisplayNameFor(x => x.Well_clearing_before)</b></td>
+                <td>@Html.DisplayFor(x => x.Well_clearing_before)</td>
+                <td>@Html.DisplayFor(x => x.Well_clearing_after)</td>
+                <td style="text-align:center;">
+                    @Html.DisplayFor(x=>x.Well_clearing_pass)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;"><b>@Html.DisplayNameFor(x => x.Test_result_before)</b></td>
+                <td>@Html.DisplayFor(x => x.Test_result_before)</td>
+                <td>@Html.DisplayFor(x => x.Test_result_after)</td>
+                <td style="text-align:center;">
+                    @Html.DisplayFor(x=>x.Test_result_pass)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;"><b>@Html.DisplayNameFor(x => x.Duration)</b></td>
+                <td colspan="3">@Html.DisplayFor(x => x.Duration)</td>
+            </tr>
+            <tr>
+                <td style="text-align:left;"><b>@Html.DisplayNameFor(x => x.method)</b></td>
+                <td colspan="3">@Html.DisplayFor(x => x.method)</td>
+            </tr>
+            <tr>
+                <td colspan="4"><b>@Html.DisplayNameFor(x => x.Notes)</b></td>
+            </tr>
+            <tr rowspan="20">
+                <td colspan="4">
+                    <textarea rows="7" cols="64" class="form-control" style="width:100%;">@Html.DisplayFor(x=>x.Notes)</textarea>
+                </td>
+            </tr>
+            <tr>
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Name")</b></td>
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Position")</b></td>
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Date")</b></td>
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Signature")</b></td>
+            </tr>
+            <tr>
+                <td>@Html.DisplayFor(x => x.Name)</td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Hoelscher Operative")</td>
+                <td>@Html.DisplayFor(x => x.Date_Done)</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Hoelscher Project Manager")</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Client")</td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,70 @@
+﻿@model IEnumerable<MainOps.Models.SafetyProblem>
+
+@{
+    ViewData["Title"] = "SafetyProblems";
+}
+
+<h2>SafetyProblems</h2>
+<form asp-action="SafetyProblems" asp-controller="TrackItems" method="get">
+    <select name="ProjectId" asp-items="ViewBag.ProjectId"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Project")</option></select>
+    <button type="submit" class="btn-hoelscher">
+           <span class="glyphicon glyphicon-search"></span>
+    </button>
+</form>
+<table style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LogText)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LogText)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeStamp)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DoneBy)
+            </td>
+
+            <td>
+                @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+                {
+                    <form asp-action="Edit_SafetyProblem" asp-route-id="@item.Id" method="get">
+                        <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                    </form>
+                    <form asp-action="Details_SafetyProblem" asp-route-id="@item.Id" method="get" target="_blank">
+                        <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Details")</button>
+                    </form>
+                    <form asp-action="GenerateAccidentReport" asp-controller="TrackItems" asp-route-id="@item.Id" method="get">
+                        <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Generate Accident Report")</button>
+                    </form>
+                    <form asp-action="OpenAccidentReport" asp-controller="TrackItems" asp-route-id="@item.Id" target="_blank" method="get">
+                        <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Open Accident Report")</button>
+                    </form>
+                }
+
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

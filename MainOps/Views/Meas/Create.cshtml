@@ -1,0 +1,368 @@
+﻿@model MainOps.Models.Meas
+<link href="~/css/jquery-ui-timepicker-addon.min.css" rel="stylesheet" />
+<head>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM&libraries=places"></script>
+</head>
+
+@inject UserManager<ApplicationUser> _userManager;
+@{ var theuser = await _userManager.GetUserAsync(User);}
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Create")</h2>
+@{int istested = Convert.ToInt32(ViewData["IsPosted"]);};
+<h4>@SharedLocalizer.GetLocalizedHtmlString("Measurements")</h4>
+<hr />
+
+<div class="row">
+    <div class="col-xs-12">
+        <form asp-action="Create" id="theform">
+            <input asp-for="Latitude" hidden id="latinput" />
+            <input asp-for="Longitude" hidden id="longinput" />
+            <input asp-for="DoneBy" value="@theuser.full_name()" hidden />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <table style="width:100%;table-layout:fixed;">
+                <tr>
+                    <td><label>@SharedLocalizer.GetLocalizedHtmlString("Project")</label></td>
+                    <td colspan="2"><select id="ProjectId" name="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillItems()"></select></td>
+
+                </tr>
+               
+                @*<tr>
+                    @if (istested == 1)
+                    {
+                        <td><label asp-for="MeasPointId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.MeasPointId))</label></td>
+                        <td colspan="2"><select id="theid" asp-for="MeasPointId" asp-items="ViewBag.MeasPointId" onchange="GetOffset();" style="width:100%;height:40px;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select Measurement Point")</option></select></td>
+                        <td colspan="2">@Html.DropDownListFor(m => m.MeasPointId, ViewData["MeasPointId"] as IEnumerable<SelectListItem>, new { @id = "theid", @onchange = "GetOffset()", style = "width:200px;height:40px;" })</td>
+                    }
+                    else
+                    {
+                        <td><label asp-for="MeasPointId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.MeasPointId))</label></td>
+
+                        <td colspan="2"><select id="theid" asp-for="MeasPointId" asp-items="ViewBag.MeasPointId" onchange="GetOffset();" style="width:100%;height:40px;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select Measurement Point")</option></select></td>
+                    }
+
+                </tr>*@
+            <tr>
+                <td><label asp-for="MeasPointId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.MeasPointId))</label></td>
+                <td colspan="2"><select id="theid" asp-for="MeasPointId" asp-items="ViewBag.MeasPointId" onchange="GetOffset();" style="width:100%;height:40px;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select Measurement Point")</option></select></td>
+            </tr>
+                <tr>
+                    <td>
+                        <label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Current Reference")</label>
+                    </td>
+                    <td>
+                        <input id="theoffset" type="number" value="0" />
+                    </td>
+                    <td><button type="button" onclick="UpdateOffset();">@SharedLocalizer.GetLocalizedHtmlString("Update kote")</button></td>
+
+                </tr>
+                <tr>
+                    <td><label asp-for="TheMeasurement" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.TheMeasurement))</label></td>
+                    <td colspan="2"><input asp-for="TheMeasurement" type="number" step="0.001" id="themeasurement" class="form-control" /><span asp-validation-for="TheMeasurement" class="text-danger" style="width:200px;"></span></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="TheComment" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.TheComment))</label></td>
+                    <td colspan="2">
+                        @Html.DropDownListFor(m => m.CommentId, ViewData["CommentId"] as IEnumerable<SelectListItem>, "Select Reason", new { style = "width:200px;height:40px;" })
+                        <span asp-validation-for="TheComment" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="NewComment" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.NewComment))</label></td>
+                    <td colspan="2">
+                        <input asp-for="NewComment" class="form-control" />
+                        <span asp-validation-for="NewComment" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="When" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.When))</label></td>
+                    <td colspan="2">
+                        <input type="datetime" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd HH:mm")" asp-for="When" id="thetime" style="width:200px;height:40px;" />
+                        <span asp-validation-for="When" class="text-danger"></span>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="form-group">
+                <input type="submit" onclick="checklimit(event);" value="@SharedLocalizer.GetLocalizedHtmlString("Add Measurement!")" class="btn-hoelscher" style="width:200px;height:100px;" />
+            </div>
+            <input id="accuracy" value="1000" type="number" step="0.001" hdden="hidden" />
+        </form>
+        <div id="myDiv" style="width:95%;height:600px;"></div>
+    </div>
+</div>
+<br />
+<br />
+<br />
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        var myLat = 0, myLng = 0, myAcc;
+        var MeasMarkers = [];
+        var myLatLng = { lat: 0, lng: 0 };
+        var id;
+        var isfound = false;
+        var myposmarker;
+        var mapOptions = {
+            center: myLatLng,
+            zoom: 16,
+            minZoom: 4,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        //Display the Google map in the div control with the defined Options
+        const map = new google.maps.Map(document.getElementById("myDiv"), mapOptions);
+        if (navigator.geolocation) {
+            id = navigator.geolocation.watchPosition(function (position) {
+                myLat = position.coords.latitude;
+                myLng = position.coords.longitude;
+                myAcc = position.coords.accuracy;
+                getPos(myLat, myLng, myAcc);
+
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                                                alert("error gps permission denied");
+                    }
+
+                }, { maximumAge: 0, timeout: 8000, enableHighAccuracy: true });
+        }
+        function FillItems() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetMeasPointsProject", "Projects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                    }
+                    $("#theid").html(s);
+                    document.getElementById("theid").style.width = "100%";
+                }
+            });
+        }
+        function setPos(lat,lng)
+        {
+            var initialLocation = new google.maps.LatLng(lat, lng);
+            if (myposmarker == null) {
+                myposmarker = new google.maps.Marker({
+                    map: map,
+                    position: { lat: lat, lng: lng },
+                    title: "You",
+                });
+                myposmarker.setIcon('https://maps.google.com/mapfiles/ms/icons/orange-dot.png')
+                myposmarker['infowindow'] = new google.maps.InfoWindow({
+                    content: 'Your Position'
+                });
+                map.setCenter(new google.maps.LatLng(lat, lng));
+            }
+
+            google.maps.event.addListener(marker, 'click', function () {
+                this['infowindow'].open(map, this);
+            });
+            map.setCenter(initialLocation);
+        }
+        function relocatemarkers() {
+            isfound = false;
+        }
+        function getPos(lat, lng, acc) {
+            //if (acc < +$("#accuracy").val()) {
+            //    $("#latinput").val(lat);
+            //    $("#longinput").val(lng);
+            //    if (!isfound) {
+            //        FindMPsWithinRadius(lat, lng);
+            //        isfound = true;
+            //    }
+            //    myposmarker.setPosition(new google.maps.LatLng(lat, lng));
+            //}
+
+            $("#latinput").val(lat);
+            $("#longinput").val(lng);
+            if (!isfound) {
+                FindMPsWithinRadius(lat, lng);
+                isfound = true;
+            }
+            myposmarker.setPosition(new google.maps.LatLng(lat, lng));
+
+        }
+        function checklimit(e) {
+            StartSpinner();
+            e.preventDefault();
+            var thetimevar = $('#thetime').datetimepicker('getDate').toISOString();
+            var theid = $("#theid").val();
+            var themeasurement = $("#themeasurement").val();
+            $.ajax({
+                type: 'post',
+                url: '@Url.Action("CheckAlertLimit","Meas")',
+                data: {
+                    'measurementIn': themeasurement,
+                    'thetimeIn': thetimevar,
+                    'IdIn': theid
+                },
+                success: function (output) {
+                    if (output != "No Limit Breached") {
+                        alert(output + " - Please contact supervisor!");
+                        $("#theform").submit();
+                    }
+                    else {
+                        $("#theform").submit();
+
+                    }
+
+                },
+                error: function () {
+                    $("#theform").submit();
+                }
+            });
+        }
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datetimepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-10:+0",
+                    dateFormat: "dd-MM-yy",
+                    timeFormat: "HH:mm",
+                    showSecond: false,
+                    showMillisec: false,
+                    showMicrosec: false,
+                    showTimezone: false,
+                    controlType: 'select',
+                    firstDay: 1
+
+                });
+                $('.date-picker').datetimepicker("setDate", new Date());
+                if (@istested == 1) {
+                    getProjectId($("#theid").val());
+                }
+                else {
+                    FillItems();
+                }
+               
+            });
+        });
+        function chooseThis(theid) {
+            var wasfound = false;
+            var options = document.getElementById('theid').options;
+            for (var i = 0; i < options.length; i++) {
+                if (options[i].value === theid.toString()) {
+                    options[i].selected = true;
+                    wasfound = true;
+                    break;
+                }
+            }
+            if (wasfound == false) {
+                getProjectId(theid);
+            }
+        }
+        function FindMPsWithinRadius(lati, longi) {
+            var url = '@Url.Action("GetMeasPointsInRadius2", "MeasPoints")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'lati': lati,
+                    'longi': longi
+                },
+                success: function (data) {
+                    for (var prop in data) {
+                            var marker = new google.maps.Marker({
+                                map: map,
+                                position: { lat: data[prop]["lati"], lng: data[prop]["longi"] },
+                             title: data[prop]["name"],
+                            });
+                            marker['infowindow'] = new google.maps.InfoWindow({
+                                content: data[prop]["project"]["name"] + ": " + data[prop]["name"] + ' : ' + '<button type="button" class="btn-hoelscher" onclick=chooseThis(' + data[prop]["id"] + ')>Chooose this</button>"'
+                            });
+
+                            google.maps.event.addListener(marker, 'click', function () {
+                                this['infowindow'].open(map, this);
+                            });
+                    }
+                    setPos(lati,longi);
+
+                },
+                error: function (output) {
+                    alert("error");
+                },
+            });
+        }
+        function getProjectId(theid) {
+            var url = '@Url.Action("GetProjectId", "Projects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': theid },
+                success: function (data) {
+                    $("#ProjectId").val(data["id"]);
+                    var url = '@Url.Action("GetMeasPointsProject", "Projects")';
+                    $.ajax({
+                        type: 'GET',
+                        url: url,
+                        dataType: 'json',
+                        data: {
+                            'theId': data["id"]
+                        },
+                        success: function (data2) {
+                            var s = '<option value="">Please Select</option>';
+                            for (var prop in data2) {
+                                s += '<option value="' + data2[prop]["id"] + '">' + data2[prop]["name"] + '</option>';
+                            }
+                            $("#theid").html(s);
+                            document.getElementById("theid").style.width = "100%";
+                            var options = document.getElementById('theid').options;
+                            for (var i = 0; i < options.length; i++) {
+                                if (options[i].value === theid.toString()) {
+                                    options[i].selected = true;
+                                    wasfound = true;
+                                    break;
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        }
+        function GetOffset() {
+            var theid = $('#theid').val();
+            var url = '@Url.Action("GetCurrentOffset", "MeasPoints")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {'theId' : theid},
+                success: function (data) {
+                    $("#theoffset").val(data["offset"]);
+                }
+            });
+        }
+
+        function UpdateOffset() {
+            $.ajax({
+                type: 'post',
+                url: '@Url.Action("UpdateOffset","MeasPoints")',
+                data: {
+                    'theoffset': $("#theoffset").val(),
+                    'theId': $('#theid').val()
+                },
+                success: function (data) {
+                    $("#theoffset").val(data["offset"]);
+                    alert("Updated");
+                },
+                error: function () {
+                    alet("error");
+                }
+            });
+        }
+    </script>
+}

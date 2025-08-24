@@ -1,0 +1,78 @@
+﻿@model MainOps.Models.ToolBox
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("ToolBox");
+}
+
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("ToolBox")</h2>
+<form asp-action="Edit_ToolBox" asp-controller="TrackItems" method="post">
+    <table style="width:100%;border:3px solid blue">
+        <tr>
+            <td>
+                <b>@Html.DisplayNameFor(x => x.DoneBy)</b>
+            </td>
+            <td>
+                <input asp-for="DoneBy" type="text" style="width:100%;" />
+            </td>
+            <td><button type="submit" class="btn-hoelscher" style="width:100%;height:100%;">@SharedLocalizer.GetLocalizedHtmlString("Save")</button></td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(x => x.ProjectId)</b></td>
+            <td><select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <b>@Html.DisplayNameFor(x => x.Report_Date)</b>
+            </td>
+            <td>
+                <input asp-for="Report_Date" class="date-picker" type="text" style="width:100%;" />
+            </td>
+            <td><label style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Instructed")</label></td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(x => x.Work_Tasks)</b></td>
+            <td><textarea asp-for="Work_Tasks" cols="30" rows="6" style="width:100%;"></textarea></td>
+            <td><input asp-for="Work_Instructed" type="checkbox" checked="checked" /></td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(x => x.Safety_Aspects)</b></td>
+            <td><textarea asp-for="Safety_Aspects" cols="30" rows="6" style="width:100%;"></textarea></td>
+            <td><input asp-for="Safety_Instructed" type="checkbox" checked="checked" /></td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(x => x.Dangerous_Work)</b></td>
+            <td><textarea asp-for="Dangerous_Work" cols="30" rows="6" style="width:100%;"></textarea></td>
+            <td><input asp-for="Dangerous_Work_Instructed" type="checkbox" checked="checked" /></td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(x => x.Comments)</b></td>
+            <td><textarea asp-for="Comments" cols="30" rows="6" style="width:100%;"></textarea></td>
+            <td></td>
+        </tr>
+
+    </table>
+</form>
+<div>
+    <a asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts{
+    <script src="~/js/signature_pad.min.js"></script>
+    <script>
+        var pads = [];
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+            });
+        });
+    </script>
+}
+

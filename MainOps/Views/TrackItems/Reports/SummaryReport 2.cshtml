@@ -1,0 +1,308 @@
+﻿@model MainOps.Models.SummaryReport
+@{
+    Layout = null;
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("Daily Summary Report")</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+<div class="row">
+    <div class="col-xs-12">
+        <table style="width:100%;">
+            <tr style="border-bottom:double;">
+                <td rowspan="2" colspan="6" style="text-align:left;"><img src="~/images/Divisions/Photos/@Model.Project.Division.Id/@Model.Project.Division.LogoPath" width="151" height="66" /></td>
+                <td rowspan="2" colspan="6" style="text-align:right;"><img src="~/images/Clients/@Model.ProjectId/AHAK.png" width="151" height="66" /></td>
+            </tr>
+            <tr>
+                <td colspan="3"></td>
+                <td colspan="12" style="text-align:left;">
+                    <b>@Model.Project.Name</b>
+                </td>
+            </tr>
+            <tr style="border-top:double;border-bottom:double;">
+                <td colspan="15" style="text-align:center;">
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("Day Report")</b>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3"></td>
+                <td colspan="12" style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => Model.Project.Name)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.Project.Name)
+                </td>
+                <td rowspan="3" align="right"></td>
+            </tr>
+            <tr>
+                <td colspan="3" style="text-align:left;">@SharedLocalizer.GetLocalizedHtmlString("Name Crew/Sub contractor :")</td>
+                <td></td>
+                <td colspan="2" style="text-underline-position:below;">@Model.Project.Division.Name</td>
+                <td colspan="3"></td>
+                <td colspan="3" style="text-align:right;">@SharedLocalizer.GetLocalizedHtmlString("Date:")</td>
+                <td colspan="4" style="text-align:left;text-underline-position:below;">@Model.Report_Date.ToString("{0:yyyy-MM-dd}")</td>
+            </tr>
+            <tr>
+                <td colspan="3" style="text-align:left;">@SharedLocalizer.GetLocalizedHtmlString("Activity :")</td>
+                <td></td>
+                <td colspan="2" style="text-underline-position:below;">@SharedLocalizer.GetLocalizedHtmlString("Dewatering")</td>
+                <td colspan="10"></td>
+            </tr>
+            <tr>
+                <td colspan="11"></td>
+                <td colspan="5" style="text-align:center;text-underline-position:below;">35 degrees C</td>
+            </tr>
+            <tr style="border-bottom:double;">
+                <td colspan="16"></td>
+            </tr>
+            <tr>
+                <td>Number</td>
+                <td>Name</td>
+                <td>Function</td>
+                <td>Hours</td>
+                <td>Equipment Number</td>
+                <td>Equip</td>
+                <td>Hours/Day</td>
+                <td>Defect</td>
+            </tr>
+            @{ int counter = 1;}
+            @foreach (var item in Model.Daily_Reports)
+            {
+                for (int i = 1; i <= item.Amount; i++)
+                {
+                    @if (Model.Daily_Reports.IndexOf(item).Equals(Model.Daily_Reports.Count() - 1) && i.Equals(item.Amount))
+                    {
+                        <tr style="border-bottom:double;">
+                            <td>@counter</td>
+                            @if (item.Amount.Equals(1))
+                            {
+                                <td>@item.DoneBy</td>
+                            }
+                            else
+                            {
+                                <td><input type="text" value="@item.DoneBy worker" /></td>
+                            }
+                            <td>@item.Title.TheTitle</td>
+                            <td>@item.Hours</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td>@counter</td>
+                            @if (item.Amount.Equals(1))
+                            {
+                                <td>@item.DoneBy</td>
+                            }
+                            else
+                            {
+                                <td><input type="text" value="@item.DoneBy worker" /></td>
+                            }
+                            <td>@item.Title.TheTitle</td>
+                            <td>@item.Hours</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    }
+
+                    counter += 1;
+                }
+            }
+            <tr>
+                <td colspan="8" rowspan="5" style="border-right:medium;border-bottom:double;">
+                    <textarea rows="5" cols="40">Comments PERSONAL :</textarea>
+                </td>
+                <td colspan="8" rowspan="5" style="border-left:medium;border-bottom:double;">
+                    <textarea rows="5" cols="40">Comments EQUIPMENT :</textarea>
+                </td>
+            </tr>
+            <tr>
+                <td rowspan="8" style="rotation:90deg;">@SharedLocalizer.GetLocalizedHtmlString("Process")</td>
+                <td rowspan="8" colspan="11">
+                    <textarea asp-for="TheDailyText" cols="120" rows="40" style="border:none;"></textarea>
+                </td>
+                <td colspan="2">@SharedLocalizer.GetLocalizedHtmlString("Start")</td>
+                <td colspan="2">@SharedLocalizer.GetLocalizedHtmlString("End")</td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td colspan="2"></td>
+                <td colspan="2"></td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => Model.Project.ProjectNr)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.Project.ProjectNr)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => Model.Project.Client)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.Project.Client)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => Model.People)
+                    </b>
+                </td>
+                <td>
+                    @{
+                        int count = 0;
+                    }
+                    @foreach (var item in Model.People.Split(Environment.NewLine))
+                    {
+                        count += 1;
+                    }
+                    <textarea asp-for="People" cols="30" rows="@count.ToString()" style="border:none;"></textarea>
+                </td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <textarea asp-for="TheDailyText" cols="120" rows="40" style="border:none;"></textarea>
+                </td>
+            </tr>
+        </table>
+        <table style="width:100%;page-break-inside:avoid;">
+            <tr><td colspan="3" style="font-size:18px;"><b>@SharedLocalizer.GetLocalizedHtmlString("Daily Reports")</b></td></tr>
+            <tr style="border-bottom:solid">
+                <td style="width:33%"><b>@SharedLocalizer.GetLocalizedHtmlString("Title")</b></td>
+                <td style="width:33%"><b>@SharedLocalizer.GetLocalizedHtmlString("Hours")</b></td>
+                <td style="width:33%"><b>@SharedLocalizer.GetLocalizedHtmlString("Machinery")</b></td>
+            </tr>
+            @foreach (var item in Model.Daily_Reports.GroupBy(x => x.TitleId))
+            {
+                var thecount = Model.Daily_Reports.Where(x => x.TitleId.Equals(item.First().TitleId)).Sum(x => x.Hours.TotalHours * x.Amount);
+                var machinery = "";
+                foreach (var dr in Model.Daily_Reports.Where(x => x.TitleId.Equals(item.First().TitleId)))
+                {
+                    machinery += dr.Machinery;
+                }
+                <tr>
+                    <td style="text-align:left;">@item.First().Title.TheTitle</td>
+                    <td>@thecount</td>
+                    <td>@machinery</td>
+                </tr>
+            }
+
+            <tr><td colspan="3" style="font-size:18px;"><b>@SharedLocalizer.GetLocalizedHtmlString("Mobilisations")</b></td></tr>
+            <tr style="border-bottom:solid">
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Equipment")</b></td>
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Amount")</b></td>
+                <td></td>
+            </tr>
+            @foreach (var item in Model.Mobilizations.GroupBy(x => x.ItemTypeId))
+            {
+                var thecount = Model.Mobilizations.Where(x => x.ItemTypeId.Equals(item.First().ItemTypeId)).Sum(x => x.Amount);
+                <tr>
+                    <td td style="text-align:left;">@item.First().ItemType.Item_Type</td>
+                    <td>@thecount</td>
+                    <td></td>
+                </tr>
+            }
+            <tr><td colspan="3" style="font-size:18px;"><b>@SharedLocalizer.GetLocalizedHtmlString("Arrivals")</b></td></tr>
+            <tr style="border-bottom:solid">
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Equipment")</b></td>
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Amount")</b></td>
+                <td></td>
+            </tr>
+            @foreach (var item in Model.Arrivals.GroupBy(x => x.ItemTypeId))
+            {
+                var thecount = Model.Arrivals.Where(x => x.ItemTypeId.Equals(item.First().ItemTypeId)).Sum(x => x.Amount);
+                <tr>
+                    <td td style="text-align:left;">@item.First().ItemType.Item_Type</td>
+                    <td>@thecount</td>
+                    <td></td>
+                </tr>
+            }
+            <tr><td colspan="3" style="font-size:18px;"><b>@SharedLocalizer.GetLocalizedHtmlString("Installations")</b></td></tr>
+            <tr style="border-bottom:solid">
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Equipment")</b></td>
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Amount")</b></td>
+                <td></td>
+            </tr>
+            @foreach (var item in Model.Installations.GroupBy(x => x.ItemTypeId))
+            {
+                var thecount = Model.Installations.Where(x => x.ItemTypeId.Equals(item.First().ItemTypeId)).Sum(x => x.Amount);
+                <tr>
+                    <td td style="text-align:left;">@item.First().ItemType.Item_Type</td>
+                    <td>@thecount</td>
+                    <td></td>
+                </tr>
+            }
+            <tr><td colspan="3" style="font-size:18px;"><b>@SharedLocalizer.GetLocalizedHtmlString("DeInstallations")</b></td></tr>
+            <tr style="border-bottom:solid;text-align:left;">
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Equipment")</b></td>
+                <td><b>@SharedLocalizer.GetLocalizedHtmlString("Amount")</b></td>
+                <td></td>
+            </tr>
+            @foreach (var item in Model.Deinstallations.GroupBy(x => x.ItemTypeId))
+            {
+                var thecount = Model.Deinstallations.Where(x => x.ItemTypeId.Equals(item.First().ItemTypeId)).Sum(x => x.Amount);
+                <tr>
+                    <td td style="text-align:left;">@item.First().ItemType.Item_Type</td>
+                    <td>@thecount</td>
+                    <td></td>
+                </tr>
+            }
+        </table>
+        <table style="width:100%;page-break-inside:avoid">
+            <tr style="border-top:solid;border-bottom:solid">
+                <td style="width:10%;"><label asp-for="SignatureHJDateTime"></label></td>
+                <td style="width:40%;"><label asp-for="signatureHJ"></label></td>
+                <td style="width:10%;"><label asp-for="SignatureClientDateTime"></label></td>
+                <td style="width:40%;"><label asp-for="signatureClient"></label></td>
+            </tr>
+            <tr>
+                <td style="width:10%;height:150px;">@Html.DisplayFor(Model => Model.SignatureHJDateTime)</td>
+                <td style="width:40%">
+                    <img id="signaturehj" src="data:image/jpg;base64, @Model.signatureHJ" style="width:100%;">
+                </td>
+                <td style="width:10%;height:150px;"><canvas height="150" style="width:100%;"></canvas></td>
+                <td style="width:40%;"><canvas height="150" style="width:100%;"></canvas></td>
+            </tr>
+        </table>
+    </div>
+</div>

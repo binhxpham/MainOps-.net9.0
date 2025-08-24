@@ -1,0 +1,223 @@
+﻿@model MainOps.Models.ReportClasses.Pump_Installation
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Well Installation");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Pump Installation")</h2>
+
+<hr />
+<div class="row">
+    <div class="col-xs-8">
+        <form asp-action="Pump_Installation" enctype="multipart/form-data" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <table>
+                <tr>
+                    <td colspan="2">
+                        <label asp-for="ProjectId" class="control-label"></label>
+                    </td>
+                    <td colspan="2">
+                        <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <label asp-for="ProjectLocation" class="control-label"></label>
+                    </td>
+                    <td colspan="2">
+                        <input asp-for="ProjectLocation" class="form-control" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <label asp-for="WellName" class="control-label"></label>
+                    </td>
+                    <td colspan="2">
+                        <input asp-for="WellName" class="form-control" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <label asp-for="VersionNr" class="control-label"></label>
+                    </td>
+                    <td colspan="2">
+                        <input asp-for="VersionNr" class="form-control" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <label asp-for="RevisionReason" class="control-label"></label>
+                    </td>
+                    <td colspan="2">
+                        <input asp-for="RevisionReason" class="form-control" />
+                    </td>
+                </tr>
+                <tr><td colspan="4"></td></tr>
+                <tr>
+                    <td colspan="2"><label asp-for="Scetch_path" class="control-label"></label></td>
+                    <td colspan="2"><input type="file" name="files" accept=".jpg,.jpeg,.png,.gif" /></td>
+                </tr>
+                <tr><td colspan="4"></td></tr>
+                <tr>
+                    <td>@SharedLocalizer.GetLocalizedHtmlString("")</td>
+                    <td>@SharedLocalizer.GetLocalizedHtmlString("Design")</td>
+                    <td>@SharedLocalizer.GetLocalizedHtmlString("Actual")</td>
+                    <td>@SharedLocalizer.GetLocalizedHtmlString("Pass/Fail")</td>
+                </tr>
+                <tr>
+                    <td><label asp-for="resting_water_level" class="control-label"></label></td>
+                    <td><input asp-for="resting_water_level" class="form-control" /><span asp-validation-for="resting_water_level" class="text-danger"></span></td>
+                    <td><input asp-for="resting_water_level_actual" class="form-control" /><span asp-validation-for="resting_water_level_actual" class="text-danger"></span></td>
+                    <td style="text-align:center;">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="resting_water_level_pass" />
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Base_depth" class="control-label"></label></td>
+                    <td><input asp-for="Base_depth" class="form-control" /><span asp-validation-for="Base_depth" class="text-danger"></span></td>
+                    <td><input asp-for="Base_depth_actual" class="form-control" /><span asp-validation-for="Base_depth_actual" class="text-danger"></span></td>
+                    <td style="text-align:center;">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="Base_depth_pass" />
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Fitted" class="control-label"></label></td>
+                    <td><input asp-for="Fitted" class="form-control" /></td>
+                    <td><input asp-for="Fitted_actual" class="form-control" /></td>
+                    <td style="text-align:center;">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="Fitted_pass" />
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Pump" class="control-label"></label></td>
+                    <td><input asp-for="Pump" class="form-control" /></td>
+                    <td><input asp-for="Pump_actual" class="form-control" /></td>
+                    <td style="text-align:center;">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="Pump_pass" />
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="dip_tube" class="control-label"></label></td>
+                    <td><input asp-for="dip_tube" class="form-control" /></td>
+                    <td><input asp-for="dip_tube_actual" class="form-control" /></td>
+                    <td style="text-align:center;">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="dip_tube_pass" />
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="rotation" class="control-label"></label></td>
+                    <td><input asp-for="rotation" class=" form-control" /></td>
+                    <td><input asp-for="rotation_actual" class="form-control" /></td>
+                    <td style="text-align:center;">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="rotation_pass" />
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="colour" class="control-label"></label></td>
+                    <td><input asp-for="colour" class=" form-control" /></td>
+                    <td><input asp-for="colour_actual" class="form-control" /></td>
+                    <td style="text-align:center;">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="colour_pass" />
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="clearing" class="control-label"></label></td>
+                    <td><input asp-for="clearing" class=" form-control" /></td>
+                    <td><input asp-for="clearing_actual" class="form-control" /></td>
+                    <td style="text-align:center;">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="clearing_pass" />
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="imhoff" class="control-label"></label></td>
+                    <td><input asp-for="imhoff" class=" form-control" /></td>
+                    <td><input asp-for="imhoff_actual" class="form-control" /></td>
+                    <td style="text-align:center;">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="imhoff_pass" />
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4"><label asp-for="Notes" class="control-label"></label></td>
+                </tr>
+                <tr rowspan="20">
+                    <td colspan="4">
+                        <textarea rows="8" cols="64" class="form-control" asp-for="Notes"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label asp-for="Name"></label></td>
+                    <td colspan="2"><input asp-for="Name" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label asp-for="Date_Done"></label></td>
+                    <td colspan="2"><input type="datetime" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd")" asp-for="Date_Done" style="width:100%;height:36px;" /></td>
+                </tr>
+            </table>
+            <div class="form-group">
+                <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString("Add Report")" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datetimepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+                $('.date-picker').datetimepicker("setDate", new Date());
+
+            });
+        });
+
+    </script>
+}

@@ -1,0 +1,333 @@
+﻿@model MainOps.Models.ClearPumpTest
+
+@{
+    ViewData["Title"] = "Clear Pump Test";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Clear Pump Test")</h2>
+<form asp-action="ClearPumpTest" asp-controller="TrackItems" enctype="multipart/form-data" onsubmit="retrieveData(event);" method="post" id="theform">
+    <table style="width:100%;table-layout:fixed;">
+        <thead>
+            <tr>
+                <th style="width:25%"></th>
+                <th style="width:25%"></th>
+                <th style="width:25%"></th>
+                <th style="width:25%"></th>
+            </tr>
+        </thead>
+        <tr>
+            <td><label asp-for="ProjectId" class="control-label"></label></td>
+            <td><select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillMeasPoints();"></select></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><label asp-for="SubProjectId" class="control-label"></label></td>
+            <td><select asp-for="SubProjectId" class="form-control" asp-items="ViewBag.SubProjectId"></select></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><label asp-for="MeasPointId" class="control-label"></label></td>
+            <td><select asp-for="MeasPointId" class="form-control" asp-items="ViewBag.MeasPointId" onchange="UpdateWellName(this);"></select></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <label asp-for="Wellname" class="control-label"></label>
+            </td>
+            <td>
+                <input asp-for="Wellname" type="text" id="Wellname" name="Wellname" style="width:100%" />
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <label asp-for="Report_Date" class="control-label"></label>
+            </td>
+            <td>
+                <input type="datetime" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd")" asp-for="Report_Date" style="width:100%" />
+            </td>
+            <td><span asp-validation-for="Report_Date" class="text-danger"></span></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><label asp-for="DischargeAvailable" class="control-label"></label></td>
+            <td>
+                <input asp-for="DischargeAvailable" type="checkbox" value="true" checked="checked" onchange="this.checked ? this.value = true : this.value = false" class="form-control" />
+
+            </td>
+            <td colspan="2"><span asp-validation-for="DischargeAvailable" class="text-danger"></span></td>
+        </tr>
+        <tr>
+            <td><label asp-for="starttime" class="control-label"></label></td>
+            <td>
+                <input asp-for="starttime" type="time" class="form-control" />
+
+            </td>
+            <td colspan="2"><span asp-validation-for="starttime" class="text-danger"></span></td>
+        </tr>
+        <tr>
+            <td><label asp-for="endtime" class="control-label"></label></td>
+            <td>
+                <input asp-for="endtime" type="time" class="form-control" />
+
+            </td>
+            <td colspan="2"><span asp-validation-for="endtime" class="text-danger"></span></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Water_Meter_Before" class="control-label"></label></td>
+            <td><input asp-for="Water_Meter_Before" id="Water_Meter_Before" type="number" style="width:100%" /></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Water_Meter_After" class="control-label"></label></td>
+            <td><input asp-for="Water_Meter_After" id="Water_Meter_After" type="number" onkeydown="UpdateWaterMeter();" style="width:100%" /></td>
+            <td><label asp-for="Totalm3" class="control-label"></label></td>
+            <td><input type="number" id="Total_m3" value="0" disabled="disabled" style="width:100%;" /></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Ref_Point" class="control-label"></label></td>
+            <td>
+                <select asp-for="Ref_Point" style="width:100%;">
+                    <option value="Top of Pipe">@SharedLocalizer.GetLocalizedHtmlString("Top of Pipe")</option>
+                    <option value="Terrain">@SharedLocalizer.GetLocalizedHtmlString("Terrain")</option>
+                </select>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Ref_Level" class="control-label"></label></td>
+            <td><input asp-for="Ref_Level" type="number" onkeydown="UpdateWaterLevel();" style="width:100%;" /></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Water_level" class="control-label"></label></td>
+            <td><input asp-for="Water_level" id="Water_level" type="number" onkeydown="UpdateWaterLevel();" style="width:100%" /></td>
+            <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Water Level Reference")</label></td>
+            <td><input id="water_in_ref_level" value="0" type="number" disabled="disabled" style="width:100%;" /></td>
+        </tr>
+
+        <tr>
+            <td><label asp-for="Before_After_Acid" class="control-label"></label></td>
+            <td>
+                <select asp-for="Before_After_Acid" style="width:100%;">
+                    <option value="Acid Not Done">@SharedLocalizer.GetLocalizedHtmlString("Acid Treatment not to be done")</option>
+                    <option value="Before">@SharedLocalizer.GetLocalizedHtmlString("Before")</option>
+                    <option value="After">@SharedLocalizer.GetLocalizedHtmlString("After")</option>
+                </select>
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Init_Meas_Time" class="control-label"></label></td>
+            <td>
+                <input asp-for="Init_Meas_Time" type="time" class="form-control" />
+            </td>
+            <td><span asp-validation-for="Init_Meas_Time" class="text-danger"></span></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Bottom_well" class="control-label"></label></td>
+            <td><input asp-for="Bottom_well" type="number" style="width:100%" /></td>
+            <td><span asp-validation-for="Bottom_well" class="text-danger"></span></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><label asp-for="PumpType" class="control-label"></label></td>
+            <td><input asp-for="PumpType" type="text" style="width:100%" /></td>
+            <td><span asp-validation-for="PumpType" class="text-danger"></span></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="4"><label asp-for="GeneralComments" class="control-label"></label></td>
+        </tr>
+        <tr>
+            <td colspan="4"><textarea asp-for="GeneralComments" cols="44" rows="6"></textarea></td>
+        </tr>
+        <tr>
+            <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label></td>
+            <td>
+                <input type="file" name="files" multiple accept=".jpg,.jpeg,.png,.pdf" />
+                <input type="number" id="latinput" value="0" name="Latitude" hidden="hidden" />
+                <input type="number" id="longinput" value="0" name="Longitude" hidden="hidden" />
+            </td>
+
+        </tr>
+    </table>
+    <input id="Times" type="text" name="Times" hidden="hidden" />
+    <input id="Dips" type="text" name="Dips" hidden="hidden" />
+    <input id="Flows" type="text" name="Flows" hidden="hidden" />
+    <input id="M3s" type="text" name="M3s" hidden="hidden" />
+    <input id="Coms" type="text" name="Coms" hidden="hidden" />
+    <table style="width:100%;table-layout:fixed;">
+        <thead>
+            <tr>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString("Time")
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString("Dip")
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString("Flow")
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString("m3")
+                </th>
+
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString("Comment")
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < 30; i++)
+            {
+                <tr>
+                    <td style="width:20%;"><input id="time_@i" type="time" style="width:100%;" /></td>
+                    <td style="width:20%;"><input id="dip_@i" type="number" style="width:100%;" /></td>
+                    <td style="width:20%;"><input id="flow_@i" type="number" style="width:100%;" /></td>
+                    <td style="width:20%;"><input id="m3_@i" type="number" style="width:100%;" /></td> 
+                    <td style="width:20%;"><input id="com_@i" type="text" style="width:100%;" /></td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+    <button type="submit" class="btn-hoelscher" style="width:100%;height:100px;font-size:18px;">@SharedLocalizer.GetLocalizedHtmlString("Upload Report")</button>
+</form>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+            var myLat = 0, myLng = 0;
+            var id;
+            if (navigator.geolocation) {
+                id = navigator.geolocation.watchPosition(function (position) {
+                    myLat = position.coords.latitude;
+                    myLng = position.coords.longitude;
+                    getPos(myLat, myLng);
+                },
+                    function (error) {
+                        if (error.code == error.PERMISSION_DENIED) {
+                            //alert("error");
+                        }
+
+                    }, { maximumAge: 0, timeout: 8000, enableHighAccuracy: true });
+            }
+            function getPos(lat, lng) {
+                $("#latinput").val(lat);
+                $("#longinput").val(lng);
+
+            }
+        $(document).ready(function () {
+            $(window).keydown(function (event) {
+                if (event.keyCode == 13) {
+                    event.preventDefault();
+                    return false;
+                }
+            });
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select',
+                    firstDay: 1
+
+                });
+                $('.date-picker').datepicker("setDate", new Date("dd-MM-yy"));
+                FillSubProjects();
+                FillMeasPoints();
+
+            });
+
+        });
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+        }
+        function FillMeasPoints() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetMeasPointsProject", "MeasPoints")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {'theId' : ProjectId},
+                success: function (data) {
+                    var s = '<option value="-1">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                    }
+                    $("#MeasPointId").html(s);
+                    document.getElementById("MeasPointId").style.width = "100%";
+                    FillSubProjects();
+                }
+            });
+            }
+            function UpdateWaterLevel() {
+                document.getElementById('water_in_ref_level').value = document.getElementById('Ref_Level').value - document.getElementById('Water_level').value;
+            }
+            function UpdateWaterMeter() {
+                document.getElementById('Total_m3').value = document.getElementById('Water_Meter_After').value - document.getElementById('Water_Meter_Before').value;
+            }
+        function UpdateWellName(sel) {
+            document.getElementById('Wellname').value = sel.options[sel.selectedIndex].text;
+        }
+
+        function retrieveData(e) {
+                var s1 = document.getElementById("Times");
+                var s2 = document.getElementById("Flows");
+                var s3 = document.getElementById("M3s");
+                var s4 = document.getElementById("Dips");
+                var s5 = document.getElementById("Coms");
+                var times = "";
+                var flows = "";
+                var m3s = "";
+                var dips = "";
+                var coms = "";
+                for (i = 0; i < 30; i++) {
+                    times = times + document.getElementById("time_" + i).value + ",";
+                    flows = flows + document.getElementById("flow_" + i).value.replace(",", ".") + ",";
+                    m3s = m3s + document.getElementById("m3_" + i).value.replace(",", ".") + ",";
+                    dips = dips + document.getElementById("dip_" + i).value.replace(",", ".") + ",";
+                    coms = coms + document.getElementById("com_" + i).value + ",";
+                }
+                s1.value = times;
+                s2.value = flows;
+                s3.value = m3s;
+                s4.value = dips;
+                s5.value = coms;
+                StartSpinner();
+            }
+
+
+    </script>
+}

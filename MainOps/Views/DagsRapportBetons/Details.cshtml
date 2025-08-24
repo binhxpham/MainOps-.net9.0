@@ -1,0 +1,120 @@
+﻿@model MainOps.Models.CGJClassesBeton.DagsRapportBeton
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>DagsRapportBeton</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.SubProject)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SubProject.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Project)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Project.Abbreviation)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Dato)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Dato)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.UdarbjedetAf)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.UdarbjedetAf)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ForSaetter)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ForSaetter)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Vejr)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Vejr)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Sol)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Sol)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Skyet)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Skyet)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.OverSkyet)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.OverSkyet)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Regn_sne)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Regn_sne)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Vindstille)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Vindstille)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Svag_Vind)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Svag_Vind)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Jaevn_Vind)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Jaevn_Vind)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Haard_Vind)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Haard_Vind)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Temperatur_kl_otte)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Temperatur_kl_otte)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Temperatur_kl_tolv)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Temperatur_kl_tolv)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.UddybendeNoter)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.UddybendeNoter)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

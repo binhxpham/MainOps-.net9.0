@@ -1,0 +1,36 @@
+﻿@model MainOps.Models.WaterSampleType
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>WaterSampleType</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Komponent)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Komponent)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Enhed)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Enhed)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DL)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DL)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <p><a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to Main WaterSample Page")</a></p>
+</div>

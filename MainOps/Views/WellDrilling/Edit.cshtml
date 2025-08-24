@@ -1,0 +1,264 @@
+﻿@model MainOps.Models.Well
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>Well</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" asp-controller="WellDrilling" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="DivisionId" />
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();"></select>
+                <span asp-validation-for="ProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SubProjectId" class="control-label"></label>
+                <select asp-for="SubProjectId" class="form-control" asp-items="ViewBag.SubProjectId"></select>
+                <span asp-validation-for="SubProjectId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="WellName" class="control-label"></label>
+                <input asp-for="WellName" class="form-control" />
+                <span asp-validation-for="WellName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WellTypeId" class="control-label"></label>
+                <select asp-for="WellTypeId" class="form-control" asp-items="ViewBag.WellTypeId"></select>
+                <span asp-validation-for="WellTypeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Coord_x" class="control-label"></label>
+                <input asp-for="Coord_x" class="form-control" />
+                <span asp-validation-for="Coord_x" class="text-danger"></span>
+                <button class="btn-hoelscher" type="button" onclick="GetCoord('x');">@SharedLocalizer.GetLocalizedHtmlString("Pull from MeasPoint")</button>
+            </div>
+            <div class="form-group">
+                <label asp-for="Coord_y" class="control-label"></label>
+                <input asp-for="Coord_y" class="form-control" />
+                <span asp-validation-for="Coord_y" class="text-danger"></span>
+                <button class="btn-hoelscher" type="button" onclick="GetCoord('y');">@SharedLocalizer.GetLocalizedHtmlString("Pull from MeasPoint")</button>
+            </div>
+            <div class="form-group">
+                <label asp-for="Coord_z" class="control-label"></label>
+                <input asp-for="Coord_z" class="form-control" />
+                <span asp-validation-for="Coord_z" class="text-danger"></span>
+                <button class="btn-hoelscher" type="button" onclick="GetCoord('z');">@SharedLocalizer.GetLocalizedHtmlString("Pull from MeasPoint")</button>
+            </div>
+            <div class="form-group">
+                <label asp-for="TopOfPipe" class="control-label"></label>
+                <input asp-for="TopOfPipe" class="form-control" />
+                <span asp-validation-for="TopOfPipe" class="text-danger"></span>
+                <button class="btn-hoelscher" type="button" onclick="GetTop();">@SharedLocalizer.GetLocalizedHtmlString("Pull from MeasPoint")</button>
+            </div>
+            <div class="form-group">
+                <label asp-for="WaterLevel" class="control-label"></label>
+                <input asp-for="WaterLevel" class="form-control" />
+                <span asp-validation-for="WaterLevel" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CoordSystemId" class="control-label"></label>
+                <select asp-for="CoordSystemId" class="form-control" asp-items="ViewBag.CoordSystemId"></select>
+                <span asp-validation-for="CoordSystemId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DGU_Number" class="control-label"></label>
+                <input asp-for="DGU_Number" class="form-control" />
+                <span asp-validation-for="DGU_Number" class="text-danger"></span>
+                <button class="btn-hoelscher" type="button" onclick="GetDGU();">@SharedLocalizer.GetLocalizedHtmlString("Pull from MeasPoint")</button>
+            </div>
+            <div class="form-group">
+                <label asp-for="Well_Depth" class="control-label"></label>
+                <input asp-for="Well_Depth" class="form-control" />
+                <span asp-validation-for="Well_Depth" class="text-danger"></span>
+
+            </div>
+            <div class="form-group">
+                <label asp-for="Drill_Method" class="control-label"></label>
+                <input asp-for="Drill_Method" class="form-control" />
+                <span asp-validation-for="Drill_Method" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Well_Type" class="control-label"></label>
+                <input asp-for="Well_Type" class="form-control" />
+                <span asp-validation-for="Well_Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Drill_Date_Start" class="control-label"></label>
+                <input asp-for="Drill_Date_Start" class="form-control" />
+                <span asp-validation-for="Drill_Date_Start" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Drill_Date_End" class="control-label"></label>
+                <input asp-for="Drill_Date_End" class="form-control" />
+                <span asp-validation-for="Drill_Date_End" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Done_By" class="control-label"></label>
+                <input asp-for="Done_By" class="form-control" />
+                <span asp-validation-for="Done_By" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Assessed_By" class="control-label"></label>
+                <input asp-for="Assessed_By" class="form-control" />
+                <span asp-validation-for="Assessed_By" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Assessed_Date" class="control-label"></label>
+                <input asp-for="Assessed_Date" type="date" class="form-control" />
+                <span asp-validation-for="Assessed_Date" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Approved_By" class="control-label"></label>
+                <input asp-for="Approved_By" class="form-control" />
+                <span asp-validation-for="Approved_By" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Approved_Date" class="control-label"></label>
+                <input asp-for="Approved_Date" type="date" class="form-control" />
+                <span asp-validation-for="Approved_Date" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WellDiameter" class="control-label"></label>
+                <input asp-for="WellDiameter" class="form-control" />
+                <span asp-validation-for="WellDiameter" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PipeDiameter" class="control-label"></label>
+                <input asp-for="PipeDiameter" class="form-control" />
+                <span asp-validation-for="PipeDiameter" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Attachments" class="control-label"></label>
+                <input asp-for="Attachments" class="form-control" />
+                <span asp-validation-for="Attachments" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WellDrillingInstructionId" class="control-label"></label>
+                <select asp-for="WellDrillingInstructionId" class="form-control" asp-items="ViewBag.WellDrillingInstructionId"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Online")</option></select>
+                <span asp-validation-for="WellDrillingInstructionId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript">
+    function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var SubProjectId = $('#SubProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                        var x = document.getElementById("SubProjectId");
+                        var i;
+                        for (i = 0; i < x.length; i++) {
+                            if (x.options[i].value == SubProjectId) {
+                                x.options[i].selected = true;
+                            }
+                        }
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+    }
+
+    function GetCoord(type) {
+        var ProjectId = $('#ProjectId').val();
+        var WellName = $('#WellName').val();
+        var url = '@Url.Action("GetCoord", "MeasPoints")';
+        $.ajax({
+            type: 'GET',
+            url: url,
+            dataType: 'json',
+            data: {
+                'theId': ProjectId,
+                'WellName': WellName
+            },
+            success: function (data) {
+                if (type == 'x') {
+                    $("#Coord_x").val(data["coordx"]);
+                }
+                else if (type == 'y') {
+                    $("#Coord_y").val(data["coordy"]);
+                }
+                else if (type == 'z') {
+                    $("#Coord_z").val(data["coordz"]);
+                }
+
+
+
+
+            }
+        });
+    }
+
+    function GetTop() {
+        var ProjectId = $('#ProjectId').val();
+        var WellName = $('#WellName').val();
+        var url = '@Url.Action("GetCurrentTop", "MeasPoints")';
+        $.ajax({
+            type: 'GET',
+            url: url,
+            dataType: 'json',
+            data: {
+                'theId': ProjectId,
+                'wellname': WellName
+            },
+            success: function (data) {
+                $("#TopOfPipe").val(data["offset"]);
+
+            }
+        });
+    }
+    function GetDGU() {
+        var ProjectId = $('#ProjectId').val();
+        var WellName = $('#WellName').val();
+        var url = '@Url.Action("GetCoord", "MeasPoints")';
+        $.ajax({
+            type: 'GET',
+            url: url,
+            dataType: 'json',
+            data: {
+                'theId': ProjectId,
+                'wellname': WellName
+            },
+            success: function (data) {
+                $("#DGU_Number").val(data["dGUnr"]);
+
+            }
+        });
+    }
+</script>
+
+}

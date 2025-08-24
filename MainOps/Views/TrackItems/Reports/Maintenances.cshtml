@@ -1,0 +1,553 @@
+﻿@model IEnumerable<MainOps.Models.MaintenanceWithEntry>
+
+@{
+    ViewData["Title"] = "Maintenances";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Maintenance List")</h2>
+
+<style>
+    th {
+        font-weight: normal;
+        height: 40px;
+        padding-left: 1px;
+        padding-right: 0px;
+        word-wrap: break-word;
+        width: 12%;
+        font-size: 12px;
+        text-align: center;
+    }
+</style>
+
+<form asp-action="Export_Maintenances" asp-controller="TrackItems" method="get" target="_blank">
+    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Export project maintenance")</button>
+    <select asp-items="ViewBag.ProjectId" id="projectexport" name="ProjectId"></select>
+</form>
+
+<table style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Project")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Sub Project")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Time Stamp")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Maintenance Point")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Maintenance Object / Type")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Maintenance Action")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Stock Item")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Done By")
+            </th>
+            <th></th>
+        </tr>
+        <tr>
+            <th>
+                <select asp-items="ViewBag.ProjectId" id="ProjectId" onchange="Filter();" style="width:100%;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Filter Project")</option>
+                </select>
+            </th>
+            <th>
+                <select asp-items="ViewBag.SubProjectId" id="SubProjectId" onchange="Filter();" style="width:100%;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Filter Sub Project")</option>
+                </select>
+            </th>
+            <th>
+
+            </th>
+            <th>
+
+            </th>
+            <th>
+                <select asp-items="ViewBag.MaintenanceTypeId" id="MaintenanceTypeId" onchange="Filter();" style="width:100%;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Filter Maintenance Object")</option>
+                </select>
+            </th>
+            <th>
+                <select asp-items="ViewBag.MaintenanceSubTypeId" id="MaintenanceSubTypeId" onchange="Filter();" style="width:100%;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Filter Maintenance Type")</option>
+                </select>
+            </th>
+            <th>
+                <select asp-items="ViewBag.HJItemId" id="HJItemId" onchange="Filter();" style="width:100%;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Filter Stock Item")</option>
+                </select>
+            </th>
+            <th>
+
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{ int i = 0;}
+        @foreach (var mainp in Model.GroupBy(x => x.Maintenance))
+        {
+        <tr class="filtertr" id="tr_@i">
+            <td id="td_proj_@i">
+                <input id="proj_@i" value="@mainp.Key.Project.Name" hidden="hidden" />
+                @mainp.Key.Project.Name
+            </td>
+            <td id="td_subproj_@i">
+                @if (mainp.Key.SubProjectId != null)
+                {
+                    <input id="subproj_@i" value="@mainp.Key.SubProject.Name" hidden="hidden" />
+                    @mainp.Key.SubProject.Name
+                }
+                else
+                {
+                    <input id="subproj_@i" value="" hidden="hidden" />
+                }
+            </td>
+            <td>
+                @mainp.Key.TimeStamp
+            </td>
+            <td>
+                @mainp.Key.MaintenancePoint
+            </td>
+            <td>
+                @{string maintasks = "";}
+                @foreach (var maintype in Model.Where(x => x.Maintenance.TimeStamp.Equals(mainp.Key.TimeStamp) && x.Maintenance.MaintenancePoint.Equals(mainp.Key.MaintenancePoint)).ToList().Select(y => y.Entry.MaintenanceType).Distinct())
+                {
+                    if (maintasks == "")
+                    {
+                        maintasks = String.Concat(maintype.Type, ": (");
+                    }
+                    else
+                    {
+                        maintasks = String.Concat(maintasks, ",", maintype.Type, ": (");
+                    }
+                    int bleh = 0;
+                    foreach (var subtype in Model.Where(x => x.Maintenance.TimeStamp.Equals(mainp.Key.TimeStamp) && x.Maintenance.MaintenancePoint.Equals(mainp.Key.MaintenancePoint) && x.Entry.MaintenanceType.Equals(maintype)).Select(y => y.Entry.MaintenanceSubType))
+                    {
+                        if (subtype != null)
+                        {
+                            if (bleh == 0)
+                            {
+                                maintasks = String.Concat(maintasks, subtype.Type);
+                            }
+                            else
+                            {
+                                maintasks = String.Concat(maintasks, ", ", subtype.Type);
+                            }
+                            bleh += 1;
+                        }
+
+                    }
+                    maintasks = String.Concat(maintasks, ")");
+                }
+
+                @maintasks
+                @*@foreach (var entry in Model.Where(x => x.Maintenance.TimeStamp.Equals(mainp.Key.TimeStamp) && x.Maintenance.MaintenancePoint.Equals(mainp.Key.MaintenancePoint)).ToList().Select(y => y.Entry))
+                            {
+                if (maintasks == "")
+                            {
+                             if(entry.MaintenanceType != null)
+                                {
+                                   if(entry.MaintenanceSubType != null)
+                                    {
+                                        maintasks = String.Concat(maintasks, entry.MaintenanceType.Type, " - ", entry.MaintenanceSubType.Type);
+                                   }
+                                    else
+                                    {
+                                        maintasks = String.Concat(maintasks, entry.MaintenanceType.Type);
+                                    }
+                                }
+
+                            }
+                            else
+                            {
+                                if (entry.MaintenanceType != null)
+                                {
+                                    if (entry.MaintenanceSubType != null)
+                                    {
+                                        maintasks = String.Concat(maintasks, ", ", entry.MaintenanceType.Type, " - ", entry.MaintenanceSubType.Type);
+                                    }
+                                    else
+                                    {
+                                        maintasks = String.Concat(maintasks, ", ", entry.MaintenanceType.Type);
+                                    }
+                               }
+
+                            }
+                        }
+        }*@
+                
+            </td>
+
+            <td id="td_HJItem_@i">
+                @if (mainp.Key.HJItemId != null)
+                {
+                    <input id="HJItem_@i" value="@mainp.Key.HJItem.HJId" hidden="hidden" />
+                    @mainp.Key.HJItem.HJId
+                }
+                else
+                {
+                    <input id="HJItem_@i" value="" hidden="hidden" />
+                }
+            </td>
+            <td>
+                @mainp.Key.DoneBy
+            </td>
+            <td>
+                <form asp-action="MaintenanceReport_PDF" asp-controller="TrackItems" asp-route-id="@mainp.Key.Id" method="get" target="_blank">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                </form>
+                <form asp-action="Edit_Maintenance" asp-controller="TrackItems" asp-route-id="@mainp.Key.Id" method="get" target="_blank">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                </form>
+                @if (Model.Where(x => x.Maintenance.MaintenancePoint.Equals(mainp.Key.MaintenancePoint) && x.Maintenance.TimeStamp.Equals(mainp.Key.TimeStamp)).First().HasPhotos.Equals(true))
+                {
+                    <form asp-action="GetZipFileMaintenance" asp-controller="TrackItems" asp-route-id="@mainp.Key.Id" method="get">
+                        <button><span class="glyphicon glyphicon-paperclip"></span></button>
+                    </form>
+                }
+            </td>
+        </tr>
+        }
+        @*@for (int i = 0; i < Model.Count(); i++)
+        {
+            <tr class="filtertr" id="tr_@i">
+                <td id="td_proj_@i">
+                    <input id="proj_@i" value="@Model.ElementAt(i).Maintenance.Project.Name" hidden="hidden" />
+                    @Html.DisplayFor(modelItem => Model.ElementAt(i).Maintenance.Project.Name)
+                </td>
+                <td id="td_subproj_@i">
+                    @if (Model.ElementAt(i).Maintenance.SubProjectId != null)
+                    {
+                        <input id="subproj_@i" value="@Model.ElementAt(i).Maintenance.SubProject.Name" hidden="hidden" />
+                        @Html.DisplayFor(modelItem => Model.ElementAt(i).Maintenance.SubProject.Name)
+                    }
+                    else
+                    {
+                        <input id="subproj_@i" value="" hidden="hidden" />
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.ElementAt(i).Maintenance.TimeStamp)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.ElementAt(i).Maintenance.MaintenancePoint)
+                </td>
+                <td id="td_maintype_@i">
+                    @if (Model.ElementAt(i).Entry.MaintenanceTypeId != null)
+                    {
+                        <input id="maintype_@i" value="@Model.ElementAt(i).Entry.MaintenanceType.Type" hidden="hidden" />
+                        @Html.DisplayFor(modelItem => Model.ElementAt(i).Entry.MaintenanceType.Type)
+                    }
+                    else
+                    {
+                        <input id="maintype_@i" value="" hidden="hidden" />
+                    }
+                </td>
+                <td id="td_mainsubtype_@i">
+                    @if (Model.ElementAt(i).Entry.MaintenanceSubTypeId != null)
+                    {
+                        <input id="mainsubtype_@i" value="@Model.ElementAt(i).Entry.MaintenanceSubType.Type" hidden="hidden" />
+                        @Html.DisplayFor(modelItem => Model.ElementAt(i).Entry.MaintenanceSubType.Type)
+                    }
+                    else
+                    {
+                        <input id="mainsubtype_@i" value="" hidden="hidden" />
+                    }
+
+                </td>
+                <td id="td_HJItem_@i">
+                    @if (Model.ElementAt(i).Maintenance.HJItemId != null)
+                    {
+                        <input id="HJItem_@i" value="@Model.ElementAt(i).Maintenance.HJItem.HJId" hidden="hidden" />
+                        @Html.DisplayFor(modelItem => Model.ElementAt(i).Maintenance.HJItem.HJId)
+                    }
+                    else
+                    {
+                        <input id="HJItem_@i" value="" hidden="hidden" />
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.ElementAt(i).Maintenance.DoneBy)
+                </td>
+                <td>
+                    <form asp-action="MaintenanceReport_PDF" asp-controller="TrackItems" asp-route-id="@Model.ElementAt(i).Maintenance.Id" method="get" target="_blank">
+                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                    </form>
+                    <form asp-action="Edit_Maintenance" asp-controller="TrackItems" asp-route-id="@Model.ElementAt(i).Maintenance.Id" method="get" target="_blank">
+                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                    </form>
+                    @if (Model.ElementAt(i).HasPhotos.Equals(true))
+                    {
+                        <form asp-action="GetZipFileMaintenance" asp-controller="TrackItems" asp-route-id="@Model.ElementAt(i).Maintenance.Id" method="get">
+                            <button><span class="glyphicon glyphicon-paperclip"></span></button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }*@
+    </tbody>
+</table>
+@section Scripts {
+@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+<script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+<script type="text/javascript">
+        
+    function Filter() {
+        var ProjectId = $("#ProjectId").val();
+        $("#projectexport").val(ProjectId);
+            var Project = $('#ProjectId option:selected')
+                .toArray().map(item => item.text).join().split(" : ")[1];
+            var SubProject = $('#SubProjectId option:selected')
+                .toArray().map(item => item.text).join();
+            var MaintenanceType = $('#MaintenanceTypeId option:selected')
+            .toArray().map(item => item.text).join();
+            var MaintenanceSubType = $('#MaintenanceSubTypeId option:selected')
+                .toArray().map(item => item.text).join();
+            var HJItem = $('#HJItemId option:selected')
+                .toArray().map(item => item.text).join().split(" : ")[0];;
+            var ProjectUse = false;
+            var SubProjectUse = false;
+            var MaintenanceTypeUse = false;
+            var MaintenanceSubTypeUse = false;
+            var HJItemUse = false;
+            if ($("#ProjectId").val() != "") {
+                ProjectUse = true;
+            }
+            if ($("#SubProjectId").val() != "") {
+                SubProjectUse = true;
+            }
+            if ($("#MaintenanceTypeId").val() != "") {
+                MaintenanceTypeUse = true;
+            }
+            if ($("#MaintenanceSubTypeId").val() != "") {
+                MaintenanceSubTypeUse = true;
+            }
+            if ($("#HJItemId").val() != "") {
+                HJItemUse = true;
+            }
+            
+            $('.filtertr').each(function (i) {
+                var found = false;
+                var theid = this.id.split('_')[1];
+                var self = $(this);
+                if (ProjectUse == true) {
+                    if (SubProjectUse == true) {
+                        if (MaintenanceTypeUse == true) {
+                            if (MaintenanceSubTypeUse == true) {
+                                if (HJItemUse == true) {
+                                    if ($("#proj_" + theid).val() == Project && $("#subproj_" + theid).val() == SubProject && $("#maintype_" + theid).val() == MaintenanceType && $("#mainsubtype_" + theid).val() == MaintenanceSubType && $("#HJItem_" + theid).val() == HJItem) {
+                                        found = true;
+                                    }
+                                }
+                                else {
+                                    if ($("#proj_" + theid).val() == Project && $("#subproj_" + theid).val() == SubProject && $("#maintype_" + theid).val() == MaintenanceType && $("#mainsubtype_" + theid).val() == MaintenanceSubType) {
+                                        found = true;
+                                    }
+                                }
+                            }
+                            else if (HJItemUse == true) {
+                                if ($("#proj_" + theid).val() == Project && $("#subproj_" + theid).val() == SubProject && $("#maintype_" + theid).val() == MaintenanceType && $("#HJItem_" + theid).val() == HJItem) {
+                                    found = true;
+                                }
+                            }
+                            else {
+                                if ($("#proj_" + theid).val() == Project && $("#subproj_" + theid).val() == SubProject && $("#maintype_" + theid).val() == MaintenanceType) {
+                                    found = true;
+                                }
+                            }
+                        }
+                        else if (MaintenanceSubTypeUse == true) {
+                            if (HJItemUse == true) {
+                                if ($("#proj_" + theid).val() == Project && $("#subproj_" + theid).val() == SubProject && $("#mainsubtype_" + theid).val() == MaintenanceSubType && $("#HJItem_" + theid).val() == HJItem) {
+                                    found = true;
+                                }
+                            }
+                            else {
+                                if ($("#proj_" + theid).val() == Project && $("#subproj_" + theid).val() == SubProject && $("#mainsubtype_" + theid).val() == MaintenanceSubType) {
+                                    found = true;
+                                }
+                            }
+                        }
+                        else if (HJItemUse == true) {
+                            if ($("#proj_" + theid).val() == Project && $("#subproj_" + theid).val() == SubProject && $("#HJItem_" + theid).val() == HJItem) {
+                                found = true;
+                            }
+                        }
+                        else {
+                            if ($("#proj_" + theid).val() == Project && $("#subproj_" + theid).val() == SubProject) {
+                                found = true;
+                            }
+                        }
+
+                    }
+                    else if (MaintenanceTypeUse == true) {
+                        if (MaintenanceSubTypeUse == true) {
+                            if (HJItemUse == true) {
+                                if ($("#proj_" + theid).val() == Project && $("#maintype_" + theid).val() == MaintenanceType && $("#mainsubtype_" + theid).val() == MaintenanceSubType && $("#HJItem_" + theid).val() == HJItem) {
+                                    found = true;
+                                }
+                            }
+                            else {
+                                if ($("#proj_" + theid).val() == Project && $("#maintype_" + theid).val() == MaintenanceType && $("#mainsubtype_" + theid).val() == MaintenanceSubType) {
+                                    found = true;
+                                }
+                            }
+                        }
+                        else if (HJItemUse == true) {
+                            if ($("#proj_" + theid).val() == Project && $("#maintype_" + theid).val() == MaintenanceType && $("#HJItem_" + theid).val() == HJItem) {
+                                found = true;
+                            }
+                        }
+                        else {
+                            if ($("#proj_" + theid).val() == Project && $("#maintype_" + theid).val() == MaintenanceType) {
+                                found = true;
+                            }
+                        }
+                    }
+                    else if (MaintenanceSubTypeUse == true) {
+                        if (HJItemUse == true) {
+                            if ($("#proj_" + theid).val() == Project && $("#maintype_" + theid).val() == MaintenanceType && $("#mainsubtype_" + theid).val() == MaintenanceSubType && $("#HJItem_" + theid).val() == HJItem) {
+                                found = true;
+                            }
+                        }
+                        else {
+                            if ($("#proj_" + theid).val() == Project && $("#maintype_" + theid).val() == MaintenanceType && $("#mainsubtype_" + theid).val() == MaintenanceSubType) {
+                                found = true;
+                            }
+                        }
+                    }
+                    else if (HJItemUse == true) {
+                        if ($("#proj_" + theid).val() == Project && $("#HJItem_" + theid).val() == HJItem) {
+                            found = true;
+                        }
+                    }
+                    else {
+                        if ($("#proj_" + theid).val() == Project) {
+                            found = true;
+                        }
+                    }   
+                }
+                else if (SubProjectUse == true) {
+                    if (MaintenanceTypeUse == true) {
+                        if (MaintenanceSubTypeUse == true) {
+                            if (HJItemUse == true) {
+                                if ($("#subproj_" + theid).val() == SubProject && $("#maintype_" + theid).val() == MaintenanceType && $("#mainsubtype_" + theid).val() == MaintenanceSubType && $("#HJItem_" + theid).val() == HJItem) {
+                                    found = true;
+                                }
+                            }
+                            else {
+                                if ($("#subproj_" + theid).val() == SubProject && $("#maintype_" + theid).val() == MaintenanceType && $("#mainsubtype_" + theid).val() == MaintenanceSubType) {
+                                    found = true;
+                                }
+                            }
+                        }
+                        else if (HJItemUse == true) {
+                            if ($("#subproj_" + theid).val() == SubProject && $("#maintype_" + theid).val() == MaintenanceType && $("#HJItem_" + theid).val() == HJItem) {
+                                found = true;
+                            }
+                        }
+                        else {
+                            if ($("#subproj_" + theid).val() == SubProject && $("#maintype_" + theid).val() == MaintenanceType) {
+                                found = true;
+                            }
+                        }
+                    }
+                    else if (MaintenanceSubTypeUse == true) {
+                        if (HJItemUse == true) {
+                            if ($("#subproj_" + theid).val() == SubProject && $("#mainsubtype_" + theid).val() == MaintenanceSubType && $("#HJItem_" + theid).val() == HJItem) {
+                                found = true;
+                            }
+                        }
+                        else {
+                            if ($("#subproj_" + theid).val() == SubProject && $("#mainsubtype_" + theid).val() == MaintenanceSubType) {
+                                found = true;
+                            }
+                        }
+                    }
+                    else if (HJItemUse == true) {
+                        if ($("#subproj_" + theid).val() == SubProject && $("#HJItem_" + theid).val() == HJItem) {
+                            found = true;
+                        }
+                    }
+                    else {
+                        if ($("#subproj_" + theid).val() == SubProject) {
+                            found = true;
+                        }
+                    }    
+                }
+                else if (MaintenanceTypeUse == true) {
+                    if (MaintenanceSubTypeUse == true) {
+                        if (HJItemUse == true) {
+                            if ($("#maintype_" + theid).val() == MaintenanceType && $("#mainsubtype_" + theid).val() == MaintenanceSubType && $("#HJItem_" + theid).val() == HJItem) {
+                                found = true;
+                            }
+                        }
+                        else {
+                            if ($("#maintype_" + theid).val() == MaintenanceType && $("#mainsubtype_" + theid).val() == MaintenanceSubType) {
+                                found = true;
+                            }
+                        }
+                    }
+                    else if (HJItemUse == true) {
+                        if ($("#maintype_" + theid).val() == MaintenanceType && $("#HJItem_" + theid).val() == HJItem) {
+                            found = true;
+                        }
+                    }
+                    else {
+                        if ($("#maintype_" + theid).val() == MaintenanceType) {
+                            found = true;
+                        }
+                    }    
+                }
+                else if (MaintenanceSubTypeUse == true) {
+                    if (HJItemUse == true) {
+                        if ($("#mainsubtype_" + theid).val() == MaintenanceSubType && $("#HJItem_" + theid).val() == HJItem) {
+                            found = true;
+                        }
+                    }
+                    else {
+                        if ($("#mainsubtype_" + theid).val() == MaintenanceSubType) {
+                            found = true;
+                        }
+                    }    
+                }
+                else if (HJItemUse == true) {
+                    if ($("#HJItem_" + theid).val() == HJItem) {
+                        found = true;
+                    }    
+                }
+                // COPY PASTE OVENFOR 4 GANGE :O: O : O og ændre
+                //if ($("#subproj_" + theid).val() == SubProject) {
+                //    found = true;
+                //}
+                //if ($("#maintype_" + theid).val() == MaintenanceType) {
+                //    found = true;
+                //}
+                //if ($("#mainsubtype_" + theid).val() == MaintenanceSubType) {
+                //    found = true;
+                //}
+                //if ($("#HJItem_" + theid).val() == HJItem) {
+                //    found = true;
+                //}
+                if (found == true) {
+                    if (self.is(":hidden") == true) {
+                        self.removeAttr('hidden');
+                    }
+                }
+                else {
+                    self.attr("hidden", 1);
+                }
+            });
+        }
+</script>
+}

@@ -1,0 +1,51 @@
+﻿@model MainOps.Models.ViewModels.ExportSamplesVM
+<p><a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to Main WaterSample Page")</a></p>
+<form asp-action="ExportSamples" asp-controller="WaterSampleTypes" method="post" target="_blank">
+
+    <table style="width:100%;">
+        <tr>
+            <td>
+                <label>@SharedLocalizer.GetLocalizedHtmlString("Start Date"):</label>
+            </td>
+            <td>
+                <input asp-for="starttime" type="text" class="date-picker" value="@DateTime.Now.AddDays(-3000)" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>@SharedLocalizer.GetLocalizedHtmlString("End Date"):</label>
+            </td>
+            <td>
+                <input asp-for="endtime" type="text" class="date-picker" value="@DateTime.Now" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>@SharedLocalizer.GetLocalizedHtmlString("Sample Place"):</label>
+            </td>
+            <td>
+                @Html.DropDownList("WaterSamplePlaceId", ViewData["WaterSamplePlaceId"] as IEnumerable<SelectListItem>, @SharedLocalizer.GetLocalizedHtmlString("All"), new { @class = "form-control" })
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <button class="btn-hoelscher" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Export")</button>
+            </td>
+        </tr>
+    </table>
+</form>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,33 @@
+﻿@model MainOps.Models.ViewModels.UploadDataSheetsVM
+@{
+    ViewData["Title"] = "UploadDataSheets";
+}
+@if (User.IsInRole("International"))
+{
+    <div style="width:100%;">
+        <form asp-action="MainMenu_HIH" asp-controller="TrackItems">
+            <button class="btn-hoelscher" style="width:100%;height:36px;">
+                @SharedLocalizer.GetLocalizedHtmlString("Back to Main Menu")
+            </button>
+        </form>
+    </div>
+}
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Upload Data Sheets")</h2>
+<form asp-action="UploadDataSheets" asp-controller="ItemTypes" method="post" enctype="multipart/form-data">
+    <table style="width:100%;">
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Choose Item")</td>
+            <td><select asp-for="id" class="form-control" asp-items="ViewBag.ItemTypeId"></select></td>
+        </tr>
+        <tr>
+            <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Upload Documents")</label></td>
+            <td><input type="file" name="files" multiple accept=".jpg,.jpeg,.pdf" style="width:100%;" /></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload")</button>
+            </td>
+        </tr>
+    </table>
+</form>
+

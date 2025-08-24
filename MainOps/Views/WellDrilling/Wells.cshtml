@@ -1,0 +1,97 @@
+﻿@model IEnumerable<MainOps.Models.Well>
+
+@{
+    ViewData["Title"] = "All Wells";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Wells")</h2>
+
+<p>
+    <big><big><big><a asp-action="DrillWell">@SharedLocalizer.GetLocalizedHtmlString("Drill New Well")</a></big></big></big>   
+</p>
+<table style="width:100%;table-layout:fixed;word-break:break-word;">
+    <thead>
+        <tr>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Project")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("SubProject")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Well Name")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Coordinates")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("DGU")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Well Type")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Start")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("End")
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Name)
+            </td>
+            <td>
+                @if (item.SubProjectId != null)
+                {
+                    @Html.DisplayFor(modelItem => item.SubProject.Name)
+                }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WellName)
+            </td>
+            <td>
+                @String.Format("({0},{1},{2})", item.Coord_x, item.Coord_y, item.Coord_z)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DGU_Number)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WellType.Type)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Drill_Date_Start)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Drill_Date_End)
+            </td>
+            <td>
+                <a asp-action="ContinueDrillWell" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Continue Drill Log")</a> |
+                <form asp-action="BoreProfile" asp-route-id="@item.Id" method="get">
+                    <select name="scale" id="scale">
+                        <option value="2.0">scale to 20cm</option>
+                        <option value="3.0" selected="selected">scale to 30cm</option>
+                        <option value="4.0">scale to 40cm</option>
+                        <option value="5.0">scale to 50cm</option>
+                    </select>
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Drill Profile")</button>
+                </form>
+                <a asp-action="Edit" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit Base Data")</a> |
+                @if (item.WellDrillingInstructionId != null)
+                {
+                    <a asp-action="GetDrillingInstructionPDF" asp-controller="WellDrilling" asp-route-id="@item.WellDrillingInstructionId" target="_blank">@SharedLocalizer.GetLocalizedHtmlString("Show Drilling Instruction")</a>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin"))
+                {
+                    <a asp-action="Delete" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Delete")</a>
+                }
+
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

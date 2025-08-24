@@ -1,0 +1,93 @@
+﻿@model MainOps.Models.Title
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>Title</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="TheTitle" class="control-label"></label>
+                <input asp-for="TheTitle" class="form-control" />
+                <span asp-validation-for="TheTitle" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="UpdateItems();"></select>
+                <span asp-validation-for="ProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ItemTypeId" class="control-label"></label>
+                <select id="ItemTypeId" asp-for="ItemTypeId" class="form-control" asp-items="ViewBag.ItemTypeId"></select>
+                <span asp-validation-for="ItemTypeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Worker" class="control-label"></label>
+                <input asp-for="Worker" class="form-control" />
+                <span asp-validation-for="Worker" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+       
+        function UpdateItems() {
+            var ProjectId = $('#ProjectId').val();
+            var itemTypeId = $('#ItemTypeId').val();
+            var url = '@Url.Action("GetItemsProject", "ItemTypes")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                    'type': "hours",
+                },
+                success: function (data) {
+                    var s = '';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["item_Type"] + ' : ' + data[prop]["boQnr"] + ' : ' + data[prop]["boQnr_Rental"] + '</option>';
+                    }
+                    $("#ItemTypeId").html(s);
+                    document.getElementById("ItemTypeId").style.width = "100%";
+                    var x = document.getElementById("ItemTypeId");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        if (x.options[i].value == itemTypeId) {
+                            x.options[i].selected = true;
+                        }
+                    }
+                }
+            });
+        }
+        
+        $(document).ready(function () {
+            $(function () {
+                UpdateItems();
+            });
+        });
+
+    </script>
+}
+
+
+
+

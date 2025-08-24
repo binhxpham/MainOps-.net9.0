@@ -1,0 +1,218 @@
+﻿@model IEnumerable<MainOps.Models.Meas>
+@inject UserManager<ApplicationUser> _userManager;
+<h2>@ViewData["Title"]</h2>
+
+<table>
+    <tr>
+        @if (User.IsInRole("Admin") || User.IsInRole("Guest") || User.IsInRole("MemberGuest") || User.IsInRole("DivisionAdmin") || User.IsInRole("Member"))
+        {
+            <td>
+                <form asp-controller="Meas" asp-action="exportData" method="get">
+                    <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Export Measurements")</button>
+                </form>
+            </td>
+            <td>
+                <form asp-controller="Meas" asp-action="ExportReport" method="get">
+                    <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Export Measurement Report")</button>
+                </form>
+            </td>
+        }
+
+        @if (!User.IsInRole("Guest"))
+        {
+            <td>
+                <form asp-controller="Meas" asp-action="Create" method="get">
+                    <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Create New Measurement")</button>
+                </form>
+            </td>
+        }
+        @if (User.IsInRole("Guest") && User.IsInRole("MemberGuest"))
+        {
+            <td>
+                <form asp-controller="Meas" asp-action="Create" method="get">
+                    <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Create New Measurement")</button>
+                </form>
+            </td>
+        }
+        @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin"))
+        {
+            <td>
+                <form asp-controller="Meas" asp-action="UploadDips" method="get">
+                    <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Upload Measurements")</button>
+                </form>
+            </td>
+        }
+        <td>
+            <form asp-controller="Meas" asp-action="Combsearch">
+                <div class="form-group">
+                    <div class="form-group">
+                        <label style="width:180px;">@SharedLocalizer.GetLocalizedHtmlString("Search Project:")</label>
+                        @Html.DropDownList("filterchoice", ViewData["filterchoices"] as SelectList, @SharedLocalizer.GetLocalizedHtmlString("All"), new { style = "width:200px" })
+                    </div>
+                    <div class="form-group">
+                        <label style="width:180px;">@SharedLocalizer.GetLocalizedHtmlString("Search Point:")</label>
+                        <input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoComplete","Meas")" />
+                    </div>
+                    <div class="form-group">
+                        <label style="width:180px;">@SharedLocalizer.GetLocalizedHtmlString("Search Start date")</label>
+                        <input type="datetime" class="date-picker" name="startDate" id="startDate" />
+                    </div>
+                    <div class="form-group">
+                        <label style="width:180px;">@SharedLocalizer.GetLocalizedHtmlString("Search End date")</label>
+                        <input type="datetime" class="date-picker" name="endDate" id="endDate" />
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn-hoelscher"><span class="glyphicon glyphicon-search"></span></button>
+                    </div>
+                </div>
+            </form>
+        </td>
+    </tr>
+</table>
+@{var nummeas = Model.Count();}
+@{ var numdays = Model.GroupBy(x => x.When.ToShortDateString()).Count();}
+<table>
+    <tr>
+        <td>
+            @SharedLocalizer.GetLocalizedHtmlString("Number of Measurements")
+        </td>
+        <td>
+            <input readonly="readonly" type="number" value="@nummeas" />
+        </td>
+        <td>
+            @SharedLocalizer.GetLocalizedHtmlString("Number of Measurement Days")
+        </td>
+        <td>
+            <input readonly="readonly" type="number" value="@numdays" />
+        </td>
+    </tr>
+</table>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.TheMeasurement))
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.TheComment.comment))
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.NewComment))
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.When))
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.MeasPoint))
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.MeasPoint.Project.Name))
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TheMeasurement)
+                </td>
+                <td>
+                    @if (item.TheComment != null)
+                    {
+                        <text>
+                        @Html.DisplayFor(modelItem => item.TheComment.comment)
+                        </text>
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NewComment)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.When)
+                </td>
+                @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin"))
+                {
+                    <td>
+                        <form asp-action="Details" asp-controller="MeasPoints" asp-route-id="@item.MeasPointId" method="get"><button class="btn-hoelscher">@Html.DisplayFor(modelItem => item.MeasPoint.Name)</button></form>
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MeasPoint.Name)
+                    </td>
+                }
+                <td>
+                    @Html.DisplayFor(modelItem => item.MeasPoint.Project.Name)
+                </td>
+                <td>
+                    <button type="button" class="btn-hoelscher" onclick="toggleManage(@item.Id)">@SharedLocalizer.GetLocalizedHtmlString("Manage Measurement")</button>
+                </td>
+                <td id="td_@item.Id" style="display:none;">
+                    @if (!User.IsInRole("Guest"))
+                    {
+                        <form asp-action="Details" asp-controller="Meas" asp-route-id="@item.Id" method="get"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Details")</button></form>
+                        <form asp-action="Edit" asp-controller="Meas" asp-route-id="@item.Id" method="get"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button></form>
+                        @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || (await _userManager.GetUserAsync(User)).full_name().Equals(item.DoneBy))
+                        {
+                            <form asp-action="Delete" asp-controller="Meas" asp-route-id="@item.Id" method="get"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button></form>
+                        }
+                    }
+                </td>
+                <td id="td2_@item.Id" style="display:none;">
+                    <form asp-action="ShowData" asp-controller="MeasPoints">
+                        <input type="hidden" id="theNameidx" name="theName" value="@item.MeasPoint.Name" />
+                        <input type="hidden" id="theididx" name="theid" value="@item.MeasPoint.Id" />
+                        <button type="submit">@SharedLocalizer.GetLocalizedHtmlString("Show data")</button>
+                    </form>
+                    @if (item.MeasPoint.MeasType.Type.ToLower().Equals("water meter"))
+                    {
+                        <form asp-action="ShowData_2" asp-controller="MeasPoints">
+                            <input type="hidden" id="theNameidx" name="theName" value="@item.MeasPoint.Name" />
+                            <input type="hidden" id="theididx" name="theid" value="@item.MeasPoint.Id" />
+                            <button type="submit">@SharedLocalizer.GetLocalizedHtmlString("Show data WM")</button>
+                        </form>
+                    }
+
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: 'dd-M-yy',
+                    controlType: 'select',
+                });
+
+            });
+        });
+        function toggleManage(theindex) {
+            var x = document.getElementById("td_" + theindex)
+            var x2 = document.getElementById("td2_" + theindex)
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+            if (x2.style.display === "none") {
+                x2.style.display = "block";
+            } else {
+                x2.style.display = "none";
+            }
+        }
+
+    </script>
+}

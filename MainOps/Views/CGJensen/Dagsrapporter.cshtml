@@ -1,0 +1,102 @@
+﻿@model IEnumerable<MainOps.Models.CGJClasses.Dagsrapport>
+
+@{
+    ViewData["Title"] = "Dagsrapporter";
+}
+
+<h2>Dagsrapporter</h2>
+
+<p>
+    <a asp-action="Create_Dagsrapport">Opret ny</a>
+</p>
+
+<form asp-action="Dagsrapporter_PDF" method="get" target="_blank">
+    <table>
+        <tr>
+            <td>Start dato</td>
+            <td><input type="datetime-local" name="startdate" id="startid" value="@DateTime.Now.AddDays(-7).Date.ToString("yyyy-MM-ddTHH:mm")" class="date-picker"></td>
+        </tr>
+        <tr>
+            <td>Slut dato</td>
+            <td><input type="datetime-local" name="enddate" id="endid" value="@DateTime.Now.Date.AddHours(23).AddMinutes(59).AddSeconds(59).ToString("yyyy-MM-ddTHH:mm")" class="date-picker"></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <button class="btn-hoelscher">Eksporter Rapporter</button>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.KontraktNr)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Kontraktnavn)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Dato)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UdarbjedetAf)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RapportNr)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KontraktNr)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Kontraktnavn)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Dato)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UdarbjedetAf)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RapportNr)
+                </td>
+                <td>
+                    <form asp-action="Edit_Dagsrapport" asp-route-id="@item.Id" method="get">
+                        <button class="btn-hoelscher">Rediger</button>
+                    </form>
+                    <form asp-action="Dagsrapport_PDF" asp-route-id="@item.Id" method="get" target="_blank">
+                        <button class="btn-hoelscher">Detaljer</button>
+                    </form>
+                    <form asp-action="Delete_Dagsrapport" asp-route-id="@item.Id" method="get">
+                        <button class="btn-hoelscher">Slet</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+                });
+            });
+        });
+    </script>
+}

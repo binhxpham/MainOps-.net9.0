@@ -1,0 +1,272 @@
+﻿@model MainOps.Models.AcidTreatment
+
+@{
+    var reflevel = Model.Ref_Level - Model.Water_level;
+}
+
+<table style="width:100%">
+    <tr>
+        <td><h2>@SharedLocalizer.GetLocalizedHtmlString("Acid Treatment Report")</h2></td>
+        <td colspan="2" align="right"><img src="~/images/Divisions/Photos/@Model.Project.DivisionId/@Model.Project.Division.LogoPath" width="151" height="66" /></td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.Project.Name)</b></td>
+        <td>@Html.DisplayFor(Model => Model.Project.Name)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.SubProjectId)</b></td>
+        <td>@Html.DisplayFor(Model => Model.SubProject.Name)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.Wellname)</b></td>
+        <td>@Html.DisplayFor(Model => Model.Wellname)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.Report_Date)</b></td>
+        <td>
+            @Html.DisplayFor(Model => Model.Report_Date)
+        </td>
+        <td></td>
+    </tr>
+
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.starttime)</b></td>
+        <td>
+            @Html.DisplayFor(Model => Model.starttime)
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.endtime)</b></td>
+        <td>
+            @Html.DisplayFor(Model => Model.endtime)
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.Water_Meter_Before)</b></td>
+        <td>@Html.DisplayFor(Model => Model.Water_Meter_Before)</td>
+        <td>m3</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.Water_Meter_After)</b></td>
+        <td>@Html.DisplayFor(Model => Model.Water_Meter_After)</td>
+        <td>m3</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.Totalm3)</b></td>
+        <td>@string.Format("{0:N2}", Model.Totalm3)</td>
+        <td>m3</td>
+    </tr>
+    @if (Model.TestData != null)
+    {
+        if (Model.TestData.Count > 0)
+        {
+            <tr>
+                <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.TestData.Last().Acid_m3_total)</b></td>
+                <td>@Html.DisplayFor(Model => Model.AcidTotalm3)</td>
+                <td>m3</td>
+            </tr>
+        }
+    }
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.Total_m3_acid_Manual)</b></td>
+        <td>@string.Format("{0:N2}", Model.Total_m3_acid_Manual)</td>
+        <td>m3</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.Ref_Level)</b></td>
+        <td>@string.Format("{0:N2}", Model.Ref_Level)</td>
+        <td>mDVR90</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.Water_level)</b></td>
+        <td>@Html.DisplayFor(Model => Model.Water_level)</td>
+        <td>m</td>
+    </tr>
+    <tr>
+        <td><b>@SharedLocalizer.GetLocalizedHtmlString("Water level in Reference")</b></td>
+        <td>@String.Format("{0:N2} ", reflevel)</td>
+        <td>mDVR90</td>
+    </tr>
+
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.Bottom_well)</b></td>
+        <td>@Html.DisplayFor(Model => Model.Bottom_well)</td>
+        <td>m</td>
+    </tr>
+    <tr>
+        <td><b>@SharedLocalizer.GetLocalizedHtmlString("Dosing %")</b></td>
+        <td>
+            @try
+            {
+                @String.Format("{0:N2}", (Model.AcidTotalm3 / (Model.TestData.OrderBy(x => x.TimeStamp).Last().m3_total - Model.TestData.OrderBy(x => x.TimeStamp).First().m3_total) * 100.0))
+            }
+            catch
+            {
+                <text>0.00 %</text>
+            }
+        </td>
+        <td>%</td>
+    </tr>
+    @*<tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.TestData.FirstOrDefault(x => x.Flow > 0).Set_Dosing_m3)</b></td>
+            <td>@Html.DisplayFor(Model => Model.TestData.FirstOrDefault(x => x.Flow > 0).Set_Dosing_m3)</td>
+            <td>m3</td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.TestData.FirstOrDefault(x => x.Flow > 0).Set_Dosing_Percent)</b></td>
+            <td>@Html.DisplayFor(Model => Model.TestData.FirstOrDefault(x => x.Flow > 0).Set_Dosing_Percent)</td>
+            <td>%</td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.TestData.FirstOrDefault(x => x.Flow > 0).Set_Dosing_Time)</b></td>
+            <td>@Html.DisplayFor(Model => Model.TestData.FirstOrDefault(x => x.Flow > 0).Set_Dosing_Time)</td>
+            <td>s</td>
+        </tr>*@
+
+
+</table>
+
+
+<div class="container">
+    <div id="chart1"></div>
+</div>
+@if (User.IsInRole("Admin") || User.IsInRole("Manager"))
+{
+    <form asp-action="DeleteDataPoint" asp-controller="TrackItems" method="post">
+        <button class="btn-hoelscher">
+            @SharedLocalizer.GetLocalizedHtmlString("Delete selected point");
+        </button>
+        <input type="number" hidden="hidden" value="0" name="selectedRow" id="selectedRow" />
+        <input type="number" hidden="hidden" value="0" name="selectedCol" id="selectedCol" />
+        <input hidden="hidden" id="theid" name="id" value="@Model.Id" />
+    </form>
+}
+<br>
+<div>
+    <form asp-action="AcidTreatmentReport_PDF" asp-controller="AcidTreatments" asp-route-id="@Model.Id" method="post" target="_blank" onsubmit="saveimage();">
+        <input hidden="hidden" id="imageid" name="theimage" />
+        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Get PDF")</button>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.load('visualization', '1.0', { 'packages': ['corechart'], 'callback': drawChart });
+        var chart;
+        var data;
+        var option = {
+            title: "Time Series Data Graph",
+            width: 1000,
+            height: 750,
+            interpolateNulls: true,
+            legend: { position: 'top' },
+            vAxes: {
+                0: { title: "Water m3"},
+                1: { title: "Acid m3", }
+            },
+            chartArea: {
+                height: '80%', width: '85%', left: 100,
+                backgroundColor: { stroke: "gray", strokeWidth: 1 },
+            },
+            series: calculateSeries(),
+            explorer: {
+                actions: ['dragToZoom', 'rightClickToReset'],
+                axis: 'both',
+                keepInBounds: true,
+                maxZoomIn: 20.0
+            },
+            pointSize: 8
+        };
+        function calculateSeries() {
+            var series = {};
+
+            series[0] = {
+                type: "line",
+                targetAxisIndex: 0
+            };
+            series[1] = {
+                type: "line",
+                targetAxisIndex: 1
+            };
+            //series[2] = {
+            //    type: "line",
+            //    targetAxisIndex: 1
+            //};
+            //series[3] = {
+            //    type: "line",
+            //    targetAxisIndex: 0
+            //};
+            //series[4] = {
+            //    type: "line",
+            //    targetAxisIndex: 0
+            //};
+            //series[5] = {
+            //    type: "line",
+            //    targetAxisIndex: 1
+            //};
+            return series;
+        }
+        function selectHandler() {
+            var selectedItem = chart.getSelection()[0];
+            if (selectedItem) {
+                document.getElementById("selectedCol").value = selectedItem.column;
+                document.getElementById("selectedRow").value = selectedItem.row;
+            }
+        }
+        function drawChart()
+        {
+            chart = new google.visualization.LineChart(document.getElementById('chart1'));
+            google.visualization.events.addListener(chart, 'select', selectHandler);
+            data = new google.visualization.DataTable();
+            data.addColumn('datetime', 'time');
+            /*data.addColumn('number', 'Pressure');*/
+            data.addColumn('number', 'Water m3');
+            data.addColumn('number', 'Acid m3');
+            /*data.addColumn('number', 'Flow Rate');*/
+            var theId = $('#theid').val();
+            var url = '@Url.Action("JsonDataAcidTreatment", "AcidTreatments")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'id': theId },
+                success: function (d) {
+                    for (var prop in d) {
+                        data.addRow
+                            ([
+                                new Date(d[prop]["timeStamp"]),
+                               /* d[prop]["pressure"],*/
+                                d[prop]["m3_total"],
+                                d[prop]["acid_m3_total"],
+                               /* d[prop]["flow"]*/
+                            ]);
+                    }
+                    chart.draw(data, option);
+                    saveImage();
+                }
+            });
+        }
+        function saveImage() {
+            $('#imageid').val(chart.getImageURI());
+        }
+
+
+
+
+
+
+
+
+
+
+    </script>
+}

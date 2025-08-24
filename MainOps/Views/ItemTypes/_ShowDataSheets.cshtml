@@ -1,0 +1,29 @@
+﻿@model MainOps.Models.ViewModels.FileListVM
+<table>
+    @foreach (var fil in Model.pictures)
+    {
+        string[] parts = fil.Split("\\");
+    <tr>
+        @if (fil.EndsWith(".pdf"))
+        {
+        <td>@parts[parts.Length - 1]</td>
+            <td>
+                <form asp-action="ShowFilePdf" method="get" target="_blank">
+                    <input id="path" name="path" type="text" value="@fil" hidden="hidden" />
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                </form>
+            </td>
+        }
+        else
+        {
+            <td>@parts[parts.Length - 1]</td>
+            <td>
+            <form asp-action="ShowFileJpg" method="get" target="_blank">
+                <input id="path" name="path" type="text" value="@fil" hidden="hidden" />
+                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+            </form>
+            </td>
+        }
+    </tr>
+    }
+ </table>

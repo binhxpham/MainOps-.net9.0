@@ -1,0 +1,329 @@
+﻿@model MainOps.Models.PumptestingVM
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Create")</h2>
+
+<h4>@SharedLocalizer.GetLocalizedHtmlString("Pump Functionality Test")</h4>
+<hr />
+<form asp-action="Create" id="theform" method="post" enctype="multipart/form-data" onsubmit="retrieveData(event);">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input asp-for="test.Signature" value="" hidden="hidden" />
+    <table style="width:100%;table-layout:fixed;word-break:break-word;">
+        <tr style="border-bottom: 2px dotted blue;">
+            <td colspan="3"><h3>@SharedLocalizer.GetLocalizedHtmlString("The Pump")</h3></td>
+        </tr>
+        <tr>
+            <td colspan="2"><label asp-for="test.TimeStamp" class="control-label"></label></td>
+            <td><input type="datetime" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd")" asp-for="test.TimeStamp" style="width:100%;height:36px;" /><span asp-validation-for="test.TimeStamp" class="text-danger"></span></td>
+        </tr>
+        <tr>
+            <td colspan="2"><label asp-for="test.PumpType" class="control-label"></label></td>
+            <td>
+                <select asp-for="test.PumpType" class="form-control" style="width:100%;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose")</option>
+                    <option value="0.75kW">0.75kW</option>
+                    <option value="1.00kW">1.00kW</option>
+                    <option value="2.20kW">2.20kW</option>
+                    <option value="3.00kW">3.00kW</option>
+                    <option value="5.00kW">5.00kW</option>
+                </select>
+                <span asp-validation-for="test.PumpType" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><label asp-for="test.PumpID" class="control-label"></label></td>
+            <td><input asp-for="test.PumpID" class="form-control" style="width:100%;" /><span asp-validation-for="test.PumpID" class="text-danger"></span></td>
+        </tr>
+        <tr style="border-bottom: 2px dotted blue;">
+            <td colspan="3"><h3>@SharedLocalizer.GetLocalizedHtmlString("1. Visual Check")</h3></td>
+        </tr>
+        <tr>
+            <td colspan="2"><label asp-for="test.CableLength" class="control-label"></label></td>
+            <td><input asp-for="test.CableLength" type="number" min="0" max="300" step="0.1" class="form-control" style="width:100%;" /><span asp-validation-for="test.PumpID" class="text-danger"></span></td>
+        </tr>
+        <tr>
+            <td colspan="2"><label asp-for="test.CableDamaged" class="control-label"></label></td>
+            <td>
+                <select asp-for="test.CableDamaged" class="form-control" onchange="ShowHideStuff();" style="width:100%;">
+                    <option value="" selected>@SharedLocalizer.GetLocalizedHtmlString("Choose")</option>
+                    <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                    <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                </select>
+                <span asp-validation-for="test.CableDamaged" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr id="whichcabledamagedtr">
+            <td colspan="2"><label asp-for="test.WhichCableDamaged" class="control-label"></label></td>
+            <td>
+                <select asp-for="test.WhichCableDamaged" class="form-control" style="width:100%;">
+                    <option value="" selected="selected">@SharedLocalizer.GetLocalizedHtmlString("Pick Blue or Black")</option>
+                    <option value="Blue">@SharedLocalizer.GetLocalizedHtmlString("Blue")</option>
+                    <option value="Black">@SharedLocalizer.GetLocalizedHtmlString("Black")</option>
+                </select>
+                <span asp-validation-for="test.WhichCableDamaged" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr id="canbefixedtr">
+            <td colspan="2"><label asp-for="test.CanBeFixed" class="control-label"></label></td>
+            <td>
+                <select asp-for="test.CanBeFixed" class="form-control" style="width:100%;">
+                    <option value="" selected>@SharedLocalizer.GetLocalizedHtmlString("Choose")</option>
+                    <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                    <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                </select>
+                <span asp-validation-for="test.CanBeFixed" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr id="completeexchangetr">
+            <td colspan="2"><label asp-for="test.CompleteExchange" class="control-label"></label></td>
+            <td>
+                <select asp-for="test.CompleteExchange" class="form-control" style="width:100%;">
+                    <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                    <option value="false" selected>@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                </select>
+                <span asp-validation-for="test.CompleteExchange" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><label asp-for="test.CableExtended" class="control-label"></label></td>
+            <td>
+                <select asp-for="test.CableExtended" class="form-control" onchange="ShowHideCableExtended();" style="width:100%;">
+                    <option value="" selected>@SharedLocalizer.GetLocalizedHtmlString("Choose")</option>
+                    <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                    <option value="false" selected>@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                </select>
+                <span asp-validation-for="test.CableExtended" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">@SharedLocalizer.GetLocalizedHtmlString("#Use only submersible cable joint kits")</td>
+        </tr>
+        <tr id="cableextendedmtr">
+            <td colspan="2"><label asp-for="test.CableExtendedm" class="control-label"></label></td>
+            <td><input asp-for="test.CableExtendedm" type="number" step="1" min="0" max="100" value="0" style="width:100%;" /></td>
+        </tr>
+        <tr style="border-bottom: 2px dotted blue;">
+            <td colspan="3"><h3>@SharedLocalizer.GetLocalizedHtmlString("2. Insulation testing")</h3></td>
+        </tr>
+        <tr>
+            <td colspan="2"><label asp-for="test.InsulationTested" class="control-label"></label></td>
+            <td>
+                <select asp-for="test.InsulationTested" class="form-control" style="width:100%;">
+                    <option value="" selected>@SharedLocalizer.GetLocalizedHtmlString("Choose")</option>
+                    <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                    <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                </select>
+                <span asp-validation-for="test.InsulationTested" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><label asp-for="test.InsulationOK" class="control-label"></label></td>
+            <td>
+                <select asp-for="test.InsulationOK" class="form-control" style="width:100%;">
+                    <option value="" selected>@SharedLocalizer.GetLocalizedHtmlString("Choose")</option>
+                    <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                    <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                </select>
+                <span asp-validation-for="test.InsulationOK" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">@SharedLocalizer.GetLocalizedHtmlString("If no, exchange the cable")</td>
+        </tr>
+        <tr style="border-bottom: 2px dotted blue;">
+            <td colspan="3"><h3>@SharedLocalizer.GetLocalizedHtmlString("3. Testing the pump")</h3></td>
+        </tr>
+        <tr>
+            <td colspan="2"><label asp-for="test.AllCableSubmerged" class="control-label"></label></td>
+            <td>
+                <select asp-for="test.AllCableSubmerged" class="form-control" style="width:100%;">
+                    <option value="" selected>@SharedLocalizer.GetLocalizedHtmlString("Choose")</option>
+                    <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                    <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                </select>
+                <span asp-validation-for="test.AllCableSubmerged" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Pressure(bar)")</td>
+            <td style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Flow(m3/h)")</td>
+            <td style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Test duration(minutes)")</td>
+        </tr>
+        @for (int i = 0; i < Model.data.Count; i++)
+        {
+            <tr>
+                <td><input asp-for="@Model.data[i].Pressure" type="number" step="1" min="0" max="50" style="width:100%;" /></td>
+                <td><input asp-for="@Model.data[i].Flow" type="number" step="0.1" min="0" max="300" style="width:100%;" /></td>
+                <td><input asp-for="@Model.data[i].Duration" type="number" step="1" min="0" max="60" style="width:100%;" /></td>
+            </tr>
+        }
+        <tr>
+            <td colspan="2"><b>@SharedLocalizer.GetLocalizedHtmlString("Upload photos")</b></td>
+            <td><input name="files" type="file" multiple accept=".jpg,.jpeg,.png" /></td>
+        </tr>
+        <tr>
+            <td colspan="3"><b>@SharedLocalizer.GetLocalizedHtmlString("Signature")</b></td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <canvas width="330" height="150" id="signature" style="border:1px solid blue;"></canvas>
+                <span asp-validation-for="test.Signature" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td style="width:45%">
+                <button type="button" id="accept" class="btn-hoelscher" style="width:100%;height:40px;">@SharedLocalizer.GetLocalizedHtmlString("Accept signature")</button>
+            </td>
+            <td style="width:45%">
+                <button type="button" id="clear" class="btn-hoelscher" style="width:100%;height:40px;">@SharedLocalizer.GetLocalizedHtmlString("Clear signature")</button>
+                <input type="text" id="signaturedata" hidden="hidden" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <img width="80" height="60" id="savetarget" hidden="hidden" style="border:1px solid black">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><button class="btn-hoelscher" style="width:100%;height:50px;">@SharedLocalizer.GetLocalizedHtmlString("Submit")</button></td>
+        </tr>
+    </table>
+</form>
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/mvc/3.0/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/js/signature_pad.min.js"></script>
+    <script type="text/javascript">
+        var pad = null;
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-1:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+                $('.date-picker').datepicker("setDate", new Date("dd-MM-yy"));
+                var canvas = document.querySelector("#signature");
+                pad = new SignaturePad(canvas);
+                $('#accept').click(function () {
+                    var data = pad.toDataURL();
+                    $('#savetarget').attr('src', data);
+                    var base64signature = data.split(',')[1];
+                    $('#signaturedata').val(base64signature);
+                    });
+                    $('#clear').click(function () {
+                        pad.clear();
+                    })
+                HideStart();
+            })
+        });
+        
+        
+        function retrieveData(e) {
+            var posting = true;
+            var s1 = document.getElementById("test_Signature");
+            var signature = "";
+            signature = document.getElementById("signaturedata").value;
+            s1.value = signature;
+            if (signature == "") {
+                posting = false;
+                e.preventDefault();
+                alert("Please sign the report!");
+            }
+            var amount = document.getElementById("test_CableLength").value;
+            if (amount == "") {
+                posting = false;
+                e.preventDefault();
+            }
+            else if (amount < 10) {
+                var extended = document.getElementById("test_CableExtended").value;
+                if (extended == "" || extended == "false") {
+                    posting = false;
+                    e.preventDefault();
+                    alert("Cable needs to be extended if cable length less than 10 meters");
+                }
+                
+            }
+            var damaged = $("#test_CableDamaged").val();
+            if (damaged == "false") {
+                $("#test_CanBeFixed").val("false");
+            }
+            if ($("#theform").valid() == false) {
+                posting = false;
+            }
+            if (posting == true) {
+                StartSpinner();
+            }
+        }
+
+        function HideStart() {
+            $("#whichcabledamagedtr").attr("hidden", 1);
+            $("#canbefixedtr").attr("hidden", 1);
+            $("#completeexchangetr").attr("hidden", 1);
+            $("#cableextendedmtr").attr("hidden", 1);
+            $("#test_CableDamaged").val("");
+            $("#test_InsulationTested").val("");
+            $("#test_InsulationOK").val("");
+            $("#test_CanBeFixed").val("");
+            $("#test_CableExtended").val("");
+            $("#test_AllCableSubmerged").val("");
+        }
+        function ShowHideCableExtended() {
+            var extended = $("#test_CableExtended").val();
+            if (extended == "true") {
+                if ($("#cableextendedmtr").is(":hidden") == true) {
+                    $("#cableextendedmtr").removeAttr('hidden');
+                }
+            }
+            else {
+                if ($("#cableextendedmtr").is(":hidden") != true) {
+                    $("#cableextendedmtr").attr("hidden", 1);
+                    $("#cableextendedmtr").val(1);
+                }
+            }
+        }
+        function ShowHideStuff() {
+            var damaged = $("#test_CableDamaged").val();
+            if (damaged == "true") {
+                if ($("#whichcabledamagedtr").is(":hidden") == true) {
+                    $("#whichcabledamagedtr").removeAttr('hidden');
+                }
+                if ($("#canbefixedtr").is(":hidden") == true) {
+                    $("#canbefixedtr").removeAttr('hidden');
+                }
+                if ($("#completeexchangetr").is(":hidden") == true) {
+                    $("#completeexchangetr").removeAttr('hidden');
+                }
+            }
+            else {
+                if ($("#whichcabledamagedtr").is(":hidden") != true) {
+                    $("#whichcabledamagedtr").attr("hidden", 1);
+                    $("#whichcabledamagedtr").val(1);
+                }
+                if ($("#canbefixedtr").is(":hidden") != true) {
+                    $("#canbefixedtr").attr("hidden", 1);
+                    $("#canbefixedtr").val(1);
+                }
+                if ($("#completeexchangetr").is(":hidden") != true) {
+                    $("#completeexchangetr").attr("hidden", 1);
+                    $("#completeexchangetr").val(1);
+                }
+
+            }
+        }
+        
+
+    </script>
+}

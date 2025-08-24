@@ -1,0 +1,215 @@
+﻿@model IEnumerable<MainOps.Models.SummaryReport>
+
+@{
+    ViewData["Title"] = "Index";
+}
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Daily Summary Report Status")</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Report_Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsSignedByHJ)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SignatureHJDateTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsSignedByClient)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SignatureClientDateTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SentToClient)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ClientEmail)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            @if (item.IsSignedByClient && item.IsSignedByHJ)
+            {
+                <tr style="background-color:green;">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Report_Date)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IsSignedByHJ)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SignatureHJDateTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IsSignedByClient)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SignatureClientDateTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SentToClient)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ClientEmail)
+                    </td>
+                    <td>
+                        <form asp-action="Details" asp-controller="SummaryReports" asp-route-id="@item.Id" target="_blank" method="get">
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Original")</button>
+                        </form>
+                    </td>
+                        @if (!item.IsSignedByClient)
+                        {
+                            <td>
+                            <form asp-action="UploadSignedReport" asp-controller="SummaryReports" asp-route-id="@item.Id" target="_blank" enctype="multipart/form-data" method="post">
+                                <table>
+                                    <tr>
+                                        <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label></td>
+                                        <td><input type="file" name="file" accept=".pdf" /></td>
+                                    </tr>
+                                    <tr><td colspan="2"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload Signed Report")</button></td></tr>
+                                </table>                   
+                            </form>
+                            </td>
+
+                        }
+                        @if (item.IsSignedByClient)
+                        {
+                            <td>
+                                <form asp-action="SeeClientSignedReport" asp-controller="SummaryReports" asp-route-id="@item.Id" target="_blank" method="get">
+                                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Client Signed Report")</button>
+                                </form>
+                            </td>
+                        }                        
+                        </tr>
+                    }
+                    else if (item.IsSignedByHJ)
+                    {
+                <tr style="background-color:yellow;">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Report_Date)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IsSignedByHJ)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SignatureHJDateTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IsSignedByClient)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SignatureClientDateTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SentToClient)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ClientEmail)
+                    </td>
+                    <td>
+                        <form asp-action="Details" asp-controller="SummaryReports" asp-route-id="@item.Id" target="_blank" method="get">
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Original")</button>
+                        </form>
+                    </td>
+                    @if (!item.IsSignedByClient)
+                    {
+                        <td>
+                            <form asp-action="UploadSignedReport" asp-controller="SummaryReports" asp-route-id="@item.Id" target="_blank" enctype="multipart/form-data" method="post">
+                                <table>
+                                    <tr>
+                                        <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label></td>
+                                        <td><input type="file" name="file" accept=".pdf" /></td>
+                                    </tr>
+                                    <tr><td colspan="2"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload Signed Report")</button></td></tr>
+                                </table>
+                            </form>
+                        </td>
+
+                    }
+                    @if (item.IsSignedByClient)
+                    {
+                        <td>
+                            <form asp-action="SeeClientSignedReport" asp-controller="SummaryReports" asp-route-id="@item.Id" target="_blank" method="get">
+                                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Client Signed Report")</button>
+                            </form>
+                        </td>
+                    }
+                </tr>
+                    }
+                    else
+                    {
+                <tr style="background-color:red;">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Report_Date)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IsSignedByHJ)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SignatureHJDateTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.IsSignedByClient)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SignatureClientDateTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SentToClient)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ClientEmail)
+                    </td>
+                    <td>
+                        <form asp-action="Details" asp-controller="SummaryReports" asp-route-id="@item.Id" target="_blank" method="get">
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Original")</button>
+                        </form>
+                    </td>
+                    @if (!item.IsSignedByClient)
+                    {
+                        <td>
+                            <form asp-action="UploadSignedReport" asp-controller="SummaryReports" asp-route-id="@item.Id" target="_blank" enctype="multipart/form-data" method="post">
+                                <table>
+                                    <tr>
+                                        <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label></td>
+                                        <td><input type="file" name="file" accept=".pdf" /></td>
+                                    </tr>
+                                    <tr><td colspan="2"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload Signed Report")</button></td></tr>
+                                </table>
+                            </form>
+                        </td>
+
+                    }
+                    @if (item.IsSignedByClient)
+                    {
+                        <td>
+                            <form asp-action="SeeClientSignedReport" asp-controller="SummaryReports" asp-route-id="@item.Id" target="_blank" method="get">
+                                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Client Signed Report")</button>
+                            </form>
+                        </td>
+                    }
+                </tr>
+                    }
+
+        }
+    </tbody>
+</table>

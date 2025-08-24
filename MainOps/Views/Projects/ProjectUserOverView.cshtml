@@ -1,0 +1,110 @@
+﻿@model MainOps.Models.ProjectUserOverview
+@using Microsoft.AspNetCore.Mvc.Localization
+@using Microsoft.AspNetCore.Localization
+@{
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+}
+<title>@SharedLocalizer.GetLocalizedHtmlString("Project User Overview")</title>
+
+<div style="font-size:10px;">
+
+    <form asp-action="ProjectUserOverView" asp-controller="Projects" method="get">
+        <table style="width:100%;table-layout:fixed;">
+            <tr>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Start Date")</td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("End Date")</td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Project")</td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("User")</td>
+            </tr>
+            <tr>
+                <td><input name="StartDate" type="datetime-local" style="width:100%;" /></td>
+                <td><input name="EndDate" type="datetime-local" style="width:100%;" /></td>
+                <td><select name="ProjectId" asp-items="ViewBag.ProjectId" value="@Model.ProjectFilterId" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Project")</option></select></td>
+                <td><select name="UserId" asp-items="ViewBag.UserId" value="@Model.EmployeeFilterId" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select User")</option></select></td>
+            </tr>
+            <tr><td><button type="submit"><span class="glyphicon glyphicon-search"></span></button></td></tr>
+        </table>
+
+        <hr />
+        <hr />
+
+        <table style="width:100%;table-layout:fixed;word-break:break-word;padding:3px;">
+            <thead><tr><td><h2>@SharedLocalizer.GetLocalizedHtmlString("Data")</h2></td></tr></thead>
+            <tbody>
+
+                @foreach (var project in Model.Projects.Where(x => Model.UsersWithDailyReports.SelectMany(y => y.DailyReports).Select(m => m.ProjectId).Contains(x.Id)))
+                {
+                    <tr>
+                        <td id="@project.Id" onclick="OpenCloseProject(@project.Id);" style="cursor:pointer;">@project.Name</td>
+                    </tr>
+                    <tr id="@String.Concat(project.Id,"_tab")" hidden="hidden">
+                        <td>
+                            <table style="width: 100%; table-layout: fixed; padding: 3px;">
+                                @foreach (var user in Model.UsersWithDailyReports.Where(x => x.DailyReports.Exists(d => d.ProjectId.Equals(project.Id))))
+                                {
+                                    <tr style="border:1px dashed blue;">
+                                        <td style="width:8%;vertical-align:top;">
+                                            <table style="width:100%;">
+                                                <tr><td colspan="2"> <b>@user.User.full_name()</b></td></tr>
+                                                <tr><td>@SharedLocalizer.GetLocalizedHtmlString("Total Hours"):</td><td>@user.DailyReports.Where(x => x.ProjectId.Equals(project.Id)).Sum(y => y.Hours.TotalSeconds / 3600.0).ToString("0.00")</td></tr>
+                                            </table>
+                                        </td>
+                                        <td style="width:94%;">
+                                            <table style="width: 100%; table-layout: fixed; padding: 3px;">
+                                                @foreach (var year in user.DailyReports.Where(x => x.ProjectId.Equals(project.Id)).Select(x => x.Report_Date).GroupBy(y => y.Year))
+                                                {
+                                                    DateTime dt3 = new DateTime(new DateTime(year.Key, 12, 31, 0, 0, 0, requestCulture.RequestCulture.Culture.Calendar).Ticks);
+                                                    <tr style="border:2px solid black;color:blue;">
+                                                        <td colspan="6"><b>@year.Key </b> @SharedLocalizer.GetLocalizedHtmlString("Total Hours"): @user.DailyReports.Where(x => x.ProjectId.Equals(project.Id) && x.Report_Date.Year.Equals(year.Key)).Sum(y => y.Hours.TotalSeconds / 3600.0).ToString("0.00")</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2">@SharedLocalizer.GetLocalizedHtmlString("Weeks:")</td>
+                                                        @for (int i = 1; i <= requestCulture.RequestCulture.Culture.Calendar.GetWeekOfYear(dt3, System.Globalization.CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday); i++)
+                                                        {
+                                                            <td style="border-left:1px solid black;">@i</td>
+                                                        }
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="2">@SharedLocalizer.GetLocalizedHtmlString("Hours:")</td>
+                                                        @for (int i = 1; i <= requestCulture.RequestCulture.Culture.Calendar.GetWeekOfYear(dt3, System.Globalization.CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday); i++)
+                                                        {
+                                                            var thehours = user.DailyReports.Where(x => x.ProjectId.Equals(project.Id) && x.Report_Date.Year.Equals(year.Key) && requestCulture.RequestCulture.Culture.Calendar.GetWeekOfYear(x.Report_Date, System.Globalization.CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday).Equals(i)).Sum(y => y.Hours.TotalSeconds / 3600.0);
+                                                    <td style="border-left:1px solid black;">
+                                                        <b>
+                                                            @if (thehours > 0)
+                                                            {
+                                                                <text>@thehours.ToString("0.0")</text>
+                                                            }
+                                                            else
+                                                            {
+                                                                <text>0</text>
+                                                            }
+                                                        </b>
+                                                    </td>
+                                                                                        }
+                                                    </tr>
+                                                }
+                                            </table>
+                                        </td>
+                                    </tr>
+
+                                }
+                            </table>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        
+        function OpenCloseProject(id) {
+            $("#" + id + "_tab").toggle();
+        }
+        
+    </script>
+}

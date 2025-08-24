@@ -1,0 +1,75 @@
+﻿/*
+    The Terms on the SHippingDetails page
+*/
+.termsx {
+    overflow-y: scroll;
+    height: 150px;
+    width: 100%;
+    border: 1px solid #DDD;
+    padding: 10px;
+}
+/*
+    The Buttons on the Indexpage
+*/
+.btn-Index {
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    width: 300px;
+    background-color: #f7f4f4;
+    color: #0086bc;
+    margin: 5px;
+    font-size: 25px;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+}
+.btn-Index:hover {
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+/*
+    Parts for the Cart
+*/
+#main-content .container {
+    padding-top: 3%;
+    padding-bottom: 3%;
+}
+.verticalScrollbar {
+    overflow-y: auto;
+    height: 500px;
+}
+.form-size {
+    height: 20px;
+}
+/*
+    Design for all buttons
+*/
+.btn-hoelscher {
+    border: 1px solid #bbb;
+    border-radius: 4px;
+    background-color: #f7f4f4;
+    color: #0086bc;
+    text-align: center;
+    margin: 5px
+}
+    .btn-hoelscher:hover {
+        box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+/*
+    Design for the More Information Page
+*/
+.moreInformation {
+    padding: 10px;
+    list-style-type: none;
+    height: 115px;
+}
+/*
+    Design for the Contactperson Personalcard
+*/
+.contactPerson {
+    border: 1px solid #0086bc;
+    border-radius: 4px;
+    width: 400px;
+}
+.contactPersonTitle {
+    color: #0086bc;
+}

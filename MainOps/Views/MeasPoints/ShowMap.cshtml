@@ -1,0 +1,543 @@
+﻿@model IEnumerable<MainOps.Models.MeasPoint>
+<head>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM&sensor=false&libraries=places"></script>
+</head>
+<table style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th>Your Latitude</th>
+            <th>Your Longitude</th>
+            <th>Your Accuracy</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td><input id="mylat" style="width:100%;" /></td>
+            <td><input id="mylng" style="width:100%;" /></td>
+            <td><input id="myacc" style="width:100%;" /></td>
+        </tr>
+        <tr>
+            <td colspan="3"><input value="@ViewData["avg_lati"]" hidden="hidden" /><input value="@ViewData["avg_longi"]" hidden="hidden" /></td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+
+<table style="width:100%;table-layout:fixed;">
+    <tr>
+        <td>
+            @SharedLocalizer.GetLocalizedHtmlString("Distance between rabbits(m):")
+        </td>
+        <td>
+            <input id="distance" type="number" value="0" size="20" style="width:100%;" />
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @SharedLocalizer.GetLocalizedHtmlString("tracking YOU on map:")
+        </td>
+        <td>
+            <input type="checkbox" checked="checked" onchange="this.checked ? this.value = true : this.value = false;" style="width:100%;" />
+        </td>
+
+    </tr>
+    <tr>
+        <td>@SharedLocalizer.GetLocalizedHtmlString("Choose Project")</td>
+        <td><select id="ProjectId" asp-items="ViewBag.ProjectId" onchange="FilterProject();" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Project")</option></select></td>
+    </tr>
+    <tr>
+        <td>@SharedLocalizer.GetLocalizedHtmlString("Choose Well")</td>
+        <td><select id="MeasPointId" onchange="FilterMP();" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select MeasPoint")</option></select></td>
+    </tr>
+    <tr>
+        <td><label>@SharedLocalizer.GetLocalizedHtmlString("Search Unique ID:")</label></td>
+        <td><input type="text" onchange="SearchUniqueID(this.value);" style="width:100%;" /></td>
+    </tr>
+    <tr>
+        <td clspan="2">@SharedLocalizer.GetLocalizedHtmlString("Choose Groups")</td>
+    </tr>
+
+
+    @foreach (var MonitorType in Model.Select(x => x.MonitorTypeId).Distinct())
+    {
+        <tr>
+            <td><label>@Model.First(x => x.MonitorTypeId.Equals(MonitorType)).MonitorType.MonitorTypeName</label></td>
+            <td><input id="@String.Concat(Model.First(x => x.MonitorTypeId.Equals(MonitorType)).MonitorType.MonitorTypeName,"_",MonitorType.ToString())" type="checkbox" onchange="OnOff(this);" checked="checked" style="width:100%;" /></td>
+        </tr>
+    }
+
+
+</table>                                       
+<br />
+@*<input id="locationTextField" class="controls" type="text" style="width:200px;" placeholder="Find...">*@
+<br />
+<div id="documentinfo" style="width:100%;"></div>
+@*<input id="TheRadius" type="number" value="1.0" />km*@
+<div id="myDiv" style="width:100%;height:600px;"></div>
+<div id="allprojectdocuments" style="width:100%;"></div>
+<div id="alldocumentsinfo" style="width:100%;"></div>
+@section Scripts {
+    <script type="text/javascript">
+        var marker1;
+        var marker2;
+        var myposmarker;
+        var markers = [];
+        var isfound = false;
+        var tracking = true;
+
+        var myLatLng = { lat: 55.312440, lng: 11.491625 };
+        var mapOptions = {
+            center: myLatLng,
+            zoom: 18,
+            minZoom: 4,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        var map = new google.maps.Map(document.getElementById("myDiv"), mapOptions);
+        if (navigator.geolocation) {
+            id = navigator.geolocation.watchPosition(function (position) {
+                myLat = position.coords.latitude;
+                myLng = position.coords.longitude;
+                myAcc = position.coords.accuracy;
+                $("#mylat").val(myLat);
+                $("#mylng").val(myLng);
+                $("#myacc").val(myAcc);
+                if (isfound == false) {
+                    getPos(myLat, myLng, myAcc);
+                }
+                if (isfound == true && tracking == true) {
+                    if (myAcc < 7.0) {
+                        marker.setPosition({ lat: myLat, lng: myLng });
+                    }
+                }
+
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                        alert("error permission denied");
+                    }
+
+                }, { maximumAge: 10000, timeout: 8000, enableHighAccuracy: true });
+        }
+        function SearchUniqueID(texttosearch) {
+            if (texttosearch.length >= 4) {
+                for (i = 0; i < markers.length; i++) {
+                    if (markers[i].title.toLowerCase().includes(texttosearch.toLowerCase()) && markers[i].getVisible() == true) {
+                        var latLng = markers[i].getPosition();
+                        map.setZoom(18);
+                        map.panTo(latLng);
+                    }
+                }
+            }
+        }
+        function FilterProject() {
+            var ProjectId = $("#ProjectId").val();
+            if (ProjectId == "") {
+                for (i = 0; i < markers.length; i++) {
+                        markers[i].setVisible(true);
+
+                }
+            }
+            else {
+                for (i = 0; i < markers.length; i++) {
+                    if (markers[i].project == ProjectId) {
+                        markers[i].setVisible(true);
+                    }
+                    else {
+                        markers[i].setVisible(false);
+                    }
+                }
+            }
+            FillMeasPoints();
+
+        }
+        function FilterMP() {
+            var MeasPointId = $("#MeasPointId").val();
+            if (MeasPointId == "") {
+                FilterProject();
+            }
+            else {
+                for (i = 0; i < markers.length; i++) {
+                    if (markers[i].MeasPoint == MeasPointId) {
+                        markers[i].setVisible(true);
+                        map.setCenter(markers[i].position);
+                    }
+                    else {
+                        markers[i].setVisible(false);
+                    }
+                }
+            }
+
+        }
+        function FillMeasPoints() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetMeasPointsProject", "MeasPoints")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                },
+                success: function (data) {
+                    var s = '<option value="">Select MeasPoint</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                    }
+                    $("#MeasPointId").html(s);
+                    document.getElementById("MeasPointId").style.width = "100%";
+                }
+                       
+                    
+            });
+        }
+        function OnOff(elem) {
+            var MonitorTypeId = elem.id.split("_")[1];
+            if (elem.checked == true) {
+                for (i = 0; i < markers.length; i++) {
+                    if (markers[i].MonitorTypeId == MonitorTypeId) {
+                        markers[i].setVisible(true);
+                    }
+
+                }
+            }
+            else {
+                for (i = 0; i < markers.length; i++) {
+                    if (markers[i].MonitorTypeId == MonitorTypeId) {
+                        markers[i].setVisible(false);
+                    }
+
+                }
+            }
+        }
+
+    function setPos(lat, lng) {
+        var initialLocation = new google.maps.LatLng(lat, lng);
+        if (myposmarker == null) {
+            myposmarker = new google.maps.Marker({
+                map: map,
+                position: { lat: lat, lng: lng },
+                title: "You",
+
+            });
+            marker1 = new google.maps.Marker({
+                map: map,
+                position: { lat: lat, lng: lng },
+                title: "Position 1",
+                draggable: true,
+
+            });
+            marker2 = new google.maps.Marker({
+                map: map,
+                position: { lat: lat, lng: lng },
+                title: "Position 2",
+                draggable: true,
+            });
+            marker1.setIcon({
+                url: 'https://drive.google.com/u/0/uc?id=1RE8IE31GsWLpFWrtTJLquSu3SfYGX30N&export=download',
+                scaledSize: new google.maps.Size(40, 40)
+            })
+            marker2.setIcon({
+                url: 'https://drive.google.com/u/0/uc?id=1RE8IE31GsWLpFWrtTJLquSu3SfYGX30N&export=download',
+                scaledSize: new google.maps.Size(40, 40)
+            })
+            myposmarker.setIcon({
+                url: 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
+                scaledSize: new google.maps.Size(70, 70)
+            })
+
+            myposmarker['infowindow'] = new google.maps.InfoWindow({
+                content: 'Your Position!'
+            });
+            marker1['infowindow'] = new google.maps.InfoWindow({
+                content: 'Position 1 for distance!'
+            });
+            marker2['infowindow'] = new google.maps.InfoWindow({
+                content: 'Position 2 for distance'
+            });
+            myposmarker.setMap(map);
+            marker1.setMap(map);
+            marker2.setMap(map);
+            @if(ViewData["avg_lati"] != null)
+                {
+                    <text>
+                    map.setCenter(new google.maps.LatLng(@ViewData["avg_lati"], @ViewData["avg_longi"]));
+                    </text>
+                }
+                else
+                {
+                    <text>
+                        map.setCenter(new google.maps.LatLng(lat, lng));
+                    </text>
+                }
+
+        }
+        google.maps.event.addListener(myposmarker, 'click', function () {
+            this['infowindow'].open(map, this);
+        });
+        google.maps.event.addListener(marker1, 'dragend', function () {
+            getDistBetweenTwoPlaces();
+        });
+        google.maps.event.addListener(marker2, 'dragend', function () {
+            getDistBetweenTwoPlaces();
+        });
+        google.maps.event.addListener(marker1, 'click', function () {
+            this['infowindow'].open(map, this);
+        });
+        google.maps.event.addListener(marker2, 'click', function () {
+            this['infowindow'].open(map, this);
+        });
+                    @if(ViewData["avg_lati"] != null)
+                {
+                    <text>
+                    map.setCenter(new google.maps.LatLng(@ViewData["avg_lati"], @ViewData["avg_longi"]));
+                    </text>
+                }
+                else
+                {
+                    <text>
+        map.setCenter(initialLocation);
+                    </text>
+                }
+
+    }
+    function getPos(lat, lng, acc) {
+        $("#accuracy").val(acc);
+        $("#latinput").val(lat);
+        $("#longinput").val(lng);
+        if (!isfound) {
+            setPos(lat, lng);
+            isfound = true;
+        }
+        
+    }
+    function rad(x) {
+        return x * Math.PI / 180;
+    };
+    function getDistBetweenTwoPlaces() {
+        var p1 = marker1.getPosition();
+        var p2 = marker2.getPosition();
+        var R = 6378137; // Earth’s mean radius in meter
+        var dLat = rad(p2.lat() - p1.lat());
+        var dLong = rad(p2.lng() - p1.lng());
+        var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(rad(p1.lat())) * Math.cos(rad(p2.lat())) *
+            Math.sin(dLong / 2) * Math.sin(dLong / 2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        var d = R * c;
+        $("#distance").val(d);
+    }
+    $(document).ready(function () {
+        DisplayGoogleMap();
+     });
+    function FindMarkersWithinRadius(lati,longi) {
+            $.ajax({
+                type: 'post',
+                url: '@Url.Action("GetMeasPInRadius","MeasPoints")',
+                data: {
+                    'radi': document.getElementById('TheRadius').value,
+                    'lati': lati,
+                    'longi': longi
+                },
+                success: function (output) {
+                    $('#alldocumentsinfo').html(output);
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+        }
+    function FindGenerator_TestsWithinRadius(lati, longi) {
+        $.ajax({
+                type: 'post',
+                url: '@Url.Action("GetGeneratorTestsInRadius","Projects")',
+                data: {
+                    'radi': document.getElementById('TheRadius').value,
+                    'lati': lati,
+                    'longi': longi
+                },
+                success: function (output) {
+                    $('#allGeneratorTestsdocuments').html(output);
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+    }
+    function FindWTP_TestsWithinRadius(lati, longi) {
+        $.ajax({
+                type: 'post',
+                url: '@Url.Action("GetWTPTestsInRadius","Projects")',
+                data: {
+                    'radi': document.getElementById('TheRadius').value,
+                    'lati': lati,
+                    'longi': longi
+                },
+                success: function (output) {
+                    $('#allWTPTestsdocuments').html(output);
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+    }
+    function FindWell_InstallationsWithinRadius(lati, longi) {
+        $.ajax({
+                type: 'post',
+                url: '@Url.Action("GetWellInstallsInRadius","Projects")',
+                data: {
+                    'radi': document.getElementById('TheRadius').value,
+                    'lati': lati,
+                    'longi': longi
+                },
+                success: function (output) {
+                    $('#allWellInstallationsdocuments').html(output);
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+    }
+    function FindWell_DevelopmentsWithinRadius(lati, longi) {
+        $.ajax({
+                type: 'post',
+                url: '@Url.Action("GetWellDevelopmentInRadius","Projects")',
+                data: {
+                    'radi': document.getElementById('TheRadius').value,
+                    'lati': lati,
+                    'longi': longi
+                },
+                success: function (output) {
+                    $('#allWellDevelopmentsdocuments').html(output);
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+    }
+        function FindProjectsWithinRadius(lati,longi) {
+            $.ajax({
+                type: 'post',
+                url: '@Url.Action("GetProjectInRadius","Projects")',
+                data: {
+                    'radi': document.getElementById('TheRadius').value,
+                    'lati': lati,
+                    'longi': longi
+                },
+                success: function (output) {
+                    $('#allprojectdocuments').html(output);
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+        }
+        function DisplayDocuments(index) {
+            $.ajax({
+                type: 'post',
+                url: '@Url.Action("GetDocuments","MeasPoints")',
+                data: {
+                    'id': index
+                },
+                success: function (output) {
+                    $('#documentinfo').html(output);
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+        }
+    function DisplayGoogleMap() {
+
+            @foreach(var item in Model){
+
+             <text>
+                var marker = new google.maps.Marker({
+                  map: map,
+                  position: { lat: @item.Lati, lng: @item.Longi },
+                    title: "@item.Name",
+                    project: "@item.ProjectId",
+                    MonitorTypeId: "@item.MonitorTypeId",
+                    MeasTypeId: "@item.MeasTypeId",
+                    MeasPoint: "@item.Id"
+                });
+
+            marker['infowindow'] = new google.maps.InfoWindow({
+                content: '@item.Project.Name' + ' : ' + '@item.Name : <a href="@Url.Action("DetailsTotal", "MeasPoints")?id=' + '@item.Id' + '" target="_blank">Details</a>"'
+            });
+
+            google.maps.event.addListener(marker, 'click', function () {
+                this['infowindow'].open(map, this);
+                DisplayDocuments(@item.Id);
+            });
+
+            @if (item.MonitorType.MonitorTypeName == "Pumping Well")
+            {
+                if (item.LoggerActive)
+                {
+                     <text>
+                marker.setIcon('https://maps.google.com/mapfiles/ms/icons/blue-dot.png')
+                    </text>
+                }
+                else
+                {
+                    <text>
+                marker.setIcon('https://maps.google.com/mapfiles/ms/icons/blue.png')
+                    </text>
+                }
+            }
+            else if (item.MonitorType.MonitorTypeName == "Reinfiltration Well")
+            {
+                if (item.LoggerActive)
+                {
+                    <text>
+            marker.setIcon('https://maps.google.com/mapfiles/ms/icons/green-dot.png')
+                </text>
+                }
+                else
+                {
+                <text>
+                marker.setIcon('https://maps.google.com/mapfiles/ms/icons/green.png')
+                </text>
+                }
+
+            }
+            else if (item.MonitorType.MonitorTypeName == "Monitoring Well" || item.MonitorType.MonitorTypeName == "Master Well" || item.MonitorType.MonitorTypeName == "Monitoring Well - shaft")
+            {
+                if (item.LoggerActive)
+                {
+                    <text>
+                    marker.setIcon('https://maps.google.com/mapfiles/ms/icons/red-dot.png')
+                </text>
+                }
+                else
+                {
+                    <text>
+                    marker.setIcon('https://maps.google.com/mapfiles/ms/icons/red.png')
+                </text>
+                }
+
+            }
+            else if(item.MonitorType.MonitorTypeName == "Manometer")
+            {
+                <text>
+            marker.setIcon('https://maps.google.com/mapfiles/ms/icons/purple-dot.png')
+                </text>
+            }
+            else{
+                <text>
+                    marker.setIcon('https://maps.google.com/mapfiles/ms/icons/purple-dot.png')
+                </text>
+            }
+
+        marker.setMap(map);
+        markers.push(marker);
+            </text>
+            }
+
+
+        }
+
+    </script>
+}

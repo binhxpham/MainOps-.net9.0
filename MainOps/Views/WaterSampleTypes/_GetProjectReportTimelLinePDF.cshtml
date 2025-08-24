@@ -1,0 +1,307 @@
+﻿@model IEnumerable<MainOps.Models.WaterSampleMeasVM>
+@{
+    Layout = null;
+   
+}
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("Water Analysis Report")</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Footer.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Different.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Sidebarmenu.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/PicturesHeader.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/RandomCss.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/RandomCss.min.css" asp-append-version="true">
+    <style>
+        thead, tfoot {
+            display: table-row-group
+        }
+
+        table {
+            font-size: 9px;
+        }
+
+        td, th {
+            padding: 0;
+        }
+
+            th > span {
+                -ms-writing-mode: tb-rl;
+                -webkit-writing-mode: vertical-rl;
+                writing-mode: vertical-rl;
+                transform: rotate(180deg);
+                white-space: nowrap;
+                display: table;
+                border-spacing: 0;
+                font-size: 8px;
+            }
+
+        .jammer {
+            -ms-writing-mode: tb-rl;
+            -webkit-writing-mode: vertical-rl;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            white-space: nowrap;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 8px;
+        }
+    </style>
+</head>
+<body>
+    @{ var colcount = Model.Select(x => x.WaterSampleType).Distinct().Count() + 5;
+        var imagecolcount = 10;
+        var namecolcount = 30;
+        var middlecount = colcount - namecolcount - imagecolcount;
+        
+    }
+    @foreach (var group in Model.GroupBy(x => x.WaterSamplePlace.Name))
+    {
+        <div style="margin-top:0px;border:1px solid black;height:25px;"><table style="width:100%;height:100%;table-layout:fixed;"><tr><td style="background-color: lightyellow;width:20%;">no limit</td><td style="background-color: orangered; width: 20%; color: white;">max-limit</td><td style="background-color: aquamarine; width: 20%;">no breach</td><td style="background-color: mediumpurple; width: 20%; color: white;">Mean limit</td><td style="background-color: black; color: white; width: 20%;">Max + Mean Limit</td></tr></table></div>
+
+        colcount = Model.Where(x => x.WaterSamplePlace.Name.Equals(group.Key)).Select(x => x.WaterSampleType).Distinct().Count() + 5;
+        imagecolcount = 10;
+        namecolcount = 30;
+        middlecount = colcount - namecolcount - imagecolcount;
+        <table border="1" style="width:100%;table-layout:fixed;break-inside:avoid !important">
+            <thead>
+                <tr style="border-bottom: 2px solid black; height: 74px;">
+                    <td colspan="@namecolcount" style="font-size:20px;border-right:0;">
+                        <b>
+                            @if (Model.FirstOrDefault() != null)
+                            {
+                                @String.Concat(Model.First().Project.Name, " - ", group.Key)
+                            }
+                        </b>
+                    </td>
+                    <td colspan="@middlecount" style="border-right:0;border-left:0;"></td>
+                    <td colspan="@imagecolcount" style="border-left:0;"><img src="~/images/Divisions/Photos/@Model.First().WaterSamplePlace.Project.DivisionId.ToString()/@Model.First().WaterSamplePlace.Project.Division.LogoPath" width="156" /></td>
+                </tr>
+                <tr style="border-bottom: 2px solid black; height: 40px; background-color: antiquewhite; ">
+                    @*<th class="rotate"><div><span>@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Dato))</span></div></th>*@
+                    <th style="text-align:center;">
+                        <span>@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Dato))</span>
+                    </th>
+                    <th>
+                        <span>@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.DateLabReceived))</span>
+                    </th>
+                    <th>
+                        <span>
+                            @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.DateReporting))
+                        </span>
+                    </th>
+                    <th>
+                        <span>
+                            @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.DateNextSample))
+                        </span>
+                    </th>
+                    <th>
+                        <span>
+                            @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.SampleTakerName))
+                        </span>
+                    </th>
+                    @foreach (var item in Model.Where(x => x.WaterSamplePlace.Name.Equals(group.Key)).Select(x => x.WaterSampleType).Distinct())
+                    {
+                        <th>
+                            <span>
+                                @Html.DisplayFor(modelItem => item.Komponent)
+                            </span>
+                        </th>
+                    }
+
+                </tr>
+                <tr style="border-bottom: 2px solid black; height: 40px; background-color: antiquewhite; ">
+                    <th style="text-align:center;">
+
+                    </th>
+                    <th>
+                        <span></span>
+                    </th>
+                    <th>
+                        <span>
+
+                        </span>
+                    </th>
+                    <th>
+                        <span>
+
+                        </span>
+                    </th>
+                    <th>
+                        <span>
+
+                        </span>
+                    </th>
+                    @foreach (var item in Model.Where(x => x.WaterSamplePlace.Name.Equals(group.Key)).Select(x => x.WaterSampleType).Distinct())
+                    {
+                        <th>
+                            <span>
+                                @Html.DisplayFor(modelItem => item.Enhed)
+                            </span>
+                        </th>
+                    }
+                </tr>
+                <tr style="height:40px !important;">
+                    <th colspan="5">  @SharedLocalizer.GetLocalizedHtmlString("Limits")</th>
+                    @foreach (var item in Model.Where(x => x.WaterSamplePlace.Name.Equals(group.Key)).Select(x => x.WaterSampleType).Distinct())
+                    {
+                        var measure = Model.Where(x => x.WaterSamplePlace.Name.Equals(group.Key)).FirstOrDefault(x => x.WaterSampleType.Equals(item) && x.WaterSamplePlace.Name.Equals(group.Key));
+                        if (measure != null)
+                        {
+                            <th>
+                                <div class="jammer" style="float:left;">
+                                    @if (measure.theLimit != null)
+                                    {
+                                        @measure.theLimit
+                                    }
+                                    else
+                                    {
+                                        <text>N/A</text>
+                                    }
+
+                                </div>
+                            </th>
+                        }
+                        else
+                        {
+                            <th><div class="jammer" style="float:left;">N/A</div></th>
+                        }
+
+
+                    }
+                </tr>
+
+            </thead>
+            <tbody>
+                @{ int testsubjectnr = 1;}
+                @foreach (DateTime d in Model.Where(x => x.WaterSamplePlace.Name.Equals(group.Key)).Select(x => x.Dato.Date).Distinct())
+                {
+                    testsubjectnr = 1;
+                    <tr style="height:60px;">
+
+                        @foreach (var item in Model.Where(x => x.WaterSamplePlace.Name.Equals(group.Key)).Select(x => x.WaterSampleType).Distinct())
+                        {
+                            var measure = Model.Where(x => x.WaterSamplePlace.Name.Equals(group.Key)).FirstOrDefault(x => x.WaterSampleType.Equals(item) && x.Dato.Date.Equals(d.Date) && x.WaterSamplePlace.Name.Equals(group.Key));
+                            if (measure != null)
+                            {
+                                if (testsubjectnr == 1)
+                                {
+                                    <td><span class="jammer">@measure.Dato.ToString("yyyy-MM-dd")</span></td>
+                                    <td><span class="jammer">@measure.DateLabReceived.ToString("yyyy-MM-dd")</span></td>
+                                    @if (measure.DateReporting != null)
+                                    {
+                                        <td><span class="jammer">@Convert.ToDateTime(measure.DateReporting).Date.ToString("yyyy-MM-dd")</span></td>
+                                    }
+                                    else
+                                    {
+                                        <td></td>
+                                    }
+                                    @if (measure.DateNextSample != null)
+                                    {
+                                        <td><span class="jammer">@Convert.ToDateTime(measure.DateNextSample).Date.ToString("yyyy-MM-dd")</span></td>
+                                    }
+                                    else
+                                    {
+                                        <td></td>
+                                    }
+
+                                    <td><span class="jammer">@measure.SampleTakerName</span></td>
+                                    @if (measure.holdslimit == 0) //no limit set
+                                    {
+                                        <td style="background-color:lightyellow;"><span class="jammer">@measure.value</span></td>
+                                    }
+                                    else if (measure.holdslimit == 1) //max limit fine, no other limits broken
+                                    {
+                                        <td style="background-color:aquamarine;"><span class="jammer">@measure.value</span></td>
+                                    }
+                                    else if (measure.holdslimit == 2) // max limit broken
+                                    {
+                                        <td style="background-color:orangered;"><span class="jammer">@measure.value</span></td>
+                                    }
+                                    else if (measure.holdslimit == 3) // max limit fine, mean limit broken
+                                    {
+                                        <td style="background-color:mediumpurple;"><span class="jammer">@measure.value</span></td>
+                                    }
+                                    else if (measure.holdslimit == 4) // max limit broken, mean limit broken
+                                    {
+                                        <td style="background-color:black;color:white"><span class="jammer">@measure.value</span></td>
+                                    }
+                                    testsubjectnr += 1;
+                                }
+                                else
+                                {
+                                    @if (measure.holdslimit == 0)
+                                    {
+                                        <td style="background-color:lightyellow;"><span class="jammer">@measure.value</span></td>
+                                    }
+                                    else if (measure.holdslimit == 1)
+                                    {
+                                        <td style="background-color:aquamarine;"><span class="jammer">@measure.value</span></td>
+                                    }
+                                    else if (measure.holdslimit == 2) // max limit broken
+                                    {
+                                        <td style="background-color:orangered;"><span class="jammer">@measure.value</span></td>
+                                    }
+                                    else if (measure.holdslimit == 3) // max limit fine, mean limit broken
+                                    {
+                                        <td style="background-color:mediumpurple;"><span class="jammer">@measure.value</span></td>
+                                    }
+                                    else if (measure.holdslimit == 4) // max limit broken, mean limit broken
+                                    {
+                                        <td style="background-color:black;color:white"><span class="jammer">@measure.value</span></td>
+                                    }
+                                    @*else
+                                        {
+                                            <td style="background-color:orangered;"><span class="jammer">@measure.value</span></td>
+                                        }*@
+                                    testsubjectnr += 1;
+                                }
+                            }
+                            else
+                            {
+                                if (testsubjectnr == 1)
+                                {
+                                    measure = Model.Where(x => x.WaterSamplePlace.Name.Equals(group.Key)).FirstOrDefault(x => x.Dato.Date.Equals(d.Date) && x.WaterSamplePlace.Name.Equals(group.Key));
+                                    <td><span class="jammer">@measure.Dato.ToString("yyyy-MM-dd")</span></td>
+                                    <td><span class="jammer">@measure.DateLabReceived.ToString("yyyy-MM-dd")</span></td>
+                                    @if (measure.DateReporting != null)
+                                    {
+                                        <td><span class="jammer">@Convert.ToDateTime(measure.DateReporting).Date.ToString("yyyy-MM-dd")</span></td>
+                                    }
+                                    else
+                                    {
+                                        <td></td>
+                                    }
+                                    @if (measure.DateNextSample != null)
+                                    {
+                                        <td><span class="jammer">@Convert.ToDateTime(measure.DateNextSample).Date.ToString("yyyy-MM-dd")</span></td>
+                                    }
+                                    else
+                                    {
+                                        <td></td>
+                                    }
+
+                                    <td><span class="jammer">@measure.SampleTakerName</span></td>
+                                }
+                                else
+                                {
+                                    <td></td>
+                                }
+                                testsubjectnr += 1;
+                            }
+                        }
+                    </tr>
+                }
+
+            </tbody>
+        </table>
+        <div style="page-break-after:always!important;"></div>
+    }
+</body>
+
+
+</html>

@@ -1,0 +1,321 @@
+﻿@model IEnumerable<MainOps.Models.Install>
+@*<head>
+        <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>*@
+@{
+    ViewData["Title"] = "Installations";
+}
+@inject UserManager<ApplicationUser> _userManager;
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Installations")</h2>
+<form asp-controller="TrackItems" asp-action="ExportInstall" method="post">
+    <table>
+        <tr>
+            <td>
+                @SharedLocalizer.GetLocalizedHtmlString("Export to csv")
+            </td>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Project"):</label></td>
+            <td>
+                <select id="ProjectId" name="ProjectId" class="form-control" asp-items="ViewBag.ProjectId">
+                    <option value="@null">@SharedLocalizer.GetLocalizedHtmlString("All")</option>
+                </select>
+            </td>
+            <td>
+                <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Export")</button>
+            </td>
+        </tr>
+    </table>
+</form>
+<form asp-controller="TrackItems" asp-action="CombsearchInstall">
+    <table>
+        <tr>
+            <td>
+                <label>@SharedLocalizer.GetLocalizedHtmlString("Installation Item / BoQ nr"):</label>
+            </td>
+            <td>
+                @Html.DropDownList("filterchoice", ViewData["ItemTypeId"] as IEnumerable<SelectListItem>, @SharedLocalizer.GetLocalizedHtmlString("All"), new { @id = "ItemTypeId", @class = "form-control" })
+            </td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Project"):</label></td>
+            <td>
+                <select id="ProjectId2" name="filterchoice2" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillItems();">
+                    <option value="@null">@SharedLocalizer.GetLocalizedHtmlString("All")</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoCompleteInstall","TrackItems")" /></td>
+            <td>
+                <button type="submit" class="btn-hoelscher">
+                    <span class="glyphicon glyphicon-search"></span>
+                </button>
+            </td>
+        </tr>
+    </table>
+</form>
+<div id="showwellpointdiv">
+    <button class="btn-hoelscher" onclick="ShowWellPoints();">Show/Hide Wellpoints</button>
+</div>
+@if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+{
+<div id="greengas" hidden="hidden">
+    <form asp-action="AddSandToHorizontalDrains" asp-controller="Installs">
+        <button class="btn-hoelscher">Add Sand to all drains</button>
+    </form>
+    <form asp-action="RemoveSandFromHorizontalDrains" asp-controller="Installs">
+        <button class="btn-hoelscher">Remove Sand from all drains</button>
+    </form>
+</div>
+}
+<table style="width:100%;table-layout:fixed;word-break:break-word;">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemType.Project.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UniqueID)
+
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Location)
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Text")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Installed")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("DeInstalled")
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Total Amount Installed")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Total Amount De-Installed")
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th>@Html.DisplayNameFor(model => model.DoneBy)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+
+
+            @if (!item.ItemTypeId.Equals(1782))
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Name)
+                        @if (item.SubProjectId != null)
+                        {
+                            <text> - @item.SubProject.Name</text>
+                        }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ItemType.Item_Type):@Html.DisplayFor(modelItem => item.ItemType.BoQnr)
+                    </td>
+                    <td>
+                        <button type="button" class="btn-hoelscher" onclick="GetBillableActivities(@item.Id);">
+                            @Html.DisplayFor(modelItem => item.UniqueID)
+                        </button>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Location)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Install_Text)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.isInstalled)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DeinstallDate)
+                    </td>
+                    <td>
+                        @String.Format("{0:N2} ", item.Amount)
+                    </td>
+                    <td>@String.Format("{0:N2} ", Model.Where(x => x.ItemTypeId.Equals(item.ItemTypeId)).Sum(x => x.Amount))</td>
+                    <td>@String.Format("{0:N2} ", Model.Where(x => x.ItemTypeId.Equals(item.ItemTypeId) && x.isInstalled.Equals(false)).Sum(x => x.Amount))</td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TimeStamp)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelITem => item.DoneBy)
+                    </td>
+                    <td>
+                        @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager") || (await _userManager.GetUserAsync(User)).full_name().Equals(item.DoneBy))
+                        {
+                            <form asp-action="Edit_Install" asp-route-id="@item.Id" method="get" target="_blank">
+                                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                            </form>
+                        }
+
+                        <form asp-controller="TrackItems" asp-action="Details_Install" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Details")</button>
+                        </form>
+                        @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+                        {
+                            <form asp-action="Delete_Install" asp-route-id="@item.Id" method="post">
+                                <button class="btn-hoelscher" onclick="return confirm('do you really want to delet this item?')">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button>
+                            </form>
+                            if (item.isInstalled.Equals(true))
+                            {
+                                <form asp-action="DeInstallItem" asp-route-id="@item.Id" method="get">
+                                    <button class="btn-hoelscher" onclick="return confirm('do you really want to deinstall this item?')">@SharedLocalizer.GetLocalizedHtmlString("DeInstall")</button>
+                                </form>
+                            }
+                            <form asp-action="AddArrival" asp-controller="Installs" asp-route-id="@item.Id" method="post">
+                                <button class="btn-hoelscher" onclick="return confirm('Are you sure you need to add this arrival?')">@SharedLocalizer.GetLocalizedHtmlString("Add Arrival")</button>
+                            </form>
+                            <form asp-action="UpdateInstallLocation" asp-controller="Installs" asp-route-id="@item.Id" method="post" target="_blank">
+                                <button class="btn-hoelscher" onclick="return confirm('Are you sure you need to update location?')">@SharedLocalizer.GetLocalizedHtmlString("Update Location")</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+            else
+            {
+                <tr class="hiddenwpline">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Name)
+                        @if (item.SubProjectId != null)
+                        {
+                            <text> - @item.SubProject.Name</text>
+                        }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ItemType.Item_Type):@Html.DisplayFor(modelItem => item.ItemType.BoQnr)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UniqueID)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Location)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Install_Text)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.isInstalled)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DeinstallDate)
+                    </td>
+                    <td>
+                        @String.Format("{0:N2} ", item.Amount)
+                    </td>
+                    <td>@String.Format("{0:N2} ", Model.Where(x => x.ItemTypeId.Equals(item.ItemTypeId)).Sum(x => x.Amount))</td>
+                    <td>@String.Format("{0:N2} ", Model.Where(x => x.ItemTypeId.Equals(item.ItemTypeId) && x.isInstalled.Equals(false)).Sum(x => x.Amount))</td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TimeStamp)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelITem => item.DoneBy)
+                    </td>
+                    <td>
+                        @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager") || (await _userManager.GetUserAsync(User)).full_name().Equals(item.DoneBy))
+                        {
+                            <form asp-action="Edit_Install" asp-route-id="@item.Id" method="get" target="_blank">
+                                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                            </form>
+                        }
+
+                        <form asp-controller="TrackItems" asp-action="Details_Install" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Details")</button>
+                        </form>
+                        @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+                        {
+                            <form asp-action="Delete_Install" asp-route-id="@item.Id" method="post">
+                                <button class="btn-hoelscher" onclick="confirm('do you really want to delet this item?')">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button>
+                            </form>
+                            if (item.isInstalled.Equals(true))
+                            {
+                                <form asp-action="DeInstallItem" asp-route-id="@item.Id" method="get">
+                                    <button class="btn-hoelscher" onclick="confirm('do you really want to deinstall this item?')">@SharedLocalizer.GetLocalizedHtmlString("DeInstall")</button>
+                                </form>
+                            }
+                            <form asp-action="AddArrival" asp-controller="Installs" asp-route-id="@item.Id" method="post">
+                                <button class="btn-hoelscher" onclick="confirm('Are you sure you need to add this arrival?')">@SharedLocalizer.GetLocalizedHtmlString("Add Arrival")</button>
+                            </form>
+                            <form asp-action="UpdateInstallLocation" asp-controller="Installs" asp-route-id="@item.Id" method="post" target="_blank">
+                                <button class="btn-hoelscher" onclick="confirm('Are you sure you need to update location?')">@SharedLocalizer.GetLocalizedHtmlString("Update Location")</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+@if (User.IsInRole("Admin"))
+{
+    <form asp-action="UploadSurveyorCoords" method="get" asp-controller="TrackItems">
+        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload Coordinates")</button>
+    </form>
+}
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+    var lang = $("#requestCulture_RequestCulture_UICulture_Name").val();
+        function ShowWellPoints() {
+            $(".hiddenwpline").toggle();
+        }
+        function FillItems() {
+            var ProjectId = $('#ProjectId2').val();
+            var url = '@Url.Action("GetItemsProject", "ItemTypes")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                    'type' : "installedit"
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select</option>';
+                    if (lang == "de-DE") {
+                        s = '<option value="">Bitte auswählen</option>';
+                    }
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["item_Type"] + '</option>';
+                    }
+                    $("#ItemTypeId").html(s);
+                    document.getElementById("ItemTypeId").style.width = "100%";
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+    }
+    function GetBillableActivities(index) {
+            var url = '@Url.Action("BilledActivities", "Installs")';
+            $.ajax({
+            type: 'GET',
+            url: url,
+            data: { "id" : index },
+            contentType: 'application/html;charset=utf-8',
+            dataType: 'html',
+            success: function (data) {
+                var thepartial = $("#billableContent").html(data);
+                OpenBillableModal();
+            }
+          });
+        }
+        $(document).ready(function () {
+            FillItems();
+        })
+    </script>
+}

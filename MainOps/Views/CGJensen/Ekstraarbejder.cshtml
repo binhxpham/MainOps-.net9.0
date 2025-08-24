@@ -1,0 +1,52 @@
+﻿@model IEnumerable<MainOps.Models.CGJClasses.EA>
+
+@{
+    ViewData["Title"] = "Ekstraarbejder";
+}
+
+<h2>Ekstraarbejder</h2>
+
+<p>
+    <a asp-action="Create_EA">Opret Ny</a>
+</p>
+<p>
+    <a asp-action="CGJensenMainMenu">Tilbage</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.EAnr)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Opgave)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Sagsnummer)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.EAnr)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Opgave)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Sagsnummer)
+            </td>
+            <td>
+                <a asp-action="Edit_EA" asp-route-id="@item.Id">Rediger</a>
+                <a asp-action="Delete_EA" asp-route-id="@item.Id">Slet</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<p>
+    <a asp-action="CGJensenMainMenu">Tilbage</a>
+</p>

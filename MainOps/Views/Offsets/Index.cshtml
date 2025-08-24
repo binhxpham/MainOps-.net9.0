@@ -1,0 +1,79 @@
+﻿@model IEnumerable<MainOps.Models.Offset>
+
+<h2>@ViewData["Title"]</h2>
+@if (User.IsInRole("Admin") || User.IsInRole("Member") || User.IsInRole("DivisionAdmin"))
+{
+    <div>
+        <form asp-action="Create" method="get">
+            <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Create New Offset")</button>
+        </form>
+    </div>
+    <form asp-action="combsearch" asp-controller="Offsets">
+        <div class="form-group">
+            <label style="width:180px;">@SharedLocalizer.GetLocalizedHtmlString("Search Project:")</label>
+            @Html.DropDownList("filterchoice", ViewData["filterchoices"] as SelectList, @SharedLocalizer.GetLocalizedHtmlString("All"), new { style = "width:200px" })
+        </div>
+        <div class="form-group">
+            <label style="width:180px;">@SharedLocalizer.GetLocalizedHtmlString("Search Point:")</label>
+            <input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoComplete","Offsets")" />
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn-hoelscher"><span class="glyphicon glyphicon-search"></span></button>
+        </div>
+    </form>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.offset))
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.measpoint.Project.Name))
+            </th>
+
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.measpoint))
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.starttime))
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.offset)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelitem => item.measpoint.Project.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.measpoint.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.starttime)
+                </td>
+                <td>
+                    @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Member"))
+                    {
+                        <form asp-action="PipeCut" asp-controller="Offsets" asp-route-id="@item.Id" method="get"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Cut/Extend The Pipe")</button></form>
+                        <form asp-action="Edit" asp-controller="Offsets" asp-route-id="@item.Id" method="get"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button></form>
+
+                    }
+                </td>
+                <td>
+                    @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin")) { 
+                    
+                    <form asp-action="Delete" asp-controller="Offsets" asp-route-id="@item.Id" method="get"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button></form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

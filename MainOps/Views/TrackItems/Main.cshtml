@@ -1,0 +1,469 @@
+﻿@model MainOps.Models.TrackItem
+<head>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM&sensor=false&libraries=places"></script>
+</head>
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Details")</h2>
+<div class="row">
+    <div class="col-xs-12">
+        <table>
+            <tr>
+                <td>
+                    @if (!Model.Packed)
+                    {
+                        <form asp-action="PackItem" asp-controller="TrackItems" asp-route-id="@Model.Id" method="get">
+                            <button class="btn-hoelscher" style="width:200px;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Pack Item")</button>
+                        </form>
+                    }
+                </td>
+                <td>
+                    @if (!Model.Sent)
+                    {
+                        <form asp-action="SendItem" asp-controller="TrackItems" asp-route-id="@Model.Id" method="get">
+                            <button class="btn-hoelscher" style="width:200px;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Send Item")</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @if (!Model.Received)
+                    {
+                        <form asp-action="ReceiveItem" asp-controller="TrackItems" asp-route-id="@Model.Id" method="get">
+                            <button class="btn-hoelscher" style="width:200px;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Receive Item")</button>
+                        </form>
+                    }
+                </td>
+                <td>
+                    @if (!Model.Installed)
+                    {
+                        <form asp-action="InstallItem" asp-controller="TrackItems" asp-route-id="@Model.Id" method="get">
+                            <button class="btn-hoelscher" style="width:200px;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Install Item")</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <form asp-action="ReportItemError" asp-controller="TrackItems" asp-route-id="@Model.Id" method="get">
+                        <button class="btn-hoelscher" style="width:200px;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Report Error")</button>
+                    </form>
+                </td>
+                <td></td>
+            </tr>
+
+        </table>
+        <br />
+        <button type="button" onclick="toggledetails();" style="width:100%;"><h3>@SharedLocalizer.GetLocalizedHtmlString("Item Information")</h3></button>
+        <table id="detailsdiv" style="display:none">
+            <tr>
+                <td><b>@Html.DisplayNameFor(model => model.TAGnr)</b></td>
+                <td>@Html.DisplayFor(model => model.TAGnr)</td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(model => model.PIDnr)</b></td>
+                <td>@Html.DisplayFor(model => model.PIDnr)</td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(model => model.RUMnr)</b></td>
+                <td>@Html.DisplayFor(model => model.RUMnr)</td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(model => model.HOFOR_Description)</b></td>
+                <td>@Html.DisplayFor(model => model.HOFOR_Description)</td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(model => model.Producent)</b></td>
+                <td>@Html.DisplayFor(model => model.Producent)</td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(model => model.Supplier)</b></td>
+                <td>@Html.DisplayFor(model => model.Supplier)</td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(model => model.TypeNr)</b></td>
+                <td>@Html.DisplayFor(model => model.TypeNr)</td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(model => model.TypeNr2)</b></td>
+                <td>@Html.DisplayFor(model => model.TypeNr2)</td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(model => model.EANnr)</b></td>
+                <td>@Html.DisplayFor(model => model.EANnr)</td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(model => model.Dimension)</b></td>
+                <td>@Html.DisplayFor(model => model.Dimension)</td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(model => model.Certificate)</b></td>
+                <td>@Html.DisplayFor(model => model.Certificate)</td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(model => model.Comments)</b></td>
+                <td>@Html.DisplayFor(model => model.Comments)</td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(model => model.Packed)</b></td>
+                <td>@Html.DisplayFor(model => model.Packed)</td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(model => model.Sent)</b></td>
+                <td>@Html.DisplayFor(model => model.Sent)</td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(model => model.Received)</b></td>
+                <td>@Html.DisplayFor(model => model.Received)</td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(model => model.Installed)</b></td>
+                <td>@Html.DisplayFor(model => model.Installed)</td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(model => model.IsError)</b></td>
+                <td>@Html.DisplayFor(model => model.IsError)</td>
+            </tr>
+            <tr>
+                <td><b>@Html.DisplayNameFor(model => model.Project)</b></td>
+                <td>@Html.DisplayFor(model => model.Project.Abbreviation)</td>
+            </tr>
+
+        </table>
+        <br />
+        <button type="button" onclick="togglepack();" style="width:100%;"><h3>@SharedLocalizer.GetLocalizedHtmlString("Photos from Packing")</h3></button>
+        <table id="packdiv" name="phototablepacked" style="display:none;page-break-inside:avoid;">
+            @{ var rows = 0;}
+            @if (Model.PackedPhotos.Count % 2 == 0)
+            {
+                rows = Model.PackedPhotos.Count() / 2;
+            }
+            else
+            {
+                rows = Convert.ToInt32(Model.PackedPhotos.Count() / 2) + 1;
+            }
+            @{ var totalpics = Model.PackedPhotos.Count();}
+            @for (int i = 0; i < rows; i++)
+            {
+                @if (totalpics - (i + 1) * 2 >= 0) //enough room to add whole row
+                {
+                    <tr>
+                        <td><img src="~/TrackItems/@Model.ProjectId/@Model.Id/PackedPhotos/@Model.PackedPhotos.AsEnumerable().ElementAt((i+1)*2 - 2).Path.Split("\\").Last()" style="width:400px;height:300px;" /></td>
+                        <td><img src="~/TrackItems/@Model.ProjectId/@Model.Id/PackedPhotos/@Model.PackedPhotos.AsEnumerable().ElementAt((i+1)*2 - 2 +1).Path.Split("\\").Last()" style="width:400px;height:300px;" /></td>
+                    </tr>
+                }
+
+                else //enough room to add 1 picture in row
+                {
+                    <tr>
+                        <td><img src="~/TrackItems/@Model.ProjectId/@Model.Id/PackedPhotos/@Model.PackedPhotos.AsEnumerable().ElementAt((i+1)*2 - 2).Path.Split("\\").Last()" style="width:400px;height:300px;" /></td>
+                        <td></td>
+                    </tr>
+                }
+
+            }
+        </table>
+        <br />
+        <button type="button" onclick="togglesend();" style="width:100%;"><h3>@SharedLocalizer.GetLocalizedHtmlString("Photos from Sending")</h3></button>
+
+        <table id="senddiv" name="phototablesent" style="display:none;page-break-inside:avoid;">
+            @{ rows = 0;}
+            @if (Model.SentPhotos.Count % 2 == 0)
+            {
+                rows = Model.SentPhotos.Count() / 2;
+            }
+            else
+            {
+                rows = Convert.ToInt32(Model.SentPhotos.Count() / 2) + 1;
+            }
+            @{ totalpics = Model.SentPhotos.Count();}
+            @for (int i = 0; i < rows; i++)
+            {
+                @if (totalpics - (i + 1) * 2 >= 0) //enough room to add whole row
+                {
+                    <tr>
+                        <td><img src="~/TrackItems/@Model.ProjectId/@Model.Id/SentPhotos/@Model.SentPhotos.AsEnumerable().ElementAt((i+1)*2 - 2).Path.Split("\\").Last()" style="width:400px;height:300px;" /></td>
+                        <td><img src="~/TrackItems/@Model.ProjectId/@Model.Id/SentPhotos/@Model.SentPhotos.AsEnumerable().ElementAt((i+1)*2 - 2 +1).Path.Split("\\").Last()" style="width:400px;height:300px;" /></td>
+                    </tr>
+                }
+
+                else //enough room to add 1 picture in row
+                {
+                    <tr>
+                        <td><img src="~/TrackItems/@Model.ProjectId/@Model.Id/SentPhotos/@Model.SentPhotos.AsEnumerable().ElementAt((i+1)*2 - 2).Path.Split("\\").Last()" style="width:400px;height:300px;" /></td>
+                        <td></td>
+                    </tr>
+                }
+
+            }
+        </table>
+        <br />
+        <button type="button" onclick="togglereceive();" style="width:100%;"><h3>@SharedLocalizer.GetLocalizedHtmlString("Photos from Receival")</h3></button>
+
+        <table id="receivediv" name="phototablereceived" style="display:none;page-break-inside:avoid;">
+            @{ rows = 0;}
+            @if (Model.ReceivedPhotos.Count % 2 == 0)
+            {
+                rows = Model.ReceivedPhotos.Count() / 2;
+            }
+            else
+            {
+                rows = Convert.ToInt32(Model.ReceivedPhotos.Count() / 2) + 1;
+            }
+            @{ totalpics = Model.ReceivedPhotos.Count();}
+            @for (int i = 0; i < rows; i++)
+            {
+                @if (totalpics - (i + 1) * 2 >= 0) //enough room to add whole row
+                {
+                    <tr>
+                        <td><img src="~/TrackItems/@Model.ProjectId/@Model.Id/ReceivePhotos/@Model.ReceivedPhotos.AsEnumerable().ElementAt((i+1)*2 - 2).Path.Split("\\").Last()" style="width:400px;height:300px;" /></td>
+                        <td><img src="~/TrackItems/@Model.ProjectId/@Model.Id/ReceivePhotos/@Model.ReceivedPhotos.AsEnumerable().ElementAt((i+1)*2 - 2 +1).Path.Split("\\").Last()" style="width:400px;height:300px;" /></td>
+                    </tr>
+                }
+
+                else //enough room to add 1 picture in row
+                {
+                    <tr>
+                        <td><img src="~/TrackItems/@Model.ProjectId/@Model.Id/ReceivePhotos/@Model.ReceivedPhotos.AsEnumerable().ElementAt((i+1)*2 - 2).Path.Split("\\").Last()" style="width:400px;height:300px;" /></td>
+                        <td></td>
+                    </tr>
+                }
+
+            }
+        </table>
+        <br />
+        <button type="button" onclick="toggleinstall();" style="width:100%;"><h3>@SharedLocalizer.GetLocalizedHtmlString("Photos from Installation")</h3></button>
+
+        <table id="installdiv" name="phototableinstalled" style="display:none;page-break-inside:avoid;">
+            @{ rows = 0;}
+            @if (Model.InstalledPhotos.Count % 2 == 0)
+            {
+                rows = Model.InstalledPhotos.Count() / 2;
+            }
+            else
+            {
+                rows = Convert.ToInt32(Model.InstalledPhotos.Count() / 2) + 1;
+            }
+            @{ totalpics = Model.InstalledPhotos.Count();}
+            @for (int i = 0; i < rows; i++)
+            {
+                @if (totalpics - (i + 1) * 2 >= 0) //enough room to add whole row
+                {
+                    <tr>
+                        <td><img src="~/TrackItems/@Model.ProjectId/@Model.Id/InstalledPhotos/@Model.InstalledPhotos.AsEnumerable().ElementAt((i+1)*2 - 2).Path.Split("\\").Last()" style="width:400px;height:300px;" /></td>
+                        <td><img src="~/TrackItems/@Model.ProjectId/@Model.Id/InstalledPhotos/@Model.InstalledPhotos.AsEnumerable().ElementAt((i+1)*2 - 2 +1).Path.Split("\\").Last()" style="width:400px;height:300px;" /></td>
+                    </tr>
+                }
+
+                else //enough room to add 1 picture in row
+                {
+                    <tr>
+                        <td><img src="~/TrackItems/@Model.ProjectId/@Model.Id/InstalledPhotos/@Model.InstalledPhotos.AsEnumerable().ElementAt((i+1)*2 - 2).Path.Split("\\").Last()" style="width:400px;height:300px;" /></td>
+                        <td></td>
+                    </tr>
+                }
+
+            }
+        </table>
+        <br />
+        <button type="button" onclick="toggleerror();" style="width:100%;"><h3>@SharedLocalizer.GetLocalizedHtmlString("Photos from Errors")</h3></button>
+        <table id="errordiv" name="phototableerror" style="display:none;page-break-inside:avoid;">
+            @{ rows = 0;}
+            @if (Model.ErrorPhotos.Count % 2 == 0)
+            {
+                rows = Model.ErrorPhotos.Count() / 2;
+            }
+            else
+            {
+                rows = Convert.ToInt32(Model.ErrorPhotos.Count() / 2) + 1;
+            }
+            @{ totalpics = Model.ErrorPhotos.Count();}
+            @for (int i = 0; i < rows; i++)
+            {
+                @if (totalpics - (i + 1) * 2 >= 0) //enough room to add whole row
+                {
+                    <tr>
+                        <td><img src="~/TrackItems/@Model.ProjectId/@Model.Id/ErrorPhotos/@Model.ErrorPhotos.AsEnumerable().ElementAt((i+1)*2 - 2).Path.Split("\\").Last()" style="width:400px;height:300px;" /></td>
+                        <td><img src="~/TrackItems/@Model.ProjectId/@Model.Id/ErrorPhotos/@Model.ErrorPhotos.AsEnumerable().ElementAt((i+1)*2 - 2 +1).Path.Split("\\").Last()" style="width:400px;height:300px;" /></td>
+                    </tr>
+                }
+
+                else //enough room to add 1 picture in row
+                {
+                    <tr>
+                        <td><img src="~/TrackItems/@Model.ProjectId/@Model.Id/ErrorPhotos/@Model.ErrorPhotos.AsEnumerable().ElementAt((i+1)*2 - 2).Path.Split("\\").Last()" style="width:400px;height:300px;" /></td>
+                        <td></td>
+                    </tr>
+                }
+
+            }
+        </table>
+        <br />
+        <button type="button" onclick="togglecoord();" style="width:100%;"><h3>@SharedLocalizer.GetLocalizedHtmlString("Show Map")</h3></button>
+        <div id="myDiv" style="display:none;width:100%;height:500px;"></div>
+        <br />
+        <button type="button" onclick="togglelog();" style="width:100%;"><h3>@SharedLocalizer.GetLocalizedHtmlString("Log Book")</h3></button>
+        <table id="logdiv" name="logtable" style="display:none;page-break-inside:avoid;">
+            <thead>
+                <tr>
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString("User")
+                    </th>
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString("Time Stamp")
+                    </th>
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString("Description")
+                    </th>
+                </tr>
+            </thead>
+            @foreach (var item in Model.Logs)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.TheUser)</td>
+                    <td>@Html.DisplayFor(modelItem => item.TimeStamp)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                </tr>
+            }
+
+        </table>
+        <br />
+        <br />
+        <br />
+        <div>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
+            }
+            <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+        </div>
+    </div>
+</div>
+    
+
+
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            DisplayGoogleMap();
+        });
+        function DisplayGoogleMap() {
+            //Set the Latitude and Longitude of the Map
+            var meanlat = 0.0;
+            var meanlong = 0.0;
+
+            var myLatLng = { lat: 55.682936, lng: 12.3729016 };
+            //Create Options or set different Characteristics of Google Map
+            var mapOptions = {
+                center: myLatLng,
+                zoom: 11,
+                minZoom: 2,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            //Display the Google map in the div control with the defined Options
+            var map = new google.maps.Map(document.getElementById("myDiv"), mapOptions);
+            @foreach(var item in Model.TrackedCoordinates)
+            {
+             <text>
+                var marker = new google.maps.Marker({
+                  map: map,
+                  position: { lat: @item.Latitude, lng: @item.Longitude },
+                  title: "@item.TypeCoord",
+            });
+            marker['infowindow'] = new google.maps.InfoWindow({
+                content: '@item.TimeStamp' + ' : ' + '@item.TypeCoord'
+            });
+
+            google.maps.event.addListener(marker, 'click', function () {
+                this['infowindow'].open(map, this);
+            });
+
+
+            marker.setMap(map);
+            </text>
+            }
+
+
+        }
+        
+        function toggledetails() {
+            var x = document.getElementById("detailsdiv")
+            if (x.style.display === "none")
+            {
+               x.style.display = "block";
+            }
+            else
+            {
+                x.style.display = "none";
+            }
+        }
+        function togglepack() {
+            var x = document.getElementById("packdiv")
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            }
+            else {
+                x.style.display = "none";
+            }
+        }
+        function togglesend() {
+            var x = document.getElementById("senddiv")
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            }
+            else {
+                x.style.display = "none";
+            }
+        }
+        function togglereceive() {
+            var x = document.getElementById("receivediv")
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            }
+            else {
+                x.style.display = "none";
+            }
+        }
+        function toggleinstall() {
+            var x = document.getElementById("installdiv")
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            }
+            else {
+                x.style.display = "none";
+            }
+        }
+        function toggleerror() {
+            var x = document.getElementById("errordiv")
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            }
+            else {
+                x.style.display = "none";
+            }
+        }
+        function togglecoord() {
+            var x = document.getElementById("myDiv")
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            }
+            else {
+                x.style.display = "none";
+            }
+        }
+        function togglelog() {
+            var x = document.getElementById("logdiv")
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            }
+            else {
+                x.style.display = "none";
+            }
+        }
+
+    </script>
+}

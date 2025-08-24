@@ -1,0 +1,28 @@
+﻿@model MainOps.Models.WTPClasses.MainClasses.Contamination
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Edit");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Edit")</h2>
+
+<h4>@SharedLocalizer.GetLocalizedHtmlString("Contamination")</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            @Html.EditorForModel()
+            <div class="form-group">
+                <input type="submit" value=@SharedLocalizer.GetLocalizedHtmlString("Save") class="btn btn-hoelscher" />
+                <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+</div>
+
+

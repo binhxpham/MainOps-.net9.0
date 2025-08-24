@@ -1,0 +1,35 @@
+﻿@model IEnumerable<MainOps.Models.MeasPoint>
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Items</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+<body>
+    <font size="4">
+        <div class="col-md-12">
+            @foreach(var item in Model){
+            <div class="col-md-6">
+                <table border="1" style="margin-bottom:1cm;margin-right:1cm;">
+                    <tbody>
+                        <tr>
+                            <td width="70" rowspan="2" align="left"><img src="~/images/Divisions/Photos/@item.Project.Division.Id/@item.Project.Division.LogoPath" height="140" /></td>
+                            <td rowspan="4" width="140" align="center"><img src='@Url.Action("GetQR3","HJItems",new { Id = item.Id })' alt="" height="210" /></td>
+                        </tr>
+                        <tr></tr>
+                        <tr>
+                            <td align="center" height="35" width="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.Project.Name)</td>
+                        </tr>
+                        <tr>
+                            <td align="center" height="35" width="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.Name)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            }
+        </div>
+    </font>
+</body>
+</html>

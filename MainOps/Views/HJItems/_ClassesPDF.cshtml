@@ -1,0 +1,72 @@
+﻿@model MainOps.Models.HJItemClasses
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<style>
+    div#myDiv {
+        -ms-transform: rotate(-90deg); /* IE 9 */
+        -webkit-transform: rotate(-90deg); /* Safari prior 9.0 */
+        transform: rotate(-90deg); /* Standard syntax */
+        transform: translate(0,500);
+        page-break-after: always;
+    }
+    .webgrid-table thead {
+        display: table-header-group;
+    }
+
+    .webgrid-table tfoot {
+        display: table-row-group;
+    }
+
+    .webgrid-table tr {
+        page-break-inside: avoid;
+    }
+</style>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Classes</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+<body>
+        <font size="5">
+                <table class="webgrid-table" style="width:100%;table-layout:fixed;">
+                    <thead>
+                        <tr>
+                            <th colspan="3" style="text-align:left;background-color:white;color:black;">
+                                <h3>@Model.masters.First().Division.Name @SharedLocalizer.GetLocalizedHtmlString("Machine Account Plan")</h3>
+                            </th>
+                            <th style="background-color: white; color: black;">
+                                <img src="~/images/Divisions/Photos/1/Logo-hölscher-jensen-sik-CMYK Zusatz.jpg" width="200px;" />
+                            </th>
+                        </tr>
+                    </thead>
+                    @foreach (var master in Model.masters)
+                    {
+                        <tr>
+                            <td style="text-align:left;width:8%;"><b>31-@Convert.ToInt32(master.ClassNumber).ToString("D2")</b></td>
+                            <td style="text-align:left;">
+                                <b>@master.ClassName</b>
+                            </td>
+                            <td style="text-align: left; width: 8%;"></td>
+                            <td style="width:40%;"></td>
+                        </tr>
+                        @foreach (var subclass in Model.subclasses)
+                        {
+                            if (subclass.HJItemMasterClassId.Equals(master.Id))
+                            {
+                                <tr style="width:100%;">
+                                    <td style="width: 8%;">31-@Convert.ToInt32(master.ClassNumber).ToString("D2")-@Convert.ToInt32(subclass.ClassNumber).ToString("D2")</td>
+                                    <td style="text-align:left;"></td>
+                                    <td style="text-align: left; width: 8%;">-@Convert.ToInt32(subclass.ClassNumber).ToString("D2")</td>
+                                    <td style="text-align:right;">@subclass.ClassName</td>
+                                </tr>
+                            }
+                        }
+                    }
+                </table>
+        </font>
+</body>
+</html>

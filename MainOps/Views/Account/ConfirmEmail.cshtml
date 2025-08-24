@@ -1,0 +1,16 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+
+@{
+    ViewData["Title"] = @SharedLocalizer.GetLocalizedHtmlString("Email confirmed");
+}
+
+<h2>@ViewData["Title"]</h2>
+<div>
+    <p>
+        @SharedLocalizer.GetLocalizedHtmlString("Thank you for confirming your email.")
+    </p>
+</div>
+@using (Html.BeginForm("Index", "Home"))
+{
+    <button class="btn btn-default" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Back to main page")</button>
+}

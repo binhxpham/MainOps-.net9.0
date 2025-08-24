@@ -1,0 +1,390 @@
+﻿@model MainOps.Models.WTPClasses.MainClasses.WTPBuilder
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("InputUse");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("WTP WAS BUILT")</h2>
+<div class="col-sm-12">
+    <h1>@SharedLocalizer.GetLocalizedHtmlString("The WTP contains")</h1>
+    <div class="col-sm-6">
+        <h3>@SharedLocalizer.GetLocalizedHtmlString("WTP stats")</h3>
+        <div class="row">
+            @Html.LabelFor(model => model.flow):
+            @Html.DisplayFor(model => model.flow)
+        </div>
+        <div class="row">
+            @Html.LabelFor(model => model.typeofdew):
+            @Html.DisplayFor(model => model.typeofdew.water_type)
+        </div>
+        <div class="row">
+            @Html.LabelFor(model => model.longestList):
+            @Html.DisplayFor(model => model.longestList)
+        </div>
+        <div class="row">
+            @Html.LabelFor(model => model.wtp_luxury):
+            @Html.DisplayFor(model => model.wtp_luxury.wtp_luxurity)
+        </div>
+        <div class="row">
+            @Html.LabelFor(model => model.pipe_type):
+            @Html.DisplayFor(model => model.pipe_type)
+        </div>
+        <div class="row">
+            @Html.LabelFor(model => model.pipe_size):
+            @Html.DisplayFor(model => model.pipe_size)
+        </div>
+        <div class="row">
+            @Html.LabelFor(model => model.priceList.total_price_mob):
+            @Html.DisplayFor(model => model.priceList.total_price_mob)
+        </div>
+
+        <div class="row">
+            @Html.LabelFor(model => model.priceList.total_price_demob):
+            @Html.DisplayFor(model => model.priceList.total_price_demob)
+        </div>
+        <div class="row">
+            @Html.LabelFor(model => model.priceList.total_price_operation):
+            @Html.DisplayFor(model => model.priceList.total_price_operation)
+        </div>
+        <div class="row">
+            @Html.LabelFor(model => model.priceList.total_price_rent):
+            @Html.DisplayFor(model => model.priceList.total_price_rent)
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <h3>@SharedLocalizer.GetLocalizedHtmlString("Add extra to WTP")</h3>
+        @using (Html.BeginForm("Add_WTPblock", "WTPbuilder", FormMethod.Post))
+        {
+            @Html.LabelFor(model => model.WTPblocks)
+            @Html.DropDownList("PosWTPblock", ViewData["WTPblocknames"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+            <button type="submit">Add</button>
+        }
+        @using (Html.BeginForm("Add_Filtermat", "WTPbuilder", FormMethod.Post))
+        {
+            @Html.LabelFor(model => model.filtermaterials)
+            @Html.DropDownList("PosFiltermats", ViewData["Filtermats"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+            <button type="submit">Add</button>
+        }
+        @using (Html.BeginForm("FindReplacementFiltermat", "WTPbuilder", FormMethod.Post))
+        {
+            @Html.LabelFor(model => model.filtermaterials)
+            @Html.DropDownList("PosFiltermats", ViewData["ChosenFilts"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("Please Select Filtermaterial"))
+            @Html.DropDownList("chosenContaId", ViewData["Contaminations"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("Please Select Contamination"))
+            <button type="submit">Replace</button>
+        }
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.contams)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.filtermaterials)
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Delete")
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WTPblocks)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WTPblocks[0].size)
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Efforts to install")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Delete")
+            </th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @for (var i = 0; i < Model.longestList; i++)
+        {
+            <tr>
+                @if (i < Model.contams.Count)
+                {
+                    <td>@Html.DisplayFor(modelItem => Model.contams[i].Name)</td>
+                }
+                else
+                {
+                    <td></td>
+
+                }
+                @if (i < Model.filtermaterials.Count)
+                {
+                    <td>@Html.DisplayFor(modelItem => Model.filtermaterials[i].Name)</td>
+                    <td>
+                        @using (Html.BeginForm("remove_filtermaterial", "WtpBuilder", new { Model.filtermaterials[i].id }))
+                        {
+                            <input type="submit" value="Remove" />
+                        }
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                    <td></td>
+
+                }
+                @if (i < Model.WTPblocks.Count)
+                {
+                    <td>@Html.DisplayFor(modelItem => Model.WTPblocks[i].name)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.WTPblocks[i].size)</td>
+                    <td><a asp-action="getEfforts" asp-route-id="@Model.WTPblocks[i].id">@Localizer["show Efforts"]</a></td>
+                    <td>
+                        @using (Html.BeginForm("remove_wtp_part", "WtpBuilder", new {  Model.WTPblocks[i].id }))
+                        {
+                            <input type="submit" value="Remove" />
+                        }
+                    </td>
+                }
+                else
+                {
+                    <td></td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+@if (User.IsInRole("Admin") || User.IsInRole("Manager") || (UserManager.GetUserAsync(User).Result?.MemberShipConfirmed == true && User.IsInRole("Member")))
+{
+    <h3>@SharedLocalizer.GetLocalizedHtmlString("Efforts to install")</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(modelItem => Model.efforts[0].WTP_block_name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(modelItem => Model.efforts[0].Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(modelItem => Model.efforts[0].Category)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(modelItem => Model.efforts[0].effort)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(modelItem => Model.efforts[0].WTPUnit)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(modelItem => Model.efforts[0].Temp_section)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(modelItem => Model.efforts[0].Wtp_luxurity)
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @for (var i = 0; i < Model.efforts.Count; i++)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => Model.efforts[i].WTP_block_name)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.efforts[i].Name)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.efforts[i].Category.category)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.efforts[i].effort)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.efforts[i].WTPUnit.the_unit)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.efforts[i].Temp_section.section)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.efforts[i].Wtp_luxurity.wtp_luxurity)</td>
+                    <td><a asp-action="EditEffort" asp-route-id="@Model.efforts[i].Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (User.IsInRole("Admin") || User.IsInRole("Manager") || (UserManager.GetUserAsync(User).Result?.MemberShipConfirmed == true))
+{
+    <h3>Mobilisation(total = @Html.DisplayFor(model => model.priceList.total_price_mob))</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString("Name")
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString("Amount")
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString("Price")
+                </th>
+
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model.priceList.prices_mob)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.Key)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.priceList.quantities_mob[item.Key])</td>
+                    <td>@Html.DisplayFor(modelItem => item.Value)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (User.IsInRole("Admin") || User.IsInRole("Manager") || (UserManager.GetUserAsync(User).Result?.MemberShipConfirmed == true && User.IsInRole("Member")))
+{
+    <h3>De - Mobilisation(total = @Html.DisplayFor(model => model.priceList.total_price_demob))</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Localizer["Name"]
+                </th>
+                <th>
+                    @Localizer["Amount"]
+                </th>
+                <th>
+                    @Localizer["Price"]
+                </th>
+
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model.priceList.prices_demob)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.Key)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.priceList.quantities_demob[item.Key])</td>
+                    <td>@Html.DisplayFor(modelItem => item.Value)</td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (User.IsInRole("Admin") || User.IsInRole("Manager") || (UserManager.GetUserAsync(User).Result?.MemberShipConfirmed == true && User.IsInRole("Member")))
+{
+    <h3>Operation and Maintenance(total = @Html.DisplayFor(model => model.priceList.total_price_operation))</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Localizer["Name"]
+                </th>
+                <th>
+                    @Localizer["Amount"]
+                </th>
+                <th>
+                    @Localizer["Price"]
+                </th>
+
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model.priceList.prices_operation)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.Key)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.priceList.quantities_operation[item.Key])</td>
+                    <td>@Html.DisplayFor(modelItem => item.Value)</td>
+
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (User.IsInRole("Admin") || User.IsInRole("Manager") || (UserManager.GetUserAsync(User).Result?.MemberShipConfirmed == true && User.IsInRole("Member")))
+{
+    <h3>Rent(total = @Html.DisplayFor(model => model.priceList.total_price_rent))</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Localizer["Name"]
+                </th>
+                <th>
+                    @Localizer["Amount"]
+                </th>
+                <th>
+                    @Localizer["Price"]
+                </th>
+
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model.priceList.prices_rent)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.Key)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.priceList.quantities_rent[item.Key])</td>
+                    <td>@Html.DisplayFor(modelItem => item.Value)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (User.IsInRole("Admin") || User.IsInRole("Manager") || (UserManager.GetUserAsync(User).Result?.MemberShipConfirmed == true && User.IsInRole("Member")))
+{
+    <h3>@Localizer["Complete Price List"]</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.LabelFor(m => m.priceList.prices_all[0].id)
+                </th>
+                <th>
+                    @Html.LabelFor(m => m.priceList.prices_all[0].id)
+                </th>
+                <th>
+                    @Html.LabelFor(m => m.priceList.prices_all[0].EkdT)
+                </th>
+                <th>
+                    @Html.LabelFor(m => m.priceList.prices_all[0].size)
+                </th>
+                <th>
+                    @Html.LabelFor(m => m.priceList.prices_all[0].unit)
+                </th>
+                <th>
+                    @Html.LabelFor(m => m.priceList.prices_all[0].price)
+                </th>
+                <th>
+                    @Html.LabelFor(m => m.priceList.prices_all[0].unit_p)
+                </th>
+                <th>
+                    @Html.LabelFor(m => m.priceList.prices_all[0].rent)
+                </th>
+                <th>
+                    @Html.LabelFor(m => m.priceList.prices_all[0].unit_r)
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @for (var i = 0; i < Model.priceList.prices_all.Count; i++)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => Model.priceList.prices_all[i].id)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.priceList.prices_all[i].name)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.priceList.prices_all[i].EkdT.category)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.priceList.prices_all[i].size)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.priceList.prices_all[i].unit.the_unit)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.priceList.prices_all[i].price)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.priceList.prices_all[i].unit_p.the_unit)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.priceList.prices_all[i].rent)</td>
+                    <td>@Html.DisplayFor(modelItem => Model.priceList.prices_all[i].unit_r.the_unit)</td>
+                    <td><a asp-action="editThePrice" asp-route-id="@Model.priceList.prices_all[i].id">@Localizer["Edit Price"]</a></td>
+
+
+                </tr>
+            }
+        </tbody>
+    </table>
+}

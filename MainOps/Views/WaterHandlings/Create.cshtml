@@ -1,0 +1,196 @@
+﻿@model MainOps.Models.WaterHandling
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+
+<h4>WaterHandling</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Project")</label>
+                <select id="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillMeasPoints()"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="MeasPointId" class="control-label"></label>
+                <select asp-for="MeasPointId" class="form-control" onchange="FindInfo();" asp-items="ViewBag.MeasPointId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="WellName" class="control-label"></label>
+                <input asp-for="WellName" class="form-control" />
+                <span asp-validation-for="WellName" class="text-danger"></span>
+            </div>
+            <div class="form-group" id="PumpBox">
+                <label asp-for="ClearPumpTestId" class="control-label"></label>
+                <input asp-for="ClearPumpTestId" class="form-control" />
+            </div>
+            <div class="form-group" id="DrillWaterBox">
+                <label asp-for="DrillWaterId" class="control-label"></label>
+                <input asp-for="DrillWaterId" class="form-control"></input>
+            </div>
+            <div class="form-group" id="DrillBox">
+                <label asp-for="WellId" class="control-label"></label>
+                <input asp-for="WellId" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="PumpDateStart" class="control-label"></label>
+                <input asp-for="PumpDateStart" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="PumpDateEnd" class="control-label"></label>
+                <input asp-for="PumpDateEnd"  class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="PumpWaterStart" class="control-label"></label>
+                <input asp-for="PumpWaterStart" class="form-control" />
+                <span asp-validation-for="PumpWaterStart" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PumpWaterEnd" class="control-label"></label>
+                <input asp-for="PumpWaterEnd" class="form-control" />
+                <span asp-validation-for="PumpWaterEnd" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DrillStart" class="control-label"></label>
+                <input asp-for="DrillStart" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="DrillEnd" class="control-label"></label>
+                <input asp-for="DrillEnd"  class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="DrillWaterStart" class="control-label"></label>
+                <input asp-for="DrillWaterStart"  class="form-control" />
+                <span asp-validation-for="DrillWaterStart" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DrillWaterEnd" class="control-label"></label>
+                <input asp-for="DrillWaterEnd" class="form-control" />
+                <span asp-validation-for="DrillWaterEnd" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AmountContainerPump" class="control-label"></label>
+                <input asp-for="AmountContainerPump" class="form-control" />
+                <span asp-validation-for="AmountContainerPump" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AmountContainerDrill" class="control-label"></label>
+                <input asp-for="AmountContainerDrill" class="form-control" />
+                <span asp-validation-for="AmountContainerDrill" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts
+    {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+    function FillMeasPoints() {
+        var MeasPointId = $('#MeasPointId').val();
+            var ProjectId = $('#ProjectId').val();
+        var url = '@Url.Action("GetWellsProject", "Projects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                },
+                success: function (data) {
+                    var s = '<option value="">Select Well</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                    }
+                    $("#MeasPointId").html(s);
+                    document.getElementById("MeasPointId").style.width = "100%";
+                    var x = document.getElementById("MeasPointId");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        if (x.options[i].value == MeasPointId) {
+                            x.options[i].selected = true;
+                        }
+                    }
+                }
+            });
+    }
+    function meh() {
+        alert("hi");
+    }
+    function FindInfo() {
+        var MeasPointId = $("#MeasPointId").val();
+        var url = '@Url.Action("GetDrilling", "WaterHandlings")';
+        document.getElementById("WellId").style.backgroundColor = "red";
+        document.getElementById("ClearPumpTestId").style.backgroundColor = "red";
+        document.getElementById("DrillWaterId").style.backgroundColor = "red";
+        $.ajax({
+            type: 'GET',
+            url: url,
+            dataType: 'json',
+            data: { 'MeasPointId': MeasPointId },
+            success: function (data) {
+                
+                $("#WellId").val(parseInt(data["id"]));
+                document.getElementById("WellId").style.backgroundColor = "lightgreen";
+                    $("#DrillStart").val(data["drill_Date_Start"]);
+                    $("#DrillEnd").val(data["drill_Date_End"]);
+                    $("#WellName").val(data["wellName"]);
+
+            }
+        });
+        var url2 = '@Url.Action("GetClearPump", "WaterHandlings")';
+        $.ajax({
+            type: 'GET',
+            url: url2,
+            dataType: 'json',
+            data: { 'MeasPointId': MeasPointId },
+            success: function (data) {
+                
+                $("#ClearPumpTestId").val(parseInt(data["id"]));
+                document.getElementById("ClearPumpTestId").style.backgroundColor = "lightgreen";
+                $("#PumpWaterStart").val(parseFloat(data["water_Meter_Before"]));
+                $("#PumpWaterEnd").val(parseFloat(data["water_Meter_After"]));
+                    $("#PumpDateStart").val(data["report_Date"]);
+                $("#PumpDateEnd").val(data["report_Date"]);
+                if (data["dischargeAvailable"] == false) {
+                    $("#AmountContainerPump").val(1);
+                }
+                else {
+                    $("#AmountContainerPump").val(0);
+                }
+            }
+        });
+        var url3 = '@Url.Action("GetDrillWater", "WaterHandlings")';
+        $.ajax({
+            type: 'GET',
+            url: url3,
+            dataType: 'json',
+            data: { 'MeasPointId': MeasPointId },
+            success: function (data) {
+                document.getElementById("DrillWaterId").style.backgroundColor = "lightgreen";
+                $("#DrillWaterId").val(parseInt(data["id"]));
+               
+                $("#DrillWaterStart").val(parseFloat(data["drillWaterStart"]));
+                $("#DrillWaterEnd").val(parseFloat(data["drillWaterEnd"]));
+                    $("#AmountContainerDrill").val(parseInt(data["amountContainers"]));
+            }
+            });
+        }
+
+    $(document).ready(function () {
+        FillMeasPoints();
+    });
+    </script>
+}

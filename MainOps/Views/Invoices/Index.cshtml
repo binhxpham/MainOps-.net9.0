@@ -1,0 +1,94 @@
+﻿@model IEnumerable<MainOps.Models.Invoice>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Invoices")</h2>
+
+<p>
+    <a asp-action="Create">@SharedLocalizer.GetLocalizedHtmlString("Create New")</a>
+</p>
+
+<form asp-action="InvoicesSearch" asp-controller="Invoices" method="get">
+    Project: <select name="ProjectId"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Project")</option></select>
+    SubProject:  <select name="SubProjectId"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Project")</option></select>
+    Taxes?:  <input name="Taxes" type="checkbox" value="true" checked="checked" onchange="this.checked ? this.value = true : this.value = false" />
+    <button type="submit" class="btn-hoelscher">
+        <span class="glyphicon glyphicon-search"></span>
+    </button>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubProject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InvoiceID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InvoiceDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStampStart)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStampEnd)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Taxes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InvoicableAmount)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Abbreviation) : @Html.DisplayFor(modelItem => item.Project.ProjectNr)
+            </td>
+            <td>
+                @if (item.SubProjectId != null)
+                {
+                    @Html.DisplayFor(modelItem => item.SubProject.Name)
+                }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.InvoiceID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Amount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.InvoiceDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeStampStart)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeStampEnd)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Taxes)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.InvoicableAmount)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

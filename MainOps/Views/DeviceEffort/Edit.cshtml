@@ -1,0 +1,102 @@
+﻿@model MainOps.Models.WTPClasses.MainClasses.Effort
+
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Edit");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Edit")</h2>
+
+<h4>@SharedLocalizer.GetLocalizedHtmlString("Effort")</h4>
+<hr />
+<div class="row">
+    <form asp-action="EditTwo">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <table>
+            <tr>
+                <td>
+                    <label asp-for="Name" class="control-label"></label>
+                </td>
+                <td>
+                    @Html.TextBoxFor(model => model.Name, new { @class = "Name-autocomplete", data_url = Url.Action("NameAutoComplete", "Efforts") })
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label asp-for="WTP_block_name" class="control-label"></label>
+                </td>
+                <td>
+                    @Html.DropDownListFor(model => model.WTP_block_name, ViewData["WTPblocknames"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control", style = "min-width:300px; max-width:300px;" })
+                    @Html.ValidationMessageFor(x => x.WTP_block_name, "", new { @class = "text-danger" })
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label asp-for="Category.category" class="control-label"></label>
+                </td>
+                <td>
+                    @Html.DropDownListFor(model => model.CategoryId, ViewData["Category_choices"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control", style = "min-width:300px; max-width:300px;" })
+                    @Html.ValidationMessageFor(x => x.CategoryId, "", new { @class = "text-danger" })
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label asp-for="effort" class="control-label"></label>
+                </td>
+                <td>
+                    <input asp-for="effort" class="form-control" style="min-width:300px;max-width:300px;"/>
+                    <span asp-validation-for="effort" class="text-danger"></span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label asp-for="WTPUnit.the_unit" class="control-label"></label>
+                </td>
+                <td>
+                    @Html.DropDownListFor(model => model.WTPUnitId, ViewData["Unit_choices"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control", style = "min-width:300px; max-width:300px;" })
+                    @Html.ValidationMessageFor(x => x.WTPUnitId, "", new { @class = "text-danger" })
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label asp-for="Temp_section.section" class="control-label"></label>
+                </td>
+                <td>
+                    
+                    @Html.DropDownListFor(model => model.Temp_sectionid, ViewData["Temporal_sections"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control", style = "min-width:300px; max-width:300px;" })
+                    @Html.ValidationMessageFor(x => x.Temp_sectionid, "", new { @class = "text-danger" })
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label asp-for="Division" class="control-label"></label>
+                </td>
+                <td>
+                    @Html.DropDownListFor(model => model.DivisionId, ViewData["Country_choices"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control", style = "min-width:300px; max-width:300px;" })
+                    @Html.ValidationMessageFor(x => x.DivisionId, "", new { @class = "text-danger" })
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label asp-for="Wtp_luxurity.wtp_luxurity" class="container"></label>
+                </td>
+                <td>
+                    @Html.DropDownListFor(model => model.Wtp_luxurityId, ViewData["Luxurity_choices"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control", style = "min-width:300px; max-width:300px;" })
+                    @Html.ValidationMessageFor(x => x.Wtp_luxurityId, "", new { @class = "text-danger" })
+                </td>
+            </tr>
+        </table>
+
+        <div class="form-group">
+            <input type="submit" value=@SharedLocalizer.GetLocalizedHtmlString("Save") class="btn btn-default" style="min-width:80px;max-width:80px;" />
+        </div>
+        <div>
+            <a asp-action="EffortblockRedirect" asp-route-id="@Model.Id">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

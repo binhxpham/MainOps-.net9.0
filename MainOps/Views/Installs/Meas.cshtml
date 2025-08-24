@@ -1,0 +1,83 @@
+﻿@model MainOps.Models.PipeLineMeas
+@{
+    ViewData["Title"] = "Add Measurement Pipeline";
+}
+
+<form asp-action="Meas" asp-controller="Installs" method="post" enctype="multipart/form-data">
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td><label>Discharge Point</label></td>
+            <td><select asp-for="uniqueid" asp-items="ViewBag.UniqueIDs" onchange="addtotext();"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Discharge Point")</option></select></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <label>OR WRITE BELOW</label>
+            </td>
+        </tr>
+        <tr>
+            <td><label>Discharge Point Manual</label></td>
+            <td><input asp-for="uniqueidtext" type="text" /></td>
+        </tr>
+        <tr>
+            <td><label>Type of device </label></td>
+<td><select asp-for="type"><option value="Piston Pump - Discharge" selected="selected">Discharge Pump</option><option value="Flow Meter">Flow Meter</option></select></td>
+        </tr>
+        <tr>
+            <td><label>Date Time</label></td>
+            <td><input asp-for="TimeStamp" type="datetime-local" value="@String.Format("{0:yyyy-MM-dd HH:mm}",DateTime.Now)" /></td>
+        </tr>
+        <tr>
+            <td><label>Water Meter Reading</label></td>
+            <td><input asp-for="Measurement" type="number" /></td>
+        </tr>
+        <tr>
+            <td><label>Add Photo?</label></td>
+            <td><input name="files" type="file" accept=".jpg,.jpeg,.png" /></td>
+        </tr>
+        <tr>
+            <td colspan="2"><button class="btn-hoelscher" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add")</button></td>
+        </tr>
+        <tr>
+            <td><label>accuracy:</label></td>
+            <td><input id="accuracy" /></td>
+        </tr>
+        <tr hidden="hidden">
+            <td><input asp-for="Longitude" id="longtitude" value="0" /></td>
+            <td><input asp-for="Latitude" id="latitude" value="0" /></td>
+        </tr>
+    </table>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        var myLat = 0, myLng = 0, myAcc = 0;
+        var id;
+        if (navigator.geolocation) {
+           id = navigator.geolocation.watchPosition(function (position) {
+               myLat = position.coords.latitude;
+               myLng = position.coords.longitude;
+               myAcc = position.coords.accuracy;
+               getPos(myLat, myLng,myAcc);
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                        alert("Turn on GPS on phone or allow it to be used via your browser");
+                        $("#accuracy").val(0);
+                        $("#latinput").val(0);
+                        $("#longinput").val(0);
+                    }
+
+                }, { maximumAge: 0, timeout: 8000, enableHighAccuracy: true });
+        }
+        function getPos(lat, lng,acc) {
+            $("#accuracy").val(acc);
+            $("#latinput").val(lat);
+            $("#longinput").val(lng);
+        }
+        function addtotext() {
+            $("#uniqueidtext").val($("#uniqueid").val());
+        }
+       </script>
+}
+

@@ -1,0 +1,71 @@
+﻿<p><a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to Main WaterSample Page")</a></p>
+
+<span>filter Project: <select id="ProjectId" asp-items="ViewBag.ProjectId" onchange="FillWaterSamplePoints();"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Project")</option></select></span>
+<div>
+    <form asp-action="CopyFromMeasPlaceToMeasPlace" method="post">
+        <table style="width:100%;table-layout:fixed;">
+
+            <tr>
+                <td colspan="4"><h3>@SharedLocalizer.GetLocalizedHtmlString("Copy Limits from WaterSample Place to another water sample place")</h3></td>
+            </tr>
+            <tr>
+                <td style="width:10%;">from</td>
+                <td style="width:40%;"> <select name="p1" id="choice1" class="form-control" asp-items="ViewBag.WaterSamplePlaceId1" style="width:100%;"></select></td>
+                <td style="width:10%;">to</td>
+                <td style="width:40%;"> <select name="p2" id="choice2" class="form-control" asp-items="ViewBag.WaterSamplePlaceId2" style="width:100%;"></select></td>
+            </tr>
+            <tr>
+                <td colspan="4"><button class="btn-hoelscher" style="width:100%;height:50px;">@SharedLocalizer.GetLocalizedHtmlString("Copy/Overwrite")</button></td>
+            </tr>
+        </table>
+
+    </form>
+</div>
+<br />
+<div>
+    <form asp-action="CopyFromMeasPlaceToProject" method="post">
+        <table style="width:100%;table-layout:fixed;">
+            <tr>
+                <td colspan="2" style="width:100%;"><h3>@SharedLocalizer.GetLocalizedHtmlString("Copy Limits from one WaterSample place to all other water sample places with the same type measurements (e.g.) grundvand within that project")</h3></td>
+            </tr>
+            <tr>
+                <td style="width:100%;">from</td>
+                <td style="width:100%;"><select name="id" id="choice3" class="form-control" asp-items="ViewBag.WaterSamplePlaceId1"></select></td>
+            </tr>
+            <tr>
+                <td colspan="2"><button class="btn-hoelscher" style="width:100%;height:50px;">@SharedLocalizer.GetLocalizedHtmlString("Copy/Overwrite")</button></td>
+            </tr>
+        </table>
+
+    </form>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        function FillWaterSamplePoints() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetWaterSamplePlacesProject", "WaterSampleTypes")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {'theId' : ProjectId},
+                success: function (data) {
+                    var s = '<option value="-1">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                    }
+                    $("#choice1").html(s);
+                    document.getElementById("choice1").style.width = "100%";
+                    $("#choice2").html(s);
+                    document.getElementById("choice2").style.width = "100%";
+                    $("#choice3").html(s);
+                    document.getElementById("choice3").style.width = "100%";
+                }
+            });
+        }
+    </script>
+}
+

@@ -1,0 +1,198 @@
+﻿@model MainOps.Models.ReportClasses.Daily_Report
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Daily Report");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Daily Report")</h2>
+
+<hr />
+<div class="row">
+    <div class="col-xs-4">
+        <form asp-action="Daily_Report" enctype="multipart/form-data" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <table>
+                <tr>
+                    <td><label asp-for="ProjectId" class="control-label"></label></td>
+                    <td><select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillMeasPoints();"></select></td>
+                </tr>
+                <tr>
+                    <td>
+                        <label asp-for="short_Description" class="control-label"></label>
+                    </td>
+                    <td>
+                        <input asp-for="short_Description" class="form-control" /><span asp-validation-for="short_Description" class="text-danger"></span>                       
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label asp-for="MeasPointId" class="control-label"></label>
+                    </td>
+                    <td>
+                        @Html.DropDownListFor(Model => Model.MeasPointId, (SelectList)ViewData["MeasPointId"], "None", new { @id = "MeasPointId", @style = "height:36px;" })<span asp-validation-for="MeasPointId" class="text-danger"></span>                       
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label asp-for="Report_Date" class="control-label"></label>
+                    </td>
+                    <td>
+                        <input type="datetime" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd")" asp-for="Report_Date" style="width:100%;height:36px;" />
+                        <span asp-validation-for="Report_Date" class="text-danger"></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><label asp-for="StartHour" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="StartHour" onchange="Updatehourminuteinput(this);" class="form-control" />
+                        <span asp-validation-for="StartHour" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="EndHour" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="EndHour" class="form-control" />
+                        <span asp-validation-for="EndHour" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Machinery" class="control-label"></label></td>
+                    <td>
+                        <select id="MachineryIds" multiple="multiple" style="width:100%;">
+                            @foreach (var item in ViewBag.Machinery)
+                            {
+                                <option value="@item.Text">@item.Text</option>
+                            }
+                        </select>
+                        <input type="text" name="Machinery" id="textformachinery" value="None" style="width:100%;" />
+                        <button type="button" onclick="AddSelection();" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Add Machinery")</button>
+                        <button type="button" onclick="ClearSelection();" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Clear Machinery")</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <label asp-for="Work_Performed" class="control-label"></label>
+                    </td>
+                </tr>
+                <tr rowspan="20">
+                    <td colspan="2">
+                        <textarea rows="6" cols="50" class="form-control" asp-for="Work_Performed"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <label asp-for="Extra_Works" class="control-label"></label>
+                    </td>
+                </tr>
+                <tr rowspan="20">
+                    <td colspan="2">
+                        <textarea rows="6" cols="50" class="form-control" asp-for="Extra_Works"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="WasAlarmCall" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="WasAlarmCall" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label></td>
+                    <td><input type="file" name="files" multiple accept=".jpg,.jpeg,.png,.gif,.pdf" /></td>
+                </tr>
+            </table>
+            <div class="form-group">
+                <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString("Add Report")" class="btn-hoelscher" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+                $('.date-picker').datepicker("setDate", new Date("dd-MM-yy"));
+
+            });
+        });
+        function GetSelectedText() {
+            var e = document.getElementById("country");
+            var result = e.options[e.selectedIndex].text;
+
+            document.getElementById("result").innerHTML = result;
+        }
+        function AddSelection() {
+            var selected_text = $('#MachineryIds option:selected')
+                .toArray().map(item => item.text).join();   
+            var currenttext = $("#textformachinery").val();
+            if (currenttext != "None") {
+                var newtext = selected_text + "," + currenttext;
+                $("#textformachinery").val(newtext);
+            }
+            else {
+                $("#textformachinery").val(selected_text);
+            }
+        }
+        function ClearSelection() {
+            $("#textformachinery").val("None");
+        }
+        function FillMeasPoints() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetMeasPointsProject", "MeasPoints")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {'theId' : ProjectId},
+                success: function (data) {
+                    var s = '<option value="">Please Select</option>'; 
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                    }
+                    $("#MeasPointId").html(s);  
+                    document.getElementById("MeasPointId").style.width = "100%";
+                }
+            });
+        }
+        function Updatehourminuteinput(elem) {
+            alert("here");
+            var re = new RegExp("^(?:\d|[01]\d|2[0-3]):[0-5]\d$");
+            if (re.test(elem.value)) {
+                alert("hi1");
+                if (elem.value.length == 4) {
+                    elem.value = "0" + elem.value;
+                }
+            }
+            else {
+                alert("no match");
+                if (elem.value.includes(".")) {
+                    alert("includes .");
+                    elem.value = elem.value.replace(".", ":");
+                    if (re.test(elem.value)) {
+                        alert("still no match after .-exchange");
+                        if (elem.value.length == 4) {
+                            elem.value = "0" + elem.value;
+                        }
+                    }
+                }
+                alert("testing other stuff");
+                if (!elem.value.includes(":") && !elem.value.include(".") && elem.value.length < 3) {
+                    elem.value = elem.value + ":00";
+                }
+            }
+        }
+    </script>
+}

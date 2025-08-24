@@ -1,0 +1,62 @@
+﻿
+@{
+    ViewData["Title"] = "Add Activity";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Add Activity to UNIQUE ID")</h2>
+<form asp-action="AddActivity" method="post" asp-controller="ItemActivities">
+    <table>
+        <tr>
+            <td>start</td>
+            <td> <input type="date" name="start" /></td>
+        </tr>
+        <tr>
+            <td>end</td>
+            <td> <input type="date" name="end" /></td>
+        </tr>
+        <tr>
+            <td>project</td>
+            <td><select name="ProjectId" asp-items="ViewBag.ProjectId"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Project")</option></select></td>
+        </tr>
+        <tr>
+            <td>unique id</td>
+            <td><select id="uniqueid" name="uniqueid" asp-items="ViewBag.UniqueIDs" onchange="PopulateActivityTable();"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Unique ID")</option></select></td>
+        </tr>
+        <tr>
+            <td colspan="2"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Add Activity")</button></td>
+        </tr>
+    </table>
+
+
+
+
+
+</form>
+
+<div id="ActivityTable" style="width:100%;">
+
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript">
+
+
+        function PopulateActivityTable() {
+            var UNIQUEID = $("#uniqueid").val();
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetUniqueIDData", "ItemActivities")',
+                data: { "UniqueID": UNIQUEID },
+                dataType: "html",
+                success: function (result) {
+                    $('#ActivityTable').html(result);
+            },
+            error: function (req, status, error) {           
+                alert("error");
+            }
+            });
+        }
+</script>
+}

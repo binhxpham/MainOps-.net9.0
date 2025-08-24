@@ -1,0 +1,92 @@
+﻿@model MainOps.Models.SummaryReport
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>SummaryReport</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Report_Date" class="control-label"></label>
+                <input asp-for="Report_Date" class="form-control" />
+                <span asp-validation-for="Report_Date" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select>
+                <span asp-validation-for="ProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="People" class="control-label"></label>
+                <input asp-for="People" class="form-control" />
+                <span asp-validation-for="People" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="IsSignedByHJ" /> @Html.DisplayNameFor(model => model.IsSignedByHJ)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="IsSignedByClient" /> @Html.DisplayNameFor(model => model.IsSignedByClient)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="signatureHJ" class="control-label"></label>
+                <input asp-for="signatureHJ" class="form-control" />
+                <span asp-validation-for="signatureHJ" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="signatureClient" class="control-label"></label>
+                <input asp-for="signatureClient" class="form-control" />
+                <span asp-validation-for="signatureClient" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SignatureHJDateTime" class="control-label"></label>
+                <input asp-for="SignatureHJDateTime" class="form-control" />
+                <span asp-validation-for="SignatureHJDateTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SignatureClientDateTime" class="control-label"></label>
+                <input asp-for="SignatureClientDateTime" class="form-control" />
+                <span asp-validation-for="SignatureClientDateTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TheDailyText" class="control-label"></label>
+                <input asp-for="TheDailyText" class="form-control" />
+                <span asp-validation-for="TheDailyText" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="SentToClient" /> @Html.DisplayNameFor(model => model.SentToClient)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="ClientEmail" class="control-label"></label>
+                <input asp-for="ClientEmail" class="form-control" />
+                <span asp-validation-for="ClientEmail" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

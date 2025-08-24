@@ -1,0 +1,277 @@
+﻿@model MainOps.Models.PreExcavation
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>PreExcavation</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4" onsubmit="StartSpinner();">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();"></select>
+                <span asp-validation-for="ProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SubProjectId" class="control-label"></label>
+                <select asp-for="SubProjectId" class="form-control" asp-items="ViewBag.SubProjectId"></select>
+                <span asp-validation-for="SubProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TimeStamp" class="control-label"></label>
+                <input asp-for="TimeStamp" class="form-control" />
+                <span asp-validation-for="TimeStamp" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MeasPointId" class="control-label"></label>
+                <select asp-for="MeasPointId" class="form-control" asp-items="ViewBag.MeasPointId" onchange="UpdateWellname();"></select>
+                <span asp-validation-for="MeasPointId" class="text-danger"></span>
+            </div>
+            <tr>
+                <td><label asp-for="VariationOrderId" class="control-label"></label></td>
+                <td><select asp-for="VariationOrderId" class="form-control" asp-items="ViewBag.VariationOrderId"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select VariationOrder")</option></select></td>
+            </tr>
+            <div class="form-group">
+                <label asp-for="wellname" class="control-label"></label>
+                <input asp-for="wellname" class="form-control" />
+                <span asp-validation-for="wellname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Large" class="control-label"></label>
+                @Html.EditorFor(Model => Model.Large)
+                <span asp-validation-for="Large" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="CablesFound" /> @Html.DisplayNameFor(model => model.CablesFound)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="NewCover" /> @Html.DisplayNameFor(model => model.NewCover)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="RemovalOldManShaft" /> @Html.DisplayNameFor(model => model.RemovalOldManShaft)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Comments" class="control-label"></label>
+                <input asp-for="Comments" class="form-control" />
+                <span asp-validation-for="Comments" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DoneBy" class="control-label"></label>
+                <input asp-for="DoneBy" class="form-control" />
+                <span asp-validation-for="DoneBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        var myLat = 0, myLng = 0, myAcc = 0;
+        var id;
+        if (navigator.geolocation) {
+           id = navigator.geolocation.watchPosition(function (position) {
+               myLat = position.coords.latitude;
+               myLng = position.coords.longitude;
+               myAcc = position.coords.accuracy;
+               getPos(myLat, myLng,myAcc);
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                                                alert("Enable Location Services! We cannot find your coordinates");
+                    }
+
+                }, { maximumAge: 0, timeout: 8000, enableHighAccuracy: true });
+        }
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datetimepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-2:+0",
+                    dateFormat: "yy-MM-dd",
+                    timeFormat: "HH:mm",
+                    controlType: 'select',
+                    showSecond: false,
+                    showMillisec: false,
+                    showMicrosec: false,
+                    showTimezone: true,
+                    firstDay: 1
+
+
+                });
+            });
+        });
+        function FillVariationOrders() {
+            var ProjectId = $('#ProjectId').val();
+            var variationOrderId = $('#VariationOrderId').val();
+            var url = '@Url.Action("GetVariationOrdersProject", "BoQHeadlines")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["headLine"] + '</option>';
+                    }
+                    $("#VariationOrderId").html(s);
+                    document.getElementById("VariationOrderId").style.width = "100%";
+                    var x = document.getElementById("VariationOrderId");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        if (x.options[i].value == variationOrderId) {
+                            x.options[i].selected = true;
+                        }
+                    }
+                }
+            });
+        }
+        function UpdateWellname() {
+            var selected_text = $('#MeasPointId option:selected')
+                .toArray().map(item => item.text).join();
+            $("#wellname").val(selected_text);
+        }
+        function getPos(lat, lng, acc) {
+            if (+$("#accuracy").val() >= acc)
+            {
+                $("#accuracy").val(acc);
+                $("#latinput").val(lat);
+                $("#longinput").val(lng);
+            }
+        }
+
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var SubProjectId = $('#SubProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                        var x = document.getElementById("SubProjectId");
+                        var i;
+                        for (i = 0; i < x.length; i++) {
+                            if (x.options[i].value == SubProjectId) {
+                                x.options[i].selected = true;
+                            }
+                        }
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                    FillMeasPoints();
+                }
+            });
+    }
+        function FillMeasPoints() {
+        var MeasPointId = $('#MeasPointId').val();
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetWellsProject", "Projects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                },
+                success: function (data) {
+                    var s = '<option value="">Select Well</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                    }
+                    $("#MeasPointId").html(s);
+                    document.getElementById("WellName").style.width = "100%";
+                    var x = document.getElementById("WellName");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        if (x.options[i].value == MeasPointId) {
+                            x.options[i].selected = true;
+                        }
+                    }
+                }
+                FillVariationOrders();
+            });
+    }
+    function FillMeasPoints2() {
+        var MeasPointId = $("#MeasPointId").val();
+            var SubProjectId = $('#SubProjectId').val();
+            var url = '@Url.Action("GetMeasPointsSubProject", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': SubProjectId,
+                },
+                success: function (data) {
+                    var s = '<option value="">Select Well</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                    }
+                    $("#MeasPointId").html(s);
+                    document.getElementById("WellName").style.width = "100%";
+                    var x = document.getElementById("MeasPointId");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        if (x.options[i].value == MeasPointId) {
+                            x.options[i].selected = true;
+                        }
+                    }
+                }
+            });
+        }
+        function retrieveData(e) {
+            var posting = false;
+            if ($("#theform").valid() == false) {
+                e.preventDefault();
+                posting = false;
+            }
+            else {
+                posting = true;
+            }
+            if (posting == true) {
+                StartSpinner();
+            }
+        }
+    </script>
+}

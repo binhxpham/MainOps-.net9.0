@@ -1,0 +1,113 @@
+﻿@model MainOps.Models.Invoice
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>Invoice</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="InvoiceID" class="control-label"></label>
+                <input asp-for="InvoiceID" class="form-control" />
+                <span asp-validation-for="InvoiceID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Amount" class="control-label"></label>
+                <input asp-for="Amount" class="form-control" />
+                <span asp-validation-for="Amount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="InvoiceDate" class="control-label"></label>
+                <input asp-for="InvoiceDate" type="date" class="form-control" />
+                <span asp-validation-for="InvoiceDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TimeStampStart" class="control-label"></label>
+                <input asp-for="TimeStampStart" type="date" class="form-control" />
+                <span asp-validation-for="TimeStampStart" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TimeStampEnd" class="control-label"></label>
+                <input asp-for="TimeStampEnd" type="date" class="form-control" />
+                <span asp-validation-for="TimeStampEnd" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select Project")</option></select>
+                <span asp-validation-for="ProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SubProjectId" class="control-label"></label>
+                <select asp-for="SubProjectId" class="form-control" asp-items="ViewBag.SubProjectId"></select>
+                <span asp-validation-for="SubProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Taxes" class="control-label"></label>
+                <input asp-for="Taxes" type="checkbox" onchange="this.checked ? this.value = true : this.value = false" />
+                <span asp-validation-for="Taxes" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Surchage" class="control-label"></label>
+                <input asp-for="Surchage" type="number" min="0.00" max="1.00" step="0.01" />
+                <span asp-validation-for="Surchage" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TaxesPercent" class="control-label"></label>
+                <input asp-for="TaxesPercent" type="number" min="0.00" max="1.00" step="0.01" />
+                <span asp-validation-for="TaxesPercent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript">
+        function FillSubProjects() {
+            var SubProjectId = $('#SubProjectId').val();
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                        var x = document.getElementById("SubProjectId");
+                        var i;
+                        for (i = 0; i < x.length; i++) {
+                            if (x.options[i].value == SubProjectId) {
+                                x.options[i].selected = true;
+                            }
+                        }
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+    }
+</script>
+}

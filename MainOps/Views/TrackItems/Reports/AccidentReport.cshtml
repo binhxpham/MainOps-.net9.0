@@ -1,0 +1,200 @@
+﻿@model MainOps.Models.ReportClasses.AccidentReport
+
+@{
+    ViewData["Title"] = "AccidentReport";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Accident Report")</h2>
+
+<hr />
+<div class="row">
+    <div class="col-xs-12">
+        <form asp-action="GenerateAccidentReport" asp-controller="TrackItems" method="post" enctype="multipart/form-data">
+            <input asp-for="@Model.SafetyProblemId" value="@Model.SafetyProblemId" hidden="hidden" />
+            <input asp-for="@Model.Id" value="@Model.Id" hidden="hidden" />
+            @Html.HiddenFor(Model => Model.SafetyProblemId)
+            @Html.HiddenFor(Model => Model.Id)
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="AccidentWithAbsence" /> @Html.DisplayNameFor(model => model.AccidentWithAbsence)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="AccidentWithoutAbsence" /> @Html.DisplayNameFor(model => model.AccidentWithoutAbsence)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="EnvironmentAccident" /> @Html.DisplayNameFor(model => model.EnvironmentAccident)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="InjuctionProhibition" class="control-label"></label>
+                <select asp-for="InjuctionProhibition">
+                    <option value="Injuction">@SharedLocalizer.GetLocalizedHtmlString("Injuction")</option>
+                    <option value="Prohibition">@SharedLocalizer.GetLocalizedHtmlString("Prohibition")</option>
+                </select>
+                <span asp-validation-for="InjuctionProhibition" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="NearMiss" /> @Html.DisplayNameFor(model => model.NearMiss)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="UnsafeConditions" /> @Html.DisplayNameFor(model => model.UnsafeConditions)
+                    </label>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                <label asp-for="HJSubContractor" class="control-label"></label>
+                <select asp-for="HJSubContractor">
+                    <option value="HJ">@SharedLocalizer.GetLocalizedHtmlString("HJ")</option>
+                    <option value="Subcontractor">@SharedLocalizer.GetLocalizedHtmlString("SubContractor")</option>
+                </select>
+                <span asp-validation-for="HJSubContractor" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Other" /> @Html.DisplayNameFor(model => model.Other)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="WhatHappened" class="control-label"></label>
+                <textarea asp-for="WhatHappened" class="form-control" cols="80" rows="10"></textarea>
+                <span asp-validation-for="WhatHappened" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NameOfInjured" class="control-label"></label>
+                <input asp-for="NameOfInjured" class="form-control" />
+                <span asp-validation-for="NameOfInjured" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WhereAndWhen" class="control-label"></label>
+                <input asp-for="WhereAndWhen" class="form-control" />
+                <span asp-validation-for="WhereAndWhen" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NameofWitnesses" class="control-label"></label>
+                <input asp-for="NameofWitnesses" class="form-control" />
+                <span asp-validation-for="NameofWitnesses" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WhatInjury" class="control-label"></label>
+                <input asp-for="WhatInjury" class="form-control" />
+                <span asp-validation-for="WhatInjury" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WhatWasDoneToFix" class="control-label"></label>
+                <textarea asp-for="WhatWasDoneToFix" class="form-control" cols="80" rows="10"></textarea>
+                <span asp-validation-for="WhatWasDoneToFix" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WhatCausedAccident" class="control-label"></label>
+                <textarea asp-for="WhatCausedAccident" class="form-control" cols="80" rows="10"></textarea>
+                <span asp-validation-for="WhatCausedAccident" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="HowCouldItHappen" class="control-label"></label>
+                <textarea asp-for="HowCouldItHappen" class="form-control" cols="80" rows="10"></textarea>
+                <span asp-validation-for="HowCouldItHappen" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="WasSafetyProcessInOrder" /> @Html.DisplayNameFor(model => model.WasSafetyProcessInOrder)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="WhatIsDoneToPrevent" class="control-label"></label>
+                <textarea asp-for="WhatIsDoneToPrevent" class="form-control" cols="80" rows="10"></textarea>
+                <span asp-validation-for="WhatIsDoneToPrevent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="CauseForChangeInAPV" /> @Html.DisplayNameFor(model => model.CauseForChangeInAPV)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="WhatCanBeLearned" class="control-label"></label>
+                <textarea asp-for="WhatCanBeLearned" class="form-control" cols="80" rows="10"></textarea>
+                <span asp-validation-for="WhatCanBeLearned" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="IsOfferedLightJob" /> @Html.DisplayNameFor(model => model.IsOfferedLightJob)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="WhatLightJob" class="control-label"></label>
+                <input asp-for="WhatLightJob" class="form-control" />
+                <span asp-validation-for="WhatLightJob" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StartLightJob" class="control-label"></label>
+                <input asp-for="StartLightJob" type="text" class="date-picker" />
+                <span asp-validation-for="StartLightJob" class="text-danger"></span>
+            </div>
+            <div class="form-gropu">
+                <label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label>
+                <input type="file" name="files" multiple accept=".jpg,.jpeg,.png" style="width:100%;" />
+            </div>
+            <div class="form-group">
+                <label asp-for="DoneBy" class="control-label"></label>
+                <input asp-for="DoneBy" class="form-control" />
+                <span asp-validation-for="DoneBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <button class="btn-hoelscher" style="width:100%;height:50px;">@SharedLocalizer.GetLocalizedHtmlString("Generate Report")</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="SafetyProblems">@SharedLocalizer.GetLocalizedHtmlString("Back to Index")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-2:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+                });
+                $('.date-picker').datepicker("setDate", new Date());
+            });
+        });
+
+    </script>
+}

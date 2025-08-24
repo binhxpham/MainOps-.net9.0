@@ -1,0 +1,104 @@
+﻿@model MainOps.Models.ItemType
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Edit")</h2>
+
+<h4>Item Type</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="MarkerPicture" />
+            <div class="form-group">
+                <label asp-for="Item_Type" class="control-label"></label>
+                <input asp-for="Item_Type" class="form-control" />
+                <span asp-validation-for="Item_Type" class="text-danger"></span>
+            </div>
+
+            <div>
+                <label>@Html.DisplayNameFor(x => x.ProjectId)</label>
+                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select>
+                <span asp-validation-for="ProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BoQnr" class="control-label"></label>
+                <input asp-for="BoQnr" type="number" step="0.001" class="form-control" />
+                <span asp-validation-for="BoQnr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BoQnr_Rental" class="control-label"></label>
+                <input asp-for="BoQnr_Rental" type="number" step="0.001" class="form-control" />
+                <span asp-validation-for="BoQnr_Rental" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="price" class="control-label"></label>
+                <input asp-for="price" class="form-control" />
+                <span asp-validation-for="price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="rental_price" class="control-label"></label>
+                <input asp-for="rental_price" class="form-control" />
+                <span asp-validation-for="rental_price" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Install_UnitId" class="control-label"></label>
+                @Html.DropDownListFor(Model => Model.Install_UnitId, (SelectList)ViewData["UnitId"], "Choose Install Unit", new { @style = "height:36px;width:100%;" })
+                <span asp-validation-for="Install_UnitId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rental_UnitId" class="control-label"></label>
+                @Html.DropDownListFor(Model => Model.Rental_UnitId, (SelectList)ViewData["UnitId"], "Choose Rental Unit", new { @style = "height:36px;width:100%;" })
+                <span asp-validation-for="Rental_UnitId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ExpectedAmount" class="control-label"></label>
+                <input asp-for="ExpectedAmount" type="number" step="0.01" class="form-control" />
+                <span asp-validation-for="ExpectedAmount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ExpectedAmountRental" class="control-label"></label>
+                <input asp-for="ExpectedAmountRental" type="number" step="0.01" class="form-control" />
+                <span asp-validation-for="ExpectedAmountRental" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Valuta" class="control-label"></label>
+                <select asp-for="Valuta">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Valuta")</option>
+                    <option value="EURO">Euro</option>
+                    <option value="DKK">DKK</option>
+                </select>
+                <span asp-validation-for="Valuta" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AgreementNumber" class="control-label"></label>
+                <input asp-for="AgreementNumber" />
+                <span asp-validation-for="AgreementNumber"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AgreementDate" class="control-label"></label>
+                <input asp-for="AgreementDate" type="date" />
+                <span asp-validation-for="AgreementDate"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ReportTypeId" class="control-label"></label>
+                <select asp-for="ReportTypeId" asp-items="ViewBag.ReportTypeId">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Report Type")</option>
+                </select>
+                <span asp-validation-for="ReportTypeId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+

@@ -1,0 +1,78 @@
+﻿@model MainOps.Models.WellCheck
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>WellCheck</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.ProjectId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ProjectId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WellName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WellName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CanBeFound)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CanBeFound)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Comments)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Comments)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Dip)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Dip)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BottomWell)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BottomWell)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.NumBerOfPipes)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.NumBerOfPipes)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.IsCoverOk)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsCoverOk)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.IsShaftOk)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsShaftOk)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WellHeads)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WellHeads)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

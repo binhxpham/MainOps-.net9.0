@@ -1,0 +1,119 @@
+﻿@model IEnumerable<MainOps.Models.HourSchedule>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.day01)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.day02)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.day03)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.day04)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.day05)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.day06)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.day07)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.day08)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.day09)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.day10)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.day11)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.day12)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.day13)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.day14)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.day01)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.day02)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.day03)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.day04)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.day05)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.day06)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.day07)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.day08)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.day09)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.day10)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.day11)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.day12)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.day13)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.day14)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

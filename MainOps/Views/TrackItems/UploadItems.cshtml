@@ -1,0 +1,23 @@
+﻿
+@{
+    ViewData["Title"] = "Upload Items";
+}
+
+<form asp-action="UploadItems" asp-controller="TrackItems" enctype="multipart/form-data" method="post">
+    <table>
+        <tr>
+            <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Project"))</label></td>
+            <td>@Html.DropDownList("ProjectId", ViewData["ProjectId"] as IEnumerable<SelectListItem>, new { style = "width:250px;height:40px;" })</td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Choose file")</td>
+            <td><input type="file" id="postedFile" name="postedFile" class="form-control" accept=".csv" /></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <input type="submit" title="Upload" value="Upload" class="btn-hoelscher" />
+            </td>
+        </tr>
+    </table>
+</form>
+

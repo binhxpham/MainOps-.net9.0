@@ -1,0 +1,142 @@
+﻿@model MainOps.Models.TruckVM
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Edit Truck Daily Report")</h2>
+
+<hr />
+<form asp-action="Edit" id="theform" method="post" onsubmit="retrieveData(event);">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    @Html.HiddenFor(Model => Model.TruckDailyReportId)
+<table style="width:100%;table-layout:fixed;">
+    <tr>
+        <td colspan="2">
+            <label asp-for="Dato"></label>
+        </td>
+        <td colspan="3">
+            <input type="datetime" asp-for="Dato" class="date-picker form-control" />
+            <span asp-validation-for="Dato" class="text-danger"></span>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <label>@SharedLocalizer.GetLocalizedHtmlString("Choose Truck")</label>
+        </td>
+        <td colspan="3">
+            <select asp-for="HJItemId" asp-items="ViewBag.HJItemId" class="form-control"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Truck")</option></select>
+            <span asp-validation-for="HJItemId" class="text-danger"></span>
+        </td>
+    </tr>
+    <tr>
+        <td><b>@SharedLocalizer.GetLocalizedHtmlString("Project")</b></td>
+        <td><b>@SharedLocalizer.GetLocalizedHtmlString("SubProject")</b></td>
+        <td><b>@SharedLocalizer.GetLocalizedHtmlString("Hours")</b></td>
+        <td><b>@SharedLocalizer.GetLocalizedHtmlString("KM Start")</b></td>
+        <td><b>@SharedLocalizer.GetLocalizedHtmlString("KM End")</b></td>
+    </tr>
+    @{ int counter = 0;}
+    @for (int i = 0; i < Model.Sites.Count; i++)
+    {
+        <tr style="border-top:2px solid blue;border-left:2px solid blue;border-right:2px solid blue;">
+            <td>
+                <select asp-for="@Model.Sites[i].ProjectId" id="ProjectId_@counter" asp-items="ViewBag.ProjectId" onchange="FillSubProjects(this);" style="width:100%;height:36px;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please choose Project")</option>
+                </select>
+            </td>
+            <td>
+                <select asp-for="@Model.Sites[i].SubProjectId" asp-items="ViewBag.SubProjectId" id="SubProjectId_@counter" style="width:100%;height:36px;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please choose SubProject")</option>
+                </select>
+            </td>
+            <td style="vertical-align:middle;">
+                <input asp-for="@Model.Sites[i].Hours" style="width:100%;height:36px;vertical-align:middle;" />
+                <span asp-validation-for="@Model.Sites[i].Hours" class="text-danger"></span>
+            </td>
+
+            <td style="vertical-align:middle;">
+                <input type="number" asp-for="@Model.Sites[i].KM_start" style="width:100%;height:36px;vertical-align:middle;" />
+                <span asp-validation-for="@Model.Sites[i].KM_start" class="text-danger"></span>
+            </td>
+            <td style="vertical-align:middle;">
+                <input type="number" asp-for="@Model.Sites[i].KM_end" style="width:100%;height:36px;vertical-align:middle;" />
+                <span asp-validation-for="@Model.Sites[i].KM_end" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr style="border-bottom:2px solid blue;border-left:2px solid blue;border-right:2px solid blue;">
+            <td><b>@SharedLocalizer.GetLocalizedHtmlString("Description"):</b></td>
+            <td colspan="4"><input asp-for="@Model.Sites[i].Description" type="text" style="width:100%;" /></td>
+        </tr>
+        counter += 1;
+    }
+    <tr>
+        <td colspan="5">
+            <button class="btn-hoelscher" style="width:100%;height:50px;">@SharedLocalizer.GetLocalizedHtmlString("Create")</button>
+        </td>
+    </tr>
+</table>
+
+</form>
+
+
+<div>
+    <a asp-action="MainMenu" asp-controller="TrackItems">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-20:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+                });
+            });
+        });
+        function retrieveData(e) {
+            var posting = true;
+            var proj = document.getElementById("ProjectId_0").value;
+            if (proj == "" || proj == null) {
+                posting = false;
+                e.preventDefault();
+            }
+            if ($("#theform").valid() == false) {
+                posting = false;
+            }
+            if (posting == true) {
+                StartSpinner();
+            }
+        }
+        function FillSubProjects(elem) {
+            var count = elem.id.split("_")[1];
+            var ProjectId = $("#ProjectId_" + count).val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId_" + count).html(s);
+                        document.getElementById("SubProjectId_" + count).style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId_" + count).html(s);
+                    }
+                }
+            });
+        }
+    </script>
+}

@@ -1,0 +1,104 @@
+﻿@model IEnumerable<MainOps.Models.WellDrillingInstruction>
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Drilling Instructions");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Drilling Insstructions")</h2>
+
+<p>
+    <a asp-action="Create_Instruction">@SharedLocalizer.GetLocalizedHtmlString("Create New Drilling Instruction")</a>
+</p>
+
+<table class="table" style="table-layout:fixed;width:100%;">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WellID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Borerig)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Boringstype)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Boretilladelse)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Afledningstilladelse)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RaadenOverVej)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Gravetilladelse)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Ledningsoplysninger)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Forgravning)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ToFiltre)
+            </th>
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WellID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Boringstype)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Boretilladelse)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Afledningstilladelse)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.RaadenOverVej)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Gravetilladelse)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Ledningsoplysninger)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Forgravning)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.ToFiltre)
+                </td>
+
+                <td>
+                    <a asp-action="EditÍnstruction" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> |
+                    <a asp-action="GetDrillingInstructionPDF" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Details")</a>
+                    @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin")) {
+                    <a asp-action="DeleteInstruction" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Delete")</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

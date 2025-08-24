@@ -1,0 +1,152 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+@inject UserManager<ApplicationUser> UserManager
+@if (User.Identity.IsAuthenticated)
+{
+    if (!(await UserManager.GetUserAsync(User)).DivisionId.Equals(10))
+    {
+        <form asp-action="MainMenu" asp-controller="TrackItems" method="get">
+
+
+            <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Main Menu")</button>
+        </form>
+    }
+}
+
+    <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="8000" style="position:center;">
+        <ol class="carousel-indicators">
+            <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+            <li data-target="#myCarousel" data-slide-to="1"></li>
+            <li data-target="#myCarousel" data-slide-to="2"></li>
+        </ol>
+        @if (User.Identity.IsAuthenticated)
+        {
+            if ((await UserManager.GetUserAsync(User)).DivisionId.Equals(10))
+            {
+                <div class="carousel-inner" role="listbox">
+                    <div class="item active">
+                        <img src="~/images/pano.jpg" alt="ASP.NET" class="img-responsive" style="height:200px;" />
+                        <div class="carousel-caption" role="option">
+                            <p style="text-align:center;">
+                                <div style="color:white; font-size:xx-large;">
+                                    @SharedLocalizer.GetLocalizedHtmlString("Nye Dagssedler i CG Jensen!")
+                                </div>
+                                <a class="btn btn-default" href="@Url.Action("Create", "DagsRapportBetons", FormMethod.Get)" style="width: 250px; height: 50px; margin: 0 auto; padding: 0; display: inline-block; line-height: 50px; text-align: center;font-size:x-large;">
+                                    @SharedLocalizer.GetLocalizedHtmlString("Opret Dagssedddel")
+                                </a>
+                            </p>
+                        </div>
+
+                    </div>
+                    <div class="item">
+                        <img src="~/images/pano2.jpg" alt="Visual Studio" class="img-responsive" style="height:200px;" />
+                        <div class="carousel-caption" role="option">
+                            <p>
+                                <div style="color:white; font-size:xx-large;">
+                                    @SharedLocalizer.GetLocalizedHtmlString("Nye Dagssedler i CG Jensen!")
+                                </div>
+                                <a class="btn btn-default" href="@Url.Action("Create", "DagsRapportBetons", FormMethod.Get)" style="width: 250px; height: 50px; margin: 0 auto; padding: 0; display: inline-block; line-height: 50px; text-align: center;font-size:x-large;">
+                                    @SharedLocalizer.GetLocalizedHtmlString("Opert Dagssedddel")
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+                <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                    <span class="sr-only">@SharedLocalizer.GetLocalizedHtmlString("forrige")</span>
+                </a>
+                <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+                    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                    <span class="sr-only">@SharedLocalizer.GetLocalizedHtmlString("næste")</span>
+                </a>
+            }
+            else
+            {
+                <div class="carousel-inner" role="listbox">
+                    <div class="item active">
+                        <img src="~/images/pano.jpg" alt="ASP.NET" class="img-responsive" style="height:200px;" />
+                        <div class="carousel-caption" role="option">
+                            <p style="text-align:center;">
+                                <div style="color:white; font-size:xx-large;">
+                                    @SharedLocalizer.GetLocalizedHtmlString("There are powerful new features in Hoelscher")
+                                </div>
+                                <a class="btn btn-default" href="@Url.Action("ProjectOverView","Projects",FormMethod.Get)" style="width: 250px; height: 50px; margin: 0 auto; padding: 0; display: inline-block; line-height: 50px; text-align: center;font-size:x-large;">
+                                    @SharedLocalizer.GetLocalizedHtmlString("Go To Projects")
+                                </a>
+                            </p>
+                        </div>
+
+                    </div>
+                    <div class="item">
+                        <img src="~/images/pano2.jpg" alt="Visual Studio" class="img-responsive" style="height:200px;" />
+                        <div class="carousel-caption" role="option">
+                            <p>
+                                <div style="color:white; font-size:xx-large;">
+                                    @SharedLocalizer.GetLocalizedHtmlString("Do your daily maintenance right here on the internet!")
+                                </div>
+                                <a class="btn btn-default" href="@Url.Action("ProjectOverView","Projects",FormMethod.Get)" style="width: 250px; height: 50px; margin: 0 auto; padding: 0; display: inline-block; line-height: 50px; text-align: center;font-size:x-large;">
+                                    @SharedLocalizer.GetLocalizedHtmlString("Go To Projects")
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+                <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                    <span class="sr-only">@SharedLocalizer.GetLocalizedHtmlString("Previous")</span>
+                </a>
+                <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+                    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                    <span class="sr-only">@SharedLocalizer.GetLocalizedHtmlString("Next")</span>
+                </a>
+            }
+        }
+        else
+        {
+            <div class="carousel-inner" role="listbox">
+                <div class="item active">
+                    <img src="~/images/pano.jpg" alt="ASP.NET" class="img-responsive" style="height:200px;" />
+                    <div class="carousel-caption" role="option">
+                        <p style="text-align:center;">
+                            <div style="color:white; font-size:xx-large;">
+                                @SharedLocalizer.GetLocalizedHtmlString("There are powerful new features in Hoelscher")
+                            </div>
+                            <a class="btn btn-default" href="@Url.Action("ProjectOverView","Projects",FormMethod.Get)" style="width: 250px; height: 50px; margin: 0 auto; padding: 0; display: inline-block; line-height: 50px; text-align: center;font-size:x-large;">
+                                @SharedLocalizer.GetLocalizedHtmlString("Go To Projects")
+                            </a>
+                        </p>
+                    </div>
+
+                </div>
+                <div class="item">
+                    <img src="~/images/pano2.jpg" alt="Visual Studio" class="img-responsive" style="height:200px;" />
+                    <div class="carousel-caption" role="option">
+                        <p>
+                            <div style="color:white; font-size:xx-large;">
+                                @SharedLocalizer.GetLocalizedHtmlString("Do your daily maintenance right here on the internet!")
+                            </div>
+                            <a class="btn btn-default" href="@Url.Action("ProjectOverView","Projects",FormMethod.Get)" style="width: 250px; height: 50px; margin: 0 auto; padding: 0; display: inline-block; line-height: 50px; text-align: center;font-size:x-large;">
+                                @SharedLocalizer.GetLocalizedHtmlString("Go To Projects")
+                            </a>
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+            <a class="left carousel-control" href="#myCarousel" role="button" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                <span class="sr-only">@SharedLocalizer.GetLocalizedHtmlString("Previous")</span>
+            </a>
+            <a class="right carousel-control" href="#myCarousel" role="button" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                <span class="sr-only">@SharedLocalizer.GetLocalizedHtmlString("Next")</span>
+            </a>
+        }
+
+
+    </div>
+

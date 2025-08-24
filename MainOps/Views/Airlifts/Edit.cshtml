@@ -1,0 +1,181 @@
+﻿@model MainOps.Models.Airlift
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>Airlift</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <select asp-for="ProjectId" onchange="FilleSubProjects();" class="form-control" asp-items="ViewBag.ProjectId"></select>
+                <span asp-validation-for="ProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SubProjectId" class="control-label"></label>
+                <select asp-for="SubProjectId" onchange="FillMeasPoints2();" class="form-control" asp-items="ViewBag.SubProjectId"></select>
+                <span asp-validation-for="SubProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MeasPointId" class="control-label"></label>
+                <select asp-for="MeasPointId" class="form-control" asp-items="ViewBag.MeasPointId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="TimeStamp" class="control-label"></label>
+                <input asp-for="TimeStamp" class="form-control" />
+                <span asp-validation-for="TimeStamp" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BottomWellBefore" class="control-label"></label>
+                <input asp-for="BottomWellBefore" class="form-control" />
+                <span asp-validation-for="BottomWellBefore" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WaterLevelBefore" class="control-label"></label>
+                <input asp-for="WaterLevelBefore" class="form-control" />
+                <span asp-validation-for="WaterLevelBefore" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BottomWellAfter" class="control-label"></label>
+                <input asp-for="BottomWellAfter" class="form-control" />
+                <span asp-validation-for="BottomWellAfter" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WaterLevelAfter" class="control-label"></label>
+                <input asp-for="WaterLevelAfter" class="form-control" />
+                <span asp-validation-for="WaterLevelAfter" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RecoveryTime" class="control-label"></label>
+                <<input asp-for="RecoveryTime" class="form-control" />
+                <span asp-validation-for="RecoveryTime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Comments" class="control-label"></label>
+                <input asp-for="Comments" class="form-control" />
+                <span asp-validation-for="Comments" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DoneBy" class="control-label"></label>
+                <input asp-for="DoneBy" class="form-control" />
+                <span asp-validation-for="DoneBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>@SharedLocalizer.GetLocalizedHtmlString("Photos")</label>
+                <input type="file" multiple="multiple" accept=".jpg,.jpeg" name="photos" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+@section Scripts
+    {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+
+
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var SubProjectId = $('#SubProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                        var x = document.getElementById("SubProjectId");
+                        var i;
+                        for (i = 0; i < x.length; i++) {
+                            if (x.options[i].value == SubProjectId) {
+                                x.options[i].selected = true;
+                            }
+                        }
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                    FillMeasPoints();
+
+                }
+            });
+    }
+    function FillMeasPoints() {
+        var MeasPointId = $('#MeasPointId').val();
+            var ProjectId = $('#ProjectId').val();
+        var url = '@Url.Action("GetWellsProject", "Projects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                },
+                success: function (data) {
+                    var s = '<option value="">Select Well</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                    }
+                    $("#MeasPointId").html(s);
+                    document.getElementById("MeasPointId").style.width = "100%";
+                    var x = document.getElementById("MeasPointId");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        if (x.options[i].value == MeasPointId) {
+                            x.options[i].selected = true;
+                        }
+                    }
+                }
+            });
+    }
+    function FillMeasPoints2() {
+        var MeasPointId = $("MeasPointId").val();
+            var SubProjectId = $('#SubProjectId').val();
+        var url = '@Url.Action("GetWellsSubProject", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': SubProjectId,
+                },
+                success: function (data) {
+                    var s = '<option value="">Select Well</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                    }
+                    $("#MeasPointId").html(s);
+                    document.getElementById("MeasPointId").style.width = "100%";
+                    var x = document.getElementById("MeasPointId");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        if (x.options[i].value == MeasPointId) {
+                            x.options[i].selected = true;
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+}

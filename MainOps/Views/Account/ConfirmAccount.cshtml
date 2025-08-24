@@ -1,0 +1,12 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+
+@{
+    ViewData["Title"] = @SharedLocalizer.GetLocalizedHtmlString("Confirm Account");
+}
+
+<h2>@ViewData["Title"]</h2>
+<div>
+    <p>
+        @SharedLocalizer.GetLocalizedHtmlString("Thank you for confirming the Account for the user")
+    </p>
+</div>

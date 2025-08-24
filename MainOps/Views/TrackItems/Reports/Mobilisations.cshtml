@@ -1,0 +1,115 @@
+﻿@model IEnumerable<MainOps.Models.Mobilize>
+
+@{
+    ViewData["Title"] = "Mobilisations";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Mobilisations")</h2>
+<form asp-controller="TrackItems" asp-action="ExportMobilize" method="post">
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td>
+                @SharedLocalizer.GetLocalizedHtmlString("Export to csv")
+            </td>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Project"):</label></td>
+            <td>
+                <select id="ProjectId" name="ProjectId" class="form-control" asp-items="ViewBag.ProjectId">
+                    <option value="@null">@SharedLocalizer.GetLocalizedHtmlString("All")</option>
+                </select>
+            </td>
+            <td>
+                <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Export")</button>
+            </td>
+        </tr>
+    </table>
+</form>
+<form asp-controller="TrackItems" asp-action="CombsearchMobilize">
+    <table>
+        <tr>
+            <td>
+                <label>@SharedLocalizer.GetLocalizedHtmlString("Installation Item / BoQ nr"):</label>
+            </td>
+            <td>
+                @Html.DropDownList("filterchoice", ViewData["ItemTypeId"] as IEnumerable<SelectListItem>, @SharedLocalizer.GetLocalizedHtmlString("All"), new { @class = "form-control" })
+            </td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Project"):</label></td>
+            <td>
+                <select id="ProjectId" name="filterchoice2" class="form-control" asp-items="ViewBag.ProjectId">
+                    <option value="@null">@SharedLocalizer.GetLocalizedHtmlString("All")</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoCompleteMobilize","TrackItems")" /></td>
+            <td>
+                <button type="submit" class="btn-hoelscher">
+                    <span class="glyphicon glyphicon-search"></span>
+                </button>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<table style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(model => model.Project)</th>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MobilizeText_Text)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Total Amount Arrived")
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Coordiantes")
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ItemType.Item_Type)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MobilizeText_Text)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Amount)
+            </td>
+            <td>
+                @Model.Where(x => x.ItemTypeId.Equals(item.ItemTypeId)).Sum(x => x.Amount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeStamp)
+            </td>
+            <td>
+                [@Html.DisplayFor(modelItem => item.Latitude);@Html.DisplayFor(modelItem => item.Longitude)]
+            </td>
+            @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+            {
+                <td>
+                    <form asp-action="Edit_Mobilization" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                    </form>
+                </td>
+            }
+            </tr>
+}
+    </tbody>
+</table>

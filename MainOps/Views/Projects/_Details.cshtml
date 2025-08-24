@@ -1,0 +1,48 @@
+﻿@model MainOps.Models.Project
+
+@{ 
+    Layout = null;
+}
+
+<div>
+    <h4>@SharedLocalizer.GetLocalizedHtmlString("Project")</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.ProjectNr)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ProjectNr)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Responsible_Person)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Responsible_Person)
+        </dd>
+        <dt>
+            <b>@SharedLocalizer.GetLocalizedHtmlString("Client Contact Person")</b>
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Client)
+        </dd>
+        <dt>
+            <b>@SharedLocalizer.GetLocalizedHtmlString("Contact Email")</b>
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ClientEmail)
+        </dd>
+        <dt>
+            <b>@SharedLocalizer.GetLocalizedHtmlString("Address")</b>
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Address)
+        </dd>
+    </dl>
+</div>

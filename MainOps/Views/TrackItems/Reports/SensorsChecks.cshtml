@@ -1,0 +1,58 @@
+﻿@model IEnumerable<MainOps.Models.SensorsCheck>
+
+@{
+    ViewData["Title"] = @SharedLocalizer.GetLocalizedHtmlString("SensorsChecks");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Sensors Checks")</h2>
+
+<table style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubProject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EnteredIntoDataBase)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SubProject.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeStamp)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DoneBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EnteredIntoDataBase)
+            </td>
+            <td>
+                <form asp-action="SensorsCheckReport_PDF" asp-route-id="@item.Id" asp-controller="TrackItems" method="get" target="_blank">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                </form>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<a asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>

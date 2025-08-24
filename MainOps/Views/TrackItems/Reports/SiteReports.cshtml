@@ -1,0 +1,96 @@
+﻿
+@{
+    ViewData["Title"] = "Reports";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Download all reports")</h2>
+
+<h3>@SharedLocalizer.GetLocalizedHtmlString("This download contains: Daily Reports, Alarm Calls, Maintenance Reports, WTP Checks, Site Checks, Sensors Checks, Generator Tests, Contruction Site Inspections")</h3>
+
+<form asp-controller="TrackItems" asp-action="DownloadSiteDocumentation" method="post" target="_blank">
+    <table>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Start Date:")</td>
+            <td> <input name="startdate" type="date" value="@DateTime.Now.Date" /></td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("End Date:")</td>
+            <td> <input name="enddate" type="date" value="@DateTime.Now.Date" /></td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Project:")</td>
+            <td><select id="ProjectId" name="ProjectId" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select Project")</option></select></td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("SubProject ?:")</td>
+            <td><select id="SubProjectId" name="SubProjectId" asp-items="ViewBag.SubProjectId"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Sub Project?")</option></select></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Generate Report")</button>
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Daily Reports:")</label></td>
+            <td><input type="checkbox" value="true" checked="checked" name="DailyReports" onclick="$(this).val(this.checked ? true : false)" /></td>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Alarm Reports:")</label></td>
+            <td><input type="checkbox" value="true" checked="checked" name="AlarmReports" onclick="$(this).val(this.checked ? true : false)" /></td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Maintenance Reports:")</label></td>
+            <td><input type="checkbox" value="true" checked="checked" name="MaintenanceReports" onclick="$(this).val(this.checked ? true : false)" /></td>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Site Inspections:")</label></td>
+            <td><input type="checkbox" value="true" checked="checked" name="InspectionReports" onclick="$(this).val(this.checked ? true : false)" /></td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Generator Tests:")</label></td>
+            <td><input type="checkbox" value="true" checked="checked" name="GeneratorReports" onclick="$(this).val(this.checked ? true : false)" /></td>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("WTP Checks:")</label></td>
+            <td><input type="checkbox" value="true" checked="checked" name="WTPReports" onclick="$(this).val(this.checked ? true : false)" /></td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Site Checks:")</label></td>
+            <td><input type="checkbox" value="true" checked="checked" name="SiteReports" onclick="$(this).val(this.checked ? true : false)" /></td>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Sensor Checks:")</label></td>
+            <td><input type="checkbox" value="true" checked="checked" name="SensorReports" onclick="$(this).val(this.checked ? true : false)" /></td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Decommissions:")</label></td>
+            <td><input type="checkbox" value="true" checked="checked" name="Decommissions" onclick="$(this).val(this.checked ? true : false)" /></td>
+        </tr>
+    </table>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "90%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+        }
+        
+
+    </script>
+}

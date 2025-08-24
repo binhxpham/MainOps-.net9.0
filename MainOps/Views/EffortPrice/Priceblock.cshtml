@@ -1,0 +1,178 @@
+﻿@model MainOps.Models.WTPClasses.MixedClasses.EffortPrice;
+
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Priceblock");
+}
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Effort Prices")</h2>
+<div class="form-horizontal">
+    <hr />
+    <div class=" row">
+        <div class="col-md-6">
+            <form asp-action="Create">
+                @Html.HiddenFor(model => model.effort.Id)
+                @Html.HiddenFor(model => model.effort.Name)
+                <table>
+                    <tr>
+                        <td>
+                            @Html.LabelFor(model => model.pxx.EkdT.category)
+                        </td>
+                        <td>
+                            @Html.DropDownListFor(model => model.pxx.EkdTid, ViewData["categories"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                        </td>
+                        <td>
+                            @Html.ValidationMessageFor(model => model.pxx.EkdTid, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.LabelFor(model => model.pxx.size)
+                        </td>
+                        <td>
+                            @Html.EditorFor(model => model.pxx.size, new { @class = "form-control" })
+                        </td>
+                        <td>
+                            @Html.ValidationMessageFor(model => model.pxx.size, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.LabelFor(model => model.pxx.unit)
+                        </td>
+                        <td>
+                            @Html.DropDownListFor(model => model.pxx.unitid, ViewData["units"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                        </td>
+                        <td>
+                            @Html.ValidationMessageFor(model => model.pxx.unitid, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.LabelFor(model => model.pxx.price)
+                        </td>
+                        <td>
+                            @Html.EditorFor(model => model.pxx.price, new { @class = "form-control" })
+                        </td>
+                        <td>
+                            @Html.ValidationMessageFor(model => model.pxx.price, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.LabelFor(model => model.pxx.unit_p)
+                        </td>
+                        <td>
+                            @Html.DropDownListFor(model => model.pxx.unit_pid, ViewData["units"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                        </td>
+                        <td>
+                            @Html.ValidationMessageFor(model => model.pxx.unit_pid, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.LabelFor(model => model.pxx.rent)
+                        </td>
+                        <td>
+                            @Html.EditorFor(model => model.pxx.rent, new { @class = "form-control" })
+                        </td>
+                        <td>
+                            @Html.ValidationMessageFor(model => model.pxx.rent,"", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.LabelFor(model => model.pxx.unit_r)
+                        </td>
+                        <td>
+                            @Html.DropDownListFor(model => model.pxx.unit_rid, ViewData["units"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                        </td>
+                        <td>
+                            @Html.ValidationMessageFor(model => model.pxx.unit_rid, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            @Html.LabelFor(model => model.pxx.division)
+                        </td>
+                        <td>
+                            @Html.DropDownListFor(model => model.pxx.divisionid, ViewData["divisions"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                        </td>
+                        <td>
+                            @Html.ValidationMessageFor(model => model.pxx.divisionid, "", new { @class = "text-danger" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input type="submit" value=@Localizer["Create"] class="btn btn-hoelscher" />
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Name")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("EkdT")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Size")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Price")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Unit of Price")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Rent")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Unit of Rent")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Neccesity")
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (var i = 0; i < Model.px.Count; i++)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.px[i].name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.px[i].EkdT.category)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.px[i].size)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.px[i].price)
+                </td>
+                <td>
+                    @Html.Raw(Model.px[i].unit_p.the_unit)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.px[i].rent)
+                </td>
+                <td>
+                    @Html.Raw(Model.px[i].unit_r.the_unit)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@Model.px[i].id">@Localizer["Edit"]</a> |
+                    <a asp-action="Details" asp-route-id="@Model.px[i].id">@Localizer["Details"]</a> |
+                    <a asp-action="Delete" asp-route-id="@Model.px[i].id">@Localizer["Delete"]</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

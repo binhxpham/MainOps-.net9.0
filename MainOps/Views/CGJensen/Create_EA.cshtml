@@ -1,0 +1,42 @@
+﻿@model MainOps.Models.CGJClasses.EA
+
+@{
+    ViewData["Title"] = "Opret Ekstraarbejde";
+}
+
+<h2>Opret Ekstraarbejde</h2>
+
+<h4>Ekstraarbejde</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create_EA">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="EAnr" class="control-label"></label>
+                <input asp-for="EAnr" class="form-control" />
+                <span asp-validation-for="EAnr" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Opgave" class="control-label"></label>
+                <input asp-for="Opgave" class="form-control" />
+                <span asp-validation-for="Opgave" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Sagsnummer" class="control-label"></label>
+                <select asp-for="Sagsnummer" asp-items="ViewBag.Sagsnummer">
+                    <option value="">Vælg Sagsnummer</option>
+                </select>
+                <span asp-validation-for="Sagsnummer" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Opret" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Ekstraarbejder">Tilbage</a>
+</div>
+

@@ -1,0 +1,55 @@
+﻿@model MainOps.Models.Document
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>Document</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="DivisionId" />
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MeasPointId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.MeasPointId))</label>
+                @Html.DropDownListFor(Model => Model.MeasPointId, ViewData["MeasPointId"] as IEnumerable<SelectListItem>,
+                @SharedLocalizer.GetLocalizedHtmlString("Please Select Measurement Point"), new { name = "id", style = "width:250px;height:40px;" })
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.ProjectId))</label>
+                @Html.DropDownListFor(Model => Model.ProjectId, ViewData["ProjectId"] as IEnumerable<SelectListItem>,
+                @SharedLocalizer.GetLocalizedHtmlString("Please Select Project"), new { name = "id", style = "width:250px;height:40px;" })
+            </div>
+            <div class="form-group">
+                <label asp-for="DocumentType" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.DocumentType))</label>
+                @Html.DropDownListFor(Model => Model.DocumentTypeId, ViewData["DocumentTypeId"] as IEnumerable<SelectListItem>,
+                @SharedLocalizer.GetLocalizedHtmlString("Please Select DocumentType"), new { name = "id", style = "width:250px;height:40px;" })
+            </div>
+            <div class="form-group">
+                <label asp-for="ExternalUrl" class="control-label"></label>
+                <input asp-for="ExternalUrl" class="form-control" />
+                <span asp-validation-for="ExternalUrl" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

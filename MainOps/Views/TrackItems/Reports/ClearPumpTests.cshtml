@@ -1,0 +1,82 @@
+﻿@model IEnumerable<MainOps.Models.ClearPumpTest>
+
+@{
+    ViewData["Title"] = "ClearPumpTests";
+}
+
+<h2>Clear Pump Tests</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubProject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Wellname)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Report_Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GeneralComments)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.OrderByDescending(x => x.Report_Date).ThenByDescending(x => x.starttime)) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Name)
+            </td>
+            @if (item.SubProjectId != null)
+            {
+                <td>
+                    @Html.DisplayFor(modelItem => item.SubProject.Name)
+                </td>
+            }
+            else
+            {
+                <td></td>
+            }
+            <td>
+                @Html.DisplayFor(modelItem => item.Wellname)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Report_Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.GeneralComments)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DoneBy)
+            </td>
+            <td>
+                <form asp-action="ClearPumpTestReport" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                </form>
+                @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+                {
+                    <a asp-action="UploadClearPumpTestData" asp-route-id="@item.Id">Upload Data</a>
+                }
+            </td>
+            <td>
+                <form asp-action="ClearPumpTestReport_PDF" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("PDF")</button>
+                </form>
+                @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+                {
+                    <a asp-action="DeleteClearPumpTestData" asp-route-id="@item.Id" onclick="confirmMessage(event);">Delete Data</a>
+                }
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

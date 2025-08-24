@@ -1,0 +1,97 @@
+﻿@model IEnumerable<MainOps.Models.CGJClassesBeton.DagsRapportBeton>
+@inject UserManager<ApplicationUser> _userManager;
+@{
+    ViewData["Title"] = "Dagssedler";
+    var username = (await _userManager.GetUserAsync(User)).full_name();
+}
+
+<h2>Dagssedler</h2>
+
+<p>
+    <a asp-action="Create">Opret Dagsseddel</a>
+</p>
+<form asp-action="UdskrivDagssedler" method="post" target="_blank">
+    <table>
+        <tr>
+            <td>Projekt:</td>
+            <td><select name="ProjectId" asp-items="ViewBag.ProjectId"><option value="">Vælg Projekt</option></select></td>
+        </tr>
+        <tr>
+            <td>start:</td>
+            <td><input type="date" name="startdate" /></td>
+        </tr>
+        <tr>
+            <td>slut:</td>
+            <td><input type="date" name="enddate" /></td>
+        </tr>
+        <tr><td colspan="2"><button class="btn-hoelscher">Print Dagssedler</button></td></tr>
+    </table>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Dato)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UdarbjedetAf)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ForSaetter)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Vejr)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Name)
+                @if(item.SubProjectId != null)
+                {
+                    <text>
+                    - @Html.DisplayFor(modelItem => item.SubProject.Name)
+                     </text>
+                }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Dato)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UdarbjedetAf)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ForSaetter)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Vejr)
+            </td>
+            
+           
+            <td>
+                @if ((User.IsInRole("Manager") || User.IsInRole("Admin") || User.IsInRole("DivisionAdmin")) || item.UdarbjedetAf.Equals(username))
+                {
+                    <a asp-action="Edit" asp-route-id="@item.Id">Rediger</a>
+                }
+                <a asp-action="DagsseddelPDF" asp-route-id="@item.Id" target="_blank">PDF</a>
+                @if (User.IsInRole("DivisionAdmin") || User.IsInRole("Admin"))
+                {
+                    <a asp-action="Delete" asp-route-id="@item.Id">Slet</a>
+                }
+                @if (item.Fotos.Count() > 0)
+                {
+                    <form asp-action="GetZipFile" asp-controller="DagsRapportBetons" asp-route-id="@item.Id" method="get">
+                        <button><span class="glyphicon glyphicon-paperclip"></span></button>
+                    </form>
+                }
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

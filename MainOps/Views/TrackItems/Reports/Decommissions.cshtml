@@ -1,0 +1,68 @@
+﻿@model IEnumerable<MainOps.Models.Decommission>
+
+@{
+    ViewData["Title"] = "Decommissions";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Decommissions")</h2>
+
+<table style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubProject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Wellname)
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SubProject.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeStamp)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DoneBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Wellname)
+            </td>
+            <td>
+                <form asp-action="DecommissionReport_PDF" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                </form>
+                @if(User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DivisionAdmin")) { 
+                    <form asp-action="Edit_Decommission" asp-controller="TrackItems" asp-route-id="@item.Id" method="get">
+                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                    </form>
+                }
+            </td>
+            <td>
+                <form asp-action="Upload_Photo_Decom" asp-controller="TrackItems" asp-route-id="@item.Id" method="post" enctype="multipart/form-data">
+                    <input name="files" type="file" multiple accept=".jpg,.jpeg" style="width:100%;" />
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload")</button>
+                </form>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

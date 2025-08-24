@@ -1,0 +1,469 @@
+﻿@model IEnumerable<MainOps.Models.ReportClasses.Daily_Report_2>
+@inject UserManager<ApplicationUser> _userManager;
+@{
+    ViewData["Title"] = "Daily Reports";
+    
+}
+<style>
+    @@media only screen and (max-width: 900px) {
+        .hidabletd{
+            display: none;
+        }
+    }
+</style>
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Daily Reports")</h2>
+<table style="border: 2px solid blue;width:100%;table-layout:fixed;">
+    <tr>
+        <td>
+            <form asp-action="Reports" asp-controller="TrackItems">
+                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Return to Report types")</button>
+            </form>
+        </td>
+        @if(User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager")) {
+        <td>
+            <form asp-action="ShowUncheckedDailyReports" asp-controller="TrackItems" method="get">
+                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Go-To Unchecked Reports!")</button>
+            </form>
+        </td>
+        }
+    </tr>
+</table>
+
+<br />
+@if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+{
+<form asp-controller="TrackItems" asp-action="ExportDailyReport" method="post">
+    <table style="border:2px solid blue;width:100%;table-layout:fixed;">
+        <tr>
+            <td>
+                @SharedLocalizer.GetLocalizedHtmlString("Export to csv")
+            </td>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Project"):</label></td>
+            <td>
+                <select id="ProjectId" name="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" style="width:100%;">
+                    <option value="@null">@SharedLocalizer.GetLocalizedHtmlString("All")</option>
+                </select>
+            </td>
+            <td>
+                <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Export")</button>
+            </td>
+        </tr>
+    </table>
+</form>
+<br />
+<form asp-action="GenerateReportSummary" asp-controller="TrackItems" method="get">
+    <table style="border:2px solid blue;width:100%;table-layout:fixed;">
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Project")</label></td>
+            <td><select name="ProjectId" asp-items="ViewBag.ProjectId" id="summaryprojectid" style="width:100%;" onchange="FillSubProjects3();"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Project")</option></select></td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("SubProject")</label></td>
+            <td><select name="SubProjectId" asp-items="ViewBag.SubProjectId" id="summarysubprojectid" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select SubProject")</option></select></td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Report Summary Date")</label></td>
+            <td><input type="text" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd")" id="thedate" name="thedate" style="width:100%;" /></td>
+        </tr>
+        <tr><td colspan="2"><button class="btn-hoelscher" style="width:100%;"> @SharedLocalizer.GetLocalizedHtmlString("Get Summary")</button></td></tr>
+    </table>
+</form>
+    <br />
+}
+
+<br />
+<table style="width:100%;table-layout:fixed;">
+    <tr style="border:2px solid blue;">
+        <td style="margin-left:5px;width:20%;">
+            @SharedLocalizer.GetLocalizedHtmlString("Search:")
+        </td>
+        <td style="width:80%;">
+            <form asp-controller="TrackItems" asp-action="CombsearchDR">
+                <table style="width:100%;table-layout:fixed;">
+                    <tr>
+                        <td>@SharedLocalizer.GetLocalizedHtmlString("Project:")</td>
+                        <td>
+                            <select name="filterchoice" asp-items="ViewBag.Filterchoices" id="filterchoiceid" onchange="FillSubProjects2();" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("All")</option></select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>@SharedLocalizer.GetLocalizedHtmlString("SubProject:")</td>
+                        <td>
+                            <select name="filterchoice2" asp-items="ViewBag.Filterchoices2" id="filterchoice2id" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("All")</option></select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoCompleteDR", "TrackItems")" style="width:100%;" />
+                        </td>
+                        <td>
+                            <button type="submit" class="btn-hoelscher">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+                
+            </form>
+        </td>
+    </tr>
+</table>
+<br />
+<table class="table" style="width:100%;table-layout:fixed;word-break:break-word;">
+    <thead>
+        <tr>
+            <th style="width:10%;">
+                @Html.DisplayNameFor(model => model.Project)
+            </th>           
+            <th style="width:10%;">
+                @Html.DisplayNameFor(model => model.short_Description)
+            </th>
+            <th style="width:10%;">
+                @Html.DisplayNameFor(model => model.Report_Date)
+            </th>
+            <th style="width:5%;">
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th style="width:10%;">
+                @Html.DisplayNameFor(model => model.OtherPeople)
+            </th>
+            <th style="width:6%;">
+                @Html.DisplayNameFor(model => model.Hours)
+            </th>
+            <th class="hidabletd" style="width:23%;">
+                @Html.DisplayNameFor(model => model.Work_Performed)
+            </th>
+            <th style="width:9%;">
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th>
+            <th style="width:9%;">
+                @Html.DisplayNameFor(model => model.Report_Checked)
+            </th>
+            <th style="width:8%;"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            @if (item.tobepaid.Equals(2))
+            {
+        <tr style="background-color:lightcoral;">
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+                @if (item.SubProjectId != null)
+                {
+                    <text>-</text>@Html.DisplayFor(modelItem => item.SubProject.Name)
+                }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.short_Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Report_Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Amount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OtherPeople)
+            </td>
+            <td>
+                @item.Hours.ToString(@"hh\:mm")
+            </td>
+            <td class="hidabletd">
+                @Html.DisplayFor(modelItem => item.Work_Performed)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DoneBy)
+            </td>
+            <td>
+                @if (item.Report_Checked.Equals(true)) 
+                {
+                    <span style="background-color:lawngreen">CHECKED</span>
+                }
+            </td>
+            <td>
+                @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager") || (User.IsInRole("ProjectMember") && (await _userManager.GetUserAsync(User)).full_name().Equals(item.DoneBy)))
+                {
+                    <form asp-action="Edit_DailyReport_2" asp-route-id="@item.Id" method="get" target="_blank">
+                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                    </form>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+                {
+                    <form asp-controller="DailyReport" asp-action="SplitDailyReport" asp-route-id="@item.Id" method="get">
+                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Split")</button>
+                    </form>
+                }
+                <form asp-action="Daily_Report_2_DetailsPdf" asp-route-id="@item.Id" method="get" target="_blank">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("PDF")</button>
+                </form>
+                @if (item.HasPhotos.Equals(true))
+                {
+                    <form asp-action="GetZipFile" asp-controller="TrackItems" asp-route-id="@item.Id" method="get">
+                        <button><span class="glyphicon glyphicon-paperclip"></span></button>
+                    </form>
+                }
+                @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin"))
+                {
+                    <form asp-action="Delete_DailyReport" asp-controller="TrackItems" asp-route-id="@item.Id" method="get">
+                        <button class="btn-hoelscher" onclick="confirm(@SharedLocalizer.GetLocalizedHtmlString("Are you sure you want to delete this?"))">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button>
+                    </form>
+                }
+            </td>
+        </tr>
+            }
+            else if (item.tobepaid.Equals(1))
+            {
+    <tr style="background-color:lightgreen;">
+        <td>
+            @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+            @if (item.SubProjectId != null)
+            {
+                <text>-</text>
+                @Html.DisplayFor(modelItem => item.SubProject.Name)
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.short_Description)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Report_Date)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Amount)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.OtherPeople)
+        </td>
+        <td>
+            @item.Hours.ToString(@"hh\:mm")
+        </td>
+        <td class="hidabletd">
+            @Html.DisplayFor(modelItem => item.Work_Performed)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DoneBy)
+        </td>
+        <td>
+            @if (item.Report_Checked.Equals(true))
+            {
+                <span style="background-color:lawngreen">CHECKED</span>
+            }
+        </td>
+        <td>
+            @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager") || (User.IsInRole("ProjectMember") && (await _userManager.GetUserAsync(User)).full_name().Equals(item.DoneBy)))
+            {
+                <form asp-action="Edit_DailyReport_2" asp-route-id="@item.Id" method="get" target="_blank">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                </form>
+            }
+            @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+            {
+                <form asp-controller="DailyReport" asp-action="SplitDailyReport" asp-route-id="@item.Id" method="get">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Split")</button>
+                </form>
+            }
+            <form asp-action="Daily_Report_2_DetailsPdf" asp-route-id="@item.Id" method="get" target="_blank">
+                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("PDF")</button>
+            </form>
+            @if (item.HasPhotos.Equals(true))
+            {
+                <form asp-action="GetZipFile" asp-controller="TrackItems" asp-route-id="@item.Id" method="get">
+                    <button><span class="glyphicon glyphicon-paperclip"></span></button>
+                </form>
+            }
+            @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin"))
+            {
+                <form asp-action="Delete_DailyReport" asp-controller="TrackItems" asp-route-id="@item.Id" method="get">
+                    <button class="btn-hoelscher" onclick="confirm(@SharedLocalizer.GetLocalizedHtmlString("Are you sure you want to delete this?"))">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button>
+                </form>
+            }
+        </td>
+    </tr>
+            }
+            else
+            {
+    <tr style="background-color:yellow">
+        <td>
+            @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+            @if (item.SubProjectId != null)
+            {
+
+                <text>-</text>
+                @Html.DisplayFor(modelItem => item.SubProject.Name)
+            }
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.short_Description)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Report_Date)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Amount)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.OtherPeople)
+        </td>
+        <td>
+            @item.Hours.ToString(@"hh\:mm")
+        </td>
+        <td class="hidabletd">
+            @Html.DisplayFor(modelItem => item.Work_Performed)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DoneBy)
+        </td>
+        <td>
+            @if (item.Report_Checked.Equals(true))
+            {
+                <span style="background-color:lawngreen">CHECKED</span>
+            }
+        </td>
+        <td>
+            @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager") || (User.IsInRole("ProjectMember") && (await _userManager.GetUserAsync(User)).full_name().Equals(item.DoneBy)))
+            {
+                <form asp-action="Edit_DailyReport_2" asp-route-id="@item.Id" method="get" target="_blank">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                </form>
+            }
+            @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+            {
+                <form asp-controller="DailyReport" asp-action="SplitDailyReport" asp-route-id="@item.Id" method="get">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Split")</button>
+                </form>
+            }
+            <form asp-action="Daily_Report_2_DetailsPdf" asp-route-id="@item.Id" method="get" target="_blank">
+                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("PDF")</button>
+            </form>
+            @if (item.HasPhotos.Equals(true))
+            {
+                <form asp-action="GetZipFile" asp-controller="TrackItems" asp-route-id="@item.Id" method="get">
+                    <button><span class="glyphicon glyphicon-paperclip"></span></button>
+                </form>
+            }
+            @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin"))
+            {
+                <form asp-action="Delete_DailyReport" asp-controller="TrackItems" asp-route-id="@item.Id" method="get">
+                    <button class="btn-hoelscher" onclick="confirm(@SharedLocalizer.GetLocalizedHtmlString("Are you sure you want to delete this?"))">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button>
+                </form>
+            }
+        </td>
+    </tr>
+            }
+
+
+        }
+    </tbody>
+</table>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-2:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+                $('.date-picker').datepicker("setDate", new Date());
+                FillSubProjects();
+                var ProjectId = $("#filterchoiceid").val();
+                if (ProjectId != "") {
+                    FillSubProjects2();
+                }
+            });
+        });
+        function FillSubProjects2() {
+            var ProjectId = $('#filterchoiceid').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#filterchoice2id").html(s);
+                        document.getElementById("dailySubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#filterchoice2id").html(s);
+                    }
+                }
+            });
+        }
+        function FillSubProjects3() {
+            var ProjectId = $('#summaryprojectid').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#summarysubprojectid").html(s);
+                        document.getElementById("dailySubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#summarysubprojectid").html(s);
+                    }
+                }
+            });
+        }
+        function FillSubProjects() {
+            var ProjectId = $('#dailyProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#dailySubProjectId").html(s);
+                        document.getElementById("dailySubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#dailySubProjectId").html(s);
+                    }
+                }
+            });
+        }
+        function unpaidchange() {
+            if (document.getElementById('unpaid').checked) {
+                document.getElementById('unpaid').value = true;
+            } else {
+                document.getElementById('unpaid').value = false;
+            }
+        }
+        function paidchange() {
+            if (document.getElementById('paid').checked) {
+                document.getElementById('paid').value = true;
+            } else {
+                document.getElementById('paid').value = false;
+            }
+        }
+</script>
+}
+

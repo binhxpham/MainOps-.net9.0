@@ -1,0 +1,75 @@
+﻿@model IEnumerable<MainOps.Models.AlarmCall>
+
+@{
+    ViewData["Title"] = "AlarmCalls";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Alarm Calls")</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubProject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LogText)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Hours)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+            </td>
+            @if(item.SubProjectId != null) { 
+            <td>
+                @Html.DisplayFor(modelItem => item.SubProject.Name)
+            </td>
+            }
+            else
+            {
+                <td></td>
+            }
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeStamp)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LogText)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Hours)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DoneBy)
+            </td>
+            <td>
+                @if(User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DivisionAdmin"))
+                {
+                    <form asp-action="Edit_AlarmCall" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
+                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                    </form>
+                }
+                <form asp-action="AlarmCall_PDF" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                </form>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<a asp-action="Reports">@SharedLocalizer.GetLocalizedHtmlString("Back to Reports page")</a>

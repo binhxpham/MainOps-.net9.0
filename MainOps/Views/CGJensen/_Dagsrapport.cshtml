@@ -1,0 +1,362 @@
+﻿@model MainOps.Models.CGJClasses.Dagsrapport
+@{
+    ViewData["Title"] = "Dagsrapport";
+    Layout = null;
+}
+@{
+    Layout = null;
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("All Documenation")</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+<style>
+    #thetable {
+        width: 100%;
+        table-layout: fixed;
+    }
+
+        #thetable td {
+            text-align: center;
+            word-break: break-all;
+            width: 100%;
+        }
+</style>
+<table id="thetable" style="page-break-inside:avoid;">
+    <tr>
+        <td colspan="10" style="background-color:orange;">
+            <b>Dagsrapport</b>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.KontraktNr)
+            </b>
+        </td>
+        <td colspan="2">
+            @Html.DisplayFor(Model => Model.KontraktNr)
+        </td>
+        <td colspan="6" rowspan="7" align="right" style="width:100%;"><img src="~/images/Divisions/Photos/@Model.Project.Division.Id/@Model.Project.Division.LogoPath" style="width:80%;" /></td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Kontraktnavn)
+            </b>
+        </td>
+        <td colspan="2">
+            @Html.DisplayFor(Model => Model.Kontraktnavn)
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Afdeling)
+            </b>
+        </td>
+        <td colspan="2">
+            @Html.DisplayFor(Model => Model.Afdeling)
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Dato)
+            </b>
+        </td>
+        <td colspan="2">
+            @Html.DisplayFor(Model => Model.Dato)
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Ugedag)
+            </b>
+        </td>
+        <td colspan="2">
+            @Html.DisplayFor(Model => Model.Ugedag)
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.UdarbjedetAf)
+            </b>
+        </td>
+        <td colspan="2">
+            @Html.DisplayFor(Model => Model.UdarbjedetAf)
+        </td>
+    </tr>
+
+    <tr>
+        <td colspan="2" style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Lokation)
+            </b>
+        </td>
+        <td colspan="2">
+            @Html.DisplayFor(Model => Model.Lokation)
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.RapportNr)
+            </b>
+        </td>
+        <td colspan="2">
+            @Html.DisplayFor(Model => Model.RapportNr)
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Addresse)
+            </b>
+        </td>
+        <td colspan="8">
+            @Html.DisplayFor(Model => Model.Addresse)
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2" style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.ForSaetter)
+            </b>
+        </td>
+        <td colspan="8">
+            @Html.DisplayFor(Model => Model.ForSaetter)
+        </td>
+    </tr>
+    <tr>
+        <td colspan="10" style="background-color:orange;">
+            <b>Tidsregistrering af mandskab</b>
+        </td>
+    </tr>
+    <tr>
+        <td rowspan="2">Aktivitet</td>
+        <td rowspan="2">Antal Personer</td>
+        <td rowspan="2">Timer</td>
+        <td rowspan="2">Timer Før Overtid</td>
+        <td colspan="2">Overtid</td>
+        <td rowspan="2">CGJ Timer Totalt</td>
+        <td colspan="3" rowspan="2">Note</td>
+
+    </tr>
+    <tr>
+        <td>50%</td>
+        <td>100%</td>
+    </tr>
+    <tr>
+        <td colspan="10" style="background-color:orange;text-align:left;"><b>Kontraktarbejde</b></td>
+    </tr>
+
+    @foreach (var item in Model.Timer.Where(x => x.EANr == null))
+    {
+        <tr>
+            <td>
+                <b>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AntalPersoner)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Timer)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimerFoerOvertid)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Overtid_50)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Overtid_100)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CGJ_Timer_Total)
+            </td>
+            <td colspan="3">
+                @Html.DisplayFor(modelItem => item.Note)
+            </td>
+        </tr>
+    }
+    <tr>
+        <td colspan="7" style="background-color:orange;text-align:left;"><b>Ekstraarbejder</b></td>
+        <td style="background-color:orange;text-align:center;">
+            EA Nr
+        </td>
+        <td colspan="2" style="background-color:orange;text-align:center;">
+            Note
+        </td>
+    </tr>
+    @foreach (var item in Model.Timer.Where(x => x.EANr != null))
+    {
+        <tr>
+            <td>
+                <b>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AntalPersoner)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Timer)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimerFoerOvertid)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Overtid_50)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Overtid_100)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CGJ_Timer_Total)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EANr)
+            </td>
+            <td colspan="2">
+                @Html.DisplayFor(modelItem => item.Note)
+            </td>
+        </tr>
+
+    }
+    <tr>
+        @{
+            var totalantal = Model.Timer.Sum(x => x.AntalPersoner);
+            var totaltimer = Model.Timer.Sum(x => x.Timer);
+            var totaltimerfoerovertid = Model.Timer.Sum(x => x.TimerFoerOvertid);
+            var totalovertid50 = Model.Timer.Sum(x => x.Overtid_50);
+            var totalovertid100 = Model.Timer.Sum(x => x.Overtid_100);
+            var totaltotal = Model.Timer.Sum(x => x.CGJ_Timer_Total);
+        }
+        <td><b>I alt:</b></td>
+        <td>@String.Format("{0:n2}", totalantal)</td>
+        <td>@String.Format("{0:n2}", totaltimer)</td>
+        <td>@String.Format("{0:n2}", totaltimerfoerovertid)</td>
+        <td>@String.Format("{0:n2}", totalovertid50)</td>
+        <td>@String.Format("{0:n2}", totalovertid100)</td>
+        <td>@String.Format("{0:n2}", totaltotal)</td>
+        <td colspan="3"></td>
+    </tr>
+    <tr>
+        <td colspan="2">Dagens vejr:</td>
+        <td colspan="3"><b>@Html.DisplayFor(Model => Model.DagensVejr)</b></td>
+        <td colspan="2">Vejrlig:</td>
+        <td colspan="3"><b>@Html.DisplayFor(Model => Model.Vejrlig)</b></td>
+    </tr>
+    <tr>
+        <td colspan="10" style="background-color:orange;"><b>Kontraktarbejde</b></td>
+    </tr>
+    <tr>
+        <td rowspan="2" colspan="5" style="background-color:orange;">Eget Materiel og Materialer</td>
+        <td colspan="5" style="background-color:orange;">Underleverandør - materiel, materialer, kørsel mm.</td>
+    </tr>
+    <tr>
+        <td colspan="2" style="background-color:orange;">Firma</td>
+        <td colspan="3" style="background-color:orange;">Hvilket materiel, materiale</td>
+    </tr>
+    @foreach (var item in Model.Kontraktarbejder)
+    {
+        <tr>
+            <td colspan="5" style="text-align:left;">@Html.DisplayFor(modelItem => item.EgetMateriel)</td>
+            <td colspan="2" style="text-align:left;">@Html.DisplayFor(modelItem => item.UL_Firma) </td>
+            <td colspan="3" style="text-align:left;">@Html.DisplayFor(modelItem => item.UL_Materiel)</td>
+        </tr>
+    }
+    <tr>
+        <td colspan="10" style="background-color:orange;"><b>Ekstraarbejde</b></td>
+    </tr>
+    <tr>
+        <td colspan="1" style="background-color:orange;">EA nr.</td>
+        <td colspan="4" style="background-color:orange;">Opgave</td>
+        <td colspan="2" style="background-color:orange;">Eget Materiel og materialer</td>
+        <td colspan="2" style="background-color:orange;">UE firma,m ateriel, materialer, kørsel mm</td>
+        <td style="background-color:orange;">Fortsætter</td>
+    </tr>
+    @foreach (var item in Model.Ekstraarbejder)
+    {
+        <tr>
+            <td colspan="1">
+                @if (item.EAId != null)
+                {
+
+                    @Html.DisplayFor(modelItem => item.EA.EAnr)
+                }
+                else
+                {
+                    @Html.DisplayFor(modelItem => item.EANr_skrevet)
+                }
+            </td>
+            <td colspan="4" style="text-align:left;text-wrap:normal;">@Html.DisplayFor(modelItem => item.Opgave)</td>
+            <td colspan="2" style="text-align:left;">@Html.DisplayFor(modelItem => item.Eget_Materiel)</td>
+            <td colspan="2" style="text-align:left;">@Html.DisplayFor(modelItem => item.UEFirma_Materiel)</td>
+            <td>@Html.DisplayFor(modelItem => item.Fortsaetter)</td>
+        </tr>
+    }
+    <tr>
+        <td colspan="10" style="background-color:orange;color:black;"><b>Uddybende Noter</b></td>
+
+    </tr>
+    <tr>
+        <td colspan="10" style="background-color:orange;color:black;"><textarea asp-for="UddybendeNoter" rows="6" cols="80" style="width:100%;"></textarea></td>
+    </tr>
+</table>
+<table style="width:50%;height:150px;float:left;">
+    <tr>
+        <td>
+            <img src="data:image/jpg;base64, @Model.Underskrift" style="width:100%;height:120px;">
+        </td>
+    </tr>
+    <tr>
+        <td style="width:30%;border-top:dashed;margin-right:3%">@SharedLocalizer.GetLocalizedHtmlString("Underskrift CG Jensen")</td>
+    </tr>
+</table>
+<table style="width:50%;height:150px;float:left;">
+    <tr>
+        <td style="height:120px;"></td>
+    </tr>
+    <tr>
+        <td style="width:100%;border-top:dashed;margin-right:3%">@SharedLocalizer.GetLocalizedHtmlString("Underskrift Bygherre")</td>
+    </tr>
+</table>
+
+<table name="phototable" style="page-break-inside:avoid;width:100%;table-layout:fixed;">
+    @{ var rows = 0;}
+    @if (Model.Photos.Count % 2 == 0)
+    {
+        rows = Model.Photos.Count() / 2;
+    }
+    else
+    {
+        rows = Convert.ToInt32(Model.Photos.Count() / 2) + 1;
+    }
+    @{ var totalpics = Model.Photos.Count();}
+    @for (int i = 0; i < rows; i++)
+    {
+        if (totalpics - 2 >= 0)
+        {
+            <tr>
+                <td style="width:100%;"><img src="~/CGJensen/Dagsrapporter/@Model.Id.ToString()/@Model.Photos[(i+1)*2 - 2]" style="width:100%;"/></td>
+                <td style="width:100%;"><img src="~/CGJensen/Dagsrapporter/@Model.Id.ToString()/@Model.Photos[(i+1)*2 - 2 +1]" style="width:100%;" /></td>
+            </tr>
+            totalpics -= 2;
+        }
+        else //enough room to add 1 picture in row
+        {
+            <tr>
+                <td style="width:100%;"><img src="~/CGJensen/Dagsrapporter/@Model.Id.ToString()/@Model.Photos[(i+1)*2 - 2]" style="width:100%;" /></td>
+            </tr>
+            totalpics -= 1;
+        }
+
+    }
+</table>

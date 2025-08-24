@@ -1,0 +1,45 @@
+﻿@model IEnumerable<MainOps.Models.WaterSamplePlace>
+
+@{
+    ViewData["Title"] = "WaterSamplePlaces";
+}
+
+<h2>WaterSamplePlaces</h2>
+
+<p>
+    <a asp-action="WaterSamplePlace">Create New</a>
+</p>
+<p>
+    <a asp-action="CopyFromMeasPlaceToMeasPlace">Copy Limits from place to place</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+            </td>
+            <td>
+                <a asp-action="Edit_WaterSamplePlace" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<p><a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to Main WaterSample Page")</a></p>

@@ -1,0 +1,174 @@
+﻿@model MainOps.Models.HorizontalDrainTest
+
+@{
+    Layout = null;
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("All Documenation")</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+
+<table style="page-break-inside:avoid;">
+    <tr>
+        <td colspan="3">
+            <b>@SharedLocalizer.GetLocalizedHtmlString("Horizontal Drain Test")</b>
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Install.Project.Name)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Install.Project.Name)
+        </td>
+        <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@Model.Project.Division.Id/@Model.Project.Division.LogoPath" width="151" height="66" /></td>
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Install.Project.ProjectNr)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Install.Project.ProjectNr)
+        </td>
+    </tr>
+    @if (Model.Install.SubProjectId != null)
+    {
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(Model => Model.Install.SubProject.Name)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.Install.SubProject.Name) : @Html.DisplayFor(Model => Model.Install.SubProject.SubProjectNr)
+            </td>
+        </tr>
+    }
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Install.Project.Client)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Install.Project.Client)
+        </td>
+
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.TimeStamp)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.TimeStamp)
+        </td>
+    </tr>
+    @if (Model.Install != null)
+    {
+        <tr>
+            <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.Install)</b></td>
+            <td>@Html.DisplayFor(Model => Model.Install.Id) : {@Html.DisplayFor(Model => Model.Install.Latitude),@Html.DisplayFor(Model => Model.Install.Longitude)}</td>
+        </tr>
+    }
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Location)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Location)
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Distance)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Distance)
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.Install.Location)</b></td>
+        <td>@Html.DisplayFor(Model => Model.Install.Location)</td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.Install.Latitude)</b></td>
+        <td>@Html.DisplayFor(Model => Model.Install.Latitude)</td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.Install.Longitude)</b></td>
+        <td>@Html.DisplayFor(Model => Model.Install.Longitude)</td>
+    </tr>
+    <tr rowspan="20">
+        <td colspan="3" style="text-align:left;">
+            @if (Model.LogText != null && Model.LogText != "")
+            {
+                @Html.Raw(Model.LogText.Replace("\r\n", "<br />"))
+            }
+            else
+            {
+                @Html.DisplayFor(Model => Model.LogText)
+            }
+        </td>
+    </tr>
+</table>
+
+<table name="phototable" style="page-break-inside:avoid;">
+    @{ var rows = 0;}
+    @if (Model.Photos.Count() % 3 == 0)
+    {
+        rows = Model.Photos.Count() / 3;
+    }
+    else
+    {
+        rows = Convert.ToInt32(Model.Photos.Count() / 3) + 1;
+    }
+    @{ var totalpics = Model.Photos.Count();}
+    @for (int i = 0; i < rows; i++)
+    {
+
+        @if (totalpics - 3 >= 0) //enough room to add whole row
+        {
+            var photo1 = Model.Photos.ElementAt((i + 1) * 3 - 3);
+            var photo2 = Model.Photos.ElementAt((i + 1) * 3 - 3 + 1);
+            var photo3 = Model.Photos.ElementAt((i + 1) * 3 - 3 + 2);
+
+            <tr>
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo3.Path.Split(".")[0], "_edit.", photo3.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+            </tr>
+            totalpics -= 3;
+        }
+        else if (totalpics - 2 >= 0)
+        {
+            var photo1 = Model.Photos.ElementAt((i + 1) * 3 - 3);
+            var photo2 = Model.Photos.ElementAt((i + 1) * 3 - 3 + 1);
+            <tr>
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                <td></td>
+            </tr>
+            totalpics -= 2;
+        }
+        else //enough room to add 1 picture in row
+        {
+            var photo1 = Model.Photos.ElementAt((i + 1) * 3 - 3);
+            <tr>
+                <td colspan="3"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+            </tr>
+            totalpics -= 1;
+        }
+
+    }
+</table>

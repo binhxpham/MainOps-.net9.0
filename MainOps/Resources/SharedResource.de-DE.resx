@@ -1,0 +1,921 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="search.." xml:space="preserve">
+    <value>suchen..</value>
+  </data>
+  <data name="Authenticator code" xml:space="preserve">
+    <value>Authentifizierungscode</value>
+  </data>
+  <data name="Confirm password" xml:space="preserve">
+    <value>Passwort bestätigen</value>
+  </data>
+  <data name="E-Mail Adress" xml:space="preserve">
+    <value>E-Mail-Adresse</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Passwort</value>
+  </data>
+  <data name="Recovery Code" xml:space="preserve">
+    <value>Wiederherstellungscode</value>
+  </data>
+  <data name="Remember me" xml:space="preserve">
+    <value>Passwort speichern</value>
+  </data>
+  <data name="Remember me?" xml:space="preserve">
+    <value>Soll das Passwort gespeichert werden?</value>
+  </data>
+  <data name="Remember this machine" xml:space="preserve">
+    <value>Gerät speichern </value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Benutzername</value>
+  </data>
+  <data name="Contact" xml:space="preserve">
+    <value>Kontakt</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Beschreibung</value>
+  </data>
+  <data name="Employee" xml:space="preserve">
+    <value>Mitarbeiter</value>
+  </data>
+  <data name="Field must be at least 2 characters" xml:space="preserve">
+    <value>Die Eingabe muss mindestens 2 Zeichen lang sein</value>
+  </data>
+  <data name="First Name" xml:space="preserve">
+    <value>Vorname</value>
+  </data>
+  <data name="Last Name" xml:space="preserve">
+    <value>Nachname</value>
+  </data>
+  <data name="Phone Number" xml:space="preserve">
+    <value>Telefonnummer</value>
+  </data>
+  <data name="Confirm new password" xml:space="preserve">
+    <value>Neues Passwort bestätigen</value>
+  </data>
+  <data name="Confirmed" xml:space="preserve">
+    <value>Bestätigt</value>
+  </data>
+  <data name="Current password" xml:space="preserve">
+    <value>Aktuelles Passwort</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>Datum</value>
+  </data>
+  <data name="E-Mail Adress confirmed" xml:space="preserve">
+    <value>E-Mail-Adresse bestätigt</value>
+  </data>
+  <data name="Must be positive" xml:space="preserve">
+    <value>Muss positiv sein </value>
+  </data>
+  <data name="New password" xml:space="preserve">
+    <value>Neues Passwort</value>
+  </data>
+  <data name="The new password and confirmation password do not match." xml:space="preserve">
+    <value>Die eingegebenen Passwörter stimmen nicht überein.</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>Benutzer</value>
+  </data>
+  <data name="Verification Code" xml:space="preserve">
+    <value>Verifizierungsschlüssel</value>
+  </data>
+  <data name="First Name(s)" xml:space="preserve">
+    <value>Vornamen</value>
+  </data>
+  <data name="Is employee" xml:space="preserve">
+    <value>Ist angestellt</value>
+  </data>
+  <data name="User ID" xml:space="preserve">
+    <value>Nutzer ID</value>
+  </data>
+  <data name="User Roles" xml:space="preserve">
+    <value>Benutzerstatus</value>
+  </data>
+  <data name="-- Please Select --" xml:space="preserve">
+    <value>Bitte auswählen</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>Alle</value>
+  </data>
+  <data name="Add flow:" xml:space="preserve">
+    <value>Durchfluss hinzufügen</value>
+  </data>
+  <data name="Add Watermeter:" xml:space="preserve">
+    <value>Wasserzähler hinzufügen</value>
+  </data>
+  <data name="Are you sure you want to delete this?" xml:space="preserve">
+    <value>Bist du dir sicher, dass du dies löschen willst?</value>
+  </data>
+  <data name="Back to List" xml:space="preserve">
+    <value>Zurück zum Index</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Erstellen</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Löschen</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Einzelheiten</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Bearbeiten</value>
+  </data>
+  <data name="Index" xml:space="preserve">
+    <value>Index</value>
+  </data>
+  <data name="Measurement Points" xml:space="preserve">
+    <value>Messstellen</value>
+  </data>
+  <data name="Measurements" xml:space="preserve">
+    <value>Messungen</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Speichern</value>
+  </data>
+  <data name="Search:" xml:space="preserve">
+    <value>Suche: </value>
+  </data>
+  <data name="Select CSV-Delimiter" xml:space="preserve">
+    <value>CSV-Trennzeichen auswählen</value>
+  </data>
+  <data name="Select Project (choose none if all)" xml:space="preserve">
+    <value>Projekt auswählen (keine wenn alle)</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Kommentar</value>
+  </data>
+  <data name="Logger Change" xml:space="preserve">
+    <value>Loggeränderung</value>
+  </data>
+  <data name="MeasType" xml:space="preserve">
+    <value>Messparameter</value>
+  </data>
+  <data name="Offset" xml:space="preserve">
+    <value>Offset</value>
+  </data>
+  <data name="Project" xml:space="preserve">
+    <value>Projekt</value>
+  </data>
+  <data name="ProjectUser" xml:space="preserve">
+    <value>Projekt Benutzer</value>
+  </data>
+  <data name="You do not have access to this resource." xml:space="preserve">
+    <value>Du hast keinen Zugriff auf diese Seite</value>
+  </data>
+  <data name="Abbreviation" xml:space="preserve">
+    <value>Kürzel</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Hinzufügen</value>
+  </data>
+  <data name="Add WaterMeter" xml:space="preserve">
+    <value>Wasserzähler hinzufügen</value>
+  </data>
+  <data name="Client" xml:space="preserve">
+    <value>Client</value>
+  </data>
+  <data name="Coordinate System Id" xml:space="preserve">
+    <value>Koordinatensystem</value>
+  </data>
+  <data name="Delimiter" xml:space="preserve">
+    <value>Trennzeichen</value>
+  </data>
+  <data name="End Date" xml:space="preserve">
+    <value>Enddatum</value>
+  </data>
+  <data name="Flow Rate" xml:space="preserve">
+    <value>Durchflussmenge</value>
+  </data>
+  <data name="For Scada" xml:space="preserve">
+    <value>Für Scada</value>
+  </data>
+  <data name="hi alexandra" xml:space="preserve">
+    <value>hallo alexandra GERMAN</value>
+  </data>
+  <data name="Logger" xml:space="preserve">
+    <value>Datenlogger</value>
+  </data>
+  <data name="Logger Added" xml:space="preserve">
+    <value>Logger hinzufügen</value>
+  </data>
+  <data name="Logger Changes" xml:space="preserve">
+    <value>Loggeränderungen</value>
+  </data>
+  <data name="Measurement" xml:space="preserve">
+    <value>Messung</value>
+  </data>
+  <data name="Measurement Point" xml:space="preserve">
+    <value>Messstelle</value>
+  </data>
+  <data name="Measurement Type" xml:space="preserve">
+    <value>Messparameter</value>
+  </data>
+  <data name="New Comment" xml:space="preserve">
+    <value>Neuer Kommentar</value>
+  </data>
+  <data name="Please Select Logger No" xml:space="preserve">
+    <value>Logger-Nummer bitte auswählen</value>
+  </data>
+  <data name="Project ID" xml:space="preserve">
+    <value>Projekt ID</value>
+  </data>
+  <data name="Project Number" xml:space="preserve">
+    <value>Projektnummer</value>
+  </data>
+  <data name="Projects" xml:space="preserve">
+    <value>Projekte</value>
+  </data>
+  <data name="Scada Adress" xml:space="preserve">
+    <value>Scada Adresse</value>
+  </data>
+  <data name="Select Project(choose none if all)" xml:space="preserve">
+    <value>Projekt auswählen (keine wenn alle)</value>
+  </data>
+  <data name="Start Date" xml:space="preserve">
+    <value>Anfangsdatum</value>
+  </data>
+  <data name="System" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Artikel</value>
+  </data>
+  <data name="User E-Mail-Adress" xml:space="preserve">
+    <value>Benutzer E-Mailadresse</value>
+  </data>
+  <data name="Water Level" xml:space="preserve">
+    <value>Wasserstand</value>
+  </data>
+  <data name="WaterMeter" xml:space="preserve">
+    <value>Wasserzähler</value>
+  </data>
+  <data name="When" xml:space="preserve">
+    <value>Zeitpunkt</value>
+  </data>
+  <data name="X-Coordinate" xml:space="preserve">
+    <value>X-Koordinate</value>
+  </data>
+  <data name="Y-Coordinate" xml:space="preserve">
+    <value>Y-Koordinate</value>
+  </data>
+  <data name="Logger Number" xml:space="preserve">
+    <value>Loggernummer</value>
+  </data>
+  <data name="Logger Removed" xml:space="preserve">
+    <value>Logger entfernen</value>
+  </data>
+  <data name="Serial Number" xml:space="preserve">
+    <value>Seriennummer</value>
+  </data>
+  <data name="Sim Card Number" xml:space="preserve">
+    <value>SIM-Kartennummer</value>
+  </data>
+  <data name="Add Raw Measurements" xml:space="preserve">
+    <value>Auch Rohwerte</value>
+  </data>
+  <data name="Error Status" xml:space="preserve">
+    <value>Fehler Status</value>
+  </data>
+  <data name="Has Error" xml:space="preserve">
+    <value>Hat einen Fehler</value>
+  </data>
+  <data name="HOFOR Description" xml:space="preserve">
+    <value>HOFOR Beschreibung</value>
+  </data>
+  <data name="Install Item" xml:space="preserve">
+    <value>Material Installieren</value>
+  </data>
+  <data name="Is Installed" xml:space="preserve">
+    <value>Ist installiert</value>
+  </data>
+  <data name="Is Packed" xml:space="preserve">
+    <value>Ist gepackt</value>
+  </data>
+  <data name="Is Received" xml:space="preserve">
+    <value>Ist angekommen</value>
+  </data>
+  <data name="Is Sent" xml:space="preserve">
+    <value>Ist gesendet</value>
+  </data>
+  <data name="Item Information" xml:space="preserve">
+    <value>Materiel Informationen</value>
+  </data>
+  <data name="Item Installed" xml:space="preserve">
+    <value>Material installiert</value>
+  </data>
+  <data name="Item Packed" xml:space="preserve">
+    <value>Material gepackt</value>
+  </data>
+  <data name="Item Received" xml:space="preserve">
+    <value>Material angekommen</value>
+  </data>
+  <data name="Item Sent" xml:space="preserve">
+    <value>Material gesendet</value>
+  </data>
+  <data name="Log Book" xml:space="preserve">
+    <value>Log Buche</value>
+  </data>
+  <data name="Pack Item" xml:space="preserve">
+    <value>Material Packen</value>
+  </data>
+  <data name="Photos from Errors" xml:space="preserve">
+    <value>Fotos von Fehleren</value>
+  </data>
+  <data name="Photos from Installation" xml:space="preserve">
+    <value>Fotos von Installation</value>
+  </data>
+  <data name="Photos from Packing" xml:space="preserve">
+    <value>Fotos von Packung</value>
+  </data>
+  <data name="Photos from Receival" xml:space="preserve">
+    <value>Fotos von Ankommen</value>
+  </data>
+  <data name="Photos from Sending" xml:space="preserve">
+    <value>Fotos von Abschickung</value>
+  </data>
+  <data name="Receive Item" xml:space="preserve">
+    <value>Material Ankommen</value>
+  </data>
+  <data name="Report Error" xml:space="preserve">
+    <value>Fehler Rapportieren</value>
+  </data>
+  <data name="Send Item" xml:space="preserve">
+    <value>Material Senden</value>
+  </data>
+  <data name="Show Map" xml:space="preserve">
+    <value>Karte anzeigen</value>
+  </data>
+  <data name="Track Items" xml:space="preserve">
+    <value>Material verfolgen</value>
+  </data>
+  <data name="Error Resolved.:" xml:space="preserve">
+    <value>Fehler behoben.:</value>
+  </data>
+  <data name="Number of Measurement Days" xml:space="preserve">
+    <value>Anzahl Messung Tage</value>
+  </data>
+  <data name="Number of Measurements" xml:space="preserve">
+    <value>Anzahl Messungen</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Fehler</value>
+  </data>
+  <data name="Filter both ON and OFF" xml:space="preserve">
+    <value>Filter beide EIN und AUS</value>
+  </data>
+  <data name="Filter specifically ON or OFF" xml:space="preserve">
+    <value>Filter speziell EIN oder AUS</value>
+  </data>
+  <data name="Installed" xml:space="preserve">
+    <value>Installiert</value>
+  </data>
+  <data name="Packed" xml:space="preserve">
+    <value>gepackt</value>
+  </data>
+  <data name="Received" xml:space="preserve">
+    <value>angekommen</value>
+  </data>
+  <data name="Sent" xml:space="preserve">
+    <value>gesendet</value>
+  </data>
+  <data name="3.6 V Saft Battery" xml:space="preserve">
+    <value>3.6 Volt Saft Batterie</value>
+  </data>
+  <data name="Add Item to Install List" xml:space="preserve">
+    <value>Element zur Installationsliste hinzufügen</value>
+  </data>
+  <data name="Alarm Call" xml:space="preserve">
+    <value>Alarmanruf</value>
+  </data>
+  <data name="Amount" xml:space="preserve">
+    <value>Menge</value>
+  </data>
+  <data name="Arrivals(Put on Rent!)" xml:space="preserve">
+    <value>Vermietung</value>
+  </data>
+  <data name="Clear Pumping" xml:space="preserve">
+    <value>Klarpumptest</value>
+  </data>
+  <data name="Current Accuracy" xml:space="preserve">
+    <value>Aktuelle Genauigkeit</value>
+  </data>
+  <data name="Cut/Extend Pipe" xml:space="preserve">
+    <value>Schnitt/Erweitern Rohr</value>
+  </data>
+  <data name="Daily Report" xml:space="preserve">
+    <value>Tagesbericht</value>
+  </data>
+  <data name="DAILY REPORT - Direct Link" xml:space="preserve">
+    <value>Tagesbericht - Direkte</value>
+  </data>
+  <data name="Daily Report and Alarm Call" xml:space="preserve">
+    <value>Tagesbericht und Alarmanruf</value>
+  </data>
+  <data name="Data Logger Antenna" xml:space="preserve">
+    <value>Data Logger Antenne</value>
+  </data>
+  <data name="Data Logger Flowmeter 4&quot;" xml:space="preserve">
+    <value>MID  4" mit Datalogger</value>
+  </data>
+  <data name="Data Logger Flowmeter 6&quot;" xml:space="preserve">
+    <value>MID 6" mit Datalogger</value>
+  </data>
+  <data name="Decommission" xml:space="preserve">
+    <value>Brunnen abbauen</value>
+  </data>
+  <data name="DeInstall" xml:space="preserve">
+    <value>Deinstallieren</value>
+  </data>
+  <data name="Discounts" xml:space="preserve">
+    <value>Rabatte</value>
+  </data>
+  <data name="Do Maintenance" xml:space="preserve">
+    <value>Wartung</value>
+  </data>
+  <data name="Extra Works" xml:space="preserve">
+    <value>Extra Arbeit</value>
+  </data>
+  <data name="Generate Invoice" xml:space="preserve">
+    <value>Rechnung generieren</value>
+  </data>
+  <data name="Generator Test" xml:space="preserve">
+    <value>Notstromaggregat Test</value>
+  </data>
+  <data name="Horizontal Drain Pipe" xml:space="preserve">
+    <value>Horizontale Drainage Rohr</value>
+  </data>
+  <data name="Horizontal Drain Tests" xml:space="preserve">
+    <value>Horizontale Drainage Test</value>
+  </data>
+  <data name="Install" xml:space="preserve">
+    <value>Installieren</value>
+  </data>
+  <data name="Install Data Logger" xml:space="preserve">
+    <value>Data Logger installieren</value>
+  </data>
+  <data name="Install Small Parts" xml:space="preserve">
+    <value>Kleinteile einbauen</value>
+  </data>
+  <data name="INSTALL!" xml:space="preserve">
+    <value>Installieren!</value>
+  </data>
+  <data name="Invoices and Costs" xml:space="preserve">
+    <value>Rechnungen und Kosten</value>
+  </data>
+  <data name="Item Amounts" xml:space="preserve">
+    <value>Artikel Menge</value>
+  </data>
+  <data name="Item IDs" xml:space="preserve">
+    <value>Artikel-IDs</value>
+  </data>
+  <data name="Item Names" xml:space="preserve">
+    <value>Arikel Namen</value>
+  </data>
+  <data name="Item UniqueIDs" xml:space="preserve">
+    <value>Artikel Eindeutigen IDs</value>
+  </data>
+  <data name="Main Menu" xml:space="preserve">
+    <value>Hauptmenü</value>
+  </data>
+  <data name="Manual Flowmeter 4&quot;" xml:space="preserve">
+    <value>Wasserzaehler 4" Ohne Datalogger</value>
+  </data>
+  <data name="Manual Flowmeter 6&quot;" xml:space="preserve">
+    <value>Wasserzaehler 6" Ohne Datalogger</value>
+  </data>
+  <data name="Meassure Pipe" xml:space="preserve">
+    <value>Rohr messen</value>
+  </data>
+  <data name="Measure Pipe" xml:space="preserve">
+    <value>Rohr messen</value>
+  </data>
+  <data name="Mobilize" xml:space="preserve">
+    <value>Mobilisieren</value>
+  </data>
+  <data name="Overview" xml:space="preserve">
+    <value>Überblick(Karte)</value>
+  </data>
+  <data name="Payments" xml:space="preserve">
+    <value>Zahlungen</value>
+  </data>
+  <data name="Please Select" xml:space="preserve">
+    <value>Bitte auswählen</value>
+  </data>
+  <data name="Project Actions" xml:space="preserve">
+    <value>Projekt Aktionen</value>
+  </data>
+  <data name="Project Documents" xml:space="preserve">
+    <value>Projekt Unterlagen</value>
+  </data>
+  <data name="Projects Overview" xml:space="preserve">
+    <value>Projekten Überblick(Karte)</value>
+  </data>
+  <data name="Pump Sump" xml:space="preserve">
+    <value>Pumpensumpf</value>
+  </data>
+  <data name="Pump Tests" xml:space="preserve">
+    <value>Pumptesten</value>
+  </data>
+  <data name="Reports" xml:space="preserve">
+    <value>Berichte</value>
+  </data>
+  <data name="Safety" xml:space="preserve">
+    <value>Sicherheit</value>
+  </data>
+  <data name="Select Item" xml:space="preserve">
+    <value>Arikel auswählen</value>
+  </data>
+  <data name="Sensors Check" xml:space="preserve">
+    <value>Sensoren Prüfen</value>
+  </data>
+  <data name="Shared Information" xml:space="preserve">
+    <value>Geteilte Informationen</value>
+  </data>
+  <data name="Site Check" xml:space="preserve">
+    <value>Baustelle Prüfen</value>
+  </data>
+  <data name="Site Maintenance" xml:space="preserve">
+    <value>Baustelle Wartung</value>
+  </data>
+  <data name="Sprinklers with stativ" xml:space="preserve">
+    <value>Sprinkler mit Stativ</value>
+  </data>
+  <data name="Sub Project" xml:space="preserve">
+    <value>Unterprojekt</value>
+  </data>
+  <data name="SubProject" xml:space="preserve">
+    <value>Unterprojekt</value>
+  </data>
+  <data name="Three Step Test" xml:space="preserve">
+    <value>Dreistufentest</value>
+  </data>
+  <data name="TimeStamp" xml:space="preserve">
+    <value>Zeitstempel</value>
+  </data>
+  <data name="Unique ID(if applicable)" xml:space="preserve">
+    <value>Eindeutige ID (falls zutreffend)</value>
+  </data>
+  <data name="Unit" xml:space="preserve">
+    <value>Einheit</value>
+  </data>
+  <data name="Upload pictures" xml:space="preserve">
+    <value>Lade Bilder hoch</value>
+  </data>
+  <data name="Water Samples" xml:space="preserve">
+    <value>Wasserproben</value>
+  </data>
+  <data name="WTP Check" xml:space="preserve">
+    <value>Grundwasseraufbereitungsanalage Prüfen</value>
+  </data>
+  <data name="Account" xml:space="preserve">
+    <value>Konto</value>
+  </data>
+  <data name="Log out" xml:space="preserve">
+    <value>Abmelden</value>
+  </data>
+  <data name="Tasks" xml:space="preserve">
+    <value>Aufgaben</value>
+  </data>
+  <data name="Truck Daily Report" xml:space="preserve">
+    <value>LKW Tagesbericht</value>
+  </data>
+  <data name="Truck Daily Reports" xml:space="preserve">
+    <value>LKW Tagesberichte</value>
+  </data>
+  <data name="Drill Well Form" xml:space="preserve">
+    <value>Bohrbrunnenform</value>
+  </data>
+  <data name="Fill Hour Sheet" xml:space="preserve">
+    <value>Stundenzettel ausfüllen</value>
+  </data>
+  <data name="Measurement Items" xml:space="preserve">
+    <value>Messelemente</value>
+  </data>
+  <data name="You can also add an external link to view a file from another destination" xml:space="preserve">
+    <value>Sie können auch einen externen Link hinzufügen, um eine Datei von einem anderen Ziel anzuzeigen</value>
+  </data>
+  <data name="Do your daily maintenance right here on the internet!" xml:space="preserve">
+    <value>Führen Sie Ihre tägliche Wartung gleich hier im Internet durch!</value>
+  </data>
+  <data name="Go To Projects" xml:space="preserve">
+    <value>Gehen Sie zu Projekte</value>
+  </data>
+  <data name="HÖLSCHER JENSEN A/S" xml:space="preserve">
+    <value>HÖLSCHER WASSERBAU GMBH</value>
+  </data>
+  <data name="Next" xml:space="preserve">
+    <value>Nächste</value>
+  </data>
+  <data name="Previous" xml:space="preserve">
+    <value>Vorherige</value>
+  </data>
+  <data name="There are powerful new features in Hoelscher" xml:space="preserve">
+    <value>Es gibt leistungsstarke neue Funktionen in Hoelscher</value>
+  </data>
+  <data name="Type in Measurements" xml:space="preserve">
+    <value>Geben Sie Messungen ein</value>
+  </data>
+  <data name="Accept signature" xml:space="preserve">
+    <value>Unterschrift akzeptieren</value>
+  </data>
+  <data name="Add Action" xml:space="preserve">
+    <value>Aktion hinzufügen</value>
+  </data>
+  <data name="Alarm Box" xml:space="preserve">
+    <value>Alarm Box</value>
+  </data>
+  <data name="Cable" xml:space="preserve">
+    <value>Kabel</value>
+  </data>
+  <data name="Centrifugal Pump" xml:space="preserve">
+    <value>Zentrifugalpumpe</value>
+  </data>
+  <data name="Chosen Item" xml:space="preserve">
+    <value>Gewählter Punkt</value>
+  </data>
+  <data name="Clear Actions" xml:space="preserve">
+    <value>Aktionen löschen</value>
+  </data>
+  <data name="Clear signature" xml:space="preserve">
+    <value>Unterschrift löschen</value>
+  </data>
+  <data name="Conductivity Sensor" xml:space="preserve">
+    <value>Leitfähigkeitssensor</value>
+  </data>
+  <data name="Current Actions" xml:space="preserve">
+    <value>Aktuelle Aktionen'</value>
+  </data>
+  <data name="Data Logger" xml:space="preserve">
+    <value>Datenlogger</value>
+  </data>
+  <data name="De-humidification Treatment" xml:space="preserve">
+    <value>Austausch Trockenmittel</value>
+  </data>
+  <data name="Deinstall Logger" xml:space="preserve">
+    <value>Ausbau Datenlogger</value>
+  </data>
+  <data name="Exchange Antenna" xml:space="preserve">
+    <value>Austausch Antenne</value>
+  </data>
+  <data name="Exchange Battery" xml:space="preserve">
+    <value>Austausch Batterie</value>
+  </data>
+  <data name="Exchange Conductivity Sensor" xml:space="preserve">
+    <value>Austausch Leitfähigkeitssensor</value>
+  </data>
+  <data name="Exchange Data Logger" xml:space="preserve">
+    <value>Austausch Datenlogger</value>
+  </data>
+  <data name="Exchange Sensor" xml:space="preserve">
+    <value>Austausch Sensor</value>
+  </data>
+  <data name="Exchange Sim Card" xml:space="preserve">
+    <value>Austausch SIM Karte</value>
+  </data>
+  <data name="Flow Meter" xml:space="preserve">
+    <value>Durchflussmesser</value>
+  </data>
+  <data name="General" xml:space="preserve">
+    <value>Allgemein</value>
+  </data>
+  <data name="Generator" xml:space="preserve">
+    <value>Generator</value>
+  </data>
+  <data name="Infiltration Well" xml:space="preserve">
+    <value>Schluckbrunnen</value>
+  </data>
+  <data name="Item" xml:space="preserve">
+    <value>Punkt</value>
+  </data>
+  <data name="Maintenance Action" xml:space="preserve">
+    <value>Wartungsmaßnahme</value>
+  </data>
+  <data name="Maintenance Type" xml:space="preserve">
+    <value>Wartungstyp</value>
+  </data>
+  <data name="No Access" xml:space="preserve">
+    <value>nicht zugänglich</value>
+  </data>
+  <data name="No Sub Projects" xml:space="preserve">
+    <value>Keine Unterprojekte</value>
+  </data>
+  <data name="Other" xml:space="preserve">
+    <value>Andere Aktion</value>
+  </data>
+  <data name="pH sensor" xml:space="preserve">
+    <value>pH Sonde</value>
+  </data>
+  <data name="Pick Installation on Map" xml:space="preserve">
+    <value>Anlage auf der Karte auswählen</value>
+  </data>
+  <data name="Pick Measurement Point on Map" xml:space="preserve">
+    <value>Bitte Messpunkt auf der Karte auswählen</value>
+  </data>
+  <data name="Pipeworks" xml:space="preserve">
+    <value>Rohrleitungen</value>
+  </data>
+  <data name="Piston Pump" xml:space="preserve">
+    <value>Kolbenpumpe</value>
+  </data>
+  <data name="Please select item on stock" xml:space="preserve">
+    <value>Bitte Lagerartikel auswählen</value>
+  </data>
+  <data name="Please select maintained item" xml:space="preserve">
+    <value>Bitte gewarteten Punkt auswählen</value>
+  </data>
+  <data name="Please select maintenance action" xml:space="preserve">
+    <value>Bitte Wartungsmaßnahme auswählen</value>
+  </data>
+  <data name="Please Select Project" xml:space="preserve">
+    <value>Bitte Projekt auswählen</value>
+  </data>
+  <data name="Please Select SubProject" xml:space="preserve">
+    <value>Bitte Unterprojekt auswählen</value>
+  </data>
+  <data name="Power Relay" xml:space="preserve">
+    <value>Stromrelais</value>
+  </data>
+  <data name="Press Send" xml:space="preserve">
+    <value>"Senden" gedrückt</value>
+  </data>
+  <data name="Pressure Sensor" xml:space="preserve">
+    <value>Drucksensor</value>
+  </data>
+  <data name="Pump" xml:space="preserve">
+    <value>Pumpe</value>
+  </data>
+  <data name="Pump water from well" xml:space="preserve">
+    <value>Wasser aus dem Brunnen gepumpt</value>
+  </data>
+  <data name="Recalibration" xml:space="preserve">
+    <value>Neu eingemessen / Neu kalibriert</value>
+  </data>
+  <data name="Service Maintenance" xml:space="preserve">
+    <value>Service Wartung</value>
+  </data>
+  <data name="Signature" xml:space="preserve">
+    <value>Unterschrift</value>
+  </data>
+  <data name="Stock Item For Service Maintenance" xml:space="preserve">
+    <value>Lagerartikel für die Servicewartung</value>
+  </data>
+  <data name="Submit" xml:space="preserve">
+    <value>Einreichen</value>
+  </data>
+  <data name="Technical Check" xml:space="preserve">
+    <value>Technische Überprüfung</value>
+  </data>
+  <data name="Temporary Battery Removal" xml:space="preserve">
+    <value>Temporäre Entfernung der Batterie</value>
+  </data>
+  <data name="Time of Maintenance" xml:space="preserve">
+    <value>Zeitpunkt der Wartung</value>
+  </data>
+  <data name="Time Spent" xml:space="preserve">
+    <value>Benötigte Zeit</value>
+  </data>
+  <data name="Turbidity Sensor" xml:space="preserve">
+    <value>Trübungssensor</value>
+  </data>
+  <data name="Water Inside" xml:space="preserve">
+    <value>Wasser im Datenlogger festgestellt</value>
+  </data>
+  <data name="Well Burried" xml:space="preserve">
+    <value>Messpunkt verschüttet</value>
+  </data>
+  <data name="Well Damaged" xml:space="preserve">
+    <value>Messpunkt beschädigt</value>
+  </data>
+  <data name="Well Destroyed" xml:space="preserve">
+    <value>Messpunkt zerstört</value>
+  </data>
+  <data name="Well Flooded" xml:space="preserve">
+    <value>Messpunkt überschwemmt</value>
+  </data>
+  <data name="Create Airlift" xml:space="preserve">
+    <value>Airlift Erstellen</value>
+  </data>
+</root>

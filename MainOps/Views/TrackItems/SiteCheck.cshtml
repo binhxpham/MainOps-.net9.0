@@ -1,0 +1,280 @@
+﻿@model MainOps.Models.SiteCheck
+@{
+    ViewData["Title"] = "SiteCheck";
+}
+<div class="row">
+    <div class="col-xs-12">
+        <form asp-action="SiteCheck" asp-controller="TrackItems" method="post" onsubmit="retrieveData(event);" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <table style="width:100%;table-layout:fixed;">
+                <tr>
+                    <td><label asp-for="ProjectId" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select Project")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="SubProjectId" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="SubProjectId" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("No Sub Projects")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="TimeStamp" class="control-label"></label></td>
+                    <td><input asp-for="TimeStamp" type="datetime" class="date-picker" value="@DateTime.Now" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="CheckAllLevels" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="CheckAllLevels" class="form-control" style="width:100%;">
+                            <option value="No">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="Yes">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                            <option value="N/A">@SharedLocalizer.GetLocalizedHtmlString("N/A")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="CheckAllLevels_Comment" class="control-label"></label></td>
+                    <td><input asp-for="CheckAllLevels_Comment" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Comment:")" class="form-control" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="SCADA_PUMPS_RUNNING" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="SCADA_PUMPS_RUNNING" class="form-control" style="width:100%;">
+                            <option value="No">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="Yes">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                            <option value="N/A">@SharedLocalizer.GetLocalizedHtmlString("N/A")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="SCADA_PUMPS_RUNNING_Comment" class="control-label"></label></td>
+                    <td><input asp-for="SCADA_PUMPS_RUNNING_Comment" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Comment:")" class="form-control" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Leakages" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="Leakages" class="form-control" style="width:100%;">
+                            <option value="No">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="Yes">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                            <option value="N/A">@SharedLocalizer.GetLocalizedHtmlString("N/A")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Leakages_Comment" class="control-label"></label></td>
+                    <td><input asp-for="Leakages_Comment" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Comment:")" class="form-control" style="width:100%;" /></td>
+                </tr>
+
+                <tr>
+                    <td><label asp-for="Valves" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="Valves" class="form-control" style="width:100%;">
+                            <option value="No">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="Yes">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                            <option value="N/A">@SharedLocalizer.GetLocalizedHtmlString("N/A")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Valves_Comment" class="control-label"></label></td>
+                    <td><input asp-for="Valves_Comment" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Comment:")" class="form-control" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="WellDamages" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="WellDamages" class="form-control" style="width:100%;">
+                            <option value="No">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="Yes">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                            <option value="N/A">@SharedLocalizer.GetLocalizedHtmlString("N/A")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="WellDamages_Comment" class="control-label"></label></td>
+                    <td><input asp-for="WellDamages_Comment" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Comment:")" class="form-control" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Insulation" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="Insulation" class="form-control" style="width:100%;">
+                            <option value="No">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="Yes">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                            <option value="N/A">@SharedLocalizer.GetLocalizedHtmlString("N/A")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Insulation_Comment" class="control-label"></label></td>
+                    <td><input asp-for="Insulation_Comment" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Comment:")" class="form-control" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="AreasClear" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="AreasClear" class="form-control" style="width:100%;">
+                            <option value="No">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="Yes">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                            <option value="N/A">@SharedLocalizer.GetLocalizedHtmlString("N/A")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="AreasClear_Comment" class="control-label"></label></td>
+                    <td><input asp-for="AreasClear_Comment" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Comment:")" class="form-control" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <label asp-for="GeneralComments"></label>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><textarea asp-for="GeneralComments" rows="6" cols="50" style="width:100%;"></textarea></td>
+                </tr>
+                <tr>
+                    <td><label>@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label></td>
+                    <td><input type="file" name="files" multiple accept=".jpg,.jpeg,.png" style="width:100%" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Latitude" class="control-label"></label></td>
+                    <td><input asp-for="Latitude" id="latinput" readonly="readonly" style="width:100%" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Longitude" class="control-label"></label></td>
+                    <td><input asp-for="Longitude" id="longinput" readonly="readonly" style="width:100%" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><b>@SharedLocalizer.GetLocalizedHtmlString("Signature")</b></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <canvas width="330" height="150" id="signature" style="border:1px solid blue;"></canvas>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:45%">
+                        <button type="button" id="accept" class="btn-hoelscher" style="width:100%;height:40px;">@SharedLocalizer.GetLocalizedHtmlString("Accept signature")</button>
+                    </td>
+                    <td style="width:45%">
+                        <button type="button" id="clear" class="btn-hoelscher" style="width:100%;height:40px;">@SharedLocalizer.GetLocalizedHtmlString("Clear signature")</button>
+                        <input type="text" id="signaturedata" hidden="hidden" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <img width="80" height="60" id="savetarget" hidden="hidden" style="border:1px solid black">
+                    </td>
+                </tr>
+            </table>
+            <div class="form-group">
+                <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString("Submit")" class="btn-hoelscher" style="width:100%;height:70px;" />
+            </div>
+            <input asp-for="Signature" value="" hidden="hidden" />
+        </form>
+    </div>
+</div>
+<div>
+    <a asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script src="~/js/signature_pad.min.js"></script>
+    <script type="text/javascript">
+        var pad = null;
+        var id;
+        var myLat;
+        var myLng;
+
+        if (navigator.geolocation) {
+            id = navigator.geolocation.watchPosition(function (position) {
+                myLat = position.coords.latitude;
+                myLng = position.coords.longitude;
+                getPos(myLat, myLng);
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                        //alert("error");
+                    }
+
+                }, { maximumAge: 0, timeout: 8000, enableHighAccuracy: true });
+        }
+        function getPos(lat, lng) {
+            $("#latinput").val(lat);
+            $("#longinput").val(lng);
+        }
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select',
+                    firstDay: 1
+                });
+                $('.date-picker').datepicker("setDate", new Date("dd-MM-yy"));
+                FillSubProjects();
+            });
+        });
+        $(document).ready(function () {
+            $(function () {
+                var canvas = document.querySelector("#signature");
+                pad = new SignaturePad(canvas);
+                $('#accept').click(function () {
+                    var data = pad.toDataURL();
+                    $('#savetarget').attr('src', data);
+                    var base64signature = data.split(',')[1];
+                    $('#signaturedata').val(base64signature);
+                    });
+                    $('#clear').click(function () {
+                        pad.clear();
+                    })
+
+            })
+        });
+        function retrieveData(e) {
+            var posting = true;
+            var s1 = document.getElementById("Signature");
+            var signature = "";
+            signature = document.getElementById("signaturedata").value;
+            s1.value = signature;
+            if (signature == "") {
+                posting = false;
+                e.preventDefault();
+                alert("Please sign the report!");
+            }
+            if (posting == true) {
+                StartSpinner();
+            }
+        }
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+        }
+    </script>
+}

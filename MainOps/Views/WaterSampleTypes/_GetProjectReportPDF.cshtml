@@ -1,0 +1,129 @@
+﻿@model IEnumerable<MainOps.Models.WaterSampleMeasVM>
+<style>
+    thead, tfoot {
+        display: table-row-group
+    }
+</style>
+@{
+    Layout = null;
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("Water Analysis Report")</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+}
+
+@foreach (var group in Model.GroupBy(x => x.WaterSamplePlace.Name))
+{
+    <table border="1" style="width:100%;table-layout:fixed;break-after:always;">
+        <thead>
+            <tr style="border-bottom: 2px solid black; background-color: antiquewhite; height: 40px;">
+                <td colspan="6" style="font-size:20px;">
+                    <b>
+                        @if (Model.FirstOrDefault() != null)
+                        {
+                            @String.Concat(Model.First().Project.Name, " - ", group.Key)
+                        }
+                    </b>
+                </td>
+            </tr>
+            <tr style="border-bottom: 2px solid black; height: 40px; background-color: antiquewhite; ">
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.WaterSamplePlace))
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.value))
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.WeekNumber))
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Dato))
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.method))
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.WaterSampleNumber))
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            @foreach (var item in Model.Where(x => x.WaterSamplePlace.Name.Equals(group.Key)))
+            {
+                if (item.holdslimit == 0)
+                {
+            <tr style="background-color: yellow; break-inside: avoid; height: 30px;">
+                <td>
+                    @Html.DisplayFor(modelItem => item.WaterSampleType.Komponent)
+                </td>
+                <td style="text-align:center;">
+                    @Html.DisplayFor(modelItem => item.value)
+                </td>
+                <td style="text-align:center;">
+                    @Html.DisplayFor(modelItem => item.WeekNumber)
+                </td>
+                <td style="text-align:center;">
+                    @Html.DisplayFor(modelItem => item.Dato)
+                </td>
+                <td style="text-align:center;">
+                    @Html.DisplayFor(modelItem => item.method)
+                </td>
+                <td style="text-align:center;">
+                    @Html.DisplayFor(modelItem => item.WaterSampleNumber)
+                </td>
+
+            </tr>
+                }
+                else if (item.holdslimit == 1)
+                {
+        <tr style="background-color: lightgreen; break-inside: avoid; height: 30px;">
+            <td>
+                @Html.DisplayFor(modelItem => item.WaterSampleType.Komponent)
+            </td>
+            <td style="text-align:center;">
+                @Html.DisplayFor(modelItem => item.value)
+            </td>
+            <td style="text-align:center;">
+                @Html.DisplayFor(modelItem => item.WeekNumber)
+            </td>
+            <td style="text-align:center;">
+                @Html.DisplayFor(modelItem => item.Dato)
+            </td>
+            <td style="text-align:center;">
+                @Html.DisplayFor(modelItem => item.method)
+            </td>
+            <td style="text-align:center;">
+                @Html.DisplayFor(modelItem => item.WaterSampleNumber)
+            </td>
+        </tr>
+                }
+                else
+                {
+        <tr style="background-color: lightcoral; break-inside: avoid;height:30px;">
+            <td>
+                @Html.DisplayFor(modelItem => item.WaterSampleType.Komponent)
+            </td>
+            <td style="text-align:center;">
+                @Html.DisplayFor(modelItem => item.value)
+            </td>
+            <td style="text-align:center;">
+                @Html.DisplayFor(modelItem => item.WeekNumber)
+            </td>
+            <td style="text-align:center;">
+                @Html.DisplayFor(modelItem => item.Dato)
+            </td>
+            <td style="text-align:center;">
+                @Html.DisplayFor(modelItem => item.method)
+            </td>
+            <td style="text-align:center;">
+                @Html.DisplayFor(modelItem => item.WaterSampleNumber)
+            </td>
+        </tr>
+                }
+
+            }
+        </tbody>
+    </table>
+    <br />
+    <br />
+}

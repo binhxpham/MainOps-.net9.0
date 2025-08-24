@@ -1,0 +1,12 @@
+﻿
+@{
+    ViewData["Title"] = "UploadListsager";
+}
+
+<h2>Upload List sager</h2>
+
+<form asp-action="UploadListSager" method="post" enctype="multipart/form-data">
+    <input type="file" name="postedFile" accept=".csv" />
+    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload")</button>
+</form>
+

@@ -1,0 +1,202 @@
+﻿@model MainOps.Models.ViewModels.ThreeStepTestReport
+
+@{
+    Layout = null;
+    var reflevel = Model.test.Ref_Level - Model.test.Water_level;
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("Pump Test")</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+
+<table style="width:100%">
+    <tr>
+        @if (Model.test.TestType != null)
+        {
+            <td><h2>@SharedLocalizer.GetLocalizedHtmlString("Test Report") - @SharedLocalizer.GetLocalizedHtmlString(Model.test.TestType)</h2></td>
+        }
+        else
+        {
+            <td><h2>@SharedLocalizer.GetLocalizedHtmlString("Test Report")</h2></td>
+        }
+        <td colspan="2" align="right"><img src="~/images/Divisions/Photos/@Model.test.Project.DivisionId/@Model.test.Project.Division.LogoPath" width="151" height="66" /></td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.test.Project.Name)</b></td>
+        <td>@Html.DisplayFor(Model => Model.test.Project.Name)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.test.SubProjectId)</b></td>
+        <td>@Html.DisplayFor(Model => Model.test.SubProject.Name)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.test.Wellname)</b></td>
+        <td>@Html.DisplayFor(Model => Model.test.Wellname)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.test.Report_Date)</b></td>
+        <td>
+            @Html.DisplayFor(Model => Model.test.Report_Date)
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.test.starttime)</b></td>
+        <td>
+            @Html.DisplayFor(Model => Model.test.starttime)
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.test.endtime)</b></td>
+        <td>
+            @Html.DisplayFor(Model => Model.test.endtime)
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.test.Water_Meter_Before)</b></td>
+        <td>@Html.DisplayFor(Model => Model.test.Water_Meter_Before)</td>
+        <td>m3</td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.test.Water_Meter_After)</b></td>
+        <td>@Html.DisplayFor(Model => Model.test.Water_Meter_After)</td>
+        <td>m3</td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.test.Totalm3)</b></td>
+        <td>@string.Format("{0:N2}",Model.test.Totalm3)</td>
+        <td>m3</td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.test.Ref_Level)</b></td>
+        <td>@string.Format("{0:N2}", Model.test.Ref_Level)</td>
+        <td>mDVR90</td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.test.Water_level)</b></td>
+        <td>@Html.DisplayFor(Model => Model.test.Water_level)</td>
+        <td>m</td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@SharedLocalizer.GetLocalizedHtmlString("Water level in Reference")</b></td>
+        <td>@String.Format("{0:N2} ", reflevel)</td>
+        <td>mDVR90</td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.test.Init_Meas_Time)</b></td>
+        <td>
+            @Html.DisplayFor(Model => Model.test.Init_Meas_Time)
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(Model => Model.test.Bottom_well)</b></td>
+        <td>@Html.DisplayFor(Model => Model.test.Bottom_well)</td>
+        <td>m</td>
+    </tr>
+    <tr style="border-bottom:double;">
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(x => x.Q_max_m3_per_hour)</b></td>
+        <td>@String.Format("{0:N2} ", Model.Q_max_m3_per_hour)</td>
+        <td>m3/h</td>
+    </tr>
+    <tr style="border-bottom:double;">
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(x => x.Q_max_m3_per_second)</b></td>
+        <td>@String.Format("{0:N3} ", Model.Q_max_m3_per_second)</td>
+        <td>m3/s</td>
+    </tr>
+    <tr style="border-bottom:double;">
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(x => x.Max_Drawdown)</b></td>
+        <td>@String.Format("{0:N2} ", Model.Max_Drawdown)</td>
+        <td>mDVR90</td>
+    </tr>
+    <tr style="border-bottom:double;">
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(x => x.m_Drawdown_6)</b></td>
+        <td>@String.Format("{0:N2} ", Model.m_Drawdown_6)</td>
+        <td>mDVR90</td>
+    </tr>
+    <tr style="border-bottom:double;">
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(x => x.m_Drawdown_60)</b></td>
+        <td>@String.Format("{0:N2} ", Model.m_Drawdown_60)</td>
+        <td>mDVR90</td>
+    </tr>
+    <tr style="border-bottom:double;">
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(x => x.s_60)</b></td>
+        <td>@String.Format("{0:N2} ", Model.s_60)</td>
+        <td>m</td>
+    </tr>
+    <tr style="border-bottom:double;">
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(x => x.specific_capacity)</b></td>
+        <td>@String.Format("{0:N4} ", Model.specific_capacity)</td>
+        <td>Q/m</td>
+    </tr>
+    <tr style="border-bottom:double;">
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(x => x.delta_s)</b></td>
+        <td>@String.Format("{0:N2} ", Model.delta_s)</td>
+        <td>m</td>
+    </tr>
+    <tr style="border-bottom:double;">
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(x => x.Transmissivity)</b></td>
+        <td>@String.Format("{0:N6} ", Model.Transmissivity)</td>
+        <td>m/s</td>
+    </tr>
+    <tr style="border-bottom:double;">
+        <td style="text-align:left;"><b>@Html.DisplayNameFor(x => x.Efficiency)</b></td>
+        <td>@String.Format("{0:N2} ", Model.Efficiency)</td>
+        <td>%</td>
+    </tr>
+    <tr style="border-bottom:double;">
+        <td style="text-align:left;"><b>@SharedLocalizer.GetLocalizedHtmlString("Link to view interactive data")</b></td>
+        <td>https://hj-mainops.com/TrackItems/StepTestReport/@Model.test.Id?</td>
+        <td></td>
+    </tr>
+</table>
+<h3>@SharedLocalizer.GetLocalizedHtmlString("Test Manual Measurements")</h3>
+<table style="width:100%;">
+    <thead>
+        <tr>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Time")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Flow")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("m3")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Dip")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Comment")
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var dat in Model.datas_dips)
+        {
+            <tr>
+                <td style="width:10%;"><input value="@dat.TimeStamp" type="time" disabled="disabled" style="width:100%;" /></td>
+                <td style="width:10%;"><input value="@dat.Flow" type="number" disabled="disabled" style="width:100%;" /></td>
+                <td style="width:10%;"><input value="@dat.m3" type="number" disabled="disabled" style="width:100%;" /></td>
+                <td style="width:10%;"><input value="@dat.Dip" type="number" disabled="disabled" style="width:100%;"/></td>
+                <td style="width:60%;"><input value="@dat.Comment" type="text" disabled="disabled" style="width:100%;" /></td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+<input hidden="hidden" id="theid" value="@Model.test.Id" />
+<div class="container">
+    <div id="chart1"></div>
+</div>
+<div id="chartimg">
+    <img src="@Model.imagepath" style="width:100%;height:800px" />
+</div>
+
+

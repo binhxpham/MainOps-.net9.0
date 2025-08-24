@@ -1,0 +1,107 @@
+﻿@model IEnumerable<MainOps.Models.MeasPoint>
+<head>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM&sensor=false&libraries=places"></script>
+</head>
+
+@{
+    ViewData["Title"] = "Map of Alarm Boxes";
+}
+<form asp-controller="MeasPoints" asp-action="AddAlarmBox" method="get">
+    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Add Alarm Box")</button>
+</form>
+<form asp-controller="MeasPoints" asp-action="AllAlarmBoxes" method="get">
+    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit Alarm Boxes")</button>
+</form>
+<form asp-controller="Documents" asp-action="CreateTwo" method="post" enctype="multipart/form-data">
+    <table>
+        <tr>
+            <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Alarm Box")</label></td>
+            <td><select name="AlarmBoxId" class="form-control" asp-items="ViewBag.MeasPointId"></select></td>
+            <td align="right"><input type="file" name="files" multiple accept=".jpg,.jpeg,.png,.gif,.pdf" /></td>
+            <td><button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload")</button></td>
+        </tr>
+    </table>  
+</form>
+<br />
+<br />
+<br />
+<div id="myDiv" style="width:100%;height:500px;"></div>
+<div id="documentinfo" style="width:100%;"></div>
+@section Scripts {
+<script type="text/javascript">
+        var MeasMarkers = [];
+
+        $(document).ready(function () {
+            DisplayGoogleMap();
+        });
+    
+        function DisplayGoogleMap() {
+            //Set the Latitude and Longitude of the Map
+            var meanlat = 0.0;
+            var meanlong = 0.0;
+
+            var myLatLng = { lat: 55.682936, lng: 12.3729016 };
+            //Create Options or set different Characteristics of Google Map
+            var mapOptions = {
+                center: myLatLng,
+                zoom: 11,
+                minZoom: 4,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            //Display the Google map in the div control with the defined Options
+            var map = new google.maps.Map(document.getElementById("myDiv"), mapOptions);
+            
+            @foreach(var item in Model){
+             <text>
+                var marker = new google.maps.Marker({
+                  map: map,
+                  position: { lat: @item.Lati, lng: @item.Longi },
+                  title: "@item.Project.Name (@item.Project.ProjectNr) : @item.Name",
+            });
+            marker['infowindow'] = new google.maps.InfoWindow({
+                content: '@item.Project.Name (@item.Project.ProjectNr)' + ' : ' + '@item.Name : @item.Description <button class="btn-hoelscher" onclick="DisplayDocuments(@item.Id)">Show Pictures</button>'
+            });
+
+            google.maps.event.addListener(marker, 'click', function () {
+                this['infowindow'].open(map, this);
+            });
+
+            @if (item.MonitorType.MonitorTypeName == "Alarm Box")
+            {
+                if (item.LoggerActive)
+                {
+                     <text>
+                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/blue-dot.png')
+                    </text>
+                }
+                else
+                {
+                    <text>
+                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red.png')
+                    </text>
+                }
+            }
+            marker.setMap(map);
+            </text>
+            }
+
+
+    }
+    function DisplayDocuments(index) {
+            $.ajax({
+                type: 'post',
+                url: '@Url.Action("GetDocuments2","MeasPoints")',
+                data: {
+                    'id': index
+                },
+                success: function (output) {
+                    $('#documentinfo').html(output);
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+        }
+
+</script>
+}

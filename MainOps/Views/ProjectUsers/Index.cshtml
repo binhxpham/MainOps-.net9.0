@@ -1,0 +1,40 @@
+﻿@model IEnumerable<MainOps.Models.ProjectUserVM>
+
+<h2>@ViewData["Title"]</h2>
+
+<div>
+    <form asp-action="Create" method="get">
+        <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Create")</button>
+    </form>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.fullname)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.fullname)
+                </td>
+                <td>
+                    <form asp-action="Edit" asp-controller="ProjectUsers" asp-route-id="@item.Id" method="get"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button></form>
+                    <form asp-action="Details" asp-controller="ProjectUsers" asp-route-id="@item.Id" method="get"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Details")</button></form>
+                    <form asp-action="Delete" asp-controller="ProjectUsers" asp-route-id="@item.Id" method="get"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button></form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

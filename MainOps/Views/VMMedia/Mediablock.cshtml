@@ -1,0 +1,152 @@
+﻿@model MainOps.Models.WTPClasses.ViewModels.VMMedia
+
+@{
+    ViewData["Title"] = "Mediablock";
+}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#NeedDosing").change(function () {
+            checkedthebox = $("#NeedDosing").is(":checked");
+            if (checkedthebox == true) {
+                $("#dosinginputs").show();
+            }
+            else {
+                $("#dosinginputs").hide();
+            }
+        });
+        $("#NeedAeration").change(function () {
+            checkedthebox = $("#NeedAeration").is(":checked");
+            if (checkedthebox == true) {
+                $("#aerationinputs").show();
+            }
+            else {
+                $("#aerationinputs").hide();
+            }
+        });
+        $("#NeedpH").change(function () {
+            checkedthebox = $("#NeedpH").is(":checked");
+            if (checkedthebox == true) {
+                $("#pHinputs").show();
+            }
+            else {
+                $("#pHinputs").hide();
+            }
+        });
+        $("#HasConc").change(function () {
+            checkedthebox = $("#HasConc").is(":checked");
+            if (checkedthebox == true) {
+                $("#concentrationinputs").show();
+            }
+            else {
+                $("#concentrationinputs").hide();
+            }
+        });
+    });
+</script>
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Mediablock")</h2>
+
+<div class="form-horizontal">
+    <div class="form-group">
+        <form asp-action="Create">
+
+            @Html.HiddenFor(model => model.Name)
+            @Html.HiddenFor(model => model.contaminations)
+            @Html.HiddenFor(model => model.device)
+            @Html.HiddenFor(model => model.water_typeid)
+            <div class="form-group">
+                @Html.LabelFor(model => model.m_efx.filtermaterial)
+                @Html.DropDownListFor(model => model.m_efx.filtermaterialid, ViewData["Filter Choices"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.m_efx.filtermaterialid)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.m_efx.Contamination)
+                @Html.DropDownListFor(model => model.m_efx.contaminationId, ViewData["Conta Choices"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.m_efx.contaminationId)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.m_efx.efficiency)
+                @Html.EditorFor(model => model.m_efx.efficiency)
+                @Html.ValidationMessageFor(model => model.m_efx.efficiency)
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.m_efx.need_dosing)
+                @Html.CheckBoxFor(model => model.m_efx.need_dosing, new { id = "NeedDosing" })
+                <div id="dosinginputs">
+                    @Html.LabelFor(model => model.m_efx.dosing_of.dosing)
+                    @Html.DropDownListFor(model => model.m_efx.dosing_ofid, ViewData["Dosing Choices"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.m_efx.dosing_ofid)
+                    @Html.LabelFor(model => model.m_efx.dosing_relation)
+                    @Html.EditorFor(model => model.m_efx.dosing_relation)
+                    @Html.ValidationMessageFor(model => model.m_efx.dosing_relation)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.m_efx.need_Aeration)
+                @Html.CheckBoxFor(model => model.m_efx.need_Aeration, new { id = "NeedAeration" })
+                <div id="aerationinputs">
+                    @Html.EditorFor(model => model.m_efx.lower_limit_aeration)
+                    @Html.EditorFor(model => model.m_efx.upper_limit_aeration)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.m_efx.need_pH_control)
+                @Html.CheckBoxFor(model => model.m_efx.need_pH_control, new { id = "NeedpH" })
+                <div id="pHinputs">
+                    @Html.EditorFor(model => model.m_efx.lower_limit_pH)
+                    @Html.EditorFor(model => model.m_efx.upper_limit_aeration)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.m_efx.has_concentration_effect)
+                @Html.CheckBoxFor(model => model.m_efx.has_concentration_effect, new { id = "HasConc" })
+                <div id="concentrationinputs">
+                    @Html.LabelFor(model => model.m_efx.effect_type.description)
+                    @Html.DropDownListFor(model => model.m_efx.effect_typeid, ViewData["Effect Choices"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("-- Please Select --"), new { @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value=@SharedLocalizer.GetLocalizedHtmlString("Create") class="btn btn-hoelscher" /> |   <a asp-action="Skip">@SharedLocalizer.GetLocalizedHtmlString("Skip")</a>
+            </div>
+        </form>
+    </div>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.m_efx.filtermaterial.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.m_efx.Contamination.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.m_efx.efficiency)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (var i = 0; i < Model.m_effs.Count; i++)
+        {
+            <tr>
+
+                <td>
+                    @Html.DisplayFor(modelItem => Model.m_effs[i].filtermaterial.Name)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => Model.m_effs[i].Contamination.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => Model.m_effs[i].efficiency)
+                </td>
+
+                <td>
+                    <a asp-action="Edit" asp-route-id="@Model.m_effs[i].Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> |
+                    <a asp-action="Delete" asp-route-id="@Model.m_effs[i].Id">@SharedLocalizer.GetLocalizedHtmlString("Delete")</a> |
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

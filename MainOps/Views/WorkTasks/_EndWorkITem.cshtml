@@ -1,0 +1,23 @@
+﻿@model MainOps.Models.WorkItem
+
+<form asp-action="EndWorkItem" method="post" enctype="multipart/form-data">
+    @Html.HiddenFor(Model => Model.IsFinished)
+    @Html.HiddenFor(Model => Model.Id)
+    @Html.HiddenFor(Model => Model.TimeFinished)
+    @Html.HiddenFor(Model => Model.Description)
+    @Html.HiddenFor(Model => Model.WorkTaskId)
+    <h3>@SharedLocalizer.GetLocalizedHtmlString("The Work Item: "):@Html.DisplayFor(Model => Model.Description)</h3>
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td style="width:30%"><label asp-for="Comment_Worker" class="control-label" style="width:100%;"></label></td>
+            <td style="width:70%;"><textarea asp-for="Comment_Worker" cols="40" rows="4" style="width:100%;" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Final Notes..")"></textarea></td>
+        </tr>
+        <tr>
+            <td style="width:30%"><label class="control-label" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Photos after end work item")</label></td>
+            <td style="width:70%"><input name="files" type="file" multiple accept=".jpg,.jpeg,.png,.pdf" style="width:100%;" /></td>
+        </tr>
+        <tr>
+            <td colspan="2"><button class="btn-hoelscher" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("End Work ITem")</button></td>
+        </tr>
+    </table>
+</form>

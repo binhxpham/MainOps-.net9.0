@@ -1,0 +1,30 @@
+﻿@{
+    ViewData["Title"] = "Main Menu";
+}
+
+<table style="width:100%;table-layout:fixed;font-size:18px;">
+    <tr>
+        <td>
+            <form asp-action="Wells" asp-controller="WellDrilling" method="get">
+                <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Wells")</button>
+            </form>
+        </td>
+        <td>
+            <form asp-action="DrillWell" asp-controller="WellDrilling" method="get">
+                <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Drill Well")</button>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form asp-action="Create_Instruction" asp-controller="WellDrilling" method="get">
+                <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Make Instruction")</button>
+            </form>
+        </td>
+        <td>
+            <form asp-action="Index" asp-controller="Layers" method="get">
+                <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Layer Types")</button>
+            </form>
+        </td>
+    </tr>
+</table>

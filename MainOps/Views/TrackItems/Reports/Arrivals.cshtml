@@ -1,0 +1,168 @@
+﻿@model IEnumerable<MainOps.Models.Arrival>
+
+@{
+    ViewData["Title"] = "Arrivals";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Arrivals")</h2>
+@if(User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DivisionAdmin")) { 
+<form asp-controller="TrackItems" asp-action="ExportArrival" method="post">
+    <table>
+        <tr>
+            <td>
+                @SharedLocalizer.GetLocalizedHtmlString("Export to csv")
+            </td>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Project"):</label></td>
+            <td>
+                <select id="ProjectId2" name="ProjectId" class="form-control" asp-items="ViewBag.ProjectId">
+                    <option value="@null">@SharedLocalizer.GetLocalizedHtmlString("All")</option>
+                </select>
+            </td>
+            <td>
+                <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Export")</button>
+            </td>
+        </tr>
+    </table>
+</form>
+}
+<form asp-controller="TrackItems" asp-action="CombsearchArrival">
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td>
+                <label>@SharedLocalizer.GetLocalizedHtmlString("Arrival Item / BoQ nr"):</label>
+            </td>
+            <td>
+                @Html.DropDownList("filterchoice", ViewData["ItemTypeId"] as IEnumerable<SelectListItem>, @SharedLocalizer.GetLocalizedHtmlString("All"), new { @id = "ItemTypeId", @class = "form-control" })
+            </td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Project"):</label></td>
+            <td>
+                <select id="ProjectId" name="filterchoice2" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillItems();">
+                    <option value="@null">@SharedLocalizer.GetLocalizedHtmlString("All")</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoCompleteArrival","TrackItems")" /></td>
+            <td>
+                <button type="submit" class="btn-hoelscher">
+                    <span class="glyphicon glyphicon-search"></span>
+                </button>
+            </td>
+        </tr>
+    </table>
+</form>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UniqueID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Arrival_Text)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Total Amount Arrived")
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EndStamp)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modeItem => item.Project.Name)
+                    @if(item.SubProjectId != null)
+                    {
+                        @item.SubProject.Name
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ItemType.Item_Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UniqueID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Arrival_Text)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Amount)
+                </td>
+                <td>
+                    @Model.Where(x => x.ItemTypeId.Equals(item.ItemTypeId)).Sum(x => x.Amount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TimeStamp)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EndStamp)
+                </td>
+                <td>
+                    @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+                    {
+                        <a asp-action="SendBackOrTransfer" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Send back or transfer")</a>
+                        <a asp-action="Edit_Arrival" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
+                        <a asp-action="Delete_Arrival" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Delete")</a>
+                    }
+                    <form asp-controller="TrackItems" asp-action="Details_Arrival" asp-route-id="@item.Id" method="get" target="_blank">
+                        <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Details")</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+    var lang = $("#requestCulture_RequestCulture_UICulture_Name").val();
+    function FillItems() {
+        var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetItemsProject", "ItemTypes")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                    'type' : "arrivaledit"
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select</option>';
+                    if (lang == "de-DE") {
+                        s = '<option value="">Bitte auswählen</option>';
+                    }
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["item_Type"] + '</option>';
+                    }
+                    $("#ItemTypeId").html(s);
+                    document.getElementById("ItemTypeId").style.width = "100%";
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+        }
+    </script>
+}

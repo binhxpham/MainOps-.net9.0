@@ -1,0 +1,67 @@
+﻿@model MainOps.Models.WaterSampleStandardLimit
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+
+<h4>WaterSampleStandardLimit</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="WaterSamplePlaceTypeId" class="control-label"></label>
+                <select asp-for="WaterSamplePlaceTypeId" class="form-control" asp-items="ViewBag.WaterSamplePlaceTypeId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="MaxLimit" class="control-label"></label>
+                <input asp-for="MaxLimit" class="form-control" />
+                <span asp-validation-for="MaxLimit" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MeanLimit" class="control-label"></label>
+                <input asp-for="MeanLimit" class="form-control" />
+                <span asp-validation-for="MeanLimit" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Choose Komponent from list")</label>
+                <select id="KomponentId" class="form-control" asp-items="ViewBag.Komponents" onchange="AddSelection();">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Komponent")</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Komponent" class="control-label"></label>
+                <input asp-for="Komponent" class="form-control" />
+                <span asp-validation-for="Komponent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script src="~/js/signature_pad.min.js"></script>
+    <script type="text/javascript">
+       
+        function AddSelection() {
+            var selected_text = $('#KomponentId option:selected')
+                .toArray().map(item => item.text).join();
+            $("#Komponent").val(selected_text);
+            
+        }
+        
+        
+
+    </script>
+}

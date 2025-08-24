@@ -1,0 +1,50 @@
+﻿@model IEnumerable<MainOps.Models.SystemCheck>
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("SystemChecks");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("System Checks")</h2>
+
+<form asp-action="SystemCheckWithComment" asp-controller="TrackItems" method="get">
+    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Add System Check With Comment")</button>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeChecked)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Division)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Comments)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeChecked)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DoneBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Division.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Comments)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+<a asp-action="Reports" asp-controller="TrackItems">@SharedLocalizer.GetLocalizedHtmlString("Back to Reports")</a>

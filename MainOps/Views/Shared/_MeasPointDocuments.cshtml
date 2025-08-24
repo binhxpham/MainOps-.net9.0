@@ -1,0 +1,37 @@
+﻿@model IEnumerable<MainOps.Models.MeasPoint>
+@{ 
+    Layout = null;
+}
+@foreach (var item in Model) {
+
+                <table width="500">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(modelItem => item.Name)
+                            </th>
+                            <th>
+                                @SharedLocalizer.GetLocalizedHtmlString("Document")
+                            </th>
+                            <th>
+                                @SharedLocalizer.GetLocalizedHtmlString("Document Type")
+                            </th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(var doc in item.Documents)
+                        {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Name)
+                            </td>
+                            <td> @Html.DisplayFor(modelItem => doc.Name)</td>
+                            <td> @Html.DisplayFor(modelItem => doc.DocumentType.Type)</td>
+                            <td> <form asp-action="Details" asp-controller="Documents" asp-route-id="@doc.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("View")</button></form></td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+                <br />
+                }

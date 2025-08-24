@@ -1,0 +1,80 @@
+﻿@model MainOps.Models.MeasPoint
+
+<h2>@ViewData["Title"]</h2>
+
+<div>
+    <h4>@SharedLocalizer.GetLocalizedHtmlString("Measurement Points")</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.LaborId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LaborId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DGUnr)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DGUnr)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.MonitorType.MonitorTypeName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MonitorType.MonitorTypeName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Offset)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Offset)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Coordx)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Coordx)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Coordy)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Coordy)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.logger)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.logger.LoggerNo)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ScadaAddress)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ScadaAddress)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Project)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Project.Client)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.MeasType)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MeasType.Type)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> |
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>

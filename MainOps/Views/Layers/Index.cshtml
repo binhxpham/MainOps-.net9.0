@@ -1,0 +1,60 @@
+﻿@model IEnumerable<MainOps.Models.Layer>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.LayerType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BackgroundUrl)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TextColor)
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.LayerType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BackgroundUrl)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TextColor)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+            <td>
+                <form asp-action="UploadBackGroundImage" asp-controller="WellDrilling" asp-route-id="@item.Id" enctype="multipart/form-data">
+                    <input type="file" name="photo" accept=".jpg" />
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload")</button>
+                </form>
+            </td>
+            @*<td><img src="@Url.Content(String.Concat("~/Images/LayerBackGroundImages/",item.Id.ToString(),".jpg"))" style="width:100%;" /></td>*@
+            @*<td><img style='height: 100%; width: 100%; object-fit: contain' /></td>*@
+            <td style="min-width:50px;background-image: url(@String.Concat("/Images/LayerBackGroundImages/",item.Id.ToString(),".jpg"));
+            background-repeat:repeat;
+            background-position: center center; background-size:100%;">
+            </td>
+            
+        </tr>
+}
+    </tbody>
+</table>

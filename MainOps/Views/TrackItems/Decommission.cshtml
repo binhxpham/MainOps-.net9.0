@@ -1,0 +1,364 @@
+﻿@model MainOps.Models.Decommission
+@{
+    ViewData["Title"] = "Decommission";
+}
+<div class="row">
+    <div class="col-xs-12">
+        <form asp-action="Decommission" asp-controller="TrackItems" id="theform" method="post" onsubmit="retrieveData(event);" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <table style="width:100%;table-layout:fixed;">
+                <tr>
+                    <td colspan="2"><h2>@SharedLocalizer.GetLocalizedHtmlString("Decommission")</h2></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="ProjectId" class="control-label"></label></td>
+                    <td><select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillMeasPoints();" style="width:100%;"></select></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="SubProjectId" class="control-label"></label></td>
+                    <td><select asp-for="SubProjectId" class="form-control" asp-items="ViewBag.SubProjectId" style="width:100%;"></select></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="MeasPointId" class="control-label"></label></td>
+                    <td><select asp-for="MeasPointId" class="form-control" asp-items="ViewBag.MeasPointId" onchange="UpdateWellName(this);" style="width:100%;"></select></td>
+                </tr>
+                <tr>
+                    <td>
+                        <label asp-for="Wellname" class="control-label"></label>
+                    </td>
+                    <td>
+                        <input asp-for="Wellname" type="text" id="Wellname" name="Wellname" style="width:100%" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="ItemTypeId" class="control-label"></label></td>
+                    <td><select asp-for="ItemTypeId" class="form-control" style="width:100%;">
+                        <option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Well Type")</option></select></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="TimeStamp" class="control-label"></label></td>
+                    <td><input asp-for="TimeStamp" type="datetime" class="date-picker" value="@DateTime.Now" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="DipBefore" class="control-label"></label></td>
+                    <td><input asp-for="DipBefore" type="number" value="0" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="BottomDip" class="control-label"></label></td>
+                    <td><input asp-for="BottomDip" type="number" value="0" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="WasAirLiftedFirst" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="WasAirLiftedFirst" class="form-control" style="width:100%;">
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="SandFilling" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="SandFilling" class="form-control" onchange="ToggleSand();" style="width:100%;">
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Kg_Sand" class="control-label"></label></td>
+                    <td id="tdsand" style="display:none;"><input asp-for="Kg_Sand" type="number" value="0" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="BentoniteFilling" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="BentoniteFilling" class="form-control" onchange="ToggleBentonite();" style="width:100%;">
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Kg_Bentonite" class="control-label"></label></td>
+                    <td id="tdbentonite" style="display:none;"><input asp-for="Kg_Bentonite" type="number" value="0" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Casted" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="Casted" class="form-control" onchange="ToggleCasting();" style="width:100%;">
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Kg_Casting" class="control-label"></label></td>
+                    <td id="tdcasting" style="display:none;"><input asp-for="Kg_Casting" type="number" value="0" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="L_Water" class="control-label"></label></td>
+                    <td id="tdwater" style="display:none;"><input asp-for="L_Water" type="number" value="0" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Pipe_Cut_X_meter_under" class="control-label"></label></td>
+                    <td><input asp-for="Pipe_Cut_X_meter_under" type="number" value="0" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Area_Reestablished" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="Area_Reestablished" class="form-control" onchange="ToggleSand();" style="width:100%;">
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <label asp-for="GeneralComments"></label>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><textarea asp-for="GeneralComments" rows="6" cols="50" style="width:100%;"></textarea></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Latitude" class="control-label"></label></td>
+                    <td><input asp-for="Latitude" id="latinput" readonly="readonly" style="width:100%;"/></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Longitude" class="control-label"></label></td>
+                    <td><input asp-for="Longitude" id="longinput" readonly="readonly" style="width:100%;"/></td>
+                </tr>
+                <tr>
+                    <td><label>@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label></td>
+                    <td><input type="file" id="files" name="files" required multiple accept=".jpg,.jpeg,.png" style="width:100%" /></td>
+                
+                </tr>
+                <tr>
+                    <td colspan="2"><b>@SharedLocalizer.GetLocalizedHtmlString("Signature")</b></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <canvas width="330" height="150" id="signature" style="border:1px solid blue;"></canvas>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:45%">
+                        <button type="button" id="accept" class="btn-hoelscher" style="width:100%;height:40px;">@SharedLocalizer.GetLocalizedHtmlString("Accept signature")</button>
+                    </td>
+                    <td style="width:45%">
+                        <button type="button" id="clear" class="btn-hoelscher" style="width:100%;height:40px;">@SharedLocalizer.GetLocalizedHtmlString("Clear signature")</button>
+                        <input type="text" id="signaturedata" hidden="hidden" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <img width="80" height="60" id="savetarget" hidden="hidden" style="border:1px solid black">
+                    </td>
+                </tr>
+            </table>
+            <div class="form-group">
+                <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString("Submit")" class="btn-hoelscher" style="width:100%;height:70px;" />
+            </div>
+            <input asp-for="Signature" value="" hidden="hidden" />
+        </form>
+    </div>
+</div>
+<div>
+    <a asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script src="~/js/signature_pad.min.js"></script>
+    <script type="text/javascript">
+        var pad = null;
+        var id;
+        var myLat;
+        var myLng;
+
+        if (navigator.geolocation) {
+            id = navigator.geolocation.watchPosition(function (position) {
+                myLat = position.coords.latitude;
+                myLng = position.coords.longitude;
+                getPos(myLat, myLng);
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                        //alert("error");
+                    }
+
+                }, { maximumAge: 0, timeout: 8000, enableHighAccuracy: true });
+        }
+
+        function getPos(lat, lng) {
+            $("#latinput").val(lat);
+            $("#longinput").val(lng);
+        }
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select',
+                    firstDay: 1
+                });
+                $('.date-picker').datepicker("setDate", new Date("dd-MM-yy"));
+                document.getElementById('ProjectId').options[0].selected = 'selected';
+                FillSubProjects();
+                FillMeasPoints();
+                FillItemTypes();
+            });
+        });
+        $(document).ready(function () {
+            $(function () {
+                var canvas = document.querySelector("#signature");
+                pad = new SignaturePad(canvas);
+                $('#accept').click(function () {
+                    var data = pad.toDataURL();
+                    $('#savetarget').attr('src', data);
+                    var base64signature = data.split(',')[1];
+                    $('#signaturedata').val(base64signature);
+                    });
+                    $('#clear').click(function () {
+                        pad.clear();
+                    })
+
+            })
+        });
+        function UpdateWellName(sel) {
+            document.getElementById('Wellname').value = sel.options[sel.selectedIndex].text;
+        }
+        function FillMeasPoints() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetMeasPointsProject", "MeasPoints")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {'theId' : ProjectId},
+                success: function (data) {
+                    var s = '<option value="">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                    }
+                    $("#MeasPointId").html(s);
+                    document.getElementById("MeasPointId").style.width = "100%";
+                    FillSubProjects();
+                }
+            });
+        }
+        function FillItemTypes() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetDecomTypes", "ItemTypes")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {'theId' : ProjectId},
+                success: function (data) {
+                    var s = '<option value="">Please Select WellType</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["item_Type"] + '</option>';
+                    }
+                    $("#ItemTypeId").html(s);
+                    document.getElementById("ItemTypeId").style.width = "100%";
+                }
+            });
+            }
+        function retrieveData(e) {
+            var posting = true;
+            var s1 = document.getElementById("Signature");
+            var signature = "";
+            signature = document.getElementById("signaturedata").value;
+            s1.value = signature;
+            if (signature == "") {
+                posting = false;
+                e.preventDefault();
+                alert("Please sign the report!");
+            }
+            if ($("#files").val() == '') {
+                e.preventDefault();
+                posting = false;
+                alert("Please upload at least 1 Photo");
+
+            }
+            if ($("#theform").valid() == false) {
+                e.preventDefault();
+                posting = false;
+            }
+            if (posting == true) {
+                StartSpinner();
+            }
+        }
+        function ToggleSand() {
+            var state = $("#SandFilling").val();
+            if (state == "true") {
+                var obj = document.getElementById("tdsand");
+                obj.style.display = "block";
+            }
+            else {
+                var obj = document.getElementById("tdsand");
+                $("#Kg_Sand").val(0);
+                obj.style.display = "none";
+            }
+        }
+        function ToggleBentonite() {
+            var state = $("#BentoniteFilling").val();
+            if (state == "true") {
+                var obj = document.getElementById("tdbentonite");
+                obj.style.display = "block";
+            }
+            else {
+                var obj = document.getElementById("tdbentonite");
+                $("#Kg_Bentonite").val(0);
+                obj.style.display = "none";
+            }
+        }
+        function ToggleCasting() {
+            var state = $("#Casted").val();
+            if (state == "true") {
+                var obj = document.getElementById("tdcasting");
+                obj.style.display = "block";
+                var obj2 = document.getElementById("tdwater");
+                obj2.style.display = "block";
+            }
+            else {
+                var obj = document.getElementById("tdcasting");
+                $("#Kg_Casting").val(0);
+                obj.style.display = "none";
+                var obj2 = document.getElementById("tdwater");
+                $("#L_Water").val(0);
+                obj2.style.display = "none";
+            }
+        }
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+            FillItemTypes();
+        }
+
+    </script>
+}

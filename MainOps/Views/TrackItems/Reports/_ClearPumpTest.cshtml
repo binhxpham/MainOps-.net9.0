@@ -1,0 +1,250 @@
+﻿@model MainOps.Models.ViewModels.ClearPumpTestReport
+
+@{
+    var reflevel = Model.test.Ref_Level - Model.test.Water_level;
+}
+
+<table style="width:100%">
+    <tr>
+        <td><h2>@SharedLocalizer.GetLocalizedHtmlString("Clear Pumping Report")</h2></td>
+        <td colspan="2" align="right"><img src="~/images/Divisions/Photos/@Model.test.Project.DivisionId/@Model.test.Project.Division.LogoPath" width="151" height="66" /></td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.test.Project.Name)</b></td>
+        <td>@Html.DisplayFor(Model => Model.test.Project.Name)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.test.SubProjectId)</b></td>
+        <td>@Html.DisplayFor(Model => Model.test.SubProject.Name)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.test.Wellname)</b></td>
+        <td>@Html.DisplayFor(Model => Model.test.Wellname)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.test.Report_Date)</b></td>
+        <td>
+            @Html.DisplayFor(Model => Model.test.Report_Date)
+        </td>
+        <td></td>
+    </tr>
+
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.test.starttime)</b></td>
+        <td>
+            @Html.DisplayFor(Model => Model.test.starttime)
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.test.endtime)</b></td>
+        <td>
+            @Html.DisplayFor(Model => Model.test.endtime)
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.test.Water_Meter_Before)</b></td>
+        <td>@Html.DisplayFor(Model => Model.test.Water_Meter_Before)</td>
+        <td>m3</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.test.Water_Meter_After)</b></td>
+        <td>@Html.DisplayFor(Model => Model.test.Water_Meter_After)</td>
+        <td>m3</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.test.Totalm3)</b></td>
+        <td>@Html.DisplayFor(Model => Model.test.Totalm3)</td>
+        <td>m3</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.test.Ref_Point)</b></td>
+        <td>@Html.DisplayFor(Model => Model.test.Ref_Point)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.test.Ref_Level)</b></td>
+        <td>@Html.DisplayFor(Model => Model.test.Ref_Level)</td>
+        <td>mDVR90</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.test.Water_level)</b></td>
+        <td>@Html.DisplayFor(Model => Model.test.Water_level)</td>
+        <td>m</td>
+    </tr>
+    <tr>
+        <td><b>@SharedLocalizer.GetLocalizedHtmlString("Water level in Reference")</b></td>
+        <td>@String.Format("{0:N2} ", reflevel)</td>
+        <td>mDVR90</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.test.Init_Meas_Time)</b></td>
+        <td>
+            @Html.DisplayFor(Model => Model.test.Init_Meas_Time)
+        </td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.test.Before_After_Acid)</b></td>
+        <td>@Html.DisplayFor(Model => Model.test.Before_After_Acid)</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.test.Bottom_well)</b></td>
+        <td>@Html.DisplayFor(Model => Model.test.Bottom_well)</td>
+        <td>m</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(Model => Model.test.PumpType)</b></td>
+        <td>@Html.DisplayFor(Model => Model.test.PumpType)</td>
+        <td></td>
+    </tr>
+    <tr rowspan="2">
+        <td style="text-align:left;"><b>@SharedLocalizer.GetLocalizedHtmlString("Comments")</b></td>
+        <td colspan="2">
+            @if (Model.test.GeneralComments != null && Model.test.GeneralComments != "")
+            {
+                @Html.Raw(Model.test.GeneralComments.Replace("\r\n", "<br />"))
+            }
+            else
+            {
+                @Html.DisplayFor(Model => Model.test.GeneralComments)
+            }
+        </td>
+    </tr>
+
+
+</table>
+<h3>@SharedLocalizer.GetLocalizedHtmlString("Test Manual Measurements")</h3>
+<table style="width:100%;">
+    <thead>
+        <tr>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Time")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Flow")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("m3")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Dip")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Comment")
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var dat in Model.datas_dips.OrderBy(x => x.TimeStamp))
+        {
+            <tr>
+                <td><input value="@dat.TimeStamp" type="time" disabled="disabled" /></td>
+                <td><input value="@dat.Flow" type="number" disabled="disabled" /></td>
+                <td><input value="@dat.m3" type="number" disabled="disabled" /></td>
+                <td><input value="@dat.Dip" type="number" disabled="disabled" /></td>
+                <td><input value="@dat.Comment" type="text" disabled="disabled" /></td>
+            </tr>
+        }
+
+    </tbody>
+</table>
+<input hidden="hidden" id="theid" name="id" value="@Model.test.Id" />
+<div class="container">
+    <div id="chart1"></div>
+</div>
+<br>
+<div>
+    <form asp-action="ClearPumpTestReport_PDF" asp-controller="TrackItems" asp-route-id="@Model.test.Id" method="post" target="_blank" onsubmit="saveimage();">
+        <input hidden="hidden" id="imageid" name="theimage" />
+        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Get PDF")</button>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js"></script>
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.load('visualization', '1.0', { 'packages': ['corechart'], 'callback': drawChart });
+        var chart;
+        var data;
+        var option = {
+            title: "Time Series Data Graph",
+            width: 1000,
+            height: 750,
+            interpolateNulls: true,
+            legend: { position: 'top' },
+            vAxes: {
+                0: { title: "main"},
+                1: { title: "per hour", }
+            },
+            chartArea: {
+                height: '80%', width: '85%', left: 100,
+                backgroundColor: { stroke: "gray", strokeWidth: 1 },
+            },
+            series: calculateSeries(),
+            explorer: {
+                actions: ['dragToZoom', 'rightClickToReset'],
+                axis: 'both',
+                keepInBounds: true,
+                maxZoomIn: 20.0
+            },
+            pointSize: 8
+        };
+        function calculateSeries() {
+            var series = {};
+
+            series[0] = {
+                type: "line",
+                targetAxisIndex: 0
+            };
+            series[1] = {
+                type: "line",
+                targetAxisIndex: 1
+            };
+            return series;
+        }
+        function drawChart()
+        {
+            chart = new google.visualization.LineChart(document.getElementById('chart1'));
+            data = new google.visualization.DataTable();
+            data.addColumn('datetime', 'time');
+            data.addColumn('number', 'Pump Level');
+            data.addColumn('number', 'Flow Rate');
+            var theId = $('#theid').val();
+            var url = '@Url.Action("JsonDataClearPumpTest", "TrackItems")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'id': theId },
+                success: function (d) {
+                    for (var prop in d) {
+                        data.addRow
+                            ([
+                                new Date(d[prop]["timeStamp"]),
+                                d[prop]["dip"],
+                                d[prop]["flow"]
+                            ]);
+                    }
+                    chart.draw(data, option);
+                    saveImage();
+                },
+                error: function (d) {
+                    alert("error");
+                }
+            });
+
+        }
+        function saveImage() {
+            $('#imageid').val(chart.getImageURI());
+        }
+    </script>
+}

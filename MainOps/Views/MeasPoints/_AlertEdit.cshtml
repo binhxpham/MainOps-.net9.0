@@ -1,0 +1,75 @@
+﻿@model MainOps.Models.ViewModels.AlertEditVM
+@{ 
+    Layout = null;
+}
+<h4>@SharedLocalizer.GetLocalizedHtmlString("Edit Alert Limits")</h4>
+<h2>@Html.DisplayFor(Model => Model.MeasPoint.Name)</h2>
+<hr />
+<div class="row">
+    <div class="col-xs-6">
+        <form asp-action="EditAlerts" method="post">
+            <input asp-for="MeasPointId" hidden="hidden" />
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <table>
+                <tr>
+                    <td><label asp-for="Upper_Upper_Limit" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="Upper_Upper_Limit" class="form-control" />
+                        <span asp-validation-for="Upper_Upper_Limit" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Middle_Upper_Limit" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="Middle_Upper_Limit" class="form-control" />
+                        <span asp-validation-for="Middle_Upper_Limit" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Middle_Lower_Limit" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="Middle_Lower_Limit" class="form-control" />
+                        <span asp-validation-for="Middle_Lower_Limit" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Lower_Lower_Limit" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="Lower_Lower_Limit" class="form-control" />
+                        <span asp-validation-for="Lower_Lower_Limit" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Flow_Upper_Upper_Limit" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="Flow_Upper_Upper_Limit" class="form-control" />
+                        <span asp-validation-for="Flow_Upper_Upper_Limit" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Flow_Middle_Upper_Limit" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="Flow_Middle_Upper_Limit" class="form-control" />
+                        <span asp-validation-for="Flow_Middle_Upper_Limit" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Flow_Middle_Lower_Limit" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="Flow_Middle_Lower_Limit" class="form-control" />
+                        <span asp-validation-for="Flow_Middle_Lower_Limit" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Flow_Lower_Lower_Limit" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="Flow_Lower_Lower_Limit" class="form-control" />
+                        <span asp-validation-for="Flow_Lower_Lower_Limit" class="text-danger"></span>
+                    </td>
+                </tr>
+            </table>
+            <button type="submit" class="btn btn-hoelscher" style="height:60px;width:120px;">@SharedLocalizer.GetLocalizedHtmlString("Apply Edit")</button>
+        </form>
+    </div>
+</div>
+

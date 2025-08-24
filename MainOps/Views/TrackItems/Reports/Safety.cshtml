@@ -1,0 +1,38 @@
+﻿
+@{
+    ViewData["Title"] = "Safety";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Safety And Site")</h2>
+
+<div class="row">
+    <div class="col-xs-12">
+        <table style="width:100%;table-layout:fixed;font-size:18px;"> 
+            <tr>
+                <td>
+                    <form asp-action="SafetyProblem" asp-controller="TrackItems" method="get">
+                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Safety Problem")</button>
+                    </form>
+                </td>
+               <td></td>
+            </tr>
+            @if(User.IsInRole("Manager") || User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Supervisor")) { 
+        <tr>
+            <td>
+                <form asp-action="SafetyProblems" asp-controller="TrackItems" method="get">
+                    <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Safety Problem Reports")</button>
+                </form>
+            </td>
+            <td>
+                <form asp-action="Index" asp-controller="AccidentReports" method="get">
+                    <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Official Accident Reports")</button>
+                </form>
+            </td>
+
+        </tr>
+            }
+        </table>
+    </div>
+</div>
+
+

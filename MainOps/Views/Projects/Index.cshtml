@@ -1,0 +1,155 @@
+﻿@model IEnumerable<MainOps.Models.Project>
+
+<h2>@ViewData["Title"]</h2>
+
+<div>
+    <form asp-action="Create" method="get">
+        <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Create")</button>
+    </form>
+    <form asp-action="ActiveProjects" method="get">
+        <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Active Projects")</button>
+    </form>
+    <form asp-action="OldProjects" method="get">
+        <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Old/Inactive Projects")</button>
+    </form>
+</div>
+@if(User.IsInRole("Admin") || User.IsInRole("DivisionAdmin"))
+            {
+<div class="row">
+    <form asp-controller="Projects" asp-action="UploadProjects" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+
+            @Html.Label("File Upload")
+
+            <div class="col-sm-7">
+                <input type="file" id="postedFile" name="postedFile" class="form-control" accept=".csv" />
+            </div>
+        </div>
+
+        <div class="form-group">
+
+            <div class="col-md-offset-3 col-md-10">
+                <br />
+                <input type="submit" title="Upload" value="Upload" class="btn-hoelscher" />
+            </div>
+        </div>
+    </form>
+</div>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ProjectNr)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Abbreviation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Client)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Address)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CoordSystem.system)
+            </th>
+
+
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ProjectNr)
+                </td>
+                @if (item.IsTemplate.Equals(true))
+                {
+                    <td>
+                        Template: @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                }
+                <td>
+                    @Html.DisplayFor(modelItem => item.Abbreviation)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Client)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Address)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CoordSystem.system)
+                </td>
+                <td>
+                    <form asp-action="Edit" asp-controller="Projects" asp-route-id="@item.Id" method="get"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button></form>
+                    <form asp-action="CreateSubProject" asp-controller="SubProjects" asp-route-id="@item.Id" method="get"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Add Subproject")</button></form>
+                    <form asp-action="ClearProject" asp-controller="Projects" asp-route-id="@item.Id" method="get"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Clear Project")</button></form>
+                    <form asp-action="Delete" asp-controller="Projects" asp-route-id="@item.Id" method="get"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button></form>
+                    <form asp-action="PopulateFromTemplate" asp-controller="ItemTypes" method="post" onsubmit="MakeSure(event);">
+                        <input type="hidden" name="ProjectId" value="@item.Id" />
+                        <select name="TemplateProjectId" asp-items="ViewBag.TemplateId">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Template")</option>
+                        </select>
+                        <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Populate From Template")</button>
+                    </form>
+                    @*@if (User.IsInRole("Admin"))
+                    {
+                        <form asp-action="PopulateProject" asp-controller="Projects" asp-route-id="@item.Id" method="get"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Create BoQ")</button></form>
+                        <form asp-action="PopulateProject2" asp-controller="Projects" asp-route-id="@item.Id" method="get"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Create BoQ AHAK")</button></form>
+                    }*@
+                </td>
+            </tr>
+            @if (item.SubProjects.Count() >= 1)
+            {
+
+                <tr>
+                    <td colspan="6">
+                        <table style="width:100%;">
+                            <tr>
+                                <td style="text-align:left;"><b>@SharedLocalizer.GetLocalizedHtmlString("Main Project Name")</b></td>
+                                <td style="text-align:left;"><b>@SharedLocalizer.GetLocalizedHtmlString("SubProject Name")</b></td>
+                                <td style="text-align:right;"><b>@SharedLocalizer.GetLocalizedHtmlString("SubProject Nr")</b></td>
+                            </tr>
+                            @foreach (var subproj in item.SubProjects)
+                            {
+                                <tr>
+                                    <td style="text-align:left;">@item.Name</td>
+                                    <td style="text-align:left;">@subproj.Name</td>
+                                    <td style="text-align:right;">@subproj.SubProjectNr</td>
+                                </tr>
+                            }
+                        </table>
+                    </td>
+                </tr>
+
+
+            }
+        }
+    </tbody>
+</table>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        function MakeSure(e) {
+            if (confirm("Are you sure you want to populate this project? This action will delete all curretn BoQ items, titles, headlines and replace them with those of the template!")) {
+                
+            } else {
+                e.preventDefault();
+            }
+        }
+    </script>
+}

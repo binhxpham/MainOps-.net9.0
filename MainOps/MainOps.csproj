@@ -1,0 +1,694 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+	  <!--<TargetFramework>netcoreapp2.1</TargetFramework>-->
+	  <TargetFramework>net9.0</TargetFramework>
+	  <Nullable>enable</Nullable>
+	  <ImplicitUsings>enable</ImplicitUsings>
+	  <UserSecretsId>aspnet-MainOps-9E6211E2-57C6-4B55-B23E-A02A07F5300B</UserSecretsId>
+    <ApplicationIcon />
+    <OutputType>Exe</OutputType>
+    <StartupObject />
+  </PropertyGroup>
+
+	<PropertyGroup>
+		<EnableDefaultContentItems>false</EnableDefaultContentItems>
+	</PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>false</Optimize>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+	<PropertyGroup>
+		<PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
+		<!--<PublishWithAspNetCoreTargetManifest>true</PublishWithAspNetCoreTargetManifest>-->
+	</PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20201016085621_betterhours.cs" />
+    <Compile Remove="Migrations\20201016085621_betterhours.Designer.cs" />
+    <Compile Remove="Migrations\20241029124214_ExtraWorkBoQsStartup.cs" />
+    <Compile Remove="Migrations\20241029124214_ExtraWorkBoQsStartup.Designer.cs" />
+    <Compile Remove="Startup.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Views\DagsRapportBetons\_Details - Copy.cshtml" />
+    <Content Remove="wwwroot\%2a%2a" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Rotativa\wkhtmltoimage.exe" />
+    <Content Include="Rotativa\wkhtmltopdf.exe" />
+    <Content Include="wwwroot\css\bootstrap-3.3.2.min.css" />
+    <Content Include="wwwroot\css\bootstrap-example.min.css" />
+    <Content Include="wwwroot\css\bootstrap-multiselect.css" />
+    <Content Include="wwwroot\css\bootstrap-theme.css" />
+    <Content Include="wwwroot\css\bootstrap-theme.css.map" />
+    <Content Include="wwwroot\css\bootstrap-theme.min.css" />
+    <Content Include="wwwroot\css\bootstrap-theme.min.css.map" />
+    <Content Include="wwwroot\css\bootstrap.css" />
+    <Content Include="wwwroot\css\bootstrap.css.map" />
+    <Content Include="wwwroot\css\bootstrap.min.css" />
+    <Content Include="wwwroot\css\bootstrap.min.css.map" />
+    <Content Include="wwwroot\css\BoreProfileCSS.css" />
+    <Content Include="wwwroot\css\BoreProfileCSS.min.css" />
+    <Content Include="wwwroot\css\dropdown4.css" />
+    <Content Include="wwwroot\css\dropdown4.min.css" />
+    <Content Include="wwwroot\css\jquery-ui-timepicker-addon.css" />
+    <Content Include="wwwroot\css\jquery-ui-timepicker-addon.min.css" />
+    <Content Include="wwwroot\css\loadercess.css" />
+    <Content Include="wwwroot\css\loadercess.min.css" />
+    <Content Include="wwwroot\css\navlinksstuff.css" />
+    <Content Include="wwwroot\css\navlinksstuff.min.css" />
+    <Content Include="wwwroot\css\pdfcss.css" />
+    <Content Include="wwwroot\css\pdfcss.min.css" />
+    <Content Include="wwwroot\css\pdfcss2.css" />
+    <Content Include="wwwroot\css\pdfcss2.min.css" />
+    <Content Include="wwwroot\css\prettify.min.css" />
+    <Content Include="wwwroot\css\RandomCss.css" />
+    <Content Include="wwwroot\css\RandomCss.min.css" />
+    <Content Include="wwwroot\css\site.css" />
+    <Content Include="wwwroot\css\site.min.css" />
+    <Content Include="wwwroot\css\themes\base\accordion.css" />
+    <Content Include="wwwroot\css\themes\base\all.css" />
+    <Content Include="wwwroot\css\themes\base\autocomplete.css" />
+    <Content Include="wwwroot\css\themes\base\base.css" />
+    <Content Include="wwwroot\css\themes\base\button.css" />
+    <Content Include="wwwroot\css\themes\base\core.css" />
+    <Content Include="wwwroot\css\themes\base\datepicker.css" />
+    <Content Include="wwwroot\css\themes\base\dialog.css" />
+    <Content Include="wwwroot\css\themes\base\draggable.css" />
+    <Content Include="wwwroot\css\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
+    <Content Include="wwwroot\css\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
+    <Content Include="wwwroot\css\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
+    <Content Include="wwwroot\css\themes\base\images\ui-bg_glass_65_ffffff_1x400.png" />
+    <Content Include="wwwroot\css\themes\base\images\ui-bg_glass_75_dadada_1x400.png" />
+    <Content Include="wwwroot\css\themes\base\images\ui-bg_glass_75_e6e6e6_1x400.png" />
+    <Content Include="wwwroot\css\themes\base\images\ui-bg_glass_95_fef1ec_1x400.png" />
+    <Content Include="wwwroot\css\themes\base\images\ui-bg_highlight-soft_75_cccccc_1x100.png" />
+    <Content Include="wwwroot\css\themes\base\images\ui-icons_222222_256x240.png" />
+    <Content Include="wwwroot\css\themes\base\images\ui-icons_2e83ff_256x240.png" />
+    <Content Include="wwwroot\css\themes\base\images\ui-icons_444444_256x240.png" />
+    <Content Include="wwwroot\css\themes\base\images\ui-icons_454545_256x240.png" />
+    <Content Include="wwwroot\css\themes\base\images\ui-icons_555555_256x240.png" />
+    <Content Include="wwwroot\css\themes\base\images\ui-icons_777620_256x240.png" />
+    <Content Include="wwwroot\css\themes\base\images\ui-icons_777777_256x240.png" />
+    <Content Include="wwwroot\css\themes\base\images\ui-icons_888888_256x240.png" />
+    <Content Include="wwwroot\css\themes\base\images\ui-icons_cc0000_256x240.png" />
+    <Content Include="wwwroot\css\themes\base\images\ui-icons_cd0a0a_256x240.png" />
+    <Content Include="wwwroot\css\themes\base\images\ui-icons_ffffff_256x240.png" />
+    <Content Include="wwwroot\css\themes\base\jquery-ui.css" />
+    <Content Include="wwwroot\css\themes\base\jquery-ui.min.css" />
+    <Content Include="wwwroot\css\themes\base\menu.css" />
+    <Content Include="wwwroot\css\themes\base\progressbar.css" />
+    <Content Include="wwwroot\css\themes\base\resizable.css" />
+    <Content Include="wwwroot\css\themes\base\selectable.css" />
+    <Content Include="wwwroot\css\themes\base\selectmenu.css" />
+    <Content Include="wwwroot\css\themes\base\slider.css" />
+    <Content Include="wwwroot\css\themes\base\sortable.css" />
+    <Content Include="wwwroot\css\themes\base\spinner.css" />
+    <Content Include="wwwroot\css\themes\base\tabs.css" />
+    <Content Include="wwwroot\css\themes\base\theme.css" />
+    <Content Include="wwwroot\css\themes\base\tooltip.css" />
+    <Content Include="wwwroot\favicon.ico" />
+    <Content Include="wwwroot\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="wwwroot\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="wwwroot\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="wwwroot\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="wwwroot\fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="wwwroot\images\stuff\Natarbejde.jpg" />
+    <Content Include="wwwroot\less\bootstrap-example.less" />
+    <Content Include="wwwroot\less\bootstrap-multiselect.less" />
+    <Content Include="wwwroot\lib\bootstrap\.bower.json" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\Blinking.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap-theme.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap-theme.css.map" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap-theme.min.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap-theme.min.css.map" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap.css.map" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap.min.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\bootstrap.min.css.map" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\Different.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\Footer.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\LoadSpinner2.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\LoadSpinner2.min.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\PicturesHeader.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\right-modal.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\Sidebarmenu.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\StepProgressBar.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\three-modal1.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\three-modal1.min.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\css\two-modal.css" />
+    <Content Include="wwwroot\lib\bootstrap\dist\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="wwwroot\lib\bootstrap\dist\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="wwwroot\lib\bootstrap\dist\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="wwwroot\lib\bootstrap\dist\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="wwwroot\lib\bootstrap\dist\fonts\glyphicons-halflings-regular.woff2" />
+    <Content Include="wwwroot\lib\bootstrap\dist\js\bootstrap.js" />
+    <Content Include="wwwroot\lib\bootstrap\dist\js\bootstrap.min.js" />
+    <Content Include="wwwroot\lib\bootstrap\dist\js\npm.js" />
+    <Content Include="wwwroot\lib\bootstrap\LICENSE" />
+    <Content Include="wwwroot\lib\jquery-validation-unobtrusive\.bower.json" />
+    <Content Include="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.js" />
+    <Content Include="wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.min.js" />
+    <Content Include="wwwroot\lib\jquery-validation-unobtrusive\LICENSE.txt" />
+    <Content Include="wwwroot\lib\jquery-validation\.bower.json" />
+    <Content Include="wwwroot\lib\jquery-validation\dist\additional-methods.js" />
+    <Content Include="wwwroot\lib\jquery-validation\dist\additional-methods.min.js" />
+    <Content Include="wwwroot\lib\jquery-validation\dist\jquery.validate.js" />
+    <Content Include="wwwroot\lib\jquery-validation\dist\jquery.validate.min.js" />
+    <Content Include="wwwroot\lib\jquery-validation\LICENSE.md" />
+    <Content Include="wwwroot\lib\jquery\.bower.json" />
+    <Content Include="wwwroot\lib\jquery\dist\jquery.js" />
+    <Content Include="wwwroot\lib\jquery\dist\jquery.min.js" />
+    <Content Include="wwwroot\lib\jquery\dist\jquery.min.map" />
+    <Content Include="wwwroot\lib\jquery\LICENSE.txt" />
+    <Content Include="wwwroot\Markers\yellow.png" />
+    <Content Include="wwwroot\PreExcavations\After\29\Hinweis zu 1_0_0_21.JPG" />
+    <Content Include="wwwroot\PreExcavations\After\29\Hinweis zu 1_0_0_21_edit.JPG" />
+    <Content Include="wwwroot\PreExcavations\After\29\SeperationOfPumpsAndRWsSteeringUnits.jpg" />
+    <Content Include="wwwroot\PreExcavations\After\29\SeperationOfPumpsAndRWsSteeringUnits_edit.jpg" />
+    <Content Include="wwwroot\PreExcavations\After\4\NHT_MonitoringSE_edit.JPG" />
+    <Content Include="wwwroot\PreExcavations\Before\29\importwellpointfile.JPG" />
+    <Content Include="wwwroot\PreExcavations\Before\29\importwellpointfile_edit.JPG" />
+    <Content Include="wwwroot\PreExcavations\Before\4\tegning_krydsning_Havneholmen_edit.jpg" />
+    <Content Include="wwwroot\PreExcavations\During\29\editdatacolumnswellpoints.JPG" />
+    <Content Include="wwwroot\PreExcavations\During\29\editdatacolumnswellpoints_edit.JPG" />
+    <Content Include="wwwroot\PreExcavations\During\29\importwellpointfile.JPG" />
+    <Content Include="wwwroot\PreExcavations\During\29\importwellpointfile_edit.JPG" />
+    <Content Include="wwwroot\PreExcavations\During\29\installeretklikbar.jpg" />
+    <Content Include="wwwroot\PreExcavations\During\29\installeretklikbar_edit.jpg" />
+    <Content Include="wwwroot\PreExcavations\During\29\metrositeoverblik.jpg" />
+    <Content Include="wwwroot\PreExcavations\During\29\metrositeoverblik_edit.jpg" />
+    <Content Include="wwwroot\PreExcavations\During\29\SystemDiagram.jpg" />
+    <Content Include="wwwroot\PreExcavations\During\29\SystemDiagram_edit.jpg" />
+    <Content Include="wwwroot\PreExcavations\During\4\cross_edit.jpg" />
+    <Content Include="wwwroot\Rotativa\wkhtmltoimage.exe" />
+    <Content Include="wwwroot\Rotativa\wkhtmltopdf.exe" />
+    <Content Include="wwwroot\svgs\pop-up-svgrepo-com.svg" />
+    <Content Include="wwwroot\Tasks\Feedbacks\107\metrositeoverblik_edit.jpg" />
+    <Content Include="wwwroot\Tasks\Feedbacks\109\metrositeoverblik_edit.jpg" />
+    <Content Include="wwwroot\Tasks\Feedbacks\1\Kalk_edit.jpg" />
+    <Content Include="wwwroot\Tasks\Feedbacks\30\20210331_103228_edit.jpg" />
+    <Content Include="wwwroot\Tasks\Feedbacks\4\Bentonit_edit.jpg" />
+    <Content Include="wwwroot\Tasks\Feedbacks\4\Grus_edit.jpg" />
+    <Content Include="wwwroot\Tasks\Feedbacks\4\kvart_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\10\22\Grus_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\10\22\kvart_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\10\23\UN17 B24.JPG" />
+    <Content Include="wwwroot\Tasks\WorkTasks\10\24\22+400-LO.png" />
+    <Content Include="wwwroot\Tasks\WorkTasks\12\25\Grus_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\12\25\kvart_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\12\26\UN17 B24.JPG" />
+    <Content Include="wwwroot\Tasks\WorkTasks\12\27\22+400-LO.png" />
+    <Content Include="wwwroot\Tasks\WorkTasks\14\28\Grus_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\14\28\kvart_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\14\29\UN17 B24.JPG" />
+    <Content Include="wwwroot\Tasks\WorkTasks\14\30\22+400-LO.png" />
+    <Content Include="wwwroot\Tasks\WorkTasks\16\31\Bentonit_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\16\31\Filter_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\16\32\UN17 B24.JPG" />
+    <Content Include="wwwroot\Tasks\WorkTasks\16\33\FWL455_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\17\34\Bentonit_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\17\34\Filter_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\17\35\UN17 B24.JPG" />
+    <Content Include="wwwroot\Tasks\WorkTasks\17\36\FWL455_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\1\1\960A-S.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\1\1\Bentonit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\1\2\EBR-PZ06_11_feb.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\21\47\MON1_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\7\18\Bentonit_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\7\18\Filter_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\7\19\Bentonit_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\7\19\Filter_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\9\20\Bentonit_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\9\20\Filter_edit.jpg" />
+    <Content Include="wwwroot\Tasks\WorkTasks\9\21\UN17 B23.JPG" />
+    <Content Include="wwwroot\Tasks\WorkTasks\9\21\UN17 B24.JPG" />
+    <Content Include="wwwroot\TempFile\1_20240731_154600.txt" />
+    <Content Include="wwwroot\TempFile\1_20240731_155100.txt" />
+    <Content Include="wwwroot\TempFile\1_20240731_155800.txt" />
+    <Content Include="wwwroot\TempFile\856_20240628_151300.txt" />
+    <Content Include="wwwroot\TempFile\856_20240628_152900.txt" />
+    <Content Include="wwwroot\TempFile\All.txt" />
+    <Content Include="wwwroot\TrackItems\39\1\InstallPhotos\960A-S.jpg" />
+    <Content Include="wwwroot\TrackItems\39\1\PackedPhotos\VM 600028 .png" />
+    <Content Include="wwwroot\TrackItems\39\1\ReceivePhotos\T4_kloak_total.png" />
+    <Content Include="wwwroot\TrackItems\39\1\ReceivePhotos\WellScetch.png" />
+    <Content Include="wwwroot\TrackItems\39\1\SentPhotos\T4_gamle_flow_maalinger.png" />
+    <Content Include="wwwroot\TrackItems\39\1\SentPhotos\T4_kloak_total.png" />
+    <Content Include="wwwroot\TrackItems\39\2\PackedPhotos\600028 Boringer Barslund Kanalvej.png" />
+    <Content Include="wwwroot\TrackItems\39\2\PackedPhotos\VM 600028 .png" />
+    <Content Include="wwwroot\TrackItems\39\2\SentPhotos\IKontrol_Hvor_Er_Mine_rapporter.png" />
+    <Content Include="wwwroot\TrackItems\39\2\SentPhotos\T4_m3_per_dag_m3_per_minut.png" />
+    <Content Include="wwwroot\TrackItems\39\3579\ErrorPhotos\ild.png" />
+    <Content Include="wwwroot\TrackItems\39\3579\ErrorPhotos\ild_salukket.png" />
+    <Content Include="wwwroot\TrackItems\39\3\PackedPhotos\T4_gamle_flow_maalinger.png" />
+    <Content Include="wwwroot\TrackItems\ClearPumpTests\IN01\1\SLU-PZ01_3.jpg" />
+    <Content Include="wwwroot\TrackItems\ClearPumpTests\IN01\2\SLU-PZ01_2.jpg" />
+    <Content Include="wwwroot\TrackItems\ClearPumpTests\IN01\2\SLU-PZ01_3.jpg" />
+    <Content Include="wwwroot\TrackItems\ClearPumpTests\IN01\3\SLU-PZ01_2.jpg" />
+    <Content Include="wwwroot\TrackItems\ClearPumpTests\IN01\3\SLU-PZ01_3.jpg" />
+    <Content Include="wwwroot\TrackItems\PumpTests\AFV1\100\afv1.jpg" />
+    <Content Include="wwwroot\UTMCoordinates\2019-09-17 ASBUILD MOP AB UTM system.txt" />
+    <Content Include="wwwroot\UTMCoordinates\2019-10-09 AS BUILT SLU AB UTM system.txt" />
+    <Content Include="wwwroot\UTMCoordinates\2019-10-22 AS BUILT HOL AB UTM system.txt" />
+    <Content Include="wwwroot\UTMCoordinates\2019-10-25 SH GAB AB UTM.txt" />
+    <Content Include="wwwroot\UTMCoordinates\2019.11.12 SH GAB AB.txt" />
+    <Content Include="wwwroot\UTMCoordinates\2019.12.10 SH NEL AB.txt" />
+    <Content Include="wwwroot\UTMCoordinates\BARS LYNG.txt" />
+    <Content Include="wwwroot\UTMCoordinates\BARS STRAND GPS sugespidser.txt" />
+    <Content Include="wwwroot\UTMCoordinates\ExtraWells.txt" />
+    <Content Include="wwwroot\UTMCoordinates\Goteborg UTM coords new.txt" />
+    <Content Include="wwwroot\UTMCoordinates\HOTEL JOYN.txt" />
+    <Content Include="wwwroot\UTMCoordinates\NHT_COORDS.txt" />
+    <Content Include="wwwroot\UTMCoordinates\Postgrunden.txt" />
+    <Content Include="wwwroot\UTMCoordinates\SH EBR UT.txt" />
+    <Content Include="wwwroot\UTMCoordinates\SH MOP AB shaft.txt" />
+    <Content Include="wwwroot\UTMCoordinates\SH_OVK_UT.txt" />
+    <Content Include="wwwroot\UTMCoordinates\Søndersø Vandvær 16-11-18.txt" />
+    <Content Include="wwwroot\UTMCoordinates\T4UTMCoordinater.txt" />
+    <Content Include="wwwroot\WellChecks\12\installeretklikbar.jpg" />
+    <Content Include="wwwroot\WellChecks\12\installeretklikbar_edit.jpg" />
+    <Content Include="wwwroot\WellChecks\12\metrositeoverblik.jpg" />
+    <Content Include="wwwroot\WellChecks\12\metrositeoverblik_edit.jpg" />
+    <Content Include="wwwroot\WellChecks\12\navne_3step_AFV4.png" />
+    <Content Include="wwwroot\WellChecks\1\editdatacolumnswellpoints_edit.JPG" />
+    <Content Include="wwwroot\WellChecks\1\importwellpointfile_edit.JPG" />
+    <Content Include="wwwroot\WellChecks\1\pic1.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Identity" Version="1.13.2" />
+    <PackageReference Include="DinkToPdf" Version="1.0.8" />
+    <PackageReference Include="Docnet.Core" Version="2.1.3" />
+    <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="7.22.1" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.1.7" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.AzureAppServices.HostingStartup" Version="2.1.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Azure.Devices" Version="1.22.0" />
+    <PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.28.0" />
+    <PackageReference Include="Microsoft.Azure.KeyVault" Version="3.0.3" />
+    <PackageReference Include="Microsoft.Azure.Services.AppAuthentication" Version="1.0.3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.14" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.1.14">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Configuration.AzureKeyVault" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="2.1.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.1.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.10" PrivateAssets="All" />
+    <PackageReference Include="Moment.js" Version="2.24.0" />
+    <!--<PackageReference Include="MySql.EntityFrameworkCore" Version="9.0.0" />-->
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.0" />
+    <PackageReference Include="QRCoder" Version="1.3.6" />
+    <PackageReference Include="Rotativa.AspNetCore" Version="1.2.0" />
+    <PackageReference Include="Sendgrid" Version="9.12.0" />
+    <PackageReference Include="signaturepad" Version="1.5.3" />
+    <PackageReference Include="Spin.js" Version="2.3.2.1" />
+    <PackageReference Include="SSH.NET" Version="2024.0.0" />
+    <PackageReference Include="System.Drawing.Common" Version="4.6.0" />
+    <PackageReference Include="Telerik.UI.for.AspNet.Core.Trial" Version="2018.3.911" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Views\CGJensen\UploadListSager.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\CGJensen\_Dagsrapportview.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\Pump_Commission.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\Pump_Commission_Report.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\Well_Development.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\Pump_Installation.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\Well_Drilling.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\Well_Drilling_Report.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\Well_Installation_Report.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\Pump_Installation_Report.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\_PumpCommissions.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\_Pump_Commission_Report.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\_WellDevelopments.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\_PumpInstallations.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\_WellDrillings.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\_Well_Development_Report.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\_Pump_Installation_Report.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\_Well_Drilling_Report.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\_WTP_Test_Report.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\WTP_Test_Report.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\_WTPTests.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Documentation\_Generator_Test_Report.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\HJItems\Maintenances.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\HJItems\_DetailsAll.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\HJItems\_DetailsAll2.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\HJItems\_Details.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\HJItems\DetailsAll.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\HJItems\DetailsAndUpdate.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\HJItems\ShowItems.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Manage\UsersWithRoles - Copy.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\MeasPoints\DetailsTotal.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\MeasPoints\AddAlarmBox.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\MeasPoints\EditAlarmBox.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\MeasPoints\ExportDipList - Copy.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\MeasPoints\ShowData_2.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\MeasPoints\AlarmBoxes.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\MeasPoints\_DIpTagsAll.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\MeasPoints\ExportDipList.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\MeasPoints\ExportMonitorPoints.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\MeasPoints\ShowMap.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\MeasPoints\_Details.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\MeasPoints\_DipTag.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\MeasPoints\DetailsTag.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\MeasPoints\DIpTagsAll.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\MeasPoints\_DetailsAll.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\MeasPoints\DetailsAll.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Meas\Index.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Offsets\PipeCut2.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Shared\_AlarmPictures.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Shared\_Layout - Copy - Copy.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Shared\_Layout - ULLI.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Shared\_Layout.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Shared\_Layout2.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Shared\_ProjectDocuments.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Shared\_MeasPointDocuments.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\Daily_Report.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\Arrival.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\Delete_Mobilization.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\InstallItem.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\InstallSmallParts.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\Invoice - Copy.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\invoice_all - Copy.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\MainMenu_HIH.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\MeasurePipebackup.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\ReceiveItem.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\Delete_Arrival.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\Reports\Arrivals_HIH.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\Reports\Edit_Mobilization.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\Reports\Edit_Arrival.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\Reports\SummaryReport 2.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\Reports\_Arrivals.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\Reports\_Mobilize.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\Reports\_Arrival.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\Reports\_Mobilisations.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\Reports\_Deinstallations.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\Reports\_Installations.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\Reports\_DailyReports.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\Reports\_Daily_Report_2.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\Reports\Edit_ToolBox.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\SendItem.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\ItemTagsAll.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\_Invoice - Copy.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\_Invoice_all.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\_ItemTagsAll.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TrackItems\_ItemTag.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\TruckDailyReports\DeleteSite.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\WaterSampleTypes\UploadSamples.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\WaterSampleTypes\_AlertEdit.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\AHAK\akonto\Documentation\" />
+    <Folder Include="wwwroot\AHAK\akonto\Excel\" />
+    <Folder Include="wwwroot\AHAK\DailyReports\144\" />
+    <Folder Include="wwwroot\AHAK\DailyReports\145\" />
+    <Folder Include="wwwroot\AHAK\DailyReports\146\" />
+    <Folder Include="wwwroot\AHAK\DailyReports\148\" />
+    <Folder Include="wwwroot\AHAK\DailySummaries\" />
+    <Folder Include="wwwroot\AHAK\DataSheets\566\" />
+    <Folder Include="wwwroot\AHAK\Drilling\NewFolder\" />
+    <Folder Include="wwwroot\AHAK\ExtraWorks\12\" />
+    <Folder Include="wwwroot\AHAK\ExtraWorks\13\" />
+    <Folder Include="wwwroot\AHAK\ExtraWorks\4\" />
+    <Folder Include="wwwroot\AHAK\ExtraWorks\91\" />
+    <Folder Include="wwwroot\AHAK\ExtraWorks\168\" />
+    <Folder Include="wwwroot\AHAK\MaintenancePhotos\" />
+    <Folder Include="wwwroot\AHAK\PipeCutPhotos\" />
+    <Folder Include="wwwroot\AHAK\Reference Coords\418\" />
+    <Folder Include="wwwroot\AHAK\test\" />
+    <Folder Include="wwwroot\CGJensen\BetonRenovering\Dagsrapporter\" />
+    <Folder Include="wwwroot\Documents\" />
+    <Folder Include="wwwroot\images\Divisions\Daily_Reports\" />
+    <Folder Include="wwwroot\images\Divisions\WellInstallations\" />
+    <Folder Include="wwwroot\images\ItemClasses\Photos\" />
+    <Folder Include="wwwroot\DrawingTest\" />
+    <Folder Include="wwwroot\images\ExternalWellTagPhotos\" />
+    <Folder Include="wwwroot\FilesToParse\" />
+    <Folder Include="wwwroot\Rental\PhotoDelivery\1\" />
+    <Folder Include="wwwroot\Rental\PhotoDelivery\2\" />
+    <Folder Include="wwwroot\Rental\PhotoReturn\1\" />
+    <Folder Include="wwwroot\Rental\PhotoReturn\2\" />
+    <Folder Include="wwwroot\Tasks\Feedbacks\106\" />
+    <Folder Include="wwwroot\Tasks\Feedbacks\108\" />
+    <Folder Include="wwwroot\Tasks\WorkTasks\21\48\" />
+    <Folder Include="wwwroot\Tasks\WorkTasks\21\49\" />
+    <Folder Include="wwwroot\Tasks\WorkTasks\21\50\" />
+    <Folder Include="wwwroot\Tasks\WorkTasks\21\51\" />
+    <Folder Include="wwwroot\Tasks\WorkTasks\21\52\" />
+    <Folder Include="wwwroot\Tasks\WorkTasks\21\53\" />
+    <Folder Include="wwwroot\Tasks\WorkTasks\21\54\" />
+    <Folder Include="wwwroot\Tasks\WorkTasks\21\55\" />
+    <Folder Include="wwwroot\Tasks\WorkTasks\21\56\" />
+    <Folder Include="wwwroot\TempFolder\" />
+    <Folder Include="wwwroot\TrackItems\PumpTests\AFV3\96\" />
+    <Folder Include="wwwroot\TrackItems\PumpTests\test\95\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Views\Contaminations\Create.cshtml" />
+    <None Include="Views\Contaminations\Delete.cshtml" />
+    <None Include="Views\Contaminations\Details.cshtml" />
+    <None Include="Views\Contaminations\Edit.cshtml" />
+    <None Include="Views\Contaminations\Index.cshtml" />
+    <None Include="Views\DeviceEffort\Delete.cshtml" />
+    <None Include="Views\DeviceEffort\Details.cshtml" />
+    <None Include="Views\DeviceEffort\Edit.cshtml" />
+    <None Include="Views\DeviceEffort\Effortblock.cshtml" />
+    <None Include="Views\EffortPrice\Priceblock.cshtml" />
+    <None Include="Views\Efforts\Create.cshtml" />
+    <None Include="Views\Efforts\Delete.cshtml" />
+    <None Include="Views\Efforts\Details.cshtml" />
+    <None Include="Views\Efforts\Edit.cshtml" />
+    <None Include="Views\Efforts\Index.cshtml" />
+    <None Include="Views\FilterMaterials\Create.cshtml" />
+    <None Include="Views\FilterMaterials\Delete.cshtml" />
+    <None Include="Views\FilterMaterials\Details.cshtml" />
+    <None Include="Views\FilterMaterials\Edit.cshtml" />
+    <None Include="Views\FilterMaterials\Index.cshtml" />
+    <None Include="Views\Prices\Create.cshtml" />
+    <None Include="Views\Prices\Delete.cshtml" />
+    <None Include="Views\Prices\Details.cshtml" />
+    <None Include="Views\Prices\Edit.cshtml" />
+    <None Include="Views\Prices\EditFirst.cshtml" />
+    <None Include="Views\Prices\Index.cshtml" />
+    <None Include="Views\Prices\Index2.cshtml" />
+    <None Include="Views\VMMedia\Delete.cshtml" />
+    <None Include="Views\VMMedia\Edit.cshtml" />
+    <None Include="Views\VMMedia\Mediablock.cshtml" />
+    <None Include="Views\VMMedia\MediablockTwo.cshtml" />
+    <None Include="Views\WtpBlock\Create.cshtml" />
+    <None Include="Views\WtpBlock\Delete.cshtml" />
+    <None Include="Views\WtpBlock\Details.cshtml" />
+    <None Include="Views\WtpBlock\Edit.cshtml" />
+    <None Include="Views\WtpBlock\Index.cshtml" />
+    <None Include="Views\WTPBuilder\Add_Concentrations.cshtml" />
+    <None Include="Views\WTPBuilder\Index.cshtml" />
+    <None Include="Views\WTPBuilder\InputUse.cshtml" />
+    <None Include="wwwroot\js\Scripts\spin.js" />
+    <None Include="wwwroot\js\Scripts\spin.min.js" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+    <EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
+    <DebugType>portable</DebugType>
+    
+    <LangVersion>latest</LangVersion>
+    
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+
+</Project>

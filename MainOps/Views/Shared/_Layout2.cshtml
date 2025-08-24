@@ -1,0 +1,293 @@
+﻿<!DOCTYPE html>
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@inject UserManager<ApplicationUser> UserManager
+@inject LocService SharedLocalizer
+
+<html>
+<head>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - @SharedLocalizer.GetLocalizedHtmlString("Hölscher Jensen A/S - Maintenance & Operations")</title>
+    <link rel="icon" href="~/images/Logos/hjonly.png"
+          type="image/x-icon">
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/two-modal.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Footer.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/stepProgressBar.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Different.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Sidebarmenu.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/PicturesHeader.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/two-modal.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Footer.css" />
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/stepProgressBar.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Different.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Sidebarmenu.css" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/PicturesHeader.css" />
+    </environment>
+</head>
+<body>
+    <!--The id topnavbar is needed, that the navbar fixed top isn't overlapping the content of the page-->
+    <nav class="navbar navbar-default navbar-fixed-top" id="topnavbar">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <table>
+                <tr>
+                    <td>
+                        <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand"><img src="~/images/logo_hj.png" alt="Hölscher Dewatering Inc." id="logo" height="80" /></a>
+                    </td>
+                    <td>
+                            <ul class="nav navbar-nav">
+                                <li>
+                                    <div class="text-center">@await Html.PartialAsync("_LoginPartial")</div>
+                                </li>
+                            </ul>
+                    </td>
+                    <td>
+                        <div class="navbar-collapse collapse">
+                            <ul class="nav navbar-nav">
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    @if (User.IsInRole("Admin") || User.IsInRole("Guest") || User.IsInRole("DivisionAdmin") || User.IsInRole("Member"))
+                                    {
+                                        <li><a asp-area="" asp-controller="Meas" asp-action="Index">@Localizer["Measurements"]</a></li>
+                                        <li><a asp-area="" asp-controller="MeasPoints" asp-action="Index">@Localizer["Measurement Points"]</a></li>
+                                        <li><a asp-area="" asp-controller="Offsets" asp-action="Index">@Localizer["Offsets"]</a></li>
+                                        <li><a asp-area="" asp-controller="MeasPoints" asp-action="ExportDipList">@Localizer["Dips"]</a></li>
+                                    }
+                                    @if (User.IsInRole("MemberGuest"))
+                                    {
+                                        <li><a asp-area="" asp-controller="Meas" asp-action="Index">@Localizer["Measurements"]</a></li>
+                                        <li><a asp-area="" asp-controller="MeasPoints" asp-action="Index">@Localizer["Measurement Points"]</a></li>
+                                        <li><a asp-area="" asp-controller="Offsets" asp-action="Index">@Localizer["Offsets"]</a></li>
+                                    }
+                                    @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin"))
+                                    {
+                                        <li><a asp-area="" asp-controller="MeasTypes" asp-action="Index">@Localizer["Measurement Types"]</a></li>
+                                        <li><a asp-area="" asp-controller="MonitorTypes" asp-action="Index">@Localizer["Monitor Types"]</a></li>
+                                        <li><a asp-area="" asp-controller="Comments" asp-action="Index">@Localizer["Comment Types"]</a></li>
+                                    }
+                                    @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin"))
+                                    {
+                                        <li><a asp-area="" asp-controller="Projects" asp-action="Index">@Localizer["Projects"]</a></li>
+                                        <li><a asp-area="" asp-controller="ProjectUsers" asp-action="Index">@Localizer["Project Users"]</a></li>
+                                        <li><a asp-area="" asp-controller="CoordSystems" asp-action="Index">@Localizer["CoordSys"]</a></li>
+                                        <li><a asp-area="" asp-controller="Loggers" asp-action="Index">@Localizer["Loggers"]</a></li>
+                                        <li><a asp-area="" asp-controller="LoggerChanges" asp-action="Index">@Localizer["Logger Changes"]</a></li>
+                                        <li><a asp-area="" asp-controller="DataPoints" asp-action="Index">@Localizer["Data Points"]</a></li>
+                                        <li><a asp-area="" asp-controller="Divisions" asp-action="Index">@Localizer["Divisions"]</a></li>
+                                        <li><a asp-area="" asp-controller="Manage" asp-action="UsersWithRoles">@Localizer["Admin Page"]</a></li>
+                                        <li><a asp-area="" asp-controller="Documents" asp-action="Index">@Localizer["Documents"]</a></li>
+
+                                    }
+                                    @if (User.IsInRole("Admin") || User.IsInRole("StorageManager"))
+                                    {
+                                        <li><a asp-area="" asp-controller="HJItems" asp-action="Index">@Localizer["HJ Items"]</a></li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </nav>
+    <div>
+
+        <div class="navigationsbild">
+            <div class="video_wrapper">
+                <div class="video">
+                    <img alt="" src="~/images/panorama3.jpg">
+                </div>
+                <div class="video_links"> <img id="nr_1" alt="" src="~/images/panorama1.jpg"> <img id="nr_2" alt="" src="~/images/panorama2.jpg"> </div>
+                <div class="video_rechts"> <img id="nr_1" alt="" src="~/images/panorama4.jpg"> <img id="nr_2" alt="" src="~/images/panorama5.jpg"> </div>
+            </div>
+        </div>
+        <!--myModal2 is used to do the overlay with the Loginpart.-->
+        <div id="myModal2" class="TwoModal">
+            <div class="TwoModal-content">
+                <div class="TwoModal-header">
+                    <span class="closer">&times;</span>
+                    <h2>@Localizer["Login"]</h2>
+                </div>
+
+                <div class="TwoModal-body">
+                    <div id="thecontent2"></div>
+                </div>
+            </div>
+        </div>
+        <!--errorModal is the popup used for all error messages. The homecontroller will localize the strings.-->
+        <div id="errorModal" class="TwoModal">
+            <div class="TwoModal-content">
+                <div class="TwoModal-header">
+                    <span class="closer">&times;</span>
+                    <h2>@Localizer["Error"]</h2>
+                </div>
+                <div class="TwoModal-body">
+                    <div id="theErrorContent"></div>
+                </div>
+            </div>
+        </div>
+        <!--errorModal is the popup used for all error messages. The homecontroller will localize the strings.-->
+        <div id="noteModal" class="TwoModal">
+            <div class="TwoModal-content">
+                <div class="TwoModal-header">
+                    <span class="closer">&times;</span>
+                    <h2>@Localizer["Note"]</h2>
+                </div>
+                <div class="TwoModal-body">
+                    <div id="theNoteContent"></div>
+                </div>
+            </div>
+        </div>
+        <div id="main-content">
+            <div class="container container-fluid">
+                <div class="col-xs-12">
+                    @RenderBody()
+                </div>
+            </div>
+        </div>
+        <footer id="myFooter">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3">
+                        <h5>@Localizer["Contact"]</h5>
+                        <ul>
+                            <li>Hölscher Jensen A/S</li>
+                            <li>Fabriksparken 37</li>
+                            <li>2600 Glostrup</li>
+                            <li><a href="http://www.hj-as.dk" target="_blank">www.hj-as.dk</a></li>
+                            <li><a asp-area="" asp-controller="Home" asp-action="Contact">@Localizer["Contact"]</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h5>@SharedLocalizer.GetLocalizedHtmlString("Site Admin")</h5>
+                        <ul>
+                            <li>Telefon: +45 21173248</li>
+                            <li><a href="mailto:rml@hj-as.dk"><span class="glyphicon-envelope"> @Localizer["rml@hj-as.dk"]</span></a></li>
+                            
+                        </ul>
+                    </div>
+                    <div class="col-md-2">
+                        <h5>Informationen</h5>
+                        <ul>
+                            <li><a asp-area="" asp-controller="Home" asp-action="MoreInformation">@Localizer["About Us"]</a></li>
+                            <li><a asp-area="" asp-controller="Home" asp-action="Directions">@Localizer["Location and Directions"]</a></li>
+                            <li><a href="http://www.hoelscher-wasserbau.de" target="_blank">www.Hoelscher-Wasserbau.de</a></li>
+                            <li><a href="http://www.CGJensen.dk" target="_blank">www.CG-Jensen.dk</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-copyright">
+                <p>© Hoelscher Jensen A/S 2019 </p>
+            </div>
+        </footer>
+    </div>
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.2.0.min.js"
+                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                crossorigin="anonymous"
+                integrity="sha384-K+ctZQ+LL8q6tP7I94W+qzQsfRV2a+AfHIi9k8z8l9ggpc8X+Ytst4yBo/hH+8Fk">
+        </script>
+        <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
+                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
+                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+                crossorigin="anonymous"
+                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
+        </script>
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+    </environment>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js"></script>
+
+    <script>
+    var modal2 = document.getElementById('myModal2');
+    var errorModal = document.getElementById('errorModal');
+    var noteModal = document.getElementById('noteModal');
+
+    var span3 = document.getElementsByClassName("closer")[0];
+    var spanError = document.getElementsByClassName("closer")[1];
+
+    function ShowError(errortext) {
+        $.ajax({
+            url: '@Url.Action("ErrorText", "Home")',
+            datatype: "json",
+            data: { text: errortext },
+                type: "post",
+                async: false,
+                success: function (output) {
+                    $('#theErrorContent').html(output);
+                    errorModal.style.display = "block";
+                },
+                error: function (output) {
+                    alert("ERROR MESSAGE ERROR");
+                    }
+                });
+            };
+    
+    $('#logo').click(function() {
+        $('#myForm').submit();
+    });
+    
+    
+
+        }
+        $(document).ready(function () {
+            if (viewportWidth > 980) {
+                document.getElementById("somecontactinfo").style.display = null;
+
+            }
+        })
+        $(document).ready(function () {
+            $('#top-menu li a').each(function () {
+                var path = window.location.href;
+                var current = path.substring(path.lastIndexOf('/') + 1);
+                var url = $(this).attr('href');
+                if (url == "/" + current) {
+                    $(this).addClass('colorcurrent');
+                }
+            });
+        });
+        $(window).resize(function () {
+            var w = $(window).width();
+            var h = $(window).height();
+            if (w > 980 && h > 800)
+            {
+                document.getElementById("somecontactinfo").style.display = null;
+            }
+            else
+            {
+                document.getElementById("somecontactinfo").style.display = 'none';
+            }
+        }); 
+    $(document).ready(function() {
+        $(document.body).css('padding-top', $('#topnavbar').height() + 10);
+        $(window).resize(function() {
+            $(document.body).css('padding-top', $('#topnavbar').height() + 10);
+        });
+    });
+    </script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

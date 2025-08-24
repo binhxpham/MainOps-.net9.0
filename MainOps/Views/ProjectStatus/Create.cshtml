@@ -1,0 +1,145 @@
+﻿@model MainOps.Models.ProjectStatusCreateVM
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Create")</h2>
+
+<h4>@SharedLocalizer.GetLocalizedHtmlString("Project Status Entry")</h4>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-controller="ProjectStatus" asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.HiddenFor(Model => Model.PS.DivisionId)
+            @Html.HiddenFor(Model => Model.PS.Id)
+            <div class="form-group">
+                <label asp-for="@Model.PS.StatusDescriptionId" class="control-label"></label>
+                <select asp-for="@Model.PS.StatusDescriptionId" class="form-control" asp-items="ViewBag.StatusDescriptionId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.PS.QuoteNumber" class="control-label"></label>
+                <input asp-for="@Model.PS.QuoteNumber" class="form-control" />
+                <span asp-validation-for="@Model.PS.QuoteNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.PS.ProjectName" class="control-label"></label>
+                <input asp-for="@Model.PS.ProjectName" class="form-control" />
+                <span asp-validation-for="@Model.PS.ProjectName" class="text-danger"></span>
+            </div>
+            @*<div class="form-group">
+                <label asp-for="@Model.PS.Client" class="control-label"></label>
+                <select id="clientchoice" asp-items="ViewBag.Clients" onchange="UpdateClient();"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Client")</option></select>
+            </div>*@
+            <div class="form-group">
+                <label asp-for="@Model.PS.Client" class="control-label"></label>
+                <input asp-for="@Model.PS.Client" class="form-control" />
+                <span asp-validation-for="@Model.PS.Client" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.PS.TenderManager" class="control-label"></label>
+                <input asp-for="@Model.PS.TenderManager" class="form-control" />
+                <span asp-validation-for="@Model.PS.TenderManager" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.PS.StartDate" class="control-label"></label>
+                <input type="datetime" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd")" asp-for="@Model.PS.StartDate" style="width:100%;height:36px;" />
+                <span asp-validation-for="@Model.PS.StartDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.PS.EndDate" class="control-label"></label>
+                <input type="datetime" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd")" asp-for="@Model.PS.EndDate" style="width:100%;height:36px;" />
+                <span asp-validation-for="@Model.PS.EndDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.PS.TenderDate" class="control-label"></label>
+                <input type="datetime" class="date-picker" asp-for="@Model.PS.TenderDate" style="width:100%;height:36px;" />
+                <span asp-validation-for="@Model.PS.TenderDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.PS.ClientTenderDate" class="control-label"></label>
+                <input type="datetime" class="date-picker" asp-for="@Model.PS.ClientTenderDate" style="width:100%;height:36px;" />
+                <span asp-validation-for="@Model.PS.ClientTenderDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.PS.DateSubmitted" class="control-label"></label>
+                <input type="datetime" class="date-picker" asp-for="@Model.PS.DateSubmitted" style="width:100%;height:36px;" />
+                <span asp-validation-for="@Model.PS.DateSubmitted" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.PS.ProjectDescription" class="control-label"></label>
+                <textarea asp-for="@Model.PS.ProjectDescription" class="form-control" cols="50" rows="6"></textarea>
+                <span asp-validation-for="@Model.PS.ProjectDescription" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>@SharedLocalizer.GetLocalizedHtmlString("Project Categories")</label>
+                <table border="1">
+                    @for (int i = 0; i < Model.Cats.Count; i++)
+                    {
+                        @Html.HiddenFor(Model => Model.Cats[i].Cat)
+                        @Html.HiddenFor(Model => Model.Cats[i].Cat.Id)
+                        @Html.HiddenFor(Model => Model.Cats[i].Cat.Text)
+                        <tr>
+                            <td>@Html.DisplayFor(Model => Model.Cats[i].Cat.Text)</td>
+                            <td>@Html.EditorFor(Model => Model.Cats[i].TrueFalse)</td>
+                        </tr>
+                    }
+                </table>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.PS.TotalContractValue" class="control-label"></label>
+                <input asp-for="@Model.PS.TotalContractValue" class="form-control" />
+                <span asp-validation-for="@Model.PS.TotalContractValue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.PS.OptionsValue" class="control-label"></label>
+                <input asp-for="@Model.PS.OptionsValue" class="form-control" />
+                <span asp-validation-for="@Model.PS.OptionsValue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="@Model.PS.WinChance" class="control-label"></label>
+                <input asp-for="@Model.PS.WinChance" class="form-control" type="number" min="0" max="100" step="1" />
+                <span asp-validation-for="@Model.PS.WinChance" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PS.Comments" class="control-label"></label>
+                <input asp-for="PS.Comments" class="form-control" />
+                <span asp-validation-for="PS.Comments" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-20:+51",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+            });
+        });
+        function UpdateClient() {
+            $("#PS_Client").val($("#clientchoice").val());
+        }
+        function ToggleVal(elem,ischeckedornot)
+        {
+            document.getElementById(elem.id).value = ischeckedornot;
+        }
+    </script>
+    }

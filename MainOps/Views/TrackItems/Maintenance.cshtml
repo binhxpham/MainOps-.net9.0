@@ -1,0 +1,1062 @@
+﻿@model MainOps.Models.MaintenanceVM
+<head>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM&sensor=false&libraries=places"></script>
+</head>
+@{
+    ViewData["Title"] = "Maintenance";
+}
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Maintenance")</h2>
+<div id="myModal3" class="ThreeModal">
+    <div class="ThreeModal-content">
+        <div class="ThreeModal-header">
+            <span class="ThreeModalclose">&times;</span>
+            <h2>@SharedLocalizer.GetLocalizedHtmlString("Choose Installation For Maintenance")</h2>
+        </div>
+        <div class="ThreeModal-body">
+            <div id="myDivMap" style="width:100%;height:600px;"></div>
+        </div>
+    </div>
+</div>
+<div id="myModal4" class="ThreeModal">
+    <div class="ThreeModal-content">
+        <div class="ThreeModal-header">
+            <span class="ThreeModalclose">&times;</span>
+            <h2>@SharedLocalizer.GetLocalizedHtmlString("Choose MeasPoint For Maintenance")</h2>
+        </div>
+        <div class="ThreeModal-body">
+            <div id="myDivMap1" style="width:100%;height:600px;"></div>
+        </div>
+    </div>
+</div>
+<form asp-action="Maintenance" enctype="multipart/form-data" id="theform" method="post" onsubmit="retrieveData(event);">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input asp-for="Latitude" id="latinput" hidden="hidden" value="0" />
+    <input asp-for="Longitude" id="longinput" hidden="hidden" value="0" />
+
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td><b>@Html.DisplayNameFor(x => x.ProjectId)</b><span asp-validation-for="ProjectId" class="text-danger"></span></td>
+            <td>
+                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();" style="width:100%;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select Project")</option>
+                </select>
+                <span asp-validation-for="ProjectId" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(x => x.SubProjectId)</b></td>
+            <td>
+                <select asp-for="SubProjectId" id="SubProjectId" onchange="GetItemsSubProject();" style="width:100%;height:40px;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("No Sub Projects")</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><label asp-for="TimeStamp" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.TimeStamp))</label></td>
+            <td>
+                <input type="datetime" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd HH:mm")" asp-for="TimeStamp" id="thetime" style="width:100%;height:36px;" />
+                <span asp-validation-for="TimeStamp" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label asp-for="InstallId" class="control-label"></label>
+            </td>
+            <td>
+                <button type="button" id="modalbutton">@SharedLocalizer.GetLocalizedHtmlString("Pick Installation on Map")</button>
+                <select asp-for="@Model.InstallId" asp-items="ViewBag.InstallId" id="InstallId" onchange="UpdateProjectInstall();" style="height:36px;width:100%;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please choose what is maintained")</option>
+                </select>
+                <span asp-validation-for="InstallId" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label asp-for="MeasPointId" class="control-label"></label>
+            </td>
+            <td>
+                <button type="button" id="modalbutton1">@SharedLocalizer.GetLocalizedHtmlString("Pick Measurement Point on Map")</button>
+                <select asp-for="@Model.MeasPointId" id="MeasPointId" onchange="UpdateProjectMeasPoint();" style="height:36px;width:100%;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please choose what is maintained")</option>
+                </select>
+                <span asp-validation-for="MeasPointId" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td><label asp-for="MaintenancePoint" class="control-label"></label><span asp-validation-for="MaintenancePoint" class="text-danger"></span></td>
+            <td><input asp-for="MaintenancePoint" value="" style="width:100%;" /><span asp-validation-for="MaintenancePoint" class="text-danger"></span></td>
+        </tr>
+
+        <tr>
+            <td><b>@SharedLocalizer.GetLocalizedHtmlString("Maintenance Type")</b></td>
+            <td><select id="MaintenanceTypeId" asp-items="ViewBag.MaintenanceTypeId" onchange="FillSubTypes()" style="width:100%;height:36px;"></select></td>
+        </tr>
+        <tr>
+            <td><b>@SharedLocalizer.GetLocalizedHtmlString("Maintenance Action")</b></td>
+            <td>
+                <select id="MaintenanceSubTypeId" multiple="multiple" style="width:100%;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select Maintenance Action")</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(x => x.HJItemId)</b></td>
+            <td id="stocktr" style="display:None;">
+                <select asp-for="HJItemId" asp-items="ViewBag.HJItemId" id="HJItemId" style="width:100%;height:36px;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select Item On Stock")</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Current Actions")</td>
+            <td>
+                <table style="width:100%;table-layout:fixed;">
+                    <tr>
+                        <td>
+                            <button type="button" class="btn-hoelscher" onclick="AddAction();">@SharedLocalizer.GetLocalizedHtmlString("Add Action")</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn-hoelscher" onclick="ClearActions();">@SharedLocalizer.GetLocalizedHtmlString("Clear Actions")</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="width:45%;">
+                            <textarea rows="6" cols="36" id="MaintenanceTypeListstr" value="" style="width:100px;"></textarea>
+                            <input asp-for="MaintenanceTypeList" value="" hidden="hidden" />
+                            <span asp-validation-for="MaintenanceTypeList" class="text-danger"></span>
+                        </td>
+                        <td style="width:45%;">
+                            <textarea rows="6" cols="36" id="MaintenanceSubTypeListstr" value="" style="width:100px;"></textarea>
+                            <input asp-for="MaintenanceSubTypeList" value="" hidden="hidden" />
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <tr>
+            <td><label asp-for="HoursSpent" class="control-label"></label></td>
+            <td>
+                <input asp-for="HoursSpent" value="01:00" class="form-control" />
+                <span asp-validation-for="HoursSpent" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr id="pumpfields" hidden="hidden">
+            <td colspan="2"><b>@SharedLocalizer.GetLocalizedHtmlString("Extra Pump Fields")</b></td>
+        </tr>
+        <tr hidden="hidden" id="Pumpowner">
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Pump owner")</td>
+            <td>
+                <select id="Pumpownerval" style="width:100%;">
+                    <option value="" selected="selected">@SharedLocalizer.GetLocalizedHtmlString("Select")</option>
+                    <option value="HW">HW</option>
+                    <option value="Tjaden">Tjaden</option>
+                    <option value="AHAK">AHAK</option>
+                    <option value="HJ">HJ</option>                   
+                </select>
+            </td>
+        </tr>
+        <tr hidden="hidden" id="Pumpnumber">
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Pump ID")</td>
+            <td><input id="Pumpnumberval" type="text" style="width:100%;" /></td>
+        </tr>
+        <tr hidden="hidden" id="Hourcounter">
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Hour counter reading")</td>
+            <td><input id="Hourcounterval" type="number" style="width:100%;" /></td>
+        </tr>
+        <tr hidden="hidden" id="Vacuumcheck">
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Vacuum Check Value")</td>
+            <td><input id="Vacuumcheckval" type="number" style="width:100%;" /></td>
+        </tr>
+        <tr hidden="hidden" id="Damagecheck">
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Which damages(upload photos also)")</td>
+            <td><input id="Damagecheckval" type="text" style="width:100%;" /></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <label asp-for="LogText" class="control-label"></label>
+            </td>
+        </tr>
+        <tr rowspan="20">
+            <td colspan="2">
+                <span asp-validation-for="LogText" class="text-danger"></span>
+                <textarea rows="6" cols="50" class="form-control" asp-for="LogText"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label></td>
+            <td><input type="file" name="files" multiple accept=".jpg,.jpeg,.png" /></td>
+        </tr>
+        <tr>
+            <td colspan="2"><b>@SharedLocalizer.GetLocalizedHtmlString("Signature")</b></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <canvas width="440" height="150" id="signature" style="border:1px solid blue;"></canvas>
+            </td>
+        </tr>
+        <tr>
+            <td style="width:50%">
+                <button type="button" id="accept" class="btn-hoelscher" style="width:100%;height:40px;">@SharedLocalizer.GetLocalizedHtmlString("Accept signature")</button>
+            </td>
+            <td style="width:50%">
+                <button type="button" id="clear" class="btn-hoelscher" style="width:100%;height:40px;">@SharedLocalizer.GetLocalizedHtmlString("Clear signature")</button>
+                <input type="text" id="signaturedata" hidden="hidden" />
+                <input asp-for="Signature" value="" hidden="hidden" />
+
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <img width="80" height="60" id="savetarget" hidden="hidden" style="border:1px solid black">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString("Submit")" class="btn-hoelscher" style="width:100%;height:70px;" />
+            </td>
+        </tr>
+    </table>
+</form>
+<br />
+<br />
+<br />
+<div>
+    <a asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script src="~/js/signature_pad.min.js"></script>
+    <script type="text/javascript">
+        var pad = null;
+        var markers = [];
+        var markers1 = [];
+        var myLatLng = { lat: 55.312440, lng: 11.491625 };
+        var myLat = null;
+        var myLng = null;
+        var isfound = false;
+        var myposmarker = null;
+        var myposmarker1 = null;
+        var mapOptions = {
+            center: myLatLng,
+            zoom: 16,
+            minZoom: 2,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        var modal = document.getElementById("myModal3");
+        var btn = document.getElementById("modalbutton");
+        var span = document.getElementsByClassName("ThreeModalclose")[0];
+        var modal1 = document.getElementById("myModal4");
+        var btn1 = document.getElementById("modalbutton1");
+        var span1 = document.getElementsByClassName("ThreeModalclose")[1];
+        var map = new google.maps.Map(document.getElementById("myDivMap"), mapOptions);
+        var map1 = new google.maps.Map(document.getElementById("myDivMap1"), mapOptions);
+        var lang = $("#requestCulture_RequestCulture_UICulture_Name").val();
+        if (navigator.geolocation) {
+            id = navigator.geolocation.watchPosition(function (position) {
+                myLat = position.coords.latitude;
+                myLng = position.coords.longitude;
+                getPos(myLat, myLng);
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                        alert("error permission GPS denied");
+                    }
+
+                }, { maximumAge: 0, timeout: 8000, enableHighAccuracy: true });
+        }
+        function setPos(lat, lng) {
+            var initialLocation = new google.maps.LatLng(lat, lng);
+            if (myposmarker == null) {
+                myposmarker = new google.maps.Marker({
+                    map: map,
+                    position: { lat: lat, lng: lng },
+                    title: "You",
+
+                });
+                myposmarker.setIcon({
+                    url: 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
+                    scaledSize: new google.maps.Size(70, 70)
+                })
+                myposmarker['infowindow'] = new google.maps.InfoWindow({
+                    content: 'Your Position!'
+                });
+                myposmarker.setMap(map);
+                map.setCenter(new google.maps.LatLng(lat, lng));
+            }
+            if (myposmarker1 == null) {
+                myposmarker1 = new google.maps.Marker({
+                    map: map1,
+                    position: { lat: lat, lng: lng },
+                    title: "You",
+
+                });
+                myposmarker1.setIcon({
+                    url: 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
+                    scaledSize: new google.maps.Size(70, 70)
+                })
+                myposmarker1['infowindow'] = new google.maps.InfoWindow({
+                    content: 'Your Position!'
+                });
+                myposmarker1.setMap(map1);
+                map1.setCenter(new google.maps.LatLng(lat, lng));
+            }
+
+            google.maps.event.addListener(myposmarker, 'click', function () {
+                this['infowindow'].open(map, this);
+            });
+            google.maps.event.addListener(myposmarker1, 'click', function () {
+                this['infowindow'].open(map1, this);
+            });
+            map.setCenter(initialLocation);
+            map1.setCenter(initialLocation);
+        }
+        function AddAction() {
+            var selected_text = $('#MaintenanceSubTypeId option:selected')
+                .toArray().map(item => item.text).join();
+            var amount = selected_text.split(",").length;
+            if (amount == 0) {
+                amount = 1;
+            }
+            var selected_val = $("#MaintenanceSubTypeId").val();
+            var currenttext = $("#MaintenanceSubTypeListstr").val();
+            var currentval = $("#MaintenanceSubTypeList").val();
+            if (currenttext != "") {
+                var newtext = selected_text + "," + currenttext;
+                var newval = selected_val + "," + currentval;
+                $("#MaintenanceSubTypeListstr").val(newtext);
+                $("#MaintenanceSubTypeList").val(newval);
+            }
+            else {
+                $("#MaintenanceSubTypeListstr").val(selected_text);
+                $("#MaintenanceSubTypeList").val(selected_val);
+            }
+            var valchecked = 0;
+            for (i = 1; i <= amount; i++) {
+                var selected_text_main = $('#MaintenanceTypeId option:selected')
+                    .toArray().map(item => item.text).join();
+                var selected_val_main = $("#MaintenanceTypeId").val();
+                valchecked = selected_val_main;
+                var currenttext_main = $("#MaintenanceTypeListstr").val();
+                var currentval_main = $("#MaintenanceTypeList").val();
+                if (currenttext_main != "") {
+                    var newtext_main = selected_text_main + "," + currenttext_main;
+                    var newval_main = selected_val_main + "," + currentval_main;
+                    $("#MaintenanceTypeListstr").val(newtext_main);
+                    $("#MaintenanceTypeList").val(newval_main);
+                }
+                else
+                {
+                    $("#MaintenanceTypeListstr").val(selected_text_main);
+                    $("#MaintenanceTypeList").val(selected_val_main);
+                }
+            }
+            if (valchecked == 15 || valchecked == 16) {
+                if ($("#pumpfields").is(":hidden") == true) {
+                    $("#pumpfields").removeAttr('hidden');
+                }
+                if ($("#Pumpowner").is(":hidden") == true)
+                {
+                    $("#Pumpowner").removeAttr('hidden');
+                }
+                if ($("#Pumpnumber").is(":hidden") == true) {
+                    $("#Pumpnumber").removeAttr('hidden');
+                }
+
+                if ($("#MaintenanceSubTypeListstr").val().indexOf("Hour Counter Read") >= 0) {
+                    if ($("#Hourcounter").is(":hidden") == true) {
+                        $("#Hourcounter").removeAttr('hidden');
+                    }
+                }
+
+                if ($("#MaintenanceSubTypeListstr").val().indexOf("Vacuum Check") >= 0) {
+                    if ($("#Vacuumcheck").is(":hidden") == true) {
+                        $("#Vacuumcheck").removeAttr('hidden');
+                    }
+
+                }
+                if ($("#MaintenanceSubTypeListstr").val().indexOf("Damages Repaired") >= 0) {
+                    if ($("#Damagecheck").is(":hidden") == true) {
+                        $("#Damagecheck").removeAttr('hidden');
+                    }
+
+                }
+            }
+
+
+        }
+        function ClearActions() {
+            $("#MaintenanceTypeList").val("");
+            $("#MaintenanceSubTypeList").val("");
+            $("#MaintenanceTypeListstr").val("");
+            $("#MaintenanceSubTypeListstr").val("");
+        }
+        function getPos(lat, lng, acc) {
+            $("#latinput").val(lat);
+            $("#longinput").val(lng);
+            if (!isfound) {
+                setPos(lat, lng);
+                isfound = true;
+            }
+        }
+        btn.onclick = function () {
+            modal.style.display = "block";
+        }
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+            if (event.target == modal1) {
+                modal1.style.display = "none";
+            }
+        }
+        btn1.onclick = function () {
+            modal1.style.display = "block";
+        }
+        span1.onclick = function () {
+            modal1.style.display = "none";
+        }
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datetimepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    timeFormat: "HH:mm",
+                    controlType: 'select',
+                    firstDay: 1
+
+                });
+                $('.date-picker').datetimepicker("setDate", new Date());
+                FillItems();
+                FillSubTypes();
+                populateMap();
+            });
+        });
+        $(document).ready(function () {
+            $(function () {
+                var canvas = document.querySelector("#signature");
+                pad = new SignaturePad(canvas);
+                $('#accept').click(function () {
+                    var data = pad.toDataURL();
+                    $('#savetarget').attr('src', data);
+                    var base64signature = data.split(',')[1];
+                    $('#signaturedata').val(base64signature);
+                    });
+                    $('#clear').click(function () {
+                        pad.clear();
+                    })
+
+            })
+        });
+        function retrieveData(e) {
+            var posting = true;
+            var s1 = document.getElementById("Signature");
+            var signature = "";
+            signature = document.getElementById("signaturedata").value;
+            s1.value = signature;
+            if (signature == "" && signature != null) {
+                posting = false;
+                e.preventDefault();
+                alert("Please sign the report!");
+            }
+            var maintype = "";
+            maintype = document.getElementById("MaintenanceTypeId").value;
+            if (maintype == "") {
+                posting = false;
+                e.preventDefault();
+                alert("Please choose Maintenance Type!");
+            }
+            var mainsubtype = "";
+            mainsubtype = document.getElementById("MaintenanceSubTypeId").value;
+            if (mainsubtype == "" && maintype != 12) {
+                posting = false;
+                e.preventDefault();
+                alert("Please choose Maintenance Sub Type!");
+            }
+            var logtext = "";
+            var pumpowner = "";
+            var pumpnumber = "";
+            var hourcounter = "";
+            var vacuumcheck = "";
+            var damagecheck = "";
+            pumpowner = document.getElementById("Pumpownerval").value;
+            pumpnumber = document.getElementById("Pumpnumberval").value;
+            hourcounter = document.getElementById("Hourcounterval").value;
+            vacuumcheck = document.getElementById("Vacuumcheckval").value;
+            damagecheck = document.getElementById("Damagecheckval").value;
+            logtext = document.getElementById("LogText").value;
+            if (pumpowner != "") {
+                logtext += "\r\nPumpowner: " + pumpowner;
+            }
+            if (pumpnumber != "") {
+                logtext += "\r\nPumpnumber: " + pumpnumber;
+            }
+            if (hourcounter != "") {
+                logtext += "\r\nHourcounter: " + hourcounter;
+            }
+            if (vacuumcheck != "") {
+                logtext += "\r\nVacuum Check: " + vacuumcheck;
+            }
+            if (damagecheck != "") {
+                logtext += "\r\nDamages: " + damagecheck;
+            }
+            $("#LogText").val(logtext);
+            if ($("#theform").valid() == false) {
+                posting = false;
+            }
+            if (posting == true) {
+                StartSpinner();
+            }
+        }
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        if (lang == "de-DE") {
+                            s = '<option value="">Bitte auswählen Unterprojekt</option>';
+                        }
+                        
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        if (lang == "de-DE") {
+                            s = '<option value="">Bitte auswählen Unterprojekt</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                    }
+                    FillItems();
+                }
+            });
+        }
+        function FillItems() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetInstallsProject", "TrackItems")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select Maintained Item</option>';
+                    if (lang == "de-DE") {
+                        s = '<option value="">Bitte gewarteten Punkt auswählen</option>';
+                    }
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["value"] + '">' + data[prop]["text"] + '</option>';
+                    }
+                    $("#InstallId").html(s);
+                    document.getElementById("InstallId").style.width = "100%";
+                    FillMeasPoints();
+                }
+            });
+        }
+        function GetItemsSubProject() {
+            var SubProjectId = $("#SubProjectId").val();
+            var url = '@Url.Action("GetMeasPointsSubProject", "TrackItems")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': SubProjectId,
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select Maintained Item</option>';
+                    if (lang == "de-DE") {                      
+                        s = '<option value="">Bitte gewarteten Punkt auswählen</option>';
+                    }
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["value"] + '">' + data[prop]["text"] + '</option>';
+                    }
+                    $("#MeasPointId").html(s);
+                    document.getElementById("MeasPointId").style.width = "100%";
+                    var url = '@Url.Action("GetInstallSubProject", "TrackItems")';
+                    $.ajax({
+                        type: 'GET',
+                        url: url,
+                        dataType: 'json',
+                        data: {
+                            'theId': SubProjectId,
+                        },
+                        success: function (data) {
+                            var s = '<option value="">Please Select Maintained Item</option>';
+                            if (lang == "de-DE") {
+                                s = '<option value="">Bitte gewarteten Punkt auswählen</option>';
+                            }
+                            for (var prop in data) {
+                                s += '<option value="' + data[prop]["value"] + '">' + data[prop]["text"] + '</option>';
+                            }
+                            $("#InstallId").html(s);
+                            document.getElementById("InstallId").style.width = "100%";
+                        }
+                    });
+                        }
+            });
+        }
+        function FillMeasPoints() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetMeasPointsProject", "TrackItems")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select Maintained Item</option>';
+                    if (lang == "de-DE") {
+                        s = '<option value="">Bitte gewarteten Punkt auswählen</option>';
+                    }
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["value"] + '">' + data[prop]["text"] + '</option>';
+                    }
+                    $("#MeasPointId").html(s);
+                    document.getElementById("MeasPointId").style.width = "100%";
+                }
+            });
+        }
+        function FillSubTypes() {
+            var MaintenanceId = $('#MaintenanceTypeId').val();
+            var url = '@Url.Action("GetSubTypes", "TrackItems")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {'theId' : MaintenanceId},
+                success: function (data) {
+                    var s = '<option value="">Please Select Maintenance Action</option>';
+                    if (lang == "de-DE") {
+                        s = '<option value="">Bitte Wartungsmaßnahme auswählen</option>';
+                    }
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["type"] + '</option>';
+                    }
+                    $("#MaintenanceSubTypeId").html(s);
+                    document.getElementById("MaintenanceSubTypeId").style.width = "100%";
+                    if (MaintenanceId == 14) {
+                        document.getElementById("stocktr").style.display = "block";
+                    }
+                }
+            });
+        }
+        function UpdateProjectInstall() {
+            var selected_text = $('#InstallId option:selected')
+                .toArray().map(item => item.text).join();
+            $("#MeasPointId").val("");
+            $("#MaintenancePoint").val(selected_text);
+            GetSubProjectInstall($("#InstallId").val());
+        }
+        function UpdateProjectMeasPoint() {
+            var selected_text = $('#MeasPointId option:selected')
+                .toArray().map(item => item.text).join();
+            $("#InstallId").val("");
+            $("#MaintenancePoint").val(selected_text);
+            GetSubProjectMP($("#MeasPointId").val());
+        }
+        function GetSubProjectInstall(idx) {
+            var url = '@Url.Action("GetSubProjectInstall", "TrackItems")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': idx },
+                success: function (data) {
+                     $("#SubProjectId").val(data);
+                }
+            });
+        }
+        function GetSubProjectMP(idx) {
+            var url = '@Url.Action("GetSubProjectMP", "TrackItems")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': idx },
+                success: function (data) {
+                     $("#SubProjectId").val(data);
+                }
+            });
+        }
+        function chooseThis(idx) {
+            var url = '@Url.Action("UpdateProjectInstall", "TrackItems")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {'theId' : idx},
+                success: function (data) {
+                    $("#ProjectId").val(data);
+                    var ProjectId = $('#ProjectId').val();
+                    var url = '@Url.Action("GetInstallsProject", "TrackItems")';
+                    $.ajax({
+                        type: 'GET',
+                        url: url,
+                        dataType: 'json',
+                        data: {
+                            'theId': ProjectId,
+                        },
+                        success: function (data) {
+                            var s = '<option value="">Please Select Maintained Item</option>';
+                            if (lang == "de-DE") {
+                                s = '<option value="">Bitte gewarteten Punkt auswählen</option>';
+                            }
+
+                            for (var prop in data) {
+                                s += '<option value="' + data[prop]["value"] + '">' + data[prop]["text"] + '</option>';
+                            }
+                            $("#InstallId").html(s);
+                            document.getElementById("InstallId").style.width = "100%";
+                            $("#InstallId").val(idx);
+                            var selected_text = $('#InstallId option:selected')
+                                .toArray().map(item => item.text).join();
+                            $("#MaintenancePoint").val(selected_text);
+                            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+                                    $.ajax({
+                                        type: 'GET',
+                                        url: url,
+                                        dataType: 'json',
+                                        data: { 'theId': ProjectId },
+                                        success: function (data) {
+                                            if (data.length > 0) {
+                                                var s = '<option value="">Please Select SubProject</option>';
+                                                if (lang == "de-DE") {
+                                                    s = '<option value="">Bitte Unterprojekt auswählen</option>';
+                                                }
+                                                for (var prop in data) {
+                                                    s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                                                }
+                                                $("#SubProjectId").html(s);
+                                                document.getElementById("SubProjectId").style.width = "100%";
+                                                GetSubProjectInstall(idx)
+                                            }
+                                            else {
+                                                var s = '<option value="">Please Select SubProject</option>';
+                                                if (lang == "de-DE") {
+                                                    s = '<option value="">Bitte Unterprojekt auswählen</option>';
+                                                }
+                                                $("#SubProjectId").html(s);
+                                            }
+
+                                        }
+                                    });
+
+
+                        }
+                    });
+                }
+            });
+        }
+        function chooseThisMP(idx) {
+            var url = '@Url.Action("UpdateProjectMeasPoint", "TrackItems")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {'theId' : idx},
+                success: function (data) {
+                    $("#ProjectId").val(data);
+                    var ProjectId = $('#ProjectId').val();
+                    var url = '@Url.Action("GetMeasPointsProject", "TrackItems")';
+                    $.ajax({
+                        type: 'GET',
+                        url: url,
+                        dataType: 'json',
+                        data: {
+                            'theId': ProjectId,
+                        },
+                        success: function (data) {
+                            var s = '<option value="">Please Select Maintained Item</option>';
+                            if (lang == "de-DE") {
+                                s = '<option value="">Bitte gewarteten Punkt auswählen</option>';
+                            }
+                            for (var prop in data) {
+                                s += '<option value="' + data[prop]["value"] + '">' + data[prop]["text"] + '</option>';
+                            }
+                            $("#MeasPointId").html(s);
+                            document.getElementById("MeasPointId").style.width = "100%";
+                            $("#MeasPointId").val(idx);
+                            var selected_text = $('#MeasPointId option:selected')
+                                .toArray().map(item => item.text).join();
+                            $("#MaintenancePoint").val(selected_text);
+
+                                    $.ajax({
+                                        type: 'GET',
+                                        url: url,
+                                        dataType: 'json',
+                                        data: { 'theId': ProjectId },
+                                        success: function (data) {
+                                            if (data.length > 0) {
+                                                var s = '<option value="">Please Select SubProject</option>';
+                                                if (lang == "de-DE") {
+                                                    s = '<option value="">Bitte Unterproject auswählen</option>';
+                                                }
+                                                for (var prop in data) {
+                                                    s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                                                }
+                                                $("#SubProjectId").html(s);
+                                                document.getElementById("SubProjectId").style.width = "100%";
+                                                GetSubProjectMP(idx);
+                                            }
+                                            else {
+                                                var s = '<option value="">Please Select SubProject</option>';
+                                                if (lang == "de-DE") {
+                                                    s = '<option value="">Bitte Unterproject auswählen</option>';
+                                                }
+                                                $("#SubProjectId").html(s);
+                                            }
+
+                                        }
+                                    });
+
+                        }
+                    });
+                }
+            });
+        }
+        function populateMap() {
+            @foreach(var item in Model.installations.Where(x=>x.TypeCoord != "Coord Measure")){
+             <text>
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: { lat: @item.Latitude, lng: @item.Longitude },
+                    title: "@item.Install.ItemType.Item_Type.Replace("\""," inch",0)",
+                });
+            if (markers.length != 0) {
+                var istrue = true;
+                var i = 0;
+                while (istrue) {
+                    var existingMarker = markers[i];
+                    var pos = existingMarker.getPosition();
+                    if (marker.position.equals(pos)) {
+                        var a = 360.0 / markers.length;
+                        var newLat = pos.lat() + -.00015 * Math.cos((+a * i) / 180 * Math.PI);  //x
+                        var newLng = pos.lng() + -.00015 * Math.sin((+a * i) / 180 * Math.PI);  //Y
+                        var latLng = new google.maps.LatLng(newLat, newLng);
+                        marker.position = latLng;
+                    }
+                    if (i == markers.length - 1) {
+                        istrue = false;
+                    }
+                    i++;
+                }
+                }
+                @if (item.InstallId != null)
+                {
+                    if (item.Install.IsInOperation)
+                    {
+                        <text>
+                    marker['infowindow'] = new google.maps.InfoWindow({
+                        content: '<p>ID: @item.Install.Id</p> <p>Item: @item.Install.ItemType.Item_Type </p><p> @item.Install.Install_Text </p><p><button type="button" onclick="chooseThis(@item.Install.Id)">Choose this</button></p>'
+            });
+                    </text>
+                    }
+                    else
+                    {
+                        <text>
+                    marker['infowindow'] = new google.maps.InfoWindow({
+                        content: '<p>ID: @item.Install.Id</p> <p>Item: @item.Install.ItemType.Item_Type </p> <p> @item.Install.Install_Text </p>  <p><button type="button" class="btn-hoelscher" onclick="chooseThis(@item.Install.Id)">Choose this</button></p>'
+            });
+                    </text>
+                    }
+
+                }
+                google.maps.event.addListener(marker, 'click', function () {
+                    this['infowindow'].open(map, this);
+                });
+
+
+            @if (item.TypeCoord == "Installed")
+            {
+                @if (item.Install.ItemType.Item_Type.ToLower().Contains("pump"))
+                {
+                    @if (item.Install.IsInOperation)
+                    {
+                    <text>
+                        marker.setIcon({
+                            url: 'https://drive.google.com/u/0/uc?id=19yF4cZ6iBNiHy_N5Pt321BSKTf5XmA38&export=download',
+                        scaledSize: new google.maps.Size(50, 50)
+                        })
+                    </text>
+                    }
+                    else
+                    {
+                    <text>
+                        marker.setIcon({
+                            url: 'https://drive.google.com/u/0/uc?id=1M3vu6d3d867bdZcsylFJhclW_gKH13bA&export=download',
+                        scaledSize: new google.maps.Size(50, 50)
+                        })
+                    </text>
+                    }
+
+                }
+                else if (item.Install.ItemType.Item_Type.ToLower().Contains("tank"))
+                {
+                    <text>
+            marker.setIcon({
+                url: 'https://maps.google.com/mapfiles/ms/icons/purple.png',
+                scaledSize: new google.maps.Size(50, 50)
+            })
+                    </text>
+                }
+                else if (item.Install.ItemType.Item_Type.ToLower().Contains("point"))
+                {
+                    <text>
+            marker.setIcon({
+                url: 'https://maps.google.com/mapfiles/ms/icons/orange.png',
+                scaledSize: new google.maps.Size(50, 50)
+            })
+                    </text>
+                }
+                else
+                {
+                    <text>
+            marker.setIcon({
+                url: 'https://maps.google.com/mapfiles/ms/icons/blue.png',
+                scaledSize: new google.maps.Size(50, 50)
+            })
+                    </text>
+                }
+
+            }
+            else
+            {
+               <text>
+            marker.setIcon({
+                url: 'https://maps.google.com/mapfiles/ms/icons/purple.png',
+                scaledSize: new google.maps.Size(50, 50)
+            })
+               </text>
+            }
+            marker.setMap(map);
+            markers.push(marker);
+            </text>
+            }
+
+            map.setCenter(myposmarker.getPosition())
+            @foreach(var item in Model.MeasPoints){
+            <text>
+                var marker = new google.maps.Marker({
+                  map: map,
+                  position: { lat: @item.Lati, lng: @item.Longi },
+                  title: "@item.Name",
+                });
+                if (markers1.length != 0) {
+                    var istrue = true;
+                    var i = 0;
+                    while (istrue) {
+                        var existingMarker = markers1[i];
+                        var pos = existingMarker.getPosition();
+                        if (marker.position.equals(pos)) {
+                            var a = 360.0 / markers.length;
+                            var newLat = pos.lat() + -.00015 * Math.cos((+a * i) / 180 * Math.PI);  //x
+                            var newLng = pos.lng() + -.00015 * Math.sin((+a * i) / 180 * Math.PI);  //Y
+                            var latLng = new google.maps.LatLng(newLat, newLng);
+                            marker.position = latLng;
+                        }
+                        if (i == markers1.length - 1) {
+                            istrue = false;
+                        }
+                        i++;
+                    }
+                }
+            marker['infowindow'] = new google.maps.InfoWindow({
+                        content: '<p>ID: @item.Id</p> <p>Item: @item.Name </p> <p><button type="button" class="btn-hoelscher" onclick="chooseThisMP(@item.Id)">Choose this</button></p>'
+                 });
+
+            google.maps.event.addListener(marker, 'click', function () {
+                this['infowindow'].open(map1, this);
+            });
+
+            @if (item.MonitorType.MonitorTypeName == "Pumping Well")
+            {
+                if (item.LoggerActive)
+                {
+                     <text>
+                        marker.setIcon('https://maps.google.com/mapfiles/ms/icons/blue-dot.png')
+                    </text>
+                }
+                else
+                {
+                    <text>
+                        marker.setIcon('https://maps.google.com/mapfiles/ms/icons/blue.png')
+                    </text>
+                }
+            }
+            else if (item.MonitorType.MonitorTypeName == "Reinfiltration Well")
+            {
+                if (item.LoggerActive)
+                {
+                    <text>
+                        marker.setIcon('https://maps.google.com/mapfiles/ms/icons/green-dot.png')
+                    </text>
+                }
+                else
+                {
+                    <text>
+                        marker.setIcon('https://maps.google.com/mapfiles/ms/icons/green.png')
+                    </text>
+                }
+
+            }
+            else if (item.MonitorType.MonitorTypeName == "Monitoring Well" || item.MonitorType.MonitorTypeName == "Master Well" || item.MonitorType.MonitorTypeName == "Monitoring Well - shaft")
+            {
+                if (item.LoggerActive)
+                {
+                    <text>
+                        marker.setIcon('https://maps.google.com/mapfiles/ms/icons/red-dot.png')
+                    </text>
+                }
+                else
+                {
+                    <text>
+                        marker.setIcon('https://maps.google.com/mapfiles/ms/icons/red.png')
+                    </text>
+                }
+
+            }
+            else if(item.MonitorType.MonitorTypeName == "Manometer")
+            {
+                <text>
+                    marker.setIcon('https://maps.google.com/mapfiles/ms/icons/purple-dot.png')
+                </text>
+            }
+            else{
+                <text>
+                    marker.setIcon('https://maps.google.com/mapfiles/ms/icons/purple-dot.png')
+                </text>
+            }
+
+            marker.setMap(map1);
+        markers1.push(marker)
+            </text>
+            }
+            map1.setCenter(myposmarker1.getPosition());
+        }
+
+
+    </script>
+}

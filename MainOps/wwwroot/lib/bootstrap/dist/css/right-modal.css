@@ -1,0 +1,102 @@
+﻿.ButtonRightModal {
+    position:relative;
+    float: right;
+    top: 300px;
+    width: 30px;
+    height: 30px;
+    background-image: url(/svgs/pop-up-svgrepo-com.svg);
+    background-size:cover;
+}
+    .ButtonRightModal:hover {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+.RightModal {
+    margin-top:200px;
+    position:fixed;
+    display:none;
+    float: right;
+    z-index: 10; /* Sit on top */
+    right: 0; /*35%*/
+    top: 0;
+    width: 50%; /*30%*/
+    height: 80%; /*50%*/
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    -webkit-animation-name: animateRight;
+    -webkit-animation-duration: 1.0s;
+    animation-name: animateRight;
+    animation-duration: 1.0s
+}
+
+.RightModal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    margin-right:0;
+    padding: 0;
+    border: 1px solid #888;
+    width: 100%; /*this is being overruled somehow*/
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animateRight;
+    -webkit-animation-duration: 1.0s;
+    animation-name: animateRight;
+    animation-duration: 1.0s
+}
+
+@-webkit-keyframes animateRight {
+    from {
+        right: -50%;
+        opacity: 0
+    }
+
+    to {
+        right: 0;
+        opacity: 1
+    }
+}
+
+@keyframes animateRight {
+    from {
+        right: -50%;
+        opacity: 0
+    }
+
+    to {
+        right: 0;
+        opacity: 1
+    }
+}
+.closer {
+    color: black;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.closer:hover,
+.closer:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+.RightModal-header {
+    padding: 2px 16px;
+    background-color: #0086bc;
+    color: white;
+    width:100%;
+}
+
+.RightModal-body {
+    padding: 2px 16px;
+}
+
+.RightModal-footer {
+    padding: 2px 16px;
+    background-color: #0086bc;
+    color: white;
+}
+

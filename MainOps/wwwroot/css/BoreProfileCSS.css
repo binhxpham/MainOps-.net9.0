@@ -1,0 +1,238 @@
+﻿table {
+    width: 100%;
+    padding: 0px;
+    page-break-inside: auto
+}
+body {
+    margin: 0px;
+    font-family: 'Segoe UI', Arial;
+}
+tfoot { 
+    display:table-footer-group;
+}
+thead {
+    display: table-header-group
+}
+td, th {
+    text-align:center;
+}
+tr {
+    page-break-inside: avoid;
+    page-break-after: auto
+}
+span_circle {
+    display: inline-block;
+    padding: 15px;
+    line-height: 100%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    background-color: black;
+    color: white;
+    text-align: center;
+    font-size: 1em;
+}
+
+
+ol,
+.li1 {
+    /* removing the default list counters/markers: */
+    list-style-type: none;
+}
+
+ol {
+    /* resetting the counter so every <ol>
+        has an independent count: */
+    counter-reset: marker -1;
+    padding-left: 0;
+}
+
+.ol2 {
+    counter-reset: marker2 -1;
+    padding-left: 0;
+}
+
+tr {
+    max-height: 0.4cm;
+    min-height: 0.4cm;
+}
+
+.li1 {
+    border-top: 1px solid #000;
+    box-sizing: border-box;
+    width: 1.5em;
+    counter-increment: marker 1;
+    position: relative;
+    border-left: 1px solid #000;
+}
+
+    .li1:first-child {
+        counter-reset: marker -1;
+    }
+
+    .li1:first-child,
+    .li1:nth-child(n+1) {
+        width: 1.5em;
+    }
+
+    .li1:last-child {
+        height: 0;
+    }
+
+    .li1:first-child::after,
+    .li1:nth-child(n+1)::after {
+        position: absolute;
+        top: -0.5em;
+        left: 100%;
+        height: 1em;
+        line-height: 1em;
+        width: 1.5em;
+        text-align: center;
+        /* specifying the counter to use: */
+        content: counter(marker);
+    }
+
+.li2 {
+    /*height: 4cm;*/ /*1cm*/
+    border-top: 1px solid #000;
+    box-sizing: border-box;
+    width: 1.5em;
+    counter-increment: marker2 -1;
+    position: relative;
+    border-left: 1px solid #000;
+}
+
+    .li2:first-child {
+        counter-reset: marker2 @Convert.ToInt32(Model.Coord_z + 1);
+    }
+
+    .li2:first-child,
+    .li2:nth-child(n) {
+        width: 1.5em;
+    }
+
+    .li2:last-child {
+        height: 0;
+    }
+
+    .li2:first-child::after,
+    .li2:nth-child(n)::after {
+        position: absolute;
+        top: -0.5em;
+        left: 100%;
+        height: 1em;
+        line-height: 1em;
+        width: 1.5em;
+        text-align: center;
+        /* specifying the counter to use: */
+        content: counter(marker2);
+    }
+
+th {
+    vertical-align: bottom;
+    text-align: center;
+}
+
+    th span {
+        -ms-writing-mode: tb-rl;
+        -webkit-writing-mode: vertical-rl;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        white-space: nowrap;
+    }
+
+
+.button-up,
+.button-down {
+    position: relative;
+    padding: 5px;
+    margin: 30px auto;
+    background: #000;
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    transition: all 0.2s linear;
+}
+
+    .button-down:hover {
+        transform: translate3d(0, 10px, 0);
+    }
+
+    .button-up:hover {
+        transform: translate3d(0, -10px, 0);
+    }
+
+    .button-up::after,
+    .button-down::after {
+        content: "";
+        position: absolute;
+        left: 17px;
+        z-index: 11;
+        display: block;
+        width: 25px;
+        height: 25px;
+        border-top: 2px solid #fff;
+        border-left: 2px solid #fff;
+    }
+
+    .button-up::after {
+        top: 20px;
+        transform: rotate(45deg);
+    }
+
+    .button-down::after {
+        top: 10px;
+        transform: rotate(225deg);
+    }
+
+.arrow-right,
+.arrow-left,
+.long-arrow-right,
+.long-arrow-left,
+.long-arrow-down {
+    display: block;
+    margin: 10px 0 0 0;
+    width: 25px;
+    height: 25px;
+    border-top: 2px solid #000;
+    border-left: 2px solid #000;
+}
+
+.arrow-right,
+.long-arrow-right {
+    -webkit-transform: rotate(135deg);
+}
+
+.long-arrow-down {
+    -webkit-transform: rotate(225deg);
+}
+
+.arrow-left,
+.long-arrow-left {
+    -webkit-transform: rotate(-45deg);
+}
+
+    .long-arrow-right::after,
+    .long-arrow-left::after,
+    .long-arrow-down::after {
+        content: "";
+        display: block;
+        width: 2px;
+        height: 45px;
+        background-color: black;
+        -webkit-transform: rotate(-45deg) translate(15px, 4px);
+        left: 0;
+        top: 0em;
+    }
+
+jammer {
+    -ms-writing-mode: tb-rl;
+    -webkit-writing-mode: vertical-rl;
+    writing-mode: vertical-rl;
+    -webkit-transform: rotate(180deg);
+    white-space: nowrap;
+    text-align: center;
+    align-content: center;
+}
+.rotated {
+    -webkit-transform:rotate(90deg);
+}

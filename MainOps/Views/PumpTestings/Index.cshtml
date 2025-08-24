@@ -1,0 +1,70 @@
+﻿@model IEnumerable<MainOps.Models.PumpTesting>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Pump Functionality Tests")</h2>
+
+<p>
+    <a asp-action="Create">@SharedLocalizer.GetLocalizedHtmlString("New Test")</a>
+</p>
+<form asp-controller="PumpTestings" asp-action="Combsearch">
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Project:")</td>
+            <td>
+                <select name="filterchoice" asp-items="ViewBag.filterchocies" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("All")</option></select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoComplete", "PumpTestings")" style="width:100%;" />
+            </td>
+            <td>
+                <button type="submit" class="btn-hoelscher">
+                    <span class="glyphicon glyphicon-search"></span>
+                </button>
+            </td>
+        </tr>
+    </table>
+
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.PumpID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.PumpID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DoneBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeStamp)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
+                <a asp-action="Details" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("View")</a>
+                @if (User.IsInRole("Admin")) { 
+                    <a asp-action="Delete" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Delete")</a>
+                }
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

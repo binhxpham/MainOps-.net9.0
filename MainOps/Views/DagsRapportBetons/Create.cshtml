@@ -1,0 +1,281 @@
+﻿@model MainOps.Models.CGJClassesBeton.DagsrapportBetonVM
+
+@{
+    ViewData["Title"] = "Udfyld Dagsseddel";
+}
+<h2>Udfyld Dagsseddel</h2>
+<hr />
+<form asp-action="Create" method="post" enctype="multipart/form-data">
+    <table border="1" style="table-layout:fixed;width:100%;">
+        <tr>
+            <td colspan="2"><label asp-for="Project"></label></td>
+            <td colspan="3"><select asp-for="ProjectId" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();" style="width:100%;"><option value="">Vælg Projekt</option></select><span asp-validation-for="ProjectId" class="text-danger"></span></td>
+
+        </tr>
+        <tr>
+            <td colspan="2"><label asp-for="SubProject"></label></td>
+            <td colspan="3"><select asp-for="SubProjectId" style="width:100%;"><option value="">Vælg UnderProjekt</option></select><span asp-validation-for="SubProjectId" class="text-danger"></span></td>
+        </tr>
+        <tr>
+            <td colspan="2"><label asp-for="Dato"></label></td>
+            <td colspan="3"><input asp-for="Dato" type="datetime-local" value="@String.Format("{0:yyyy-MM-ddThh:mm}",DateTime.Now)" style="width:100%;" /><span asp-validation-for="Dato" class="text-danger"></span></td>
+        </tr>
+        <tr>
+            <td colspan="5"><h3>Arbejdsløn, Timer fordeles på de enkelte aktiviteter</h3></td>
+        </tr>
+        <tr><td><label asp-for="Vejr"></label></td><td><input asp-for="Vejr" type="checkbox" value="@Model.Vejr" onchange="HideUnhideVejr();" /></td></tr>
+        <tr>
+            <td colspan="5">
+                <table id="vejrtabel" style="display:none;table-layout:fixed;width:100%;">
+                    <tr>
+                        <td>
+                            <div class="checkbox">
+                                <label>
+                                    <input asp-for="Sol" /> @Html.DisplayNameFor(model => model.Sol)
+                                </label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="checkbox">
+                                <label>
+                                    <input asp-for="Skyet" /> @Html.DisplayNameFor(model => model.Skyet)
+                                </label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="checkbox">
+                                <label>
+                                    <input asp-for="OverSkyet" /> @Html.DisplayNameFor(model => model.OverSkyet)
+                                </label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="checkbox">
+                                <label>
+                                    <input asp-for="Regn_sne" /> @Html.DisplayNameFor(model => model.Regn_sne)
+                                </label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="checkbox">
+                                <label>
+                                    <input asp-for="Vindstille" /> @Html.DisplayNameFor(model => model.Vindstille)
+                                </label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="checkbox">
+                                <label>
+                                    <input asp-for="Svag_Vind" /> @Html.DisplayNameFor(model => model.Svag_Vind)
+                                </label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="checkbox">
+                                <label>
+                                    <input asp-for="Jaevn_Vind" /> @Html.DisplayNameFor(model => model.Jaevn_Vind)
+                                </label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="checkbox">
+                                <label>
+                                    <input asp-for="Haard_Vind" /> @Html.DisplayNameFor(model => model.Haard_Vind)
+                                </label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td> <label asp-for="Temperatur_kl_otte" class="control-label"></label></td>
+                        <td><input asp-for="Temperatur_kl_otte" type="number" step="0.01" class="form-control" /><span asp-validation-for="Temperatur_kl_otte" class="text-danger"></span></td>
+                        <td> <label asp-for="Temperatur_kl_tolv" class="control-label"></label></td>
+                        <td> <input asp-for="Temperatur_kl_tolv" type="number" step="0.01" class="form-control" /><span asp-validation-for="Temperatur_kl_tolv" class="text-danger"></span></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="width:10%;"><label asp-for="Timer.First().Navn"></label></td>
+            <td style="width:10%;"><label asp-for="Timer.First().Timer"></label></td>
+            <td style="width:10%;"><label asp-for="Timer.First().Overtid_50100"></label></td>
+            <td style="width:60%;"><label asp-for="Timer.First().Note"></label></td>
+            <td style="width:10%;"><label asp-for="Timer.First().CGJ_Timer_Total"></label></td>
+        </tr>
+        @for (int i = 0; i < Model.Timer.Count; i++)
+        {
+            <tr>
+                <td style="width:10%;"><input asp-for="Timer[i].Navn" style="width:100%;" /></td>
+                <td style="width:10%;"><input type="number" step="0.01" asp-for="Timer[i].Timer" style="width:100%;" /></td>
+                <td style="width:10%;"><input type="number" step="0.01" asp-for="Timer[i].Overtid_50100" style="width:100%;" /></td>
+                <td style="width:60%;"><input asp-for="Timer[i].Note" style="width:100%;" /></td>
+                <td style="width:10%;"><input type="number" step="0.01" asp-for="Timer[i].CGJ_Timer_Total" style="width:100%;" /></td>
+            </tr>
+        }
+        <tr style="border-bottom:2px solid black;"><td colspan="5"></td></tr>
+        <tr>
+            <td colspan="5"><h3>EkstraArbejder Timer</h3></td>
+        </tr>
+        <tr>
+            <td style="width:10%;"><label asp-for="TimerEkstraarbejder.First().Navn"></label></td>
+            <td style="width:10%;"><label asp-for="TimerEkstraarbejder.First().Timer"></label></td>
+            <td style="width:10%;"><label asp-for="TimerEkstraarbejder.First().Overtid_50100"></label></td>
+            <td style="width:60%;"><label asp-for="TimerEkstraarbejder.First().Note"></label></td>
+            <td style="width:10%;"><label asp-for="TimerEkstraarbejder.First().CGJ_Timer_Total"></label></td>
+        </tr>
+        @for (int i = 0; i < Model.TimerEkstraarbejder.Count; i++)
+        {
+            <tr>
+                <td style="width:10%;"><input asp-for="TimerEkstraarbejder[i].Navn" style="width:100%;" /></td>
+                <td style="width:10%;"><input type="number" step="0.01" asp-for="TimerEkstraarbejder[i].Timer" style="width:100%;" /></td>
+                <td style="width:10%;"><input type="number" step="0.01" asp-for="TimerEkstraarbejder[i].Overtid_50100" style="width:100%;" /></td>
+                <td style="width:60%;"><input asp-for="TimerEkstraarbejder[i].Note" style="width:100%;" /></td>
+                <td style="width:10%;"><input type="number" step="0.01" asp-for="TimerEkstraarbejder[i].CGJ_Timer_Total" style="width:100%;" /></td>
+            </tr>
+        }
+    </table>
+    <table border="1" style="table-layout:fixed;width:100%;">
+        <tr>
+            <td colspan="3"><h3>Materialer, Forbrugsgods, kørsel,underentreprenører m.m.</h3></td>
+        </tr>
+        <tr>
+            <td style="width:15%;"><label asp-for="Kontraktarbejder.First().EgetMateriel"></label></td>
+            <td style="width:35%;"><label asp-for="Kontraktarbejder.First().UL_Firma"></label></td>
+            <td style="width:50%;"><label asp-for="Kontraktarbejder.First().UL_Materiel"></label></td>
+        </tr>
+        @for (int i = 0; i < Model.Kontraktarbejder.Count; i++)
+        {
+            <tr>
+                <td style="width:15%;"><input asp-for="Kontraktarbejder[i].EgetMateriel" style="width:100%;" /></td>
+                <td style="width:35%;"><input asp-for="Kontraktarbejder[i].UL_Firma" style="width:100%;" /></td>
+                <td style="width:50%;"><input asp-for="Kontraktarbejder[i].UL_Materiel" style="width:100%;" /></td>
+            </tr>
+        }
+        <tr style="border-bottom:2px solid black;"><td colspan="3"></td></tr>
+        <tr>
+            <td><label>Upload Fotos:</label></td>
+            <td colspan="2">
+                <input type="file" multiple="multiple" name="files" accept=".jpg,.jpeg,.heic,.png" />
+            </td>
+        </tr>
+    </table>
+    <table border="1" style="page-break-inside:avoid;width:100%;table-layout:fixed;">
+        @{ var rows = 0;}
+        @if (Model.Materiel.Count % 3 == 0)
+        {
+            rows = Model.Materiel.Count() / 3;
+        }
+        else
+        {
+            rows = Convert.ToInt32(Model.Materiel.Count() / 3) + 1;
+        }
+        @{ var totalcells = Model.Materiel.Count();}
+        @for (int i = 0; i < rows; i++)
+        {
+            @if (totalcells - 3 >= 0) //enough room to add whole row
+            {
+                <tr>
+                    <td style="width:25%;"><label>@Model.Materiel[(i + 1) * 3 - 3].Materiel.Materiellet</label></td>
+                    <td style="width:8%;"><input asp-for="@Model.Materiel[(i + 1) * 3 - 3].Antal" style="width:100%;" /></td>
+                    <td style="width:25%;"><label>@Model.Materiel[(i + 1) * 3 - 3 + 1].Materiel.Materiellet</label></td>
+                    <td style="width: 8%;"><input asp-for="@Model.Materiel[(i + 1) * 3 - 3 + 1].Antal" style="width:100%;" /></td>
+                    <td style="width:25%;"><label>@Model.Materiel[(i + 1) * 3 - 3 + 2].Materiel.Materiellet</label></td>
+                    <td style="width: 8%;"><input asp-for="@Model.Materiel[(i+1)*3 - 3 +2].Antal" style="width:100%;" /></td>
+                </tr>
+                totalcells -= 3;
+                @Html.HiddenFor(Model => Model.Materiel[(i + 1) * 3 - 3].MaterielId)
+                @Html.HiddenFor(Model => Model.Materiel[(i + 1) * 3 - 3 + 1].MaterielId)
+                @Html.HiddenFor(Model => Model.Materiel[(i + 1) * 3 - 3 + 2].MaterielId)
+            }
+            else if (totalcells - 2 >= 0)
+            {
+                <tr>
+                    <td style="width:25%;"><label>@Model.Materiel[(i + 1) * 3 - 3].Materiel.Materiellet</label></td>
+                    <td style="width:8%;"><input asp-for="@Model.Materiel[(i+1)*3 - 3].Antal" style="width:100%;" /></td>
+                    <td style="width:25%;"><label>@Model.Materiel[(i + 1) * 3 - 3 + 1].Materiel.Materiellet</label></td>
+                    <td style="width:8%;"><input asp-for="@Model.Materiel[(i+1)*3 - 3 +1].Antal" style="width:100%;" /></td>
+                    <td style="width:25%;"></td>
+                    <td style="width:8%;"></td>
+                    @Html.HiddenFor(Model => Model.Materiel[(i + 1) * 3 - 3].MaterielId)
+                    @Html.HiddenFor(Model => Model.Materiel[(i + 1) * 3 - 3 + 1].MaterielId)
+                </tr>
+                totalcells -= 2;
+            }
+            else //enough room to add 1 picture in row
+            {
+                <tr>
+                    <td style="width:25%;"><label>@Model.Materiel[(i + 1) * 3 - 3].Materiel.Materiellet</label></td>
+                    <td style="width:8%;"><input asp-for="@Model.Materiel[(i+1)*3 - 3].Antal" style="width:100%;" /></td>
+                    <td style="width:25%;"></td>
+                    <td style="width:8%;"></td>
+                    <td style="width:25%;"></td>
+                    <td style="width:8%;"></td>
+                    @Html.HiddenFor(Model => Model.Materiel[(i + 1) * 3 - 3].MaterielId)
+                </tr>
+                totalcells -= 1;
+            }
+
+        }
+        <tr>
+            <td colspan="6" style="text-align:left;"> <label asp-for="UddybendeNoter"></label></td>
+        </tr>
+        <tr>
+            <td rowspan="8" colspan="6"> <textarea asp-for="UddybendeNoter" cols="40" rows="8" style="width:100%;height:100%;"></textarea></td>
+        </tr>
+    </table>
+    <div class="form-group">
+        <label asp-for="ForSaetter"></label> : <input asp-for="ForSaetter" value="true" checked="checked" onchange="this.checked ? this.value = true : this.value = false;" />
+    </div>
+    <br />
+    <div style="width:100%;height:55px;">
+        <button class="btn-hoelscher" style="width:100%;height:100%;font-size:16px;"><b>Indsend</b></button>
+    </div>
+    <br />
+    <br />
+
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript">
+    function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var SubProjectId = $("#SubProjectId").val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Vælg UnderProjekt</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                        if (SubProjectId != "" && SubProjectId != null) {
+                            $("#SubProjectId").val(SubProjectId);
+                        }
+                    }
+                    else {
+                        var s = '<option value="">Vælg UnderProjekt</option>';
+                        $("#SubProjectId").html(s);
+                    }
+
+                }
+            });
+    }
+    function HideUnhideVejr() {
+        document.getElementById("Vejr").value = document.querySelector('#Vejr').checked;
+        if (document.querySelector('#Vejr').checked == true) {
+            document.getElementById("vejrtabel").style.display = "block";
+        }
+        else {
+            document.getElementById("vejrtabel").style.display = "none";
+        }
+    }
+</script>
+}

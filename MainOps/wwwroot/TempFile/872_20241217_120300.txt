@@ -1,0 +1,2 @@
+Measurement Point Name;Labor ID;TimeStamp;The Raw Measurement;The Measurement Reference Point;The Measurement in Reference;NewComment;ChosenComment
+2S-4/SB5-Q Tiefenlotung;872;2024-12-17 12:03:00;30.000;522.6;492.600;test test ;

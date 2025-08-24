@@ -1,0 +1,84 @@
+﻿@model MainOps.Models.ItemActivity
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>ItemActivity</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.TheDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TheDate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WasActive)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WasActive)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.HJItem)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.HJItem.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.UniqueID)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.UniqueID)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ProjectId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ProjectId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SubProjectId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SubProjectId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Latitude)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Latitude)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Longitude)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Longitude)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ItemName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ItemName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Install)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Install.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Arrival)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Arrival.Id)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

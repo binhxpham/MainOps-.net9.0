@@ -1,0 +1,87 @@
+﻿@model MainOps.Models.ItemActivity
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>ItemActivity</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.TheDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TheDate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WasActive)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WasActive)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.HJItem)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.HJItem.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.UniqueID)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.UniqueID)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ProjectId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ProjectId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SubProjectId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SubProjectId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Latitude)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Latitude)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Longitude)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Longitude)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ItemName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ItemName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Install)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Install.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Arrival)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Arrival.Id)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

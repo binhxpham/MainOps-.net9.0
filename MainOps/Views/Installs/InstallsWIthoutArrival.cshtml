@@ -1,0 +1,168 @@
+﻿@model IEnumerable<MainOps.Models.Install>
+
+@{
+    ViewData["Title"] = "Installs With Some Problem";
+}
+
+
+
+<form asp-action="InstallsWithoutArrival" method="post">
+    <table>
+        <tr>
+            <td style="width:35%;"><label>@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.Project))</label></td>
+            <td><select name="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillItems()" style="width:100%;"></select></td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("SubProject")</label></td>
+            <td>
+                <select name="SubProjectId" id="SubProjectId" style="width:100%;height:40px;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select SubProject")</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td colsplan="2"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Search")</button></td>
+        </tr>
+    </table>
+</form>
+
+<table style="width:100%;table-layout:fixed;word-break:break-word;">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemType.Project.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UniqueID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Location)
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Text")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Installed")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("DeInstalled")
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Total Amount Installed")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Total Amount De-Installed")
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderBy(x => x.TimeStamp))
+        {
+
+
+            @if (!item.ItemTypeId.Equals(1782))
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Name)
+                        @if (item.SubProjectId != null)
+                        {
+                            <text> - @item.SubProject.Name</text>
+                        }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ItemType.Item_Type):@Html.DisplayFor(modelItem => item.ItemType.BoQnr)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UniqueID)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Location)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Install_Text)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.isInstalled)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DeinstallDate)
+                    </td>
+                    <td>
+                        @String.Format("{0:N2} ", item.Amount)
+                    </td>
+                    <td>@String.Format("{0:N2} ", Model.Where(x => x.ItemTypeId.Equals(item.ItemTypeId)).Sum(x => x.Amount))</td>
+                    <td>@String.Format("{0:N2} ", Model.Where(x => x.ItemTypeId.Equals(item.ItemTypeId) && x.isInstalled.Equals(false)).Sum(x => x.Amount))</td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TimeStamp)
+                    </td>
+                    <td>
+                        <form asp-action="Edit_Install" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                        </form>
+
+
+                        <form asp-controller="TrackItems" asp-action="Details_Install" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Details")</button>
+                        </form>
+                        @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+                        {
+                            <form asp-action="AddArrival" asp-controller="Installs" asp-route-id="@item.Id" method="post">
+                                <button class="btn-hoelscher" onclick="confirm('Are you sure you need to add this arrival?')">@SharedLocalizer.GetLocalizedHtmlString("Add Arrival")</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript">
+
+
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+
+                        if (lang == "de-DE") {
+                            s = '<option value="">Bitte auswählen Unterprojekt</option>';
+                        }
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        if (lang == "de-DE") {
+                            s = '<option value="">Bitte auswählen Unterprojekt</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+        }
+</script>
+}

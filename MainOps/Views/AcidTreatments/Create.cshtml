@@ -1,0 +1,197 @@
+﻿@model MainOps.Models.AcidTreatment
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Acid Treatment");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Acid Treatment")</h2>
+<form asp-action="Create" asp-controller="AcidTreatments" enctype="multipart/form-data" method="post">
+    <input asp-for="DoneBy" hidden="hidden" />
+    <table style="width:100%;table-layout:fixed;">
+        <thead>
+            <tr>
+                <th style="width:25%"></th>
+                <th style="width:25%"></th>
+                <th style="width:25%"></th>
+                <th style="width:25%"></th>
+            </tr>
+        </thead>
+        <tr>
+            <td><label asp-for="ProjectId" class="control-label"></label></td>
+            <td><select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillMeasPoints();"></select></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><label asp-for="SubProjectId" class="control-label"></label></td>
+            <td><select asp-for="SubProjectId" class="form-control" asp-items="ViewBag.SubProjectId"></select></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><label asp-for="MeasPointId" class="control-label"></label></td>
+            <td><select asp-for="MeasPointId" class="form-control" asp-items="ViewBag.MeasPointId" onchange="UpdateWellName(this);"></select></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <label asp-for="Wellname" class="control-label"></label>
+            </td>
+            <td>
+                <input asp-for="Wellname" type="text" id="Wellname" name="Wellname" style="width:100%" />
+            </td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <label asp-for="Report_Date" class="control-label"></label>
+            </td>
+            <td>
+                <input type="datetime" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd")" asp-for="Report_Date" style="width:100%" />
+            </td>
+            <td><span asp-validation-for="Report_Date" class="text-danger"></span></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Ref_Level" class="control-label"></label></td>
+            <td><input asp-for="Ref_Level" type="number" step="0.01" style="width:100%" placeholder="0.00" /></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Water_level" class="control-label"></label></td>
+            <td><input asp-for="Water_level" id="Water_level" type="number" step="0.01" style="width:100%" /></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Bottom_well" class="control-label"></label></td>
+            <td><input asp-for="Bottom_well" type="number" style="width:100%" /></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Water_Meter_Before" class="control-label"></label></td>
+            <td><input asp-for="Water_Meter_Before" id="Water_Meter_Before" type="number" style="width:100%" /></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td><label asp-for="starttime" class="control-label"></label></td>
+            <td>
+                <input asp-for="starttime" type="time" class="form-control" />
+
+            </td>
+            <td colspan="2"><span asp-validation-for="starttime" class="text-danger"></span></td>
+        </tr>
+        <tr>
+            <td><label asp-for="endtime" class="control-label"></label></td>
+            <td>
+                <input asp-for="endtime" type="time" class="form-control" />
+
+            </td>
+            <td colspan="2"><span asp-validation-for="endtime" class="text-danger"></span></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Total_m3_acid_Manual" class="control-label"></label></td>
+            <td><input asp-for="Total_m3_acid_Manual" id="Water_Meter_After" type="number" onkeydown="UpdateWaterMeter();" style="width:100%" /></td>
+            <td colspan="2"></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Water_Meter_After" class="control-label"></label></td>
+            <td><input asp-for="Water_Meter_After" id="Water_Meter_After" type="number" onkeydown="UpdateWaterMeter();" style="width:100%" /></td>
+            <td><label asp-for="Totalm3" class="control-label"></label></td>
+            <td><input type="number" id="Total_m3" value="0" disabled="disabled" style="width:100%;" /></td>
+        </tr>
+
+        <tr>
+            <td><label asp-for="Comments" class="control-label"></label></td>
+            <td><textarea asp-for="Comments" cols="40" rows="8"></textarea></td>
+        </tr>
+
+    </table>
+
+    
+    <button type="submit" class="btn-hoelscher" style="width:100%;height:100px;font-size:18px;">@SharedLocalizer.GetLocalizedHtmlString("Upload Report")</button>
+</form>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+           
+            var id;
+           
+           
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select',
+                    firstDay: 1
+
+                });
+                $('.date-picker').datepicker("setDate", new Date("dd-MM-yy"));
+                FillSubProjects();
+                FillMeasPoints();
+
+            });
+        });
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+        }
+        function FillMeasPoints() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetMeasPointsProject", "MeasPoints")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {'theId' : ProjectId},
+                success: function (data) {
+                    var s = '<option value="-1">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                    }
+                    $("#MeasPointId").html(s);
+                    document.getElementById("MeasPointId").style.width = "100%";
+                    FillSubProjects();
+                }
+            });
+            }
+            
+        function UpdateWaterMeter() {
+                document.getElementById('Total_m3').value = document.getElementById('Water_Meter_After').value - document.getElementById('Water_Meter_Before').value;
+        }
+        function UpdateAcidMeter() {
+            document.getElementById('AcidTotal_m3').value = document.getElementById('Acid_Meter_After').value - document.getElementById('Acid_Meter_Before').value;
+        }
+        function UpdateWellName(sel) {
+            document.getElementById('Wellname').value = sel.options[sel.selectedIndex].text;
+            }
+          
+
+
+    </script>
+}

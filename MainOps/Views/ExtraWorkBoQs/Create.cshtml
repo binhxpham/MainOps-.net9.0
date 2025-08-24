@@ -1,0 +1,326 @@
+﻿@model MainOps.Models.ExtraWorkBoQVM
+
+
+<h2>Create</h2>
+
+<h4>ExtraWork BoQ</h4>
+<form asp-action="Create">
+    <table>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Sub Title:")</td>
+            <td><input type="text" asp-for="ExtraWorkSubTitle" /></td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Project (search Header):")</td>
+            <td> <select id="ProjectId" asp-items="ViewBag.ProjectId" onchange="FillHeadLines();">@SharedLocalizer.GetLocalizedHtmlString("Chooes Project")</select></td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Main Extra Work")</td>
+            <td><select asp-for="BoQHeadLineId" asp-items="ViewBag.BoQHeadLineId"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Main Header")</option></select></td>
+        </tr>
+    </table>
+   
+    
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td style="width:50%;">
+                <table style="width:100%;table-layout:fixed;">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(Model => Model.Descriptions)
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(Model => Model.Descriptions.First().Topic)
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(Model => Model.Descriptions.First().Description)
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(Model => Model.Descriptions.First().IsRelatedToBoQ)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Descriptions.Count; i++)
+                        {
+                        <tr>
+                            <td><input asp-for="Descriptions[i].Topic" style="width:100%;" /></td>
+                            <td><textarea asp-for="Descriptions[i].Description" cols="30" rows="2" style="width:100%;"></textarea>
+                            <td><input asp-for="Descriptions[i].IsRelatedToBoQ" type="checkbox" onchange="this.checked ? this.value = true : this.value = false;" style="width:100%;" /></td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </td>
+            <td style="width:50%;align-content:start;">
+                <table style="width:100%;table-layout:fixed;float:left;">
+                    <thead>
+                        <tr>
+                            <th colspan="2">
+                                @Html.DisplayNameFor(Model => Model.Headers)
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(Model => Model.Headers.First().Number)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(Model => Model.Headers.First().Title)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Headers.Count; i++)
+                        {
+                            <tr>
+                                <td><input asp-for="Headers[i].Number" style="width:100%;" /></td>
+                                <td><input asp-for="Headers[i].Title" style="width:100%;" /></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </td>
+
+        </tr>
+        <tr>
+            <td colspan="2">
+                <table style="width:100%;padding:3px">
+                    <thead>
+                        <tr>
+                            <th colspan="6">
+                                @Html.DisplayNameFor(Model => Model.BoQItems)
+                            </th>
+                            <th>
+                               <label>Search:</label> 
+                            </th>
+                            <th>
+                                <input id="searchfield" name="searchfield" type="text" />
+                            </th>
+                            <th>
+                                <button type="button" class="btn-hoelscher" onclick="LoadExistingItems();">@SharedLocalizer.GetLocalizedHtmlString("Load exising item list")</button>
+                            </th>
+                        </tr>
+                        <tr style="font-size:10px;">
+                            <th style="width: 40px !important;">
+                                @Html.DisplayNameFor(Model => Model.BoQItems.First().ExtraWorkBoQHeaderId)
+                            </th>
+                            <th style="width: 70px !important;">
+                                @Html.DisplayNameFor(Model => Model.BoQItems.First().NewBoQNr)
+                            </th>
+                            <th style="width: 70px !important;">
+                                @Html.DisplayNameFor(Model => Model.BoQItems.First().NewRentalBoQNr)
+                            </th>
+                            <th style="width: 350px !important;">
+                                @Html.DisplayNameFor(Model => Model.BoQItems.First().Item_Type)
+                            </th>
+                            <th style="width: 50px !important;">
+                                @Html.DisplayNameFor(Model => Model.BoQItems.First().Install_UnitId)
+                            </th>
+                            <th style="width: 50px !important;">
+                                @Html.DisplayNameFor(Model => Model.BoQItems.First().Rental_UnitId)
+                            </th>
+                            <th style="width: 70px !important;">
+                                @Html.DisplayNameFor(Model => Model.BoQItems.First().price)
+                            </th>
+                            <th style="width: 70px !important;">
+                                @Html.DisplayNameFor(Model => Model.BoQItems.First().rental_price)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(Model => Model.BoQItems.First().BoQItemDescription)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.BoQItems.Count; i++)
+                        {
+                            <tr style="height:40px;">
+                                <td>
+                                    <input  asp-for="BoQItems[i].ExtraWorkBoQHeaderId" min="1" max="10" step="1" style="width:100%;"/>
+                                </td>
+                                <td>
+                                    <input asp-for="BoQItems[i].NewBoQNr" style="width:100%;" />
+                                    <input asp-for="BoQItems[i].BoQnr" hidden="hidden" />
+                                </td>
+                                <td>
+                                    <input asp-for="BoQItems[i].NewRentalBoQNr" style="width:100%;" />
+                                    <input asp-for="BoQItems[i].BoQnr_Rental" hidden="hidden" />
+                                </td>
+                                <td>
+                                    <input asp-for="BoQItems[i].Item_Type" style="width:100%;" />
+                                </td>
+                                <td>
+                                    <select asp-for="BoQItems[i].Install_UnitId" asp-items="ViewBag.UnitId" style="width:100%;"></select>
+                                </td>
+                                <td>
+                                    <select asp-for="BoQItems[i].Rental_UnitId" asp-items="ViewBag.UnitId" style="width:100%;"></select>
+                                </td>
+                                <td>
+                                    <input asp-for="BoQItems[i].price" style="width:100%;" />
+                                </td>
+                                <td>
+                                    <input asp-for="BoQItems[i].rental_price" style="width:100%;" />
+                                </td>
+                                <td>
+                                    <textarea asp-for="BoQItems[i].BoQItemDescription" style="width:100%;height:100%;"></textarea>
+                                    <input type="hidden" asp-for="BoQItems[i].ItemTypeId" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <button type="submit">Submit</button>
+</form>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript">
+        $(document).ready(function () {
+            FillHeadLines();
+        });
+    function AddItemToBoQ(theId) {
+        var url = '@Url.Action("GetItem", "ItemTypes")';
+        $.ajax({
+            type: 'GET',
+            url: url,
+            dataType: 'json',
+            data: {
+                'theId': theId
+            },
+            success: function (data)
+            {
+                for (i = 0; i <= 20; i++) {
+                    var elementcheck = document.getElementById("BoQItems_" + i + "__Item_Type");
+                    if (elementcheck.value == null || elementcheck.value == "")
+                    {
+                        document.getElementById("BoQItems_" + i + "__ItemTypeId").value = parseInt(data["id"]);
+                        document.getElementById("BoQItems_" + i + "__Item_Type").value = data["item_Type"];
+                        document.getElementById("BoQItems_" + i + "__NewBoQNr").value = data["boQnr"];
+                        document.getElementById("BoQItems_" + i + "__NewRentalBoQNr").value = data["boQnr_Rental"];
+                        document.getElementById("BoQItems_" + i + "__BoQnr").value = data["boQnr"];
+                        document.getElementById("BoQItems_" + i + "__BoQnr_Rental").value = data["boQnr_Rental"];
+                        document.getElementById("BoQItems_" + i + "__price").value = parseFloat(data["price"]);
+                        document.getElementById("BoQItems_" + i + "__rental_price").value = parseFloat(data["rental_price"]);
+                        document.getElementById("BoQItems_" + i + "__Install_UnitId").value = parseInt(data["install_UnitId"]);
+                        document.getElementById("BoQItems_" + i + "__Rental_UnitId").value = parseInt(data["rental_UnitId"]);
+                        break;
+                    }
+                }
+            }
+        });
+
+    }
+    function FillItems() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetItemsProjectHtml", "ItemTypes")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                    'type' : "install"
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select</option>';
+                    if (lang == "de-DE") {
+                        s = '<option value="">Bitte auswählen</option>';
+                    }
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["item_Type"] + '</option>';
+                    }
+                    $("#ItemTypeId").html(s);
+                    document.getElementById("ItemTypeId").style.width = "100%";
+                    FillSubProjects();
+
+                }
+            });
+    }
+        function FillHeadLines() {
+            var ProjectId = $('#ProjectId').val();
+            var searchfield = $('#searchfield').val();
+            var url = '@Url.Action("GetProjectHeadLines", "BoQHeadLines")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                    'searchfield': searchfield
+                },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Choose Main Header</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["headLine"] + '</option>';
+                        }
+                        $("#BoQHeadLineId").html(s);
+                        document.getElementById("BoQHeadLineId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Choose Main Header</option>';
+                        $("#BoQHeadLineId").html(s);
+                    }
+                }
+            });
+        }
+        function FillItems() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetItemsProjectHtml", "ItemTypes")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                    'type' : "install"
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select</option>';
+                    if (lang == "de-DE") {
+                        s = '<option value="">Bitte auswählen</option>';
+                    }
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["item_Type"] + '</option>';
+                    }
+                    $("#ItemTypeId").html(s);
+                    document.getElementById("ItemTypeId").style.width = "100%";
+                    FillSubProjects();
+
+                }
+            });
+    }
+    function LoadExistingItems() {
+        var ProjectId = $("#ProjectId").val();
+        var searchfield = $("#searchfield").val();
+            var url = '@Url.Action("GetItemTypes", "ItemTypes")';
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    data: {
+                        'theId': ProjectId,
+                        'searchfield': searchfield
+                    },
+                    contentType: 'application/html;charset=utf-8',
+                    dataType: 'html',
+                    success: function (data) {
+                        var thepartial = $("#itemtypesContent").html(data);
+                        OpenItemTypesModal();
+                    }
+                });
+        }
+
+</script>
+}

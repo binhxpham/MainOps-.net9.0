@@ -1,0 +1,2658 @@
+﻿@model MainOps.Models.ViewModels.SiteDocumentationVM
+@{
+    Layout = null;
+}
+@inject IHostingEnvironment _env;
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("All Documenation")</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+@{
+    var DivisionId = Model.DivisionId;
+    var LogoPath = Model.LogoPath;
+}
+<h1>@SharedLocalizer.GetLocalizedHtmlString("Reports")</h1>
+@foreach (var item in Model.DailyReports)
+{
+    <table style="page-break-inside:avoid;page-break-before:always;">
+        <tr>
+            <td colspan="3">
+                <b>@SharedLocalizer.GetLocalizedHtmlString("Daily Report")</b>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelitem => item.Project.Name)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelitem => item.Project.Name)
+            </td>
+            <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@Model.Project.Division.Id/@Model.Project.Division.LogoPath" width="151" height="66" /></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelitem => item.Project.ProjectNr)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelitem => item.Project.ProjectNr)
+            </td>
+        </tr>
+        @if (item.SubProjectId != null)
+        {
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelitem => item.SubProject.Name)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelitem => item.SubProject.Name) : @Html.DisplayFor(modelitem => item.SubProject.SubProjectNr)
+                </td>
+            </tr>
+        }
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelitem => item.Project.Client)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelitem => item.Project.Client)
+            </td>
+
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelitem => item.short_Description)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelitem => item.short_Description)
+            </td>
+        </tr>
+
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelitem => item.Report_Date)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelitem => item.Report_Date)
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelitem => item.Amount)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelitem => item.Amount)
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelitem => item.StartHour)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelitem => item.StartHour)
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelitem => item.EndHour)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelitem => item.EndHour)
+            </td>
+        </tr>
+        @if (item.StandingTime != TimeSpan.Zero)
+        {
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelitem => item.StandingTime)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelitem => item.StandingTime)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelitem => item.Machinery)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelitem => item.Machinery)
+                </td>
+            </tr>
+        }
+
+
+        @try
+        {
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelitem => item.Title.TheTitle)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelitem => item.Title.TheTitle)
+                </td>
+            </tr>
+        }
+        catch
+        {
+
+        }
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelitem => item.DoneBy)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelitem => item.DoneBy)
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3"><b>@Html.DisplayNameFor(modelitem => item.Work_Performed)</b></td>
+        </tr>
+        <tr rowspan="20">
+            <td colspan="3" style="text-align:left;">
+                @if (item.Work_Performed != null && item.Work_Performed != "")
+                {
+                    @Html.Raw(item.Work_Performed.Replace("\r\n", "<br />"))
+                }
+                else
+                {
+                    @Html.DisplayFor(modelitem => item.Work_Performed)
+                }
+            </td>
+        </tr>
+    </table>
+
+    <table name="phototable" style="page-break-inside:avoid;width:100%;table-layout:fixed;">
+        @{ var rows = 0;}
+        @if (item.pictures.Count % 3 == 0)
+        {
+            rows = item.pictures.Count() / 3;
+        }
+        else
+        {
+            rows = Convert.ToInt32(item.pictures.Count() / 3) + 1;
+        }
+        @{ var totalpics = item.pictures.Count();}
+        @for (int i = 0; i < rows; i++)
+        {
+            @if (totalpics - 3 >= 0) //enough room to add whole row
+            {
+                <tr>
+                    <td style="width:100%;"><img src="~/AHAK/DailyReports/@item.Id.ToString()/@item.pictures[(i+1)*3 - 3]" style="width:100%;" /></td>
+                    <td style="width:100%;"><img src="~/AHAK/DailyReports/@item.Id.ToString()/@item.pictures[(i+1)*3 - 3 +1]" style="width:100%;" /></td>
+                    <td style="width:100%;"><img src="~/AHAK/DailyReports/@item.Id.ToString()/@item.pictures[(i+1)*3 - 3 +2]" style="width:100%;" /></td>
+                </tr>
+                totalpics -= 3;
+            }
+            else if (totalpics - 2 >= 0)
+            {
+                <tr>
+                    <td style="width:100%;"><img src="~/AHAK/DailyReports/@item.Id.ToString()/@item.pictures[(i+1)*3 - 3]" style="width:100%;" /></td>
+                    <td style="width:100%;"><img src="~/AHAK/DailyReports/@item.Id.ToString()/@item.pictures[(i+1)*3 - 3 +1]" style="width:100%;" /></td>
+                    <td style="width:100%;"></td>
+                </tr>
+                totalpics -= 2;
+            }
+            else //enough room to add 1 picture in row
+            {
+                <tr>
+                    <td style="width:100%;"><img src="~/AHAK/DailyReports/@item.Id.ToString()/@item.pictures[(i+1)*3 - 3]" style="width:100%;" /></td>
+                    <td style="width:100%;"></td>
+                    <td style="width:100%;"></td>
+                </tr>
+                totalpics -= 1;
+            }
+
+        }
+    </table>
+}
+@foreach (var item in Model.AlarmCalls)
+{
+    <table style="page-break-inside:avoid;page-break-before:always;">
+        <tr>
+            <td colspan="3">
+                <b>@SharedLocalizer.GetLocalizedHtmlString("Alarm Report")</b>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(Model => Model.Project.Name)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.Project.Name)
+            </td>
+            <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@DivisionId/@LogoPath" width="151" height="66" /></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(Model => Model.Project.ProjectNr)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.Project.ProjectNr)
+            </td>
+        </tr>
+        @if (item.SubProjectId != null)
+        {
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.SubProject.Name)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SubProject.Name) : @Html.DisplayFor(modelItem => item.SubProject.SubProjectNr)
+                </td>
+            </tr>
+        }
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.Project.Client)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Client)
+            </td>
+
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.Alarm_Time)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Alarm_Time)
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.TimeStamp)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeStamp)
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.Hours)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Hours)
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.DoneBy)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DoneBy)
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" style="text-align:left;">
+                @if (item.LogText != null && item.LogText != "")
+                {
+                    @Html.Raw(item.LogText.Replace("\r\n", "<br />"))
+                }
+                else
+                {
+                    @Html.DisplayFor(modelItem => item.LogText)
+                }
+            </td>
+        </tr>
+    </table>
+
+    if (item.pictures.Count() > 0)
+    {
+        <table name="phototable" style="page-break-inside:avoid;width:100%;table-layout:fixed;">
+            @{ var rows = 0;}
+            @if (item.pictures.Count() % 3 == 0)
+            {
+                rows = item.pictures.Count() / 3;
+            }
+            else
+            {
+                rows = Convert.ToInt32(item.pictures.Count() / 3) + 1;
+            }
+            @{ var totalpics = item.pictures.Count();}
+            @for (int i = 0; i < rows; i++)
+            {
+
+                @if (totalpics - 3 >= 0) //enough room to add whole row
+                {
+                    var photo1 = item.pictures.ElementAt((i + 1) * 3 - 3);
+                    var photo2 = item.pictures.ElementAt((i + 1) * 3 - 3 + 1);
+                    var photo3 = item.pictures.ElementAt((i + 1) * 3 - 3 + 2);
+
+                    <tr>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo3.Path.Split(".")[0], "_edit.", photo3.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                    </tr>
+                    totalpics -= 3;
+                }
+                else if (totalpics - 2 >= 0)
+                {
+                    var photo1 = item.pictures.ElementAt((i + 1) * 3 - 3);
+                    var photo2 = item.pictures.ElementAt((i + 1) * 3 - 3 + 1);
+                    <tr>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"></td>
+                    </tr>
+                    totalpics -= 2;
+                }
+                else //enough room to add 1 picture in row
+                {
+                    var photo1 = item.pictures.ElementAt((i + 1) * 3 - 3);
+                    <tr>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"></td>
+                        <td style="width:100%;"></td>
+                    </tr>
+                    totalpics -= 1;
+                }
+
+            }
+        </table>
+    }
+}
+@foreach (var item in Model.Maintenances)
+{
+<table style="page-break-inside:avoid;page-break-before:always;">
+    <tr>
+        <td colspan="3">
+            <b>@SharedLocalizer.GetLocalizedHtmlString("Maintenance")</b>
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Project.Name)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Project.Name)
+        </td>
+        <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@DivisionId/@LogoPath" width="151" height="66" /></td>
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Project.ProjectNr)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Project.ProjectNr)
+        </td>
+    </tr>
+    @if (item.SubProjectId != null)
+    {
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(Model => Model.SubProject.Name)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.SubProject.Name) : @Html.DisplayFor(Model => Model.SubProject.SubProjectNr)
+            </td>
+        </tr>
+    }
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(Model => Model.Project.Client)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.Project.Client)
+        </td>
+
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(modelItem => item.MaintenancePoint)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.MaintenancePoint)
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(modelItem => item.TimeStamp)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.TimeStamp)
+        </td>
+    </tr>
+    <tr>
+        <td style="text-align:left;">
+            <b>
+                @Html.DisplayNameFor(modelItem => item.DoneBy)
+            </b>
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.DoneBy)
+        </td>
+    </tr>
+    @if (item.InstallId != null)
+    {
+        @if (item.Install.UniqueID != null && item.Install.UniqueID != "")
+        {
+            <tr>
+                <td style="text-align:left;"><b>@Html.DisplayNameFor(modelItem => item.Install.UniqueID)</b></td>
+                <td>@Html.DisplayFor(modelItem => item.Install.UniqueID)</td>
+            </tr>
+        }
+    }
+    <tr>
+        <td colspan="3" style="text-align:left;">
+            @if (item.LogText != null && item.LogText != "")
+            {
+                @Html.Raw(item.LogText.Replace("\r\n", "<br />"))
+            }
+            else
+            {
+                @Html.DisplayFor(modelItem => item.LogText)
+            }
+        </td>
+    </tr>
+    @foreach (var maint in item.MaintenanceEntries)
+    {
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Action Performed:")</td>
+            @if (maint.MaintenanceSubTypeId != null)
+            {
+                <td>@maint.MaintenanceType.Type : @maint.MaintenanceSubType.Type</td>
+            }
+            else
+            {
+                <td>@maint.MaintenanceType.Type  : </td>
+            }
+        </tr>
+    }
+    <tr>
+        <td colspan="3" style="text-align:left;">
+            @if (item.LogText != null && item.LogText != "")
+            {
+                @Html.Raw(item.LogText.Replace("\r\n", "<br />"))
+            }
+            else
+            {
+                @Html.DisplayFor(modelItem => item.LogText)
+            }
+        </td>
+    </tr>
+</table>
+    if (item.MaintenancePhotos.Count > 0)
+    {
+        <table name="phototable" style="page-break-inside:avoid;width:100%;table-layout:fixed;">
+            @{ var rows = 0;}
+            @if (item.MaintenancePhotos.Count() % 3 == 0)
+            {
+                rows = item.MaintenancePhotos.Count() / 3;
+            }
+            else
+            {
+                rows = Convert.ToInt32(item.MaintenancePhotos.Count() / 3) + 1;
+            }
+            @{ var totalpics = item.MaintenancePhotos.Count();}
+            @for (int i = 0; i < rows; i++)
+            {
+
+                @if (totalpics - 3 >= 0) //enough room to add whole row
+                {
+                    var photo1 = item.MaintenancePhotos.ElementAt((i + 1) * 3 - 3);
+                    var photo2 = item.MaintenancePhotos.ElementAt((i + 1) * 3 - 3 + 1);
+                    var photo3 = item.MaintenancePhotos.ElementAt((i + 1) * 3 - 3 + 2);
+
+                    <tr>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo3.Path.Split(".")[0], "_edit.", photo3.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                    </tr>
+                    totalpics -= 3;
+                }
+                else if (totalpics - 2 >= 0)
+                {
+                    var photo1 = item.MaintenancePhotos.ElementAt((i + 1) * 3 - 3);
+                    var photo2 = item.MaintenancePhotos.ElementAt((i + 1) * 3 - 3 + 1);
+                    <tr>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                    </tr>
+                    totalpics -= 2;
+                }
+                else //enough room to add 1 picture in row
+                {
+                    var photo1 = item.MaintenancePhotos.ElementAt((i + 1) * 3 - 3);
+                    <tr>
+                        <td colspan="3" style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                    </tr>
+                    totalpics -= 1;
+                }
+
+            }
+        </table>
+    }
+}
+@foreach (var item in Model.GeneratorChecks)
+{
+    <table style="page-break-inside:avoid;page-break-before:always;">
+        <tr>
+            <td colspan="3">
+                <b>@SharedLocalizer.GetLocalizedHtmlString("Generator Test")</b>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(Model => Model.Project.Name)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.Project.Name)
+            </td>
+            <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@DivisionId/@LogoPath" width="151" height="66" /></td>
+        </tr>
+
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(Model => Model.Project.ProjectNr)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.Project.ProjectNr)
+            </td>
+        </tr>
+        @if (item.SubProjectId != null)
+        {
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.SubProject.Name)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SubProject.Name) : @Html.DisplayFor(modelItem => item.SubProject.SubProjectNr)
+                </td>
+            </tr>
+        }
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.Project.Client)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Client)
+            </td>
+
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.TimeStamp)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeStamp.Date)
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Oil_Level)</b></td>
+            @if (item.Oil_Level == true)
+            {
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else
+            {
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+            }
+        </tr>
+        @if (item.Oil_Level_Comment != null)
+        {
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Oil_Level_Comment)</b></td>
+                <td colspan="2">@Html.DisplayFor(modelItem => item.Oil_Level_Comment)</td>
+            </tr>
+        }
+        <tr>
+            <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Diesel_Level)</b></td>
+            @if (item.Diesel_Level >= 50)
+            {
+                <td style="width:25%">@Html.DisplayFor(modelItem => item.Diesel_Level)</td>
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("OK")</span_circle></td>
+            }
+            else
+            {
+                <td style="width:25%">@Html.DisplayFor(modelItem => item.Diesel_Level)</td>
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Not OK")</span_circle></td>
+            }
+        </tr>
+        @if (item.Diesel_Level_Comment != null)
+        {
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Diesel_Level_Comment)</b></td>
+                <td colspan="2">@Html.DisplayFor(modelItem => item.Diesel_Level_Comment)</td>
+            </tr>
+        }
+        <tr>
+            <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Coolant)</b></td>
+            @if (item.Coolant == true)
+            {
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else
+            {
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+            }
+        </tr>
+        @if (item.Coolant_Comment != null)
+        {
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Coolant_Comment)</b></td>
+                <td colspan="2">@Html.DisplayFor(modelItem => item.Coolant_Comment)</td>
+            </tr>
+        }
+        <tr>
+            <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Generator_Started)</b></td>
+            @if (item.Generator_Started == "Yes")
+            {
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else
+            {
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+            }
+        </tr>
+        @if (item.Generator_Started_Comment != null)
+        {
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Generator_Started_Comment)</b></td>
+                <td colspan="2">@Html.DisplayFor(modelItem => item.Generator_Started_Comment)</td>
+            </tr>
+        }
+        <tr>
+            <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Equipment_Started)</b></td>
+            @if (item.Equipment_Started == "Yes")
+            {
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else
+            {
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+            }
+        </tr>
+        @if (item.Equipment_Started_Comment != null)
+        {
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Equipment_Started_Comment)</b></td>
+                <td colspan="2">@Html.DisplayFor(modelItem => item.Equipment_Started_Comment)</td>
+            </tr>
+        }
+        <tr>
+            <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Generator_Stopped)</b></td>
+            @if (item.Generator_Stopped == "Yes")
+            {
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else
+            {
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+            }
+        </tr>
+        @if (item.Generator_Stopped_Comment != null)
+        {
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Generator_Stopped_Comment)</b></td>
+                <td colspan="2">@Html.DisplayFor(modelItem => item.Generator_Stopped_Comment)</td>
+            </tr>
+        }
+        <tr>
+            <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Equipment_Started_After)</b></td>
+            @if (item.Equipment_Started_After == "Yes")
+            {
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else
+            {
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+            }
+        </tr>
+        @if (item.Equipment_Started_After_Comment != null)
+        {
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Equipment_Started_After_Comment)</b></td>
+                <td colspan="2">@Html.DisplayFor(modelItem => item.Equipment_Started_After_Comment)</td>
+            </tr>
+        }
+        <tr>
+            <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Generator_Hours)</b></td>
+            <td colspan="2">@Html.DisplayFor(modelItem => item.Generator_Hours)</td>
+        </tr>
+        @if (item.GeneralComments != null)
+        {
+            <tr>
+                <td colspan="3"><b>@Html.DisplayNameFor(modelItem => item.GeneralComments)</b></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <textarea disabled="disabled" class="form-control" style="width:100%;" rows="6" cols="50">@Html.DisplayFor(modelItem => item.GeneralComments)</textarea>
+                </td>
+            </tr>
+        }
+
+    </table>
+    <table>
+        <tr>
+            <td style="width:25%;"><b>@Html.DisplayNameFor(modelItem => item.DoneBy)</b></td>
+            <td style="width:75%;text-align:center;">@Html.DisplayFor(modelItem => item.DoneBy)</td>
+
+        </tr>
+        <tr>
+            <td style="width:25%;"><b>@Html.DisplayNameFor(modelItem => item.Signature)</b></td>
+            <td style="width:75%;"><img src="data:image/jpg;base64, @item.Signature" style="width:100%;"></td>
+        </tr>
+    </table>
+    <table name="phototable" style="page-break-inside:avoid;width:100%;table-layout:fixed;">
+        @{ var rows = 0;}
+        @if (item.Photos.Count() % 3 == 0)
+        {
+            rows = item.Photos.Count() / 3;
+        }
+        else
+        {
+            rows = Convert.ToInt32(item.Photos.Count() / 3) + 1;
+        }
+        @{ var totalpics = item.Photos.Count();}
+        @for (int i = 0; i < rows; i++)
+        {
+
+            @if (totalpics - 3 >= 0) //enough room to add whole row
+            {
+                var photo1 = item.Photos.ElementAt((i + 1) * 3 - 3);
+                var photo2 = item.Photos.ElementAt((i + 1) * 3 - 3 + 1);
+                var photo3 = item.Photos.ElementAt((i + 1) * 3 - 3 + 2);
+
+                <tr>
+                    <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                    <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                    <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo3.Path.Split(".")[0], "_edit.", photo3.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                </tr>
+                totalpics -= 3;
+            }
+            else if (totalpics - 2 >= 0)
+            {
+                var photo1 = item.Photos.ElementAt((i + 1) * 3 - 3);
+                var photo2 = item.Photos.ElementAt((i + 1) * 3 - 3 + 1);
+                <tr>
+                    <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                    <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                </tr>
+                totalpics -= 2;
+            }
+            else //enough room to add 1 picture in row
+            {
+                var photo1 = item.Photos.ElementAt((i + 1) * 3 - 3);
+                <tr>
+                    <td colspan="3" style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                </tr>
+                totalpics -= 1;
+            }
+
+        }
+    </table>
+}
+@foreach (var item in Model.WTPChecks)
+{
+    if (Model.WTPChecks.Count() > 0)
+    {
+        <table style="page-break-inside:avoid;page-break-before:always;">
+            <tr>
+                <td colspan="3">
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("WTP Check")</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(Model => Model.Project.Name)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(Model => Model.Project.Name)
+                </td>
+                <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@DivisionId/@LogoPath" width="151" height="66" /></td>
+            </tr>
+
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(Model => Model.Project.ProjectNr)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(Model => Model.Project.ProjectNr)
+                </td>
+            </tr>
+            @if (item.SubProjectId != null)
+            {
+                <tr>
+                    <td style="text-align:left;">
+                        <b>
+                            @Html.DisplayNameFor(modelItem => item.SubProject.Name)
+                        </b>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubProject.Name) : @Html.DisplayFor(modelItem => item.SubProject.SubProjectNr)
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Project.Client)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Client)
+                </td>
+
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.TimeStamp)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TimeStamp.Date)
+                </td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Leakages)</b></td>
+                @if (item.Leakages == "Yes")
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            @if (item.Leakages_Comment != null)
+            {
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Leakages_Comment)</b></td>
+                    <td colspan="4">@Html.DisplayFor(modelItem => item.Leakages_Comment)</td>
+                </tr>
+            }
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Pressures)</b></td>
+                @if (item.Pressures == "Yes")
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            @if (item.Preassures_Comment != null)
+            {
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Preassures_Comment)</b></td>
+                    <td colspan="4">@Html.DisplayFor(modelItem => item.Preassures_Comment)</td>
+                </tr>
+            }
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Tanks)</b></td>
+                @if (item.Tanks == "Yes")
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            @if (item.Tanks_Comment != null)
+            {
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Tanks_Comment)</b></td>
+                    <td colspan="2">@Html.DisplayFor(modelItem => item.Tanks_Comment)</td>
+                </tr>
+            }
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Suction_Tank)</b></td>
+                @if (item.Suction_Tank == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            @if (item.Suction_Tank_Comment != null)
+            {
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Suction_Tank_Comment)</b></td>
+                    <td colspan="2">@Html.DisplayFor(modelItem => item.Suction_Tank_Comment)</td>
+                </tr>
+            }
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Clear_Water_Pump)</b></td>
+                @if (item.Clear_Water_Pump == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            @if (item.Clear_Water_Pump_Comment != null)
+            {
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Clear_Water_Pump_Comment)</b></td>
+                    <td colspan="2">@Html.DisplayFor(modelItem => item.Clear_Water_Pump_Comment)</td>
+                </tr>
+            }
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Filters_Operation)</b></td>
+                @if (item.Filters_Operation == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            @if (item.Filters_Operation_Comment != null)
+            {
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Filters_Operation_Comment)</b></td>
+                    <td colspan="2">@Html.DisplayFor(modelItem => item.Filters_Operation_Comment)</td>
+                </tr>
+            }
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Valves)</b></td>
+                @if (item.Valves == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            @if (item.Valves_Comment != null)
+            {
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Valves_Comment)</b></td>
+                    <td colspan="2">@Html.DisplayFor(modelItem => item.Valves_Comment)</td>
+                </tr>
+            }
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Heating)</b></td>
+                @if (item.Heating == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            @if (item.Heating_Comment != null)
+            {
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Heating_Comment)</b></td>
+                    <td colspan="2">@Html.DisplayFor(modelItem => item.Heating_Comment)</td>
+                </tr>
+            }
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Water_Clear)</b></td>
+                @if (item.Water_Clear == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            @if (item.Water_Clear_Comment != null)
+            {
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Water_Clear_Comment)</b></td>
+                    <td colspan="2">@Html.DisplayFor(modelItem => item.Water_Clear_Comment)</td>
+                </tr>
+            }
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.FlowMeters)</b></td>
+                @if (item.FlowMeters == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            @if (item.FlowMeters_Comment != null)
+            {
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.FlowMeters_Comment)</b></td>
+                    <td colspan="2">@Html.DisplayFor(modelItem => item.FlowMeters_Comment)</td>
+                </tr>
+            }
+            @if (item.GeneralComments != null)
+            {
+                <tr>
+                    <td colspan="3"><b>@Html.DisplayNameFor(modelItem => item.GeneralComments)</b></td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <textarea disabled="disabled" class="form-control" style="width:100%;" rows="6" cols="50">@Html.DisplayFor(modelItem => item.GeneralComments)</textarea>
+                    </td>
+                </tr>
+            }
+        </table>
+        <table style="width:100%;page-break-inside:avoid;">
+            <tr>
+                <td style="width:25%;"><b>@Html.DisplayNameFor(modelItem => item.DoneBy)</b></td>
+                <td style="width:75%;text-align:center;">@Html.DisplayFor(modelItem => item.DoneBy)</td>
+
+            </tr>
+            <tr>
+                <td style="width:25%;"><b>@Html.DisplayNameFor(modelItem => item.Signature)</b></td>
+                <td style="width:75%;"><img src="data:image/jpg;base64, @item.Signature" style="width:100%;"></td>
+            </tr>
+        </table>
+        <table name="phototable" style="page-break-inside:avoid;width:100%;table-layout:fixed;">
+            @{ var rows = 0;}
+            @if (item.Photos.Count() % 3 == 0)
+            {
+                rows = item.Photos.Count() / 3;
+            }
+            else
+            {
+                rows = Convert.ToInt32(item.Photos.Count() / 3) + 1;
+            }
+            @{ var totalpics = item.Photos.Count();}
+            @for (int i = 0; i < rows; i++)
+            {
+
+                @if (totalpics - 3 >= 0) //enough room to add whole row
+                {
+                    var photo1 = item.Photos.ElementAt((i + 1) * 3 - 3);
+                    var photo2 = item.Photos.ElementAt((i + 1) * 3 - 3 + 1);
+                    var photo3 = item.Photos.ElementAt((i + 1) * 3 - 3 + 2);
+
+                    <tr>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo3.Path.Split(".")[0], "_edit.", photo3.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                    </tr>
+                    totalpics -= 3;
+                }
+                else if (totalpics - 2 >= 0)
+                {
+                    var photo1 = item.Photos.ElementAt((i + 1) * 3 - 3);
+                    var photo2 = item.Photos.ElementAt((i + 1) * 3 - 3 + 1);
+                    <tr>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                    </tr>
+                    totalpics -= 2;
+                }
+                else //enough room to add 1 picture in row
+                {
+                    var photo1 = item.Photos.ElementAt((i + 1) * 3 - 3);
+                    <tr>
+                        <td colspan="3" style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                    </tr>
+                    totalpics -= 1;
+                }
+
+            }
+        </table>
+    }
+}
+@foreach (var item in Model.SitesChecks)
+{
+    if (Model.SitesChecks.Count() > 0)
+    {
+        <table style="page-break-inside:avoid;page-break-before:always;">
+            <tr>
+                <td colspan="3">
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("Site Check")</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(Model => Model.Project.Name)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(Model => Model.Project.Name)
+                </td>
+                <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@DivisionId/@LogoPath" width="151" height="66" /></td>
+            </tr>
+
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(Model => Model.Project.ProjectNr)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(Model => Model.Project.ProjectNr)
+                </td>
+            </tr>
+            @if (item.SubProjectId != null)
+            {
+                <tr>
+                    <td style="text-align:left;">
+                        <b>
+                            @Html.DisplayNameFor(modelItem => item.SubProject.Name)
+                        </b>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubProject.Name) : @Html.DisplayFor(modelItem => item.SubProject.SubProjectNr)
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Project.Client)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Client)
+                </td>
+
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.TimeStamp)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TimeStamp.Date)
+                </td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.CheckAllLevels)</b></td>
+                @if (item.CheckAllLevels == "Yes")
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            @if (item.CheckAllLevels_Comment != null)
+            {
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.CheckAllLevels_Comment)</b></td>
+                    <td colspan="4">@Html.DisplayFor(modelItem => item.CheckAllLevels_Comment)</td>
+                </tr>
+            }
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.SCADA_PUMPS_RUNNING)</b></td>
+                @if (item.SCADA_PUMPS_RUNNING == "Yes")
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            @if (item.SCADA_PUMPS_RUNNING != null)
+            {
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.SCADA_PUMPS_RUNNING_Comment)</b></td>
+                    <td colspan="4">@Html.DisplayFor(modelItem => item.SCADA_PUMPS_RUNNING_Comment)</td>
+                </tr>
+            }
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Leakages)</b></td>
+                @if (item.Leakages == "Yes")
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            @if (item.Leakages_Comment != null)
+            {
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Leakages_Comment)</b></td>
+                    <td colspan="4">@Html.DisplayFor(modelItem => item.Leakages_Comment)</td>
+                </tr>
+            }
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Valves)</b></td>
+                @if (item.Valves == "Yes")
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            @if (item.Valves_Comment != null)
+            {
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Valves_Comment)</b></td>
+                    <td colspan="4">@Html.DisplayFor(modelItem => item.Valves_Comment)</td>
+                </tr>
+            }
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.WellDamages)</b></td>
+                @if (item.WellDamages == "Yes")
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            @if (item.WellDamages_Comment != null)
+            {
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.WellDamages_Comment)</b></td>
+                    <td colspan="4">@Html.DisplayFor(modelItem => item.WellDamages_Comment)</td>
+                </tr>
+            }
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Insulation)</b></td>
+                @if (item.Insulation == "Yes")
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            @if (item.Insulation_Comment != null)
+            {
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Insulation_Comment)</b></td>
+                    <td colspan="4">@Html.DisplayFor(modelItem => item.Insulation_Comment)</td>
+                </tr>
+            }
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.AreasClear)</b></td>
+                @if (item.AreasClear == "Yes")
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            @if (item.AreasClear_Comment != null)
+            {
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.AreasClear_Comment)</b></td>
+                    <td colspan="4">@Html.DisplayFor(modelItem => item.AreasClear_Comment)</td>
+                </tr>
+            }
+            @if (item.GeneralComments != null)
+            {
+                <tr>
+                    <td colspan="3"><b>@Html.DisplayNameFor(modelItem => item.GeneralComments)</b></td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <textarea disabled="disabled" class="form-control" style="width:100%;" rows="6" cols="50">@Html.DisplayFor(modelItem => item.GeneralComments)</textarea>
+                    </td>
+                </tr>
+            }
+        </table>
+        <table style="width:100%;page-break-inside:avoid;">
+            <tr>
+                <td style="width:25%;"><b>@Html.DisplayNameFor(modelItem => item.DoneBy)</b></td>
+                <td style="width:75%;text-align:center;">@Html.DisplayFor(modelItem => item.DoneBy)</td>
+
+            </tr>
+            <tr>
+                <td style="width:25%;"><b>@Html.DisplayNameFor(modelItem => item.Signature)</b></td>
+                <td style="width:75%;"><img src="data:image/jpg;base64, @item.Signature" style="width:100%;"></td>
+            </tr>
+        </table>
+        <table name="phototable" style="page-break-inside:avoid;width:100%;table-layout:fixed;">
+            @{ var rows = 0;}
+            @if (item.Photos.Count() % 3 == 0)
+            {
+                rows = item.Photos.Count() / 3;
+            }
+            else
+            {
+                rows = Convert.ToInt32(item.Photos.Count() / 3) + 1;
+            }
+            @{ var totalpics = item.Photos.Count();}
+            @for (int i = 0; i < rows; i++)
+            {
+
+                @if (totalpics - 3 >= 0) //enough room to add whole row
+                {
+                    var photo1 = item.Photos.ElementAt((i + 1) * 3 - 3);
+                    var photo2 = item.Photos.ElementAt((i + 1) * 3 - 3 + 1);
+                    var photo3 = item.Photos.ElementAt((i + 1) * 3 - 3 + 2);
+
+                    <tr>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo3.Path.Split(".")[0], "_edit.", photo3.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                    </tr>
+                    totalpics -= 3;
+                }
+                else if (totalpics - 2 >= 0)
+                {
+                    var photo1 = item.Photos.ElementAt((i + 1) * 3 - 3);
+                    var photo2 = item.Photos.ElementAt((i + 1) * 3 - 3 + 1);
+                    <tr>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                    </tr>
+                    totalpics -= 2;
+                }
+                else //enough room to add 1 picture in row
+                {
+                    var photo1 = item.Photos.ElementAt((i + 1) * 3 - 3);
+                    <tr>
+                        <td colspan="3" style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                    </tr>
+                    totalpics -= 1;
+                }
+
+            }
+        </table>
+    }
+}
+@foreach (var item in Model.SensorsCheck)
+{
+    if (Model.SensorsCheck.Count() > 0)
+    {
+        <table style="page-break-inside:avoid;page-break-before:always;">
+            <tr>
+                <td colspan="3">
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("Sensors Check")</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(Model => Model.Project.Name)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(Model => Model.Project.Name)
+                </td>
+                <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@DivisionId/@LogoPath" width="151" height="66" /></td>
+            </tr>
+
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(Model => Model.Project.ProjectNr)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(Model => Model.Project.ProjectNr)
+                </td>
+            </tr>
+            @if (item.SubProjectId != null)
+            {
+                <tr>
+                    <td style="text-align:left;">
+                        <b>
+                            @Html.DisplayNameFor(modelItem => item.SubProject.Name)
+                        </b>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubProject.Name) : @Html.DisplayFor(modelItem => item.SubProject.SubProjectNr)
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Project.Client)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Client)
+                </td>
+
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.TimeStamp)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TimeStamp.Date)
+                </td>
+            </tr>
+        </table>
+        <h2>@SharedLocalizer.GetLocalizedHtmlString("Inlet")</h2>
+        <table>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Turbidity_SCADA_Inlet)</b></td>
+                <td colspan="2" style="width:50%">@Html.DisplayFor(modelItem => item.Turbidity_SCADA_Inlet)</td>
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.PH_SCADA_Inlet)</b></td>
+                <td colspan="2" style="width:50%">@Html.DisplayFor(modelItem => item.PH_SCADA_Inlet)</td>
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Conductivity_SCADA_Inlet)</b></td>
+                <td colspan="2" style="width:50%">@Html.DisplayFor(modelItem => item.Conductivity_SCADA_Inlet)</td>
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Turbidity_Cleaned_Inlet)</b></td>
+                @if (item.Turbidity_Cleaned_Inlet == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.PH_Cleaned_Inlet)</b></td>
+                @if (item.PH_Cleaned_Inlet == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Conductivity_Cleaned_Inlet)</b></td>
+                @if (item.Conductivity_Cleaned_Inlet == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Turbidity_SCADA_Inlet_After)</b></td>
+                <td colspan="2" style="width:50%">@Html.DisplayFor(modelItem => item.Turbidity_SCADA_Inlet_After)</td>
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.PH_SCADA_Inlet_After)</b></td>
+                <td colspan="2" style="width:50%">@Html.DisplayFor(modelItem => item.PH_SCADA_Inlet_After)</td>
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Conductivity_SCADA_Inlet_After)</b></td>
+                <td colspan="2" style="width:50%">@Html.DisplayFor(modelItem => item.Conductivity_SCADA_Inlet_After)</td>
+            </tr>
+
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.PH_Calibrated_Inlet)</b></td>
+                @if (item.PH_Calibrated_Inlet == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Closed_Bypass_Valve_Inlet)</b></td>
+                @if (item.Closed_Bypass_Valve_Inlet == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+        </table>
+        <h2>@SharedLocalizer.GetLocalizedHtmlString("Outlet")</h2>
+        <table>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Turbidity_SCADA_Outlet)</b></td>
+                <td colspan="2" style="width:50%">@Html.DisplayFor(modelItem => item.Turbidity_SCADA_Outlet)</td>
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.PH_SCADA_Outlet)</b></td>
+                <td colspan="2" style="width:50%">@Html.DisplayFor(modelItem => item.PH_SCADA_Outlet)</td>
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Conductivity_SCADA_Outlet)</b></td>
+                <td colspan="2" style="width:50%">@Html.DisplayFor(modelItem => item.Conductivity_SCADA_Outlet)</td>
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Turbidity_Cleaned_Outlet)</b></td>
+                @if (item.Turbidity_Cleaned_Outlet == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.PH_Cleaned_Outlet)</b></td>
+                @if (item.PH_Cleaned_Outlet == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Conductivity_Cleaned_Outlet)</b></td>
+                @if (item.Conductivity_Cleaned_Outlet == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Turbidity_SCADA_Outlet_After)</b></td>
+                <td colspan="2" style="width:50%">@Html.DisplayFor(modelItem => item.Turbidity_SCADA_Outlet_After)</td>
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.PH_SCADA_Outlet_After)</b></td>
+                <td colspan="2" style="width:50%">@Html.DisplayFor(modelItem => item.PH_SCADA_Outlet_After)</td>
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Conductivity_SCADA_Outlet_After)</b></td>
+                <td colspan="2" style="width:50%">@Html.DisplayFor(modelItem => item.Conductivity_SCADA_Outlet_After)</td>
+            </tr>
+
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.PH_Calibrated_Outlet)</b></td>
+                @if (item.PH_Calibrated_Outlet == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Closed_Bypass_Valve_Outlet)</b></td>
+                @if (item.Closed_Bypass_Valve_Outlet == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+        </table>
+        <table style="width:100%;page-break-inside:avoid;">
+            @if (item.GeneralComments != null)
+            {
+                <tr>
+                    <td colspan="2"><b>@Html.DisplayNameFor(modelItem => item.GeneralComments)</b></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <textarea disabled="disabled" class="form-control" style="width:100%;" rows="6" cols="50">@Html.DisplayFor(modelItem => item.GeneralComments)</textarea>
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td style="width:25%;"><b>@Html.DisplayNameFor(modelItem => item.DoneBy)</b></td>
+                <td style="width:75%;text-align:center;">@Html.DisplayFor(modelItem => item.DoneBy)</td>
+
+            </tr>
+            <tr>
+                <td style="width:25%;"><b>@Html.DisplayNameFor(modelItem => item.Signature)</b></td>
+                <td style="width:75%;"><img src="data:image/jpg;base64, @item.Signature" style="width:100%;"></td>
+            </tr>
+        </table>
+        <table name="phototable" style="page-break-inside:avoid;width:100%;table-layout:fixed;">
+            @{ var rows = 0;}
+            @if (item.Photos.Count() % 3 == 0)
+            {
+                rows = item.Photos.Count() / 3;
+            }
+            else
+            {
+                rows = Convert.ToInt32(item.Photos.Count() / 3) + 1;
+            }
+            @{ var totalpics = item.Photos.Count();}
+            @for (int i = 0; i < rows; i++)
+            {
+
+                @if (totalpics - 3 >= 0) //enough room to add whole row
+                {
+                    var photo1 = item.Photos.ElementAt((i + 1) * 3 - 3);
+                    var photo2 = item.Photos.ElementAt((i + 1) * 3 - 3 + 1);
+                    var photo3 = item.Photos.ElementAt((i + 1) * 3 - 3 + 2);
+
+                    <tr>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo3.Path.Split(".")[0], "_edit.", photo3.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                    </tr>
+                    totalpics -= 3;
+                }
+                else if (totalpics - 2 >= 0)
+                {
+                    var photo1 = item.Photos.ElementAt((i + 1) * 3 - 3);
+                    var photo2 = item.Photos.ElementAt((i + 1) * 3 - 3 + 1);
+                    <tr>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                    </tr>
+                    totalpics -= 2;
+                }
+                else //enough room to add 1 picture in row
+                {
+                    var photo1 = item.Photos.ElementAt((i + 1) * 3 - 3);
+                    <tr>
+                        <td colspan="3" style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                    </tr>
+                    totalpics -= 1;
+                }
+
+            }
+        </table>
+    }
+}
+@foreach (var item in Model.ConstructionSiteInspections)
+{
+    if (Model.ConstructionSiteInspections.Count() > 0)
+    {
+        <table style="page-break-inside:avoid;page-break-before:always;">
+            <tr>
+                <td colspan="3">
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("Construction Site Inspection")</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(Model => Model.Project.Name)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(Model => Model.Project.Name)
+                </td>
+                <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@DivisionId/@LogoPath" width="151" height="66" /></td>
+            </tr>
+
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(Model => Model.Project.ProjectNr)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(Model => Model.Project.ProjectNr)
+                </td>
+            </tr>
+            @if (item.SubProjectId != null)
+            {
+                <tr>
+                    <td style="text-align:left;">
+                        <b>
+                            @Html.DisplayNameFor(modelItem => item.SubProject.Name)
+                        </b>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubProject.Name) : @Html.DisplayFor(modelItem => item.SubProject.SubProjectNr)
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Project.Client)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Client)
+                </td>
+
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.TimeStamp)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TimeStamp.Date)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Branch)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Branch)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.NumberOfPeople)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NumberOfPeople)
+                </td>
+            </tr>
+        </table>
+        <table>
+            <tr>
+                <td colspan="3">
+                    <h2>@SharedLocalizer.GetLocalizedHtmlString("Organisation")</h2>
+                </td>
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.WPA_Done)</b></td>
+                @if (item.WPA_Done == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.ToolBox_Done)</b></td>
+                @if (item.ToolBox_Done == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Hazardous_Work)</b></td>
+                @if (item.Hazardous_Work == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td colspan="3"><h2>@SharedLocalizer.GetLocalizedHtmlString("Workplace")</h2></td>
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.OverAllState)</b></td>
+                @if (item.OverAllState == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Walkways)</b></td>
+                @if (item.Walkways == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.LaddersStepsPlatforms)</b></td>
+                @if (item.LaddersStepsPlatforms == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.FirstAiders)</b></td>
+                @if (item.FirstAiders == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.SafeStorage)</b></td>
+                @if (item.SafeStorage == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.KnownContaminants)</b></td>
+                @if (item.KnownContaminants == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.EmergencyMeasures)</b></td>
+                @if (item.EmergencyMeasures == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.UnKnownContaminants)</b></td>
+                @if (item.UnKnownContaminants == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.SufficientLighting)</b></td>
+                @if (item.SufficientLighting == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Tidy)</b></td>
+                @if (item.Tidy == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td colspan="3"><h2>@SharedLocalizer.GetLocalizedHtmlString("Fall and construction pit protection")</h2></td>
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.GroundSupport)</b></td>
+                @if (item.GroundSupport == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.FloorOpenings)</b></td>
+                @if (item.FloorOpenings == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.SloapingAreas)</b></td>
+                @if (item.SloapingAreas == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.SafeAccessSite)</b></td>
+                @if (item.SafeAccessSite == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td colspan="3"><h2>@SharedLocalizer.GetLocalizedHtmlString("Wate disposal / environment")</h2></td>
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.WasteDisposal)</b></td>
+                @if (item.WasteDisposal == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.WasteSeperation)</b></td>
+                @if (item.WasteSeperation == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.MeasuresPreventEnvHarm)</b></td>
+                @if (item.MeasuresPreventEnvHarm == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr><td colspan="3"><h2>@SharedLocalizer.GetLocalizedHtmlString("Personal Protection")</h2></td></tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.AllPPE)</b></td>
+                @if (item.AllPPE == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.SpecialPPE)</b></td>
+                @if (item.SpecialPPE == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr><td colspan="3"><h2>@SharedLocalizer.GetLocalizedHtmlString("Condition of construction machinery / small equipment")</h2></td></tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.SafetyCondition)</b></td>
+                @if (item.SafetyCondition == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.MarkingDevices)</b></td>
+                @if (item.MarkingDevices == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.ConditionLoadHandling)</b></td>
+                @if (item.ConditionLoadHandling == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr><td colspan="3"><h2>@SharedLocalizer.GetLocalizedHtmlString("Sub-Contractors")</h2></td></tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Sub_PPE)</b></td>
+                @if (item.Sub_PPE == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Sub_SafetyCond)</b></td>
+                @if (item.Sub_SafetyCond == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Sub_MaterialStorage)</b></td>
+                @if (item.Sub_MaterialStorage == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.SubContractorsUsed)</b></td>
+                @if (item.SubContractorsUsed == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr><td colspan="3"><h2>@SharedLocalizer.GetLocalizedHtmlString("Others")</h2></td></tr>
+            <tr>
+                <td colspan="3"><b>@Html.DisplayNameFor(modelItem => item.GeneralComments)</b></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <textarea rows="8" cols="64" class="form-control" style="width:100%;">@Html.DisplayFor(modelItem => item.GeneralComments)</textarea>
+                </td>
+            </tr>
+            <tr><td><h2>@SharedLocalizer.GetLocalizedHtmlString("Evaluation")</h2></td></tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.ProjectManager)</b></td>
+                @if (item.ProjectManager == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.AdditionalInstruction)</b></td>
+                @if (item.AdditionalInstruction == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
+            </tr>
+            <tr>
+                <td colspan="3"><b>@Html.DisplayNameFor(modelItem => item.PreviousProblems)</b></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <textarea rows="8" cols="64" class="form-control" style="width:100%;">@Html.DisplayFor(modelItem => item.PreviousProblems)</textarea>
+                </td>
+            </tr>
+        </table>
+        <table style="width:100%;page-break-inside:avoid;">
+            <tr>
+                <td style="width:25%;"><b>@Html.DisplayNameFor(modelItem => item.DoneBy)</b></td>
+                <td style="width:75%;text-align:center;">@Html.DisplayFor(modelItem => item.DoneBy)</td>
+
+            </tr>
+            <tr>
+                <td style="width:25%;"><b>@Html.DisplayNameFor(modelItem => item.Signature)</b></td>
+                <td style="width:75%;"><img src="data:image/jpg;base64, @item.Signature" style="width:100%;"></td>
+            </tr>
+        </table>
+        <table name="phototable" style="page-break-inside:avoid;width:100%;table-layout:fixed;">
+            @{ var rows = 0;}
+            @if (item.Photos.Count() % 3 == 0)
+            {
+                rows = item.Photos.Count() / 3;
+            }
+            else
+            {
+                rows = Convert.ToInt32(item.Photos.Count() / 3) + 1;
+            }
+            @{ var totalpics = item.Photos.Count();}
+            @for (int i = 0; i < rows; i++)
+            {
+
+                @if (totalpics - 3 >= 0) //enough room to add whole row
+                {
+                    var photo1 = item.Photos.ElementAt((i + 1) * 3 - 3);
+                    var photo2 = item.Photos.ElementAt((i + 1) * 3 - 3 + 1);
+                    var photo3 = item.Photos.ElementAt((i + 1) * 3 - 3 + 2);
+
+                    <tr>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo3.Path.Split(".")[0], "_edit.", photo3.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                    </tr>
+                    totalpics -= 3;
+                }
+                else if (totalpics - 2 >= 0)
+                {
+                    var photo1 = item.Photos.ElementAt((i + 1) * 3 - 3);
+                    var photo2 = item.Photos.ElementAt((i + 1) * 3 - 3 + 1);
+                    <tr>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                    </tr>
+                    totalpics -= 2;
+                }
+                else //enough room to add 1 picture in row
+                {
+                    var photo1 = item.Photos.ElementAt((i + 1) * 3 - 3);
+                    <tr>
+                        <td colspan="3" style="width:100%;"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;" /></td>
+                    </tr>
+                    totalpics -= 1;
+                }
+
+            }
+        </table>
+    }
+}
+@foreach (var item in Model.Decommissions)
+{
+    <table style="page-break-inside:avoid;page-break-before:always;">
+        <tr>
+            <td colspan="3">
+                <b>@SharedLocalizer.GetLocalizedHtmlString("Decommission")</b>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(Model => Model.Project.Name)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.Project.Name)
+            </td>
+            <td rowspan="5" align="right"><img src="~/images/Divisions/Photos/@DivisionId/@LogoPath" width="151" height="66" /></td>
+        </tr>
+
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(Model => Model.Project.ProjectNr)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.Project.ProjectNr)
+            </td>
+        </tr>
+        @if (item.SubProjectId != null)
+        {
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.SubProject.Name)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SubProject.Name) : @Html.DisplayFor(modelItem => item.SubProject.SubProjectNr)
+                </td>
+            </tr>
+        }
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.Project.Client)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Client)
+            </td>
+
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.TimeStamp)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeStamp.Date)
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.Wellname)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Wellname)
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.DipBefore)</b></td>
+            <td colspan="2">@Html.DisplayFor(modelItem => item.DipBefore)</td>
+        </tr>
+        <tr>
+            <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.BottomDip)</b></td>
+            <td colspan="2">@Html.DisplayFor(modelItem => item.BottomDip)</td>
+        </tr>
+        <tr>
+            <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.WasAirLiftedFirst)</b></td>
+            @if (item.WasAirLiftedFirst == true)
+            {
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else
+            {
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+            }
+        </tr>
+        <tr>
+            <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.SandFilling)</b></td>
+            @if (item.SandFilling == true)
+            {
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%">@Html.DisplayFor(modelItem => item.Kg_Sand) Kg</td>
+            }
+            else
+            {
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                <td style="width:25%">0 Kg</td>
+            }
+        </tr>
+        <tr>
+            <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.BentoniteFilling)</b></td>
+            @if (item.BentoniteFilling == true)
+            {
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%">@Html.DisplayFor(modelItem => item.Kg_Bentonite) Kg</td>
+            }
+            else
+            {
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                <td style="width:25%">0 Kg</td>
+            }
+        </tr>
+
+        <tr>
+            <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Casted)</b></td>
+            @if (item.Casted == true)
+            {
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%">@Html.DisplayFor(modelItem => item.Kg_Casting) Kg</td>
+            }
+            else
+            {
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                <td style="width:25%">0 Kg</td>
+            }
+        </tr>
+        @if (item.Casted == true)
+        {
+            <tr>
+                <td style="width:50%"><b>@SharedLocalizer.GetLocalizedHtmlString("Water Used?")</b></td>
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%">@Html.DisplayFor(modelItem => item.L_Water) L</td>
+            </tr>
+        }
+        @if (item.Pipe_Cut_X_meter_under > 0.01 || item.Pipe_Cut_X_meter_under < 0.01)
+        {
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Pipe_Cut_X_meter_under)</b></td>
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%">@Html.DisplayFor(modelItem => item.Pipe_Cut_X_meter_under) m</td>
+            </tr>
+        }
+        else
+        {
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Pipe_Cut_X_meter_under)</b></td>
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                <td style="width:25%"></td>
+            </tr>
+        }
+        <tr>
+            <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Area_Reestablished)</b></td>
+            @if (item.Area_Reestablished == true)
+            {
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else
+            {
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+            }
+        </tr>
+        <tr>
+            <td colspan="3"><b>@SharedLocalizer.GetLocalizedHtmlString("Calculations")</b></td>
+        </tr>
+        @if (item.Density > 0)
+        {
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Density)</b></td>
+                <td colspan="2">@String.Format("{0:n2}", item.Density) kg/m3</td>
+            </tr>
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(modelItem => item.Resolution)</b></td>
+                <td colspan="2">@Html.DisplayFor(modelItem => item.Resolution)</td>
+            </tr>
+        }
+        @if (item.GeneralComments != null)
+        {
+            <tr>
+                <td colspan="3"><b>@Html.DisplayNameFor(modelItem => item.GeneralComments)</b></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <textarea disabled="disabled" class="form-control" style="width:100%;" rows="6" cols="50">@Html.DisplayFor(modelItem => item.GeneralComments)</textarea>
+                </td>
+            </tr>
+        }
+    </table>
+    <table style="width:100%;page-break-inside:avoid;">
+        <tr>
+            <td style="width:25%;"><b>@Html.DisplayNameFor(modelItem => item.DoneBy)</b></td>
+            <td style="width:75%;text-align:center;">@Html.DisplayFor(modelItem => item.DoneBy)</td>
+
+        </tr>
+        <tr>
+            <td style="width:25%;"><b>@Html.DisplayNameFor(modelItem => item.Signature)</b></td>
+            <td style="width:75%;"><img src="data:image/jpg;base64, @item.Signature" style="width:100%;"></td>
+        </tr>
+    </table>
+    <table name="phototable" style="page-break-inside:avoid;">
+        @{ var rows = 0;}
+        @if (item.Photos.Count() % 3 == 0)
+        {
+            rows = item.Photos.Count() / 3;
+        }
+        else
+        {
+            rows = Convert.ToInt32(item.Photos.Count() / 3) + 1;
+        }
+        @{ var totalpics = item.Photos.Count();}
+        @for (int i = 0; i < rows; i++)
+        {
+
+            @if (totalpics - 3 >= 0) //enough room to add whole row
+            {
+                var photo1 = item.Photos.ElementAt((i + 1) * 3 - 3);
+                var photo2 = item.Photos.ElementAt((i + 1) * 3 - 3 + 1);
+                var photo3 = item.Photos.ElementAt((i + 1) * 3 - 3 + 2);
+
+                <tr>
+                    <td><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                    <td><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                    <td><img src="@String.Concat("/AHAK/", @String.Concat(photo3.Path.Split(".")[0], "_edit.", photo3.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                </tr>
+                totalpics -= 3;
+            }
+            else if (totalpics - 2 >= 0)
+            {
+                var photo1 = item.Photos.ElementAt((i + 1) * 3 - 3);
+                var photo2 = item.Photos.ElementAt((i + 1) * 3 - 3 + 1);
+                <tr>
+                    <td><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                    <td><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                    <td></td>
+                </tr>
+                totalpics -= 2;
+            }
+            else //enough room to add 1 picture in row
+            {
+                var photo1 = item.Photos.ElementAt((i + 1) * 3 - 3);
+                <tr>
+                    <td colspan="3"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" /></td>
+                </tr>
+                totalpics -= 1;
+            }
+
+        }
+    </table>
+
+}

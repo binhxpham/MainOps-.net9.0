@@ -1,0 +1,297 @@
+﻿@model MainOps.Models.ViewModels.ExternalWellTagVM
+
+@{
+    Layout = null;
+    int thecounter = 1;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Items</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+    <style>
+        .pagebreaker {
+            page-break-inside:avoid;
+            page-break-after:always;
+        }
+    </style>
+</head>
+<body>
+    <font size="4">
+        @foreach (var item in Model.measpoints)
+        {
+            if (thecounter == 2)
+            {
+                @if (!String.IsNullOrEmpty(Model.photopath))
+                {
+        <div class="pagebreaker">
+            <table style="margin-bottom:4cm;">
+                <tbody>
+                    <tr>
+                        <td rowspan="3" width="20%" align="left"><img src="@Model.photopath" height="210" /></td>
+                        <td align="center" width="20%" height="70">@Html.DisplayNameFor(modelItem => item.Project.Name)</td>
+                        <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.Project.Name)</td>
+                    </tr>
+                    <tr>
+                        <td align="center" width="20%" height="70">@Html.DisplayNameFor(model => item.Name)</td>
+                        @if (Model.PrintSecondaries.Equals(false))
+                        {
+                            <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.getBaseName)</td>
+                        }
+                        else
+                        {
+                            <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.Name)</td>
+                        }
+                    </tr>
+                    <tr>
+
+                        <td align="center" width="20%" height="70">@SharedLocalizer.GetLocalizedHtmlString("Coordinates")</td>
+
+
+                        @if (item.Coordz != 0)
+                        {
+                            <td align="center" height="70" style="border-width:thin;border-style:solid;">@String.Concat("{", item.Coordx, " ; ", item.Coordy, " ; ", item.Coordz, "}")</td>
+                        }
+                        else if (item.Coordx != 0)
+                        {
+                    <td align="center" height="70" style="border-width:thin;border-style:solid;"> @String.Concat("{", item.Coordx, " ; ", item.Coordy, "}")</td>
+                           
+                        }
+                        else
+                        {
+                            <td align="center" height="70" style="border-width:thin;border-style:solid;"></td>
+
+                        }
+                    </tr>
+                    @if (item.DGUnr != null && item.DGUnr != "")
+                    {
+                        <tr>
+                            <td></td>
+                            <td align="center" width="20%" height="70">@Html.DisplayNameFor(modelItem => item.DGUnr)</td>
+                            <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.DGUnr)</td>
+                        </tr>
+                    }
+                    <tr>
+                        <td colspan="3" height="70">
+                            @if (Model.TextForTag != null && Model.TextForTag != "")
+                            {
+                                @Html.Raw(Model.TextForTag.Replace("\r\n", "<br />"))
+                            }
+                            else
+                            {
+                                @Html.DisplayFor(Model => Model.TextForTag) 
+                            }
+                        </td>
+                    </tr>
+
+
+                </tbody>
+            </table>
+        </div>
+                        }
+                        else
+                        {
+                        <div class="pagebreaker">
+                            <table style="margin-bottom: 4cm; ">
+                                <tbody>
+                                    <tr>
+                                        <td align="center" width="20%" height="70">@Html.DisplayNameFor(modelItem => item.Project.Name)</td>
+                                        <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.Project.Name)</td>
+                                    </tr>
+                                    <tr>
+                                        <td align="center" width="20%" height="70">@Html.DisplayNameFor(model => item.Name)</td>
+                                        @if (Model.PrintSecondaries.Equals(false))
+                                        {
+                                            <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.getBaseName)</td>
+                                        }
+                                        else
+                                        {
+                                            <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.Name)</td>
+                                        }
+                                    </tr>
+                                    <tr>
+                                        <td align="center" width="20%" height="70">@SharedLocalizer.GetLocalizedHtmlString("Coordinates")</td>
+
+                                        @if (item.Coordz != 0)
+                                        {
+                                            <td align="center" height="70" style="border-width:thin;border-style:solid;">@String.Concat("{", item.Coordx, " ; ", item.Coordy, " ; ", item.Coordz, "}")</td>
+                                        }
+                                        else if (item.Coordx != 0)
+                                        {
+                                            <td align="center" height="70" style="border-width:thin;border-style:solid;">@String.Concat("{", item.Coordx, " ; ", item.Coordy, "}")</td>
+                                        }
+                                        else
+                                        {
+                                            <td align="center" height="70" style="border-width:thin;border-style:solid;"></td>
+
+                                        }
+                                    </tr>
+                                    @if (item.DGUnr != null && item.DGUnr != "")
+                                    {
+                                        <tr>
+                                            <td align="center" width="20%" height="70">@Html.DisplayNameFor(modelItem => item.DGUnr)</td>
+                                            <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.DGUnr)</td>
+                                        </tr>
+                                    }
+                                    <tr>
+                                        <td align="center" width="20%" height="70"></td>
+                                        <td align="center" height="70" style="border-width:thin;border-style:solid;">
+                                            @if (Model.TextForTag != null && Model.TextForTag != "")
+                                            {
+                                                @Html.Raw(Model.TextForTag.Replace("\r\n", "<br />"))
+                                            }
+                                            else
+                                            {
+                                                @Html.DisplayFor(Model => Model.TextForTag)
+                                            }
+                                        </td>
+                                    </tr>
+
+
+                                </tbody>
+                            </table>
+                        </div>
+                        }
+                        thecounter = 0;
+                        }
+                        else
+                        {
+                        @if (!String.IsNullOrEmpty(Model.photopath))
+                        {
+                            <div style="break-inside:avoid !important;">
+                                <table style="margin-bottom:4cm;">
+                                    <tbody>
+                                        <tr>
+                                            <td rowspan="3" width="20%" align="left"><img src="@Model.photopath" height="210" /></td>
+                                            <td align="center" width="20%" height="70">@Html.DisplayNameFor(modelItem => item.Project.Name)</td>
+                                            <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.Project.Name)</td>
+                                        </tr>
+                                        <tr>
+                                            <td align="center" width="20%" height="70">@Html.DisplayNameFor(model => item.Name)</td>
+                                            @if (Model.PrintSecondaries.Equals(false))
+                                            {
+                                                <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.getBaseName)</td>
+                                            }
+                                            else
+                                            {
+                                                <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.Name)</td>
+                                            }
+                                        </tr>
+                                        <tr>
+
+                                            <td align="center" width="20%" height="70">@SharedLocalizer.GetLocalizedHtmlString("Coordinates")</td>
+
+                                            @if (item.Coordz != 0)
+                                            {
+                                                <td align="center" height="70" style="border-width:thin;border-style:solid;">@String.Concat("{", item.Coordx, " ; ", item.Coordy, " ; ", item.Coordz, "}")</td>
+                                            }
+                                            else if (item.Coordx != 0)
+                                            {
+                                                <td align="center" height="70" style="border-width:thin;border-style:solid;">@String.Concat("{", item.Coordx, " ; ", item.Coordy, "}")</td>
+                                            }
+                                            else
+                                            {
+                                                <td align="center" height="70" style="border-width:thin;border-style:solid;"></td>
+
+                                            }
+                                        </tr>
+                                        @if (item.DGUnr != null && item.DGUnr != "")
+                                        {
+                                            <tr>
+                                                <td></td>
+                                                <td align="center" width="20%" height="70">@Html.DisplayNameFor(modelItem => item.DGUnr)</td>
+                                                <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.DGUnr)</td>
+                                            </tr>
+                                        }
+                                        <tr>
+                                            <td colspan="3" height="70">
+                                                @if (Model.TextForTag != null && Model.TextForTag != "")
+                                                {
+                                                    @Html.Raw(Model.TextForTag.Replace("\r\n", "<br />"))
+                                                }
+                                                else
+                                                {
+                                                    @Html.DisplayFor(Model => Model.TextForTag)
+                                                }
+                                            </td>
+                                        </tr>
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div style="break-inside:avoid !important;">
+                                <table style="margin-bottom: 4cm;">
+                                    <tbody>
+                                        <tr>
+                                            <td align="center" width="20%" height="70">@Html.DisplayNameFor(modelItem => item.Project.Name)</td>
+                                            <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.Project.Name)</td>
+                                        </tr>
+                                        <tr>
+                                            <td align="center" width="20%" height="70">@Html.DisplayNameFor(model => item.Name)</td>
+                                            @if (Model.PrintSecondaries.Equals(false))
+                                            {
+                                                <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.getBaseName)</td>
+                                            }
+                                            else
+                                            {
+                                                <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.Name)</td>
+                                            }
+                                        </tr>
+                                        <tr>
+                                            <td align="center" width="20%" height="70">@SharedLocalizer.GetLocalizedHtmlString("Coordinates")</td>
+
+                                            @if (item.Coordz != 0)
+                                            {
+                                                <td align="center" height="70" style="border-width:thin;border-style:solid;">@String.Concat("{", item.Coordx, " ; ", item.Coordy, " ; ", item.Coordz, "}")</td>
+                                            }
+                                            else if (item.Coordx != 0)
+                                            {
+                                                <td align="center" height="70" style="border-width:thin;border-style:solid;">@String.Concat("{", item.Coordx, " ; ", item.Coordy, "}")</td>
+                                            }
+                                            else
+                                            {
+                                                <td align="center" height="70" style="border-width:thin;border-style:solid;"></td>
+
+                                            }
+                                        </tr>
+                                        @if (item.DGUnr != null && item.DGUnr != "")
+                                        {
+                                            <tr>
+                                                <td align="center" width="20%" height="70">@Html.DisplayNameFor(modelItem => item.DGUnr)</td>
+                                                <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.DGUnr)</td>
+                                            </tr>
+                                        }
+                                        <tr>
+                                            <td align="center" width="20%" height="70"></td>
+                                            <td align="center" height="70" style="border-width:thin;border-style:solid;">
+                                                @if (Model.TextForTag != null && Model.TextForTag != "")
+                                                {
+                                                    @Html.Raw(Model.TextForTag.Replace("\r\n", "<br />"))
+                                                }
+                                                else
+                                                {
+                                                    @Html.DisplayFor(Model => Model.TextForTag)
+                                                }
+                                            </td>
+                                        </tr>
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        }
+
+
+                        thecounter += 1;
+                        }
+                </font>
+</body>
+</html>
+

@@ -1,0 +1,45 @@
+﻿@model MainOps.Models.WaterSampleStandardLimit
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>WaterSampleStandardLimit</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.WaterSamplePlaceType)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WaterSamplePlaceType.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.MaxLimit)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MaxLimit)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.MeanLimit)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MeanLimit)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Komponent)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Komponent)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

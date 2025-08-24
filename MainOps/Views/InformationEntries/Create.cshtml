@@ -1,0 +1,31 @@
+﻿@model MainOps.Models.InformationEntry
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h4>Chat info</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Text" class="control-label"></label>
+                <textarea asp-for="Text" cols="40" rows="4" style="width:100%;"></textarea>
+                <input asp-for="DivisionId" value="1" hidden="hidden" />
+                <input asp-for="DateEntered" value="@DateTime.Now" hidden="hidden" />
+                <input asp-for="DoneBy" value="" hidden="hidden" />
+                <span asp-validation-for="Text" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Create")</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+

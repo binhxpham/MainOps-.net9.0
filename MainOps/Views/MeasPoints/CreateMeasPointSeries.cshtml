@@ -1,0 +1,100 @@
+﻿@model MainOps.Models.ViewModels.MeasPointSeriesVM
+    <h2>Create Measpoint Series</h2>
+
+    <h4>@SharedLocalizer.GetLocalizedHtmlString("Create Measurement Point Series")</h4>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="CreateMeasPointSeries" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="ProjectId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.ProjectId))</label>
+                    <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();"></select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="SubProjectId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.SubProjectId))</label>
+                    <select asp-for="SubProjectId" class="form-control" asp-items="ViewBag.SubProjectId">
+                        <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select SubProject")</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="PrelimName" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.PrelimName))</label>
+                    <input asp-for="PrelimName" class="form-control" />
+                    <span asp-validation-for="PrelimName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="numDigits" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.numDigits))</label>
+                    <input asp-for="numDigits" type="number" min="1" max="4" value="2" class="form-control" />
+                    <span asp-validation-for="numDigits" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="startnum" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.startnum))</label>
+                    <input asp-for="startnum" type="number" min="0" step="1" class="form-control" />
+                    <span asp-validation-for="startnum" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="endnum" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.endnum))</label>
+                    <input asp-for="endnum" type="number" min="0" step="1" class="form-control" />
+                    <span asp-validation-for="endnum" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="MonitorTypeId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.MonitorTypeId))</label>
+                    <select asp-for="MonitorTypeId" class="form-control" asp-items="ViewBag.MonitorTypeId"></select>
+                </div>
+                <div class="form-group">
+                    <label asp-for="MeasTypeId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.MeasTypeId))</label>
+                    <select asp-for="MeasTypeId" class="form-control" asp-items="ViewBag.MeasTypeId"></select>
+                </div>
+                <div class="form-group">
+                    @SharedLocalizer.GetLocalizedHtmlString("Add flow :") @Html.EditorFor(Model => Model.AddFlow)
+                    @SharedLocalizer.GetLocalizedHtmlString("Add WaterMeter :") @Html.EditorFor(Model => Model.AddWM)
+                </div>
+
+
+
+
+                <div class="form-group">
+                    <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString(" Create")" class="btn btn-default" />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div>
+        <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+    </div>
+
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+        <script type="text/javascript">
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+    }
+    $(document).ready(function () {
+        $(function () {
+            FillSubProjects();
+        });
+    });
+        </script>
+    }

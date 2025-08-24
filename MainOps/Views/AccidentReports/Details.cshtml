@@ -1,0 +1,168 @@
+﻿@model MainOps.Models.ReportClasses.AccidentReport
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>AccidentReport</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Project)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Project.Abbreviation)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SafetyProblem)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SafetyProblem.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AccidentWithAbsence)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AccidentWithAbsence)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AccidentWithoutAbsence)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AccidentWithoutAbsence)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.EnvironmentAccident)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.EnvironmentAccident)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.InjuctionProhibition)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.InjuctionProhibition)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.NearMiss)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.NearMiss)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.HJSubContractor)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.HJSubContractor)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Other)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Other)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WhatHappened)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WhatHappened)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.NameOfInjured)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.NameOfInjured)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WhereAndWhen)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WhereAndWhen)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.NameofWitnesses)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.NameofWitnesses)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WhatInjury)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WhatInjury)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WhatWasDoneToFix)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WhatWasDoneToFix)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WhatCausedAccident)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WhatCausedAccident)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.HowCouldItHappen)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.HowCouldItHappen)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WasSafetyProcessInOrder)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WasSafetyProcessInOrder)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WhatIsDoneToPrevent)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WhatIsDoneToPrevent)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CauseForChangeInAPV)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CauseForChangeInAPV)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WhatCanBeLearned)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WhatCanBeLearned)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.IsOfferedLightJob)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsOfferedLightJob)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WhatLightJob)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WhatLightJob)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.StartLightJob)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.StartLightJob)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DoneBy)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DoneBy)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

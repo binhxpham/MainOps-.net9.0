@@ -1,0 +1,177 @@
+﻿@model MainOps.Models.Drill
+
+@{
+    ViewData["Title"] = "Edit_Drilling";
+}
+
+<h2>Edit_Drilling</h2>
+
+<h4>Drill</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit_Drilling" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" name="OldID" value="@Model.WellID" />
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();"></select>
+                <span asp-validation-for="ProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SubProjectId" class="control-label"></label>
+                <select asp-for="SubProjectId" class="form-control" asp-items="ViewBag.SubProjectId"></select>
+                <span asp-validation-for="SubProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TimeStamp" class="control-label"></label>
+                <input asp-for="TimeStamp" class="form-control" />
+                <span asp-validation-for="TimeStamp" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WellID" class="control-label"></label>
+                <input asp-for="WellID" class="form-control" />
+                <span asp-validation-for="WellID" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DrillDepth" class="control-label"></label>
+                <input asp-for="DrillDepth" class="form-control" />
+                <span asp-validation-for="DrillDepth" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PipeDiameter" class="control-label"></label>
+                <input asp-for="PipeDiameter" class="form-control" />
+                <span asp-validation-for="PipeDiameter" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PipeHeight" class="control-label"></label>
+                <input asp-for="PipeHeight" class="form-control" />
+                <span asp-validation-for="PipeHeight" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Location" class="control-label"></label>
+                <input asp-for="Location" class="form-control" />
+                <span asp-validation-for="Location" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FilterStart" class="control-label"></label>
+                <input asp-for="FilterStart" class="form-control" />
+                <span asp-validation-for="FilterStart" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FilterEnd" class="control-label"></label>
+                <input asp-for="FilterEnd" class="form-control" />
+                <span asp-validation-for="FilterEnd" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FilterLength" class="control-label"></label>
+                <input asp-for="FilterLength" class="form-control" />
+                <span asp-validation-for="FilterLength" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BlindPipeDepth" class="control-label"></label>
+                <input asp-for="BlindPipeDepth" class="form-control" />
+                <span asp-validation-for="BlindPipeDepth" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SandBagsUsed" class="control-label"></label>
+                <input asp-for="SandBagsUsed" class="form-control" />
+                <span asp-validation-for="SandBagsUsed" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MikrolitBagsUsed" class="control-label"></label>
+                <input asp-for="MikrolitBagsUsed" class="form-control" />
+                <span asp-validation-for="MikrolitBagsUsed" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Latitude" class="control-label"></label>
+                <input asp-for="Latitude" class="form-control" />
+                <span asp-validation-for="Latitude" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Longitude" class="control-label"></label>
+                <input asp-for="Longitude" class="form-control" />
+                <span asp-validation-for="Longitude" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DoneBy" class="control-label"></label>
+                <input asp-for="DoneBy" class="form-control" />
+                <span asp-validation-for="DoneBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Comments" class="control-label"></label>
+                <input asp-for="Comments" class="form-control" />
+                <span asp-validation-for="Comments" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Photos</label>
+                <input type="file" name="files" multiple accept=".jpg,.jpeg,.png,.pdf" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+@{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+<script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-2:+0",
+                    dateFormat: "yy-MM-dd",
+                    timeFormat: "HH:mm",
+                    controlType: 'select',
+                    showSecond: false,
+                    showMillisec: false,
+                    showMicrosec: false,
+                    showTimezone: false
+                });
+            });
+        });
+        function FillSubProjects() {
+            var SubProjectId = $('#SubProjectId').val();
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                        var x = document.getElementById("SubProjectId");
+                        var i;
+                        for (i = 0; i < x.length; i++) {
+                            if (x.options[i].value == SubProjectId) {
+                                x.options[i].selected = true;
+                            }
+                        }
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+        }
+
+
+</script>
+}

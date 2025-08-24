@@ -1,0 +1,43 @@
+﻿@model MainOps.Models.MeasPoint
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>@Model.Name</title>
+</head>
+
+<body>
+    <font size="4">
+        <div class="col-md-6">
+            <table border="1" style="margin-bottom:2cm;margin-right:1cm;margin-left:1cm;">
+                <tbody>
+                    <tr>
+                        <td width="240" rowspan="2" align="left"><img src="~/images/Divisions/Photos/@Model.Project.Division.Id/@Model.Project.Division.LogoPath" height="80" /></td>
+                        <td rowspan="4" width="120" align="center"><img src='@Url.Action("GetQR3","HJItems",new { Id = Model.Id })' alt="" height="120" /></td>
+                    </tr>
+                    <tr></tr>
+                    <tr>
+                        <td align="center" height="40" width="240" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => Model.Project.Name)</td>
+                    </tr>
+                    @if (Model.DGUnr != "" && Model.DGUnr != null)
+                    {
+                        <tr>
+                            <td align="center" height="40" width="240" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => Model.Name) : @Html.DisplayFor(modelItem => Model.DGUnr)</td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr>
+                            <td align="center" height="40" width="240" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => Model.Name)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+      
+    </font>
+</body>
+</html>

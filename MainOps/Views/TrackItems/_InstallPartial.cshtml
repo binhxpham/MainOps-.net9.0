@@ -1,0 +1,105 @@
+﻿@model MainOps.Models.Install
+
+<table style="width:100%;border:1px solid black;">
+    <tr>
+        <td><b>@Html.DisplayNameFor(model => model.Project)</b></td>
+        <td>@Html.DisplayFor(model => model.Project.Name)</td>
+        <td><b>@Html.DisplayNameFor(model => model.ItemType)</b></td>
+        <td>@Html.DisplayFor(model => model.ItemType.Item_Type)</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(model => model.Install_Text)</b></td>
+        <td colspan="3">@Html.DisplayFor(model => model.Install_Text)</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(model => model.TimeStamp)</b></td>
+        <td>@Html.DisplayFor(model => model.TimeStamp)</td>
+        <td><b>@Html.DisplayNameFor(model => model.DeinstallDate)</b></td>
+        <td>@Html.DisplayFor(model => model.DeinstallDate)</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(model => model.isInstalled)</b></td>
+        <td>@Html.DisplayFor(model => model.isInstalled)</td>
+        <td><b>@Html.DisplayNameFor(model => model.Amount)</b></td>
+        <td>@Html.DisplayFor(model => model.Amount)</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(model => model.Latitude)</b></td>
+        <td>@Html.DisplayFor(model => model.Latitude)</td>
+        <td><b>@Html.DisplayNameFor(model => model.Longitude)</b></td>
+        <td>@Html.DisplayFor(model => model.Longitude)</td>
+    </tr>
+    <tr>
+        <td><b>@Html.DisplayNameFor(model => model.Location)</b></td>
+        <td>@Html.DisplayFor(model => model.Location)</td>
+        <td><b>@Html.DisplayNameFor(model => model.UniqueID)</b></td>
+        <td>@Html.DisplayFor(model => model.UniqueID)</td>
+    </tr>
+</table>
+<table>
+    <tr>
+        <td>
+            <form asp-controller="TrackItems" asp-action="Edit_Install" method="get" target="_blank">
+                <input hidden="hidden" asp-for="Id" />
+                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit Instllation")</button>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form asp-action="AddMeasurement" asp-controller="TrackItems" method="post" enctype="multipart/form-data">
+                <table style="width:100%;table-layout:fixed;border:1px solid black;">
+                    <tr>
+                        <td><label style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement to:")</label></td>
+                        <td><input asp-for="Id" name="InstallationId2" style="width:100%;" /></td>
+                    </tr>
+                    <tr>
+                        <td><label style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Measurement:")</label></td>
+                        <td><input type="number" id="themeas" name="themeas" value="0" style="width:100%;" /></td>
+                    </tr>
+                    <tr>
+                        <td><label style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Comment:")</label></td>
+                        <td><input type="text" id="comment" name="comment" style="width:100%;" /></td>
+                    </tr>
+                    <tr>
+                        <td><label class="control-label" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label></td>
+                        <td><input type="file" name="files" multiple accept=".jpg,.jpeg,.png,.gif,.pdf" style="width:100%;" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <button class="btn-hoelscher" type="submit" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement!")</button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </td>
+        <td>
+            <form asp-action="UpdateCoords" asp-controller="TrackItems" method="post">
+                <table style="width:100%;table-layout:fixed;border:1px solid black;">
+                    <tr>
+                        <td><label style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Update Coords of:")</label></td>
+                        <td><input asp-for="Id" name="InstallationId" style="width:100%;" /></td>
+                    </tr>
+                    <tr>
+                        <td><label style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Accuracy:")</label></td>
+                        <td><input type="text" id="accuracy" value="0.0" name="accuracy" style="width:100%;" /></td>
+                    </tr>
+                    <tr>
+                        <td><label style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Latitude:")</label></td>
+                        <td><input type="text" id="latinput" value="0.0" name="Latitude" style="width:100%;" /></td>
+                    </tr>
+                    <tr>
+                        <td><label style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Longitude:")</label></td>
+                        <td><input type="text" id="longinput" value="0.0" name="Longitude" style="width:100%;" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <button class="btn-hoelscher" type="submit" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Update Coordiantes!")</button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </td>
+    </tr>
+</table>
+       

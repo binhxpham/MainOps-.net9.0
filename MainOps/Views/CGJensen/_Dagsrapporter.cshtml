@@ -1,0 +1,347 @@
+﻿@model IEnumerable<MainOps.Models.CGJClasses.Dagsrapport>
+@{
+    ViewData["Title"] = "Dagsrapporter";
+    Layout = null;
+}
+@{
+    Layout = null;
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("Dagsrapporter")</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+<style>
+    #thetable {
+        width: 100%;
+        table-layout: fixed;
+    }
+
+        #thetable td {
+            text-align: center;
+            word-break: break-all;
+            width: 100%;
+        }
+</style>
+@foreach (var item in Model)
+{
+    <table id="thetable" style="page-break-inside:avoid;">
+        <tr>
+            <td colspan="10" style="background-color:orange;">
+                <b>Dagsrapport</b>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.KontraktNr)
+                </b>
+            </td>
+            <td colspan="2">
+                @Html.DisplayFor(modelItem => item.KontraktNr)
+            </td>
+            <td colspan="6" rowspan="7" align="right"><img src="~/images/Divisions/Photos/@item.Project.Division.Id/@item.Project.Division.LogoPath" width="151" height="66" /></td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.Kontraktnavn)
+                </b>
+            </td>
+            <td colspan="2">
+                @Html.DisplayFor(modelItem => item.Kontraktnavn)
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.Afdeling)
+                </b>
+            </td>
+            <td colspan="2">
+                @Html.DisplayFor(modelItem => item.Afdeling)
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.Dato)
+                </b>
+            </td>
+            <td colspan="2">
+                @Html.DisplayFor(modelItem => item.Dato)
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.Ugedag)
+                </b>
+            </td>
+            <td colspan="2">
+                @Html.DisplayFor(modelItem => item.Ugedag)
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.UdarbjedetAf)
+                </b>
+            </td>
+            <td colspan="2">
+                @Html.DisplayFor(modelItem => item.UdarbjedetAf)
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="2" style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.Lokation)
+                </b>
+            </td>
+            <td colspan="2">
+                @Html.DisplayFor(modelItem => item.Lokation)
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.Addresse)
+                </b>
+            </td>
+            <td colspan="8">
+                @Html.DisplayFor(modelItem => item.Addresse)
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2" style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.ForSaetter)
+                </b>
+            </td>
+            <td colspan="8">
+                @Html.DisplayFor(modelItem => item.ForSaetter)
+            </td>
+        </tr>
+        <tr>
+            <td colspan="10" style="background-color:orange;">
+                <b>Tidsregistrering af mandskab</b>
+            </td>
+        </tr>
+        <tr>
+            <td rowspan="2">Aktivitet</td>
+            <td rowspan="2">Antal Personer</td>
+            <td rowspan="2">Timer</td>
+            <td rowspan="2">Timer Før Overtid</td>
+            <td colspan="2">Overtid</td>
+            <td rowspan="2">CGJ Timer Totalt</td>
+            <td colspan="3" rowspan="2">Note</td>
+
+        </tr>
+        <tr>
+            <td>50%</td>
+            <td>100%</td>
+        </tr>
+        <tr>
+            <td colspan="10" style="background-color:orange;text-align:left;"><b>Kontraktarbejde</b></td>
+        </tr>
+
+        @foreach (var item2 in item.Timer.Where(x => x.EANr == null))
+        {
+            <tr>
+                <td>
+                    <b>
+                        @Html.DisplayFor(modelItem => item2.Title)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item2.AntalPersoner)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item2.Timer)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item2.TimerFoerOvertid)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item2.Overtid_50)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item2.Overtid_100)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item2.CGJ_Timer_Total)
+                </td>
+                <td colspan="3">
+                    @Html.DisplayFor(modelItem => item2.Note)
+                </td>
+            </tr>
+        }
+        <tr>
+            <td colspan="7" style="background-color:orange;text-align:left;"><b>Ekstraarbejder</b></td>
+            <td style="background-color:orange;text-align:center;">
+                EA Nr
+            </td>
+            <td colspan="2" style="background-color:orange;text-align:center;">
+                Note
+            </td>
+        </tr>
+        @foreach (var item2 in item.Timer.Where(x => x.EANr != null))
+        {
+            <tr>
+                <td>
+                    <b>
+                        @Html.DisplayFor(modelItem => item2.Title)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item2.AntalPersoner)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item2.Timer)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item2.TimerFoerOvertid)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item2.Overtid_50)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item2.Overtid_100)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item2.CGJ_Timer_Total)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item2.EANr)
+                </td>
+                <td colspan="2">
+                    @Html.DisplayFor(modelItem => item2.Note)
+                </td>
+            </tr>
+
+        }
+        <tr>
+            @{
+                var totalantal = item.Timer.Sum(x => x.AntalPersoner);
+                var totaltimer = item.Timer.Sum(x => x.Timer);
+                var totaltimerfoerovertid = item.Timer.Sum(x => x.TimerFoerOvertid);
+                var totalovertid50 = item.Timer.Sum(x => x.Overtid_50);
+                var totalovertid100 = item.Timer.Sum(x => x.Overtid_100);
+                var totaltotal = item.Timer.Sum(x => x.CGJ_Timer_Total);
+            }
+            <td><b>I alt:</b></td>
+            <td>@String.Format("{0:n2}", totalantal)</td>
+            <td>@String.Format("{0:n2}", totaltimer)</td>
+            <td>@String.Format("{0:n2}", totaltimerfoerovertid)</td>
+            <td>@String.Format("{0:n2}", totalovertid50)</td>
+            <td>@String.Format("{0:n2}", totalovertid100)</td>
+            <td>@String.Format("{0:n2}", totaltotal)</td>
+            <td colspan="3"></td>
+        </tr>
+        <tr>
+            <td colspan="2">Dagens vejr:</td>
+            <td colspan="3"><b>@Html.DisplayFor(modelItem => item.DagensVejr)</b></td>
+            <td colspan="2">Vejrlig:</td>
+            <td colspan="3"><b>@Html.DisplayFor(modelItem => item.Vejrlig)</b></td>
+        </tr>
+        <tr>
+            <td colspan="10" style="background-color:orange;"><b>Kontraktarbejde</b></td>
+        </tr>
+        <tr>
+            <td rowspan="2" colspan="5" style="background-color:orange;">Eget Materiel og Materialer</td>
+            <td colspan="5" style="background-color:orange;">Underleverandør - materiel, materialer, kørsel mm.</td>
+        </tr>
+        <tr>
+            <td colspan="2" style="background-color:orange;">Firma</td>
+            <td colspan="3" style="background-color:orange;">Hvilket materiel, materiale</td>
+        </tr>
+        @foreach (var item2 in item.Kontraktarbejder)
+        {
+            <tr>
+                <td colspan="5" style="text-align:left;">@Html.DisplayFor(modelItem => item2.EgetMateriel)</td>
+                <td colspan="2" style="text-align:left;">@Html.DisplayFor(modelItem => item2.UL_Firma) </td>
+                <td colspan="3" style="text-align:left;">@Html.DisplayFor(modelItem => item2.UL_Materiel)</td>
+            </tr>
+        }
+        <tr>
+            <td colspan="10" style="background-color:orange;"><b>Ekstraarbejde</b></td>
+        </tr>
+        <tr>
+            <td colspan="3" style="background-color:orange;">EA nr.</td>
+            <td colspan="2" style="background-color:orange;">Opgave</td>
+            <td colspan="2" style="background-color:orange;">Eget Materiel og materialer</td>
+            <td colspan="2" style="background-color:orange;">UE firma,m ateriel, materialer, kørsel mm</td>
+            <td style="background-color:orange;">Fortsætter</td>
+        </tr>
+        @foreach (var item2 in item.Ekstraarbejder)
+        {
+            <tr>
+                <td colspan="3">
+                    @if (item2.EAId != null)
+                    {
+                        @Html.DisplayFor(modelItem => item2.EA.EAnr)
+                    }
+                    else
+                    {
+                        @Html.DisplayFor(modelItem => item2.EANr_skrevet)
+                    }
+                </td>
+                <td colspan="2" style="text-align:left;">@Html.DisplayFor(modelItem => item2.Opgave)</td>
+                <td colspan="2" style="text-align:left;">@Html.DisplayFor(modelItem => item2.Eget_Materiel)</td>
+                <td colspan="2" style="text-align:left;">@Html.DisplayFor(modelItem => item2.UEFirma_Materiel)</td>
+                <td>@Html.DisplayFor(modelItem => item2.Fortsaetter)</td>
+            </tr>
+        }
+
+    </table>
+    <table style="width:50%;height:150px;float:left;">
+        <tr>
+            <td>
+                <img src="data:image/jpg;base64, @item.Underskrift" style="width:100%;height:120px;">
+            </td>
+        </tr>
+        <tr>
+            <td style="width:30%;border-top:dashed;margin-right:3%">@SharedLocalizer.GetLocalizedHtmlString("Underskrift CG Jensen")</td>
+        </tr>
+    </table>
+    <table style="width:50%;height:150px;float:left;">
+        <tr>
+            <td style="height:120px;"></td>
+        </tr>
+        <tr>
+            <td style="width:100%;border-top:dashed;margin-right:3%">@SharedLocalizer.GetLocalizedHtmlString("Underskrift Bygherre")</td>
+        </tr>
+    </table> 
+    <table name="phototable" style="page-break-inside:avoid;width:100%;table-layout:fixed;page-break-after:always;">
+        @{ var rows = 0;}
+        @if (item.Photos.Count % 2 == 0)
+        {
+            rows = item.Photos.Count() / 2;
+        }
+        else
+        {
+            rows = Convert.ToInt32(item.Photos.Count() / 2) + 1;
+        }
+        @{ var totalpics = item.Photos.Count();}
+        @for (int i = 0; i < rows; i++)
+        {
+            if (totalpics - 2 >= 0)
+            {
+                <tr>
+                    <td style="width:100%;"><img src="~/CGJensen/Dagsrapporter/@item.Id.ToString()/@item.Photos[(i+1)*2 - 2]" style="width:100%;" /></td>
+                    <td style="width:100%;"><img src="~/CGJensen/Dagsrapporter/@item.Id.ToString()/@item.Photos[(i+1)*2 - 2 +1]" style="width:100%;" /></td>
+                </tr>
+                totalpics -= 2;
+            }
+            else //enough room to add 1 picture in row
+            {
+                <tr>
+                    <td style="width:100%;"><img src="~/CGJensen/Dagsrapporter/@item.Id.ToString()/@item.Photos[(i+1)*2 - 2]" style="width:100%;" /></td>
+                </tr>
+                totalpics -= 1;
+            }
+
+        }
+    </table>
+            }

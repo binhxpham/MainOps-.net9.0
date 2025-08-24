@@ -1,0 +1,232 @@
+﻿@model MainOps.Models.Airlift
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Air Lift Report</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+<body>
+    <table style="width:100%;">
+        <tr>
+            <td colspan="3">
+                <b>@SharedLocalizer.GetLocalizedHtmlString("Air Lifting")</b>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(Model => Model.Project.Name)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.Project.Name)
+            </td>
+            <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@Model.Project.DivisionId/@Model.Project.Division.LogoPath" width="151" height="66" /></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(Model => Model.Project.ProjectNr)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.Project.ProjectNr)
+            </td>
+        </tr>
+        @if (Model.SubProjectId != null)
+        {
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(Model => Model.SubProject.Name)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(Model => Model.SubProject.Name) : @Html.DisplayFor(Model => Model.SubProject.SubProjectNr)
+                </td>
+            </tr>
+        }
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(Model => Model.Project.Client)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.Project.Client)
+            </td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.MeasPoint.Name)</b></td>
+            <td>
+                @Html.DisplayFor(Model => Model.MeasPoint.Name)
+            </td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.BottomWellBefore)</b></td>
+            <td>
+                @Html.DisplayFor(Model => Model.BottomWellBefore)
+            </td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.WaterLevelBefore)</b></td>
+            <td>
+                @Html.DisplayFor(Model => Model.WaterLevelBefore)
+            </td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.BottomWellAfter)</b></td>
+            <td>
+                @Html.DisplayFor(Model => Model.BottomWellAfter)
+            </td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.WaterLevelAfter)</b></td>
+            <td>
+                @Html.DisplayFor(Model => Model.WaterLevelAfter)
+            </td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.RecoveryTime)</b></td>
+            <td>
+                @Html.DisplayFor(Model => Model.RecoveryTime)
+            </td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(Model => Model.DoneBy)</b></td>
+            <td>
+                @Html.DisplayFor(Model => Model.DoneBy)
+            </td>
+        </tr>
+        <tr rowspan="6">
+            <td colspan="3" style="text-align:left;">
+                @if (Model.Comments != null && Model.Comments != "")
+                {
+                    @Html.Raw(Model.Comments.Replace("\r\n", "<br />"))
+                }
+                else
+                {
+                    @Html.DisplayFor(Model => Model.Comments)
+                }
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="3">@SharedLocalizer.GetLocalizedHtmlString("Photos")</td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <table name="phototable" style="page-break-inside:avoid;width:100%;table-layout:fixed;">
+                    @{ var rows = 0;}
+                    @if (Model.Photos.Count % 3 == 0)
+                    {
+                        rows = Model.Photos.Count() / 3;
+                    }
+                    else
+                    {
+                        rows = Convert.ToInt32(Model.Photos.Count() / 3) + 1;
+                    }
+                    @{ var totalpics = Model.Photos.Count();}
+                    @for (int i = 0; i < rows; i++)
+                    {
+                        @if (totalpics - 3 >= 0) //enough room to add whole row
+                        {
+
+
+                            <tr>
+                                @try
+                                {
+                                    <td style="width:100%;"><img src="@String.Concat(Model.Photos.ElementAt((i+1)*3 - 3).path.Split(".jp")[0],"_edit.jp",Model.Photos.ElementAt((i+1)*3 - 3).path.Split(".jp")[1])" style="width:100%;" /></td>
+                                }
+                                catch
+                                {
+                                    <td style="width:100%;"><img src="@String.Concat(Model.Photos.ElementAt((i+1)*3 - 3).path.Split(".JP")[0],"_edit.JP",Model.Photos.ElementAt((i+1)*3 - 3).path.Split(".JP")[1])" style="width:100%;" /></td>
+                                }
+
+
+                                @try
+                                {
+                                    <td style="width:100%;"><img src="@String.Concat(Model.Photos.ElementAt((i+1)*3 - 3 + 1).path.Split(".jp")[0],"_edit.jp",Model.Photos.ElementAt((i+1)*3 - 3 + 1).path.Split(".jp")[1])" style="width:100%;" /></td>
+                                }
+                                catch
+                                {
+                                    <td style="width:100%;"><img src="@String.Concat(Model.Photos.ElementAt((i+1)*3 - 3 + 1).path.Split(".JP")[0],"_edit.JP",Model.Photos.ElementAt((i+1)*3 - 3 + 1).path.Split(".JP")[1])" style="width:100%;" /></td>
+                                }
+
+
+                                @try
+                                {
+                                    <td style="width:100%;"><img src="@String.Concat(Model.Photos.ElementAt((i+1)*3 - 3 + 2).path.Split(".jp")[0],"_edit.jp",Model.Photos.ElementAt((i+1)*3 - 3 + 2).path.Split(".jp")[1])" style="width:100%;" /></td>
+                                }
+                                catch
+                                {
+                                    <td style="width:100%;"><img src="@String.Concat(Model.Photos.ElementAt((i+1)*3 - 3 + 2).path.Split(".JP")[0],"_edit.JP",Model.Photos.ElementAt((i+1)*3 - 3 + 2).path.Split(".JP")[1])" style="width:100%;" /></td>
+                                }
+
+                            </tr>
+                            totalpics -= 3;
+                        }
+                        else if (totalpics - 2 >= 0)
+                        {
+
+
+                            <tr>
+                                @try
+                                {
+                                    <td style="width:100%;"><img src="@String.Concat(Model.Photos.ElementAt((i+1)*3 - 3).path.Split(".jp")[0],"_edit.jp",Model.Photos.ElementAt((i+1)*3 - 3).path.Split(".jp")[1])" style="width:100%;" /></td>
+                                }
+                                catch
+                                {
+                                    <td style="width:100%;"><img src="@String.Concat(Model.Photos.ElementAt((i+1)*3 - 3).path.Split(".JP")[0],"_edit.JP",Model.Photos.ElementAt((i+1)*3 - 3).path.Split(".JP")[1])" style="width:100%;" /></td>
+                                }
+                                @try
+                                {
+                                    <td style="width:100%;"><img src="@String.Concat(Model.Photos.ElementAt((i+1)*3 - 3 + 1).path.Split(".jp")[0],"_edit.jp",Model.Photos.ElementAt((i+1)*3 - 3 + 1).path.Split(".jp")[1])" style="width:100%;" /></td>
+                                }
+                                catch
+                                {
+                                    <td style="width:100%;"><img src="@String.Concat(Model.Photos.ElementAt((i+1)*3 - 3 + 1).path.Split(".JP")[0],"_edit.JP",Model.Photos.ElementAt((i+1)*3 - 3 + 1).path.Split(".JP")[1])" style="width:100%;" /></td>
+                                }
+
+                                <td style="width:100%;"></td>
+                            </tr>
+                            totalpics -= 2;
+                        }
+                        else //enough room to add 1 picture in row
+                        {
+                            <tr>
+                                @try
+                                {
+                                    <td style="width:100%;"><img src="@String.Concat(Model.Photos.ElementAt((i+1)*3 - 3).path.Split(".jp")[0],"_edit.jp",Model.Photos.ElementAt((i+1)*3 - 3).path.Split(".jp")[1])" style="width:100%;" /></td>
+                                }
+                                catch
+                                {
+                                    <td style="width:100%;"><img src="@String.Concat(Model.Photos.ElementAt((i+1)*3 - 3).path.Split(".JP")[0],"_edit.JP",Model.Photos.ElementAt((i+1)*3 - 3).path.Split(".JP")[1])" style="width:100%;" /></td>
+                                }
+                                <td style="width:100%;"></td>
+                                <td style="width:100%;"></td>
+                            </tr>
+                            totalpics -= 1;
+                        }
+
+                    }
+                </table>
+            </td>
+        </tr>
+
+
+
+
+    </table>
+
+</body>
+</html>
+
+
+
+
+

@@ -1,0 +1,239 @@
+﻿@model IEnumerable<MainOps.Models.WaterSampleMeasVM>
+
+@{
+    ViewData["Title"] = "ShowMeasures";
+    var startdate = (DateTime)ViewBag.StartDate;
+    var enddate = (DateTime)ViewBag.EndDate;
+    int ProjectId = (Int32)ViewBag.ProjectId;
+    bool goodbad = (bool)ViewBag.GoodBad;
+        
+}
+<div id="ModalInput" class="TwoModal">
+    <div class="TwoModal-content">
+        <div class="TwoModal-header">
+            <span class="closer" onclick="closethepopup();">&times;</span>
+            <h3>@SharedLocalizer.GetLocalizedHtmlString("Edit Alert Limits")</h3>
+        </div>
+        <div class="TwoModal-body">
+            <div id="theMPContent"></div>
+        </div>
+    </div>
+</div>
+<br />
+<p><a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to Main WaterSample Page")</a></p>
+
+<br />
+<form asp-action="GetProjectReportPDF" asp-controller="WaterSampleTypes" method="post" target="_blank">
+    <input name="ProjectId" type="number" value="@ProjectId" hidden="hidden" />
+    <input name="StartDate" type="datetime" value="@startdate" hidden="hidden" />
+    <input name="EndDate" type="datetime" value="@enddate" hidden="hidden" />
+    @if (goodbad == true)
+    {
+        <input type="checkbox" value="true" checked="checked" name="GoodBad" onclick="$(this).val(this.checked ? true : false)" hidden="hidden" />
+    }
+    else
+    {
+        <input type="checkbox" value="false" name="GoodBad" onclick="$(this).val(this.checked ? true : false)" hidden="hidden" />
+    }
+    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Get PDF")</button>
+</form>
+    <br />
+
+    @foreach (var group in Model.GroupBy(x => x.WaterSamplePlace.Name))
+    {
+        if((Model.Where(x => x.WaterSamplePlace.Name.Equals(group.Key)).Count() > 0 && goodbad.Equals(true)) || (Model.Where(x => x.WaterSamplePlace.Name.Equals(group.Key) && x.holdslimit.Equals(2)).Count() > 0 && goodbad.Equals(false)))
+                {
+
+                
+        <table class="table">
+            <thead>
+                <tr style="border-bottom:2px solid black;background-color:antiquewhite">
+                    <th colspan="8">
+                        <h3>
+                            @ViewBag.Project.Name - @group.Key
+                        </h3>
+                    </th>
+                </tr>
+                <tr>
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.WaterSamplePlace))
+                    </th>
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.value))
+                    </th>
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.WeekNumber))
+                    </th>
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Dato))
+                    </th>
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.method))
+                    </th>
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.WaterSampleNumber))
+                    </th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Where(x => x.WaterSamplePlace.Name.Equals(group.Key)))
+                {
+                    if (item.holdslimit == 0 && goodbad.Equals(true))
+                    {
+                <tr class="rowid" style="background-color:yellow;">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WaterSampleType.Komponent)
+                    </td>
+                    <td id="@item.Id" class="tdform">
+                        @Html.DisplayFor(modelItem => item.value)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WeekNumber)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Dato)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.method)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.WaterSampleNumber)
+                    </td>
+                    <td>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        }
+                        <button type="button" onclick="editAlerts(@item.Id)">@SharedLocalizer.GetLocalizedHtmlString("Edit Alert Limits")</button>
+                    </td>
+                    <td class="td_1" hidden="hidden">@item.Id</td>
+                </tr>
+                    }
+                    else if (item.holdslimit == 1 && goodbad.Equals(true))
+                    {
+            <tr class="rowid" style="background-color:lightgreen;">
+                <td>
+                    @Html.DisplayFor(modelItem => item.WaterSampleType.Komponent)
+                </td>
+                <td id="@item.Id" class="tdform">
+                    @Html.DisplayFor(modelItem => item.value)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WeekNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Dato)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.method)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WaterSampleNumber)
+                </td>
+                <td>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    }
+                    <button type="button" onclick="editAlerts(@item.Id)">@SharedLocalizer.GetLocalizedHtmlString("Edit Alert Limits")</button>
+                </td>
+                <td class="td_1" hidden="hidden">@item.Id</td>
+            </tr>
+                    }
+                    else if(item.holdslimit == 2)
+                    {
+            <tr class="rowid" style="background-color:lightcoral;">
+                <td>
+                    @Html.DisplayFor(modelItem => item.WaterSampleType.Komponent)
+                </td>
+                <td id="@item.Id" class="tdform">
+                    @Html.DisplayFor(modelItem => item.value)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WeekNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Dato)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.method)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WaterSampleNumber)
+                </td>
+                <td>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    }
+                    <button type="button" onclick="editAlerts(@item.Id)">@SharedLocalizer.GetLocalizedHtmlString("Edit Alert Limits")</button>
+                </td>
+                <td class="td_1" hidden="hidden">@item.Id</td>
+            </tr>
+                    }
+
+                }
+            </tbody>
+        </table>
+        }
+    }
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+            });
+        });
+
+
+        var AlertModal = document.getElementById('ModalInput');
+        var span4 = document.getElementByClassName("closer")[1];
+
+        function doTheSubmit() {
+            $.ajax({
+                type: "POST",
+                url: $('#TheForm').attr('action'),
+                data: $('#TheForm').serialize(),
+                success: function (response) {
+                    AlertModal.style.display = "none";
+                },
+                error: function (response) {
+                    alert("error");
+                }
+            });
+        }
+        function editAlerts(theindex) {
+            $.ajax({
+                type: 'get',
+                url: '/WaterSampleTypes/EditAlert',
+                data: {
+                    'Id': theindex
+                },
+                success: function (response) {
+                    $('#theMPContent').html(response);
+                    AlertModal.style.display = "block";
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+        }
+        function closethepopup() {
+            AlertModal.style.display = "none";
+        }
+
+
+    </script>
+}

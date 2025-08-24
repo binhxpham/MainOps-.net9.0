@@ -1,0 +1,43 @@
+﻿@model IEnumerable<MainOps.Models.Document>
+
+@{
+    ViewData["Title"] = "SharedDocuments";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Shared Documents")</h2>
+
+<p>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to Shared Info")</a>
+</p>
+<table class="table" style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                <form asp-action="Details" asp-controller="Documents" asp-route-id="@item.Id" method="get" target="_blank">
+                    <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                </form>
+            </td>
+            <td>
+                @if(item.ExternalUrl == "" || item.ExternalUrl == null) { 
+                <form asp-action="DownloadDocument" asp-controller="Documents" asp-route-id="@item.Id" method="get">
+                    <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Download")</button>
+                </form>
+                }
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

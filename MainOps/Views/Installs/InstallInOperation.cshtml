@@ -1,0 +1,91 @@
+﻿@model IEnumerable<MainOps.Models.InstallInOperation>
+
+@{
+    ViewData["Title"] = "InstallInOperation";
+}
+
+<h2>Installs In Operation</h2>
+
+<form asp-action="InstallInOperation" method="get">
+    <table>
+        <tr>
+            <td> <input name="TheDate" type="date" /></td>
+            <td><button class="btn-hoelscher">Search</button></td>
+        </tr>
+    </table>
+</form>
+<form asp-action="InstallInOperationPDF" method="get" target="_blank">
+    <table>
+        <tr>
+            <td> <input name="TheDate" type="date" /></td>
+            <td><button class="btn-hoelscher">PDF</button></td>
+        </tr>
+    </table>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Unique ID")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Date")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Operational")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Installation Date")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("DeInstallation Date")
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            if (item.operational == true)
+            {
+        <tr style="background-color:lightgreen;">
+            <td>
+                @item.install.UniqueID
+            </td>
+            <td>
+                @item.TheDate
+            </td>
+            <td>
+                @item.operational
+            </td>
+            <td>
+                @item.install.TimeStamp
+            </td>
+            <td>
+                @item.install.DeinstallDate
+            </td>
+        </tr>
+            }
+            else
+            {
+    <tr style="background-color:indianred;">
+        <td>
+            @item.install.UniqueID
+        </td>
+        <td>
+            @item.TheDate
+        </td>
+        <td>
+            @item.operational
+        </td>
+        <td>
+            @item.install.TimeStamp
+        </td>
+        <td>
+            @item.install.DeinstallDate
+        </td>
+    </tr>
+            }
+        }
+    </tbody>
+</table>

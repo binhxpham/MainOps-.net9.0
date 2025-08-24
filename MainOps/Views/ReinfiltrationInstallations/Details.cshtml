@@ -1,0 +1,120 @@
+﻿@model MainOps.Models.ReinfiltrationInstallation
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>ReinfiltrationInstallation</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.MeasPoint)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MeasPoint.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WellName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WellName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SensorRange)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SensorRange)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WellDepth)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WellDepth)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SensorDepth)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SensorDepth)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DiameterHose)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DiameterHose)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WaterLevel)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WaterLevel)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.VariationOrder)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.VariationOrder.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Latitude)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Latitude)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Longitude)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Longitude)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Accuracy)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Accuracy)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ReinfiltrationType)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ReinfiltrationType.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Project)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Project.Abbreviation)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SubProject)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SubProject.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TimeStamp)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TimeStamp)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Comments)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Comments)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DoneBy)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DoneBy)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

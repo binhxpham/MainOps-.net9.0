@@ -1,0 +1,1186 @@
+﻿@model MainOps.Models.HourRegistrationVM
+@{
+    ViewData["Title"] = "HourRegistration";
+}
+<style>
+    /* Chrome, Safari, Edge, Opera */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+
+    th {
+        font-weight: normal;
+        height: 40px;
+        padding-left: 1px;
+        padding-right: 0px;
+        word-wrap: break-word;
+        width: 4%;
+        font-size: 12px;
+        text-align: center;
+    }
+</style>
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Check Hours - Hourly Payed Workers")</h2>
+<form asp-action="RedoHourSheet" asp-controller="TrackItems" method="post">
+    <table style="table-layout:fixed;border:2px solid red;">
+        <tr>
+            
+            <td><textarea name="comment" cols="40" rows="4" placeholder="@SharedLocalizer.GetLocalizedHtmlString("text in email for user...")"></textarea><input name="id" value="@Model.HourRegistration.Id" hidden="hidden" /></td>
+            <td><button class="btn-hoeslcher" style="width:100%;height:50px;">@SharedLocalizer.GetLocalizedHtmlString("Send Sheet back to redo it!")</button></td>
+        </tr>
+    </table>
+        
+        
+
+</form>
+<form asp-action="Edit_HourRegistration" asp-controller="TrackItems" method="post" onsubmit="retrieveData(event);">
+    @Html.HiddenFor(Model => Model.HourRegistration.FullName)
+    @Html.HiddenFor(Model => Model.HourRegistration.PaymentNr)
+    @Html.HiddenFor(Model => Model.HourRegistration.LicensePlate)
+    @Html.HiddenFor(Model => Model.HourRegistration.Week1)
+    @Html.HiddenFor(Model => Model.HourRegistration.Week2)
+    @Html.HiddenFor(Model => Model.HourRegistration.Signature_Worker)
+    @Html.HiddenFor(Model => Model.HourRegistration.Supervisor_Name)
+    @Html.HiddenFor(Model => Model.HourRegistration.DivisionId)
+    @Html.HiddenFor(Model => Model.HourRegistration.HourSheetYear)
+    @Html.HiddenFor(MOdel => Model.HourRegistration.userid)
+    <div class="col-xs-12">
+        <div class="col-xs-6">
+            <table>
+                <tr>
+                    <td colspan="2"><b>@Html.DisplayNameFor(x => x.HourRegistration.PaymentNr)</b></td>
+                    <td colspan="2">@Html.DisplayFor(x => x.HourRegistration.PaymentNr)</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><b>@Html.DisplayNameFor(x => x.HourRegistration.FullName)</b></td>
+                    <td colspan="2">@Html.DisplayFor(x => x.HourRegistration.FullName)</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><b>@Html.DisplayNameFor(x => x.HourRegistration.LicensePlate)</b></td>
+                    <td colspan="2">@Html.DisplayFor(x => x.HourRegistration.LicensePlate)</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><b>@Html.DisplayNameFor(x => x.HourRegistration.weektype)</b></td>
+                    <td colspan="2">
+                        <select asp-for="HourRegistration.weektype" onchange="changetype();" asp-items="ViewBag.HourSchedules" style="width:100%;"></select>
+                    </td>
+                </tr>
+                @*<tr>
+                    <td colspan="2"><b>@Html.DisplayNameFor(x => x.HourRegistration.weektype)</b></td>
+                    <td colspan="2">
+                        <select asp-for="HourRegistration.weektype" onchange="changetype();">
+                            <option value="1">7½-7½-7½-7½-7</option>
+                            <option value="2">8-8-8-8-5</option>
+                            @if (Model.HourRegistration.FullName.Contains("Janis"))
+                            {
+                                <option value="3">Janis Schedule</option>
+                            }
+                            @if (Model.HourRegistration.FullName.Contains("Maris") || Model.HourRegistration.FullName.Contains("Arnis"))
+                            {
+                                <option value="4">Maris/Arnis Schedule</option>
+                            }
+                        </select>
+                    </td>
+                </tr>*@
+                <tr>
+                    <td colspan="2"><b>@Html.DisplayNameFor(x => x.HourRegistration.Supervisor_Name)</b></td>
+                    <td colspan="2">
+                        @Html.DisplayFor(x => x.HourRegistration.Supervisor_Name)
+                    </td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <td><b>@Html.DisplayNameFor(x => x.HourRegistration.Week1)</b></td>
+                    <td>
+                        @Html.DisplayFor(x => x.HourRegistration.Week1)
+                        <input asp-for="@Model.HourRegistration.Week1" value="@Model.HourRegistration.Week1" hidden="hidden" />
+                    </td>
+                    <td><b>@Html.DisplayNameFor(x => x.HourRegistration.Week2)</b></td>
+                    <td>
+                        @Html.DisplayFor(x => x.HourRegistration.Week2)
+                        <input asp-for="@Model.HourRegistration.Week2" value="@Model.HourRegistration.Week2" hidden="hidden" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-xs-6">
+            <table border="1">
+                <tr>
+                    <td>Ferie</td>
+                    <td style="color:red;">F</td>
+                    <td>Syg</td>
+                    <td style="color:red;">S</td>
+                    <td>Orlov</td>
+                    <td style="color:red;">O</td>
+                </tr>
+                <tr>
+                    <td>½ feriedag</td>
+                    <td style="color:red;">½ F</td>
+                    <td>Barn syg</td>
+                    <td style="color:red;">C</td>
+                    <td>Arbejdsulykke</td>
+                    <td style="color:red;">U</td>
+                </tr>
+                <tr>
+                    <td>Feriefridag</td>
+                    <td style="color:red;">FF</td>
+                    <td>Barsel</td>
+                    <td style="color:red;">B</td>
+                    <td>Helligdag</td>
+                    <td style="color:red;">H</td>
+                </tr>
+                <tr>
+                    <td>Vejrligsdag</td>
+                    <td style="color:red;">V</td>
+                    <td>Alm. Arbejdsdag</td>
+                    <td style="color:red;">W</td>
+                    <td>Arbejdsdag Uge Hjemme</td>
+                    <td style="color:red;">WH</td>
+                </tr>
+                <tr>
+                    <td>Syg Corona</td>
+                    <td style="color:red;">SC</td>
+                    <td>Nat Arbejde</td>
+                    <td style="color:red;">N</td>
+                    <td>Home Paid</td>
+                    <td style="color:red;">HP</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <br />
+    <div class="col-xs-12">
+        <row>
+            <h2>@SharedLocalizer.GetLocalizedHtmlString("Regular Hours")</h2>
+            <button type="button" class="btn-hoelscher" onclick="DoChecks();">@SharedLocalizer.GetLocalizedHtmlString("Verify Inputs")</button>
+        </row>
+        <table border="1" style="table-layout:fixed;width:100%;">
+            <thead>
+                <tr>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(x => x.Rows.First().day1)
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(x => x.Rows.First().day2)
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(x => x.Rows.First().day3)
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(x => x.Rows.First().day4)
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(x => x.Rows.First().day5)
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(x => x.Rows.First().day6)
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(x => x.Rows.First().day7)
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(x => x.Rows.First().day8)
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(x => x.Rows.First().day9)
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(x => x.Rows.First().day10)
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(x => x.Rows.First().day11)
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(x => x.Rows.First().day12)
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(x => x.Rows.First().day13)
+                    </th>
+                    <th rowspan="2">
+                        @Html.DisplayNameFor(x => x.Rows.First().day14)
+                    </th>
+                    <th rowspan="2" style="width:5%;">@SharedLocalizer.GetLocalizedHtmlString("Hours")</th>
+                    <th style="width:5%;">@SharedLocalizer.GetLocalizedHtmlString("Overhours")</th>
+                    <th style="width:5%;">@SharedLocalizer.GetLocalizedHtmlString("Overhours")</th>
+                    <th colspan="2" style="width:11%;">@SharedLocalizer.GetLocalizedHtmlString("Add Ons")</th>
+                    <th>@SharedLocalizer.GetLocalizedHtmlString("Shed Money")</th>
+                    <th rowspan="3" style="width:9%;">@SharedLocalizer.GetLocalizedHtmlString("Project")</th>
+                    <th rowspan="3" style="width:9%;">@SharedLocalizer.GetLocalizedHtmlString("Others")</th>
+                </tr>
+                <tr>
+                    <th style="height:20px;">50%</th>
+                    <th style="height:20px;">100%</th>
+                    <th style="height:20px;">@SharedLocalizer.GetLocalizedHtmlString("Amount")</th>
+                    <th style="height:20px;">@SharedLocalizer.GetLocalizedHtmlString("Rate")</th>
+                    <th style="height:20px;">@SharedLocalizer.GetLocalizedHtmlString("Amount")</th>
+                    <th style="height:20px;"></th>
+                    <th style="height:20px;"></th>
+                </tr>
+                <tr>
+                    <th style="height:20px;">
+                        <select asp-for="Rows[0].day1_Type" onchange="status_change(event);" style="width:100%;">
+                            <option value="W">@SharedLocalizer.GetLocalizedHtmlString("W")</option>
+                            <option value="WH">WH</option>
+                            <option value="F">F</option>
+                            <option value="½F">½F</option>
+                            <option value="FF">FF</option>
+                            <option value="S">S</option>
+                            <option value="SC">SC</option>
+                            <option value="C">C</option>
+                            <option value="B">B</option>
+                            <option value="O">O</option>
+                            <option value="U">U</option>
+                            <option value="H">H</option>
+                            <option value="V">V</option>
+                            <option value="N">N</option>
+                            <option value="HP">HP</option>
+                        </select>
+                    </th>
+                    <th style="height:20px;">
+                        <select asp-for="Rows[0].day2_Type" onchange="status_change(event);" style="width:100%;">
+                            <option value="W">@SharedLocalizer.GetLocalizedHtmlString("W")</option>
+                            <option value="WH">WH</option>
+                            <option value="F">F</option>
+                            <option value="½F">½F</option>
+                            <option value="FF">FF</option>
+                            <option value="S">S</option>
+                            <option value="SC">SC</option>
+                            <option value="C">C</option>
+                            <option value="B">B</option>
+                            <option value="O">O</option>
+                            <option value="U">U</option>
+                            <option value="H">H</option>
+                            <option value="V">V</option>
+                            <option value="N">N</option>
+                            <option value="HP">HP</option>
+                        </select>
+                    </th>
+                    <th style="height:20px;">
+                        <select asp-for="Rows[0].day3_Type" onchange="status_change(event);" style="width:100%;">
+                            <option value="W">@SharedLocalizer.GetLocalizedHtmlString("W")</option>
+                            <option value="WH">WH</option>
+                            <option value="F">F</option>
+                            <option value="½F">½F</option>
+                            <option value="FF">FF</option>
+                            <option value="S">S</option>
+                            <option value="SC">SC</option>
+                            <option value="C">C</option>
+                            <option value="B">B</option>
+                            <option value="O">O</option>
+                            <option value="U">U</option>
+                            <option value="H">H</option>
+                            <option value="V">V</option>
+                            <option value="N">N</option>
+                            <option value="HP">HP</option>
+                        </select>
+                    </th>
+                    <th style="height:20px;">
+                        <select asp-for="Rows[0].day4_Type" onchange="status_change(event);" style="width:100%;">
+                            <option value="W">@SharedLocalizer.GetLocalizedHtmlString("W")</option>
+                            <option value="WH">WH</option>
+                            <option value="F">F</option>
+                            <option value="½F">½F</option>
+                            <option value="FF">FF</option>
+                            <option value="S">S</option>
+                            <option value="SC">SC</option>
+                            <option value="C">C</option>
+                            <option value="B">B</option>
+                            <option value="O">O</option>
+                            <option value="U">U</option>
+                            <option value="H">H</option>
+                            <option value="V">V</option>
+                            <option value="N">N</option>
+                            <option value="HP">HP</option>
+                        </select>
+                    </th>
+                    <th style="height:20px;">
+                        <select asp-for="Rows[0].day5_Type" onchange="status_change(event);" style="width:100%;">
+                            <option value="W">@SharedLocalizer.GetLocalizedHtmlString("W")</option>
+                            <option value="WH">WH</option>
+                            <option value="F">F</option>
+                            <option value="½F">½F</option>
+                            <option value="FF">FF</option>
+                            <option value="S">S</option>
+                            <option value="SC">SC</option>
+                            <option value="C">C</option>
+                            <option value="B">B</option>
+                            <option value="O">O</option>
+                            <option value="U">U</option>
+                            <option value="H">H</option>
+                            <option value="V">V</option>
+                            <option value="N">N</option>
+                            <option value="HP">HP</option>
+                        </select>
+                    </th>
+                    <th style="height:20px;">
+                        <select asp-for="Rows[0].day6_Type" onchange="status_change(event);" style="width:100%;">
+                            <option value="W">@SharedLocalizer.GetLocalizedHtmlString("W")</option>
+                            <option value="WH">WH</option>
+                            <option value="F">F</option>
+                            <option value="½F">½F</option>
+                            <option value="FF">FF</option>
+                            <option value="S">S</option>
+                            <option value="SC">SC</option>
+                            <option value="C">C</option>
+                            <option value="B">B</option>
+                            <option value="O">O</option>
+                            <option value="U">U</option>
+                            <option value="H">H</option>
+                            <option value="V">V</option>
+                            <option value="N">N</option>
+                            <option value="HP">HP</option>
+                        </select>
+                    </th>
+                    <th style="height:20px;">
+                        <select asp-for="Rows[0].day7_Type" onchange="status_change(event);" style="width:100%;">
+                            <option value="W">@SharedLocalizer.GetLocalizedHtmlString("W")</option>
+                            <option value="WH">WH</option>
+                            <option value="F">F</option>
+                            <option value="½F">½F</option>
+                            <option value="FF">FF</option>
+                            <option value="S">S</option>
+                            <option value="SC">SC</option>
+                            <option value="C">C</option>
+                            <option value="B">B</option>
+                            <option value="O">O</option>
+                            <option value="U">U</option>
+                            <option value="H">H</option>
+                            <option value="V">V</option>
+                            <option value="N">N</option>
+                            <option value="HP">HP</option>
+                        </select>
+                    </th>
+                    <th style="height:20px;">
+                        <select asp-for="Rows[0].day8_Type" onchange="status_change(event);" style="width:100%;">
+                            <option value="W">@SharedLocalizer.GetLocalizedHtmlString("W")</option>
+                            <option value="WH">WH</option>
+                            <option value="F">F</option>
+                            <option value="½F">½F</option>
+                            <option value="FF">FF</option>
+                            <option value="S">S</option>
+                            <option value="SC">SC</option>
+                            <option value="C">C</option>
+                            <option value="B">B</option>
+                            <option value="O">O</option>
+                            <option value="U">U</option>
+                            <option value="H">H</option>
+                            <option value="V">V</option>
+                            <option value="N">N</option>
+                            <option value="HP">HP</option>
+                        </select>
+                    </th>
+                    <th style="height:20px;">
+                        <select asp-for="Rows[0].day9_Type" onchange="status_change(event);" style="width:100%;">
+                            <option value="W">@SharedLocalizer.GetLocalizedHtmlString("W")</option>
+                            <option value="WH">WH</option>
+                            <option value="F">F</option>
+                            <option value="½F">½F</option>
+                            <option value="FF">FF</option>
+                            <option value="S">S</option>
+                            <option value="SC">SC</option>
+                            <option value="C">C</option>
+                            <option value="B">B</option>
+                            <option value="O">O</option>
+                            <option value="U">U</option>
+                            <option value="H">H</option>
+                            <option value="V">V</option>
+                            <option value="N">N</option>
+                            <option value="HP">HP</option>
+                        </select>
+                    </th>
+                    <th style="height:20px;">
+                        <select asp-for="Rows[0].day10_Type" onchange="status_change(event);" style="width:100%;">
+                            <option value="W">@SharedLocalizer.GetLocalizedHtmlString("W")</option>
+                            <option value="WH">WH</option>
+                            <option value="F">F</option>
+                            <option value="½F">½F</option>
+                            <option value="FF">FF</option>
+                            <option value="S">S</option>
+                            <option value="SC">SC</option>
+                            <option value="C">C</option>
+                            <option value="B">B</option>
+                            <option value="O">O</option>
+                            <option value="U">U</option>
+                            <option value="H">H</option>
+                            <option value="V">V</option>
+                            <option value="N">N</option>
+                            <option value="HP">HP</option>
+                        </select>
+                    </th>
+                    <th style="height:20px;">
+                        <select asp-for="Rows[0].day11_Type" onchange="status_change(event);" style="width:100%;">
+                            <option value="W">@SharedLocalizer.GetLocalizedHtmlString("W")</option>
+                            <option value="WH">WH</option>
+                            <option value="F">F</option>
+                            <option value="½F">½F</option>
+                            <option value="FF">FF</option>
+                            <option value="S">S</option>
+                            <option value="SC">SC</option>
+                            <option value="C">C</option>
+                            <option value="B">B</option>
+                            <option value="O">O</option>
+                            <option value="U">U</option>
+                            <option value="H">H</option>
+                            <option value="V">V</option>
+                            <option value="N">N</option>
+                            <option value="HP">HP</option>
+                        </select>
+                    </th>
+                    <th style="height:20px;">
+                        <select asp-for="Rows[0].day12_Type" onchange="status_change(event);" style="width:100%;">
+                            <option value="W">@SharedLocalizer.GetLocalizedHtmlString("W")</option>
+                            <option value="WH">WH</option>
+                            <option value="F">F</option>
+                            <option value="½F">½F</option>
+                            <option value="FF">FF</option>
+                            <option value="S">S</option>
+                            <option value="SC">SC</option>
+                            <option value="C">C</option>
+                            <option value="B">B</option>
+                            <option value="O">O</option>
+                            <option value="U">U</option>
+                            <option value="H">H</option>
+                            <option value="V">V</option>
+                            <option value="N">N</option>
+                            <option value="HP">HP</option>
+                        </select>
+                    </th>
+                    <th style="height:20px;">
+                        <select asp-for="Rows[0].day13_Type" onchange="status_change(event);" style="width:100%;">
+                            <option value="W">@SharedLocalizer.GetLocalizedHtmlString("W")</option>
+                            <option value="WH">WH</option>
+                            <option value="F">F</option>
+                            <option value="½F">½F</option>
+                            <option value="FF">FF</option>
+                            <option value="S">S</option>
+                            <option value="C">C</option>
+                            <option value="B">B</option>
+                            <option value="O">O</option>
+                            <option value="U">U</option>
+                            <option value="H">H</option>
+                            <option value="V">V</option>
+                            <option value="N">N</option>
+                            <option value="HP">HP</option>
+                        </select>
+                    </th>
+                    <th style="height:20px;">
+                        <select asp-for="Rows[0].day14_Type" onchange="status_change(event);" style="width:100%;">
+                            <option value="W">@SharedLocalizer.GetLocalizedHtmlString("W")</option>
+                            <option value="WH">WH</option>
+                            <option value="F">F</option>
+                            <option value="½F">½F</option>
+                            <option value="FF">FF</option>
+                            <option value="S">S</option>
+                            <option value="SC">SC</option>
+                            <option value="C">C</option>
+                            <option value="B">B</option>
+                            <option value="O">O</option>
+                            <option value="U">U</option>
+                            <option value="H">H</option>
+                            <option value="V">V</option>
+                            <option value="N">N</option>
+                            <option value="HP">HP</option>
+                        </select>
+                    </th>
+                    <th style="height:20px;"><b>1201</b></th>
+                    <th style="height:20px;"><b>1202</b></th>
+                    <th style="height:20px;"><b>1204</b></th>
+                    <th colspan="2" style="height:20px;"><b>1220</b></th>
+                    <th style="height:20px;"><b>1221</b></th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Rows.Count(); i++)
+                {
+                    <tr>
+                        <td style="padding-left:0px;padding-right:0px;width:35px;"><input asp-for="Rows[i].day1" type="number" min="0" max="24" style="border:none;width:100%;" onchange="calchours(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day2" type="number" min="0" max="24" style="border:none;width:100%;" onchange="calchours(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day3" type="number" min="0" max="24" style="border:none;width:100%;" onchange="calchours(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day4" type="number" min="0" max="24" style="border:none;width:100%;" onchange="calchours(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day5" type="number" min="0" max="24" style="border:none;width:100%;" onchange="calchours(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day6" type="number" min="0" max="24" style="border:none;width:100%;" onchange="calchours(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day7" type="number" min="0" max="24" style="border:none;width:100%;" onchange="calchours(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day8" type="number" min="0" max="24" style="border:none;width:100%;" onchange="calchours(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day9" type="number" min="0" max="24" style="border:none;width:100%;" onchange="calchours(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day10" type="number" min="0" max="24" style="border:none;width:100%;" onchange="calchours(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day11" type="number" min="0" max="24" style="border:none;width:100%;" onchange="calchours(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day12" type="number" min="0" max="24" style="border:none;width:100%;" onchange="calchours(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day13" type="number" min="0" max="24" style="border:none;width:100%;" onchange="calchours(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day14" type="number" min="0" max="24" style="border:none;width:100%;" onchange="calchours(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].Hours" type="number" style="border:none;width:100%;" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].OverHours_50" type="number" style="border:none;width:100%;" onchange="calchoursother(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].OverHours_100" type="number" style="border:none;width:100%;" onchange="calchoursother(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].AddOns" type="number" style="border:none;width:100%;" onchange="calchoursother(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].AddOns_Amount" type="number" style="border:none;width:100%;" onchange="calchoursother(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].Skur_penge" type="number" min="0" max="24" step="1" style="border:none;width:100%;" onchange="CalcSkurPenge();" /></td>
+                        @Html.HiddenFor(Model => Model.Rows[i].Driving_Money_Days)
+                        @Html.HiddenFor(Model => Model.Rows[i].Driving_Money_Amount)
+                        <td style="padding-left:0px;padding-right:0px;">
+                            <select asp-for="Rows[i].ProjectId" asp-items="ViewBag.ProjectId" id="proj_@i" onchange="changeProject(event);" style="width:100%;">
+                                <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select")</option>
+                            </select>
+                            @*@Html.DisplayFor(x => x.Rows[i].Project.ProjectNr)
+                            @Html.HiddenFor(x => x.Rows[i].ProjectId)*@
+                        </td>
+                        <td><input asp-for="Rows[i].Others" type="text" style="border:none;width:100%;" /></td>
+                    </tr>
+                }
+            <tr>
+                <td style="padding-left:0px;padding-right:0px;width:35px;"><input id="day1total" type="number" min="0" max="24" style="border:none;width:100%;" /></td>
+                <td style="padding-left:0px;padding-right:0px;"><input id="day2total" type="number" disabled="disabled" min="0" max="24" style="border:none;width:100%;" /></td>
+                <td style="padding-left:0px;padding-right:0px;"><input id="day3total" type="number" disabled="disabled" min="0" max="24" style="border:none;width:100%;" /></td>
+                <td style="padding-left:0px;padding-right:0px;"><input id="day4total" type="number" disabled="disabled" min="0" max="24" style="border:none;width:100%;" /></td>
+                <td style="padding-left:0px;padding-right:0px;"><input id="day5total" type="number" disabled="disabled" min="0" max="24" style="border:none;width:100%;" /></td>
+                <td style="padding-left:0px;padding-right:0px;"><input id="day6total" type="number" disabled="disabled" min="0" max="24" style="border:none;width:100%;" /></td>
+                <td style="padding-left:0px;padding-right:0px;"><input id="day7total" type="number" disabled="disabled" min="0" max="24" style="border:none;width:100%;" /></td>
+                <td style="padding-left:0px;padding-right:0px;"><input id="day8total" type="number" disabled="disabled" min="0" max="24" style="border:none;width:100%;" /></td>
+                <td style="padding-left:0px;padding-right:0px;"><input id="day9total" type="number" disabled="disabled" min="0" max="24" style="border:none;width:100%;" /></td>
+                <td style="padding-left:0px;padding-right:0px;"><input id="day10total" type="number" disabled="disabled" min="0" max="24" style="border:none;width:100%;" /></td>
+                <td style="padding-left:0px;padding-right:0px;"><input id="day11total" type="number" disabled="disabled" min="0" max="24" style="border:none;width:100%;" /></td>
+                <td style="padding-left:0px;padding-right:0px;"><input id="day12total" type="number" disabled="disabled" min="0" max="24" style="border:none;width:100%;" /></td>
+                <td style="padding-left:0px;padding-right:0px;"><input id="day13total" type="number" disabled="disabled" min="0" max="24" style="border:none;width:100%;" /></td>
+                <td style="padding-left:0px;padding-right:0px;"><input id="day14total" type="number" disabled="disabled" min="0" max="24" style="border:none;width:100%;" /></td>
+                <td style="padding-left:0px;padding-right:0px;"><input id="hourstotal" type="number" disabled="disabled" style="border:none;width:100%;" /></td>
+                <td style="padding-left:0px;padding-right:0px;"><input id="overhours50total" type="number" disabled="disabled" style="border:none;width:100%;" /></td>
+                <td style="padding-left:0px;padding-right:0px;"><input id="overhours100total" type="number" disabled="disabled" style="border:none;width:100%;" /></td>
+                <td style="padding-left:0px;padding-right:0px;"><input id="Addonstotal" type="number" disabled="disabled" style="border:none;width:100%;" /></td>
+                <td style="padding-left:0px;padding-right:0px;"><input id="AddonsAmounttotal" type="number" disabled="disabled" style="border:none;width:100%;" /></td>
+                <td style="padding-left:0px;padding-right:0px;"><input id="SkurPengetotal" type="number" disabled="disabled" style="border:none;width:100%;" /></td>
+                <td colspan="2" style="padding-left:0px;padding-right:0px;text-align:center;">
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("Sums")</b>
+                </td>
+
+            </tr>
+            </tbody>
+        </table>
+
+        <h2>@SharedLocalizer.GetLocalizedHtmlString("Alarm Hours")</h2>
+        <table border="1" style="table-layout:fixed;width:100%;">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(x => x.Rows.First().day1)</th>
+                    <th>@Html.DisplayNameFor(x => x.Rows.First().day2) </th>
+                    <th>@Html.DisplayNameFor(x => x.Rows.First().day3)</th>
+                    <th>@Html.DisplayNameFor(x => x.Rows.First().day4)</th>
+                    <th>@Html.DisplayNameFor(x => x.Rows.First().day5)</th>
+                    <th>@Html.DisplayNameFor(x => x.Rows.First().day6)</th>
+                    <th>@Html.DisplayNameFor(x => x.Rows.First().day7)</th>
+                    <th>@Html.DisplayNameFor(x => x.Rows.First().day8)</th>
+                    <th>@Html.DisplayNameFor(x => x.Rows.First().day9)</th>
+                    <th>@Html.DisplayNameFor(x => x.Rows.First().day10)</th>
+                    <th>@Html.DisplayNameFor(x => x.Rows.First().day11)</th>
+                    <th>@Html.DisplayNameFor(x => x.Rows.First().day12)</th>
+                    <th>@Html.DisplayNameFor(x => x.Rows.First().day13)</th>
+                    <th>@Html.DisplayNameFor(x => x.Rows.First().day14)</th>
+                    <th style="width:6%;">@Html.DisplayNameFor(x => x.Rows.First().Hours)</th>
+                    <th style="width:40%;">@Html.DisplayNameFor(x => x.Rows.First().ProjectId)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.Rows.Count(); i++)
+                {
+                    <tr>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day1_Alarm" type="number" min="4" max="24" style="border:none;width:100%;" onchange="calchoursalarm(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day2_Alarm" type="number" min="4" max="24" style="border:none;width:100%;" onchange="calchoursalarm(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day3_Alarm" type="number" min="4" max="24" style="border:none;width:100%;" onchange="calchoursalarm(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day4_Alarm" type="number" min="4" max="24" style="border:none;width:100%;" onchange="calchoursalarm(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day5_Alarm" type="number" min="4" max="24" style="border:none;width:100%;" onchange="calchoursalarm(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day6_Alarm" type="number" min="4" max="48" style="border:none;width:100%;" onchange="calchoursalarm(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day7_Alarm" type="number" min="4" max="48" style="border:none;width:100%;" onchange="calchoursalarm(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day8_Alarm" type="number" min="4" max="24" style="border:none;width:100%;" onchange="calchoursalarm(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day9_Alarm" type="number" min="4" max="24" style="border:none;width:100%;" onchange="calchoursalarm(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day10_Alarm" type="number" min="4" max="24" style="border:none;width:100%;" onchange="calchoursalarm(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day11_Alarm" type="number" min="4" max="24" style="border:none;width:100%;" onchange="calchoursalarm(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day12_Alarm" type="number" min="4" max="24" style="border:none;width:100%;" onchange="calchoursalarm(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day13_Alarm" type="number" min="4" max="48" style="border:none;width:100%;" onchange="calchoursalarm(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].day14_Alarm" type="number" min="4" max="48" style="border:none;width:100%;" onchange="calchoursalarm(event);" /></td>
+                        <td style="padding-left:0px;padding-right:0px;"><input asp-for="Rows[i].Hours_Alarm" type="number" readonly="readonly" style="border:none;width:100%;" /></td>
+                        <td style="padding-left:0px;padding-right:0px;">
+                            <select asp-for="Rows[i].ProjectId" asp-items="ViewBag.ProjectId" id="alarmproj_@i" onchange="changeProjectAlarm(event);" style="width:100%;">
+                                <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select")</option>
+                            </select>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="col-xs-12">
+        <br />
+        <br />
+        <div class="col-xs-6">
+            <table border="1">
+                <tr>
+                    <td>
+                        @SharedLocalizer.GetLocalizedHtmlString("Calculation week:")
+                    </td>
+                    <td>
+                        <input type="text" disabled="disabled" size="2" value="" id="wk1" style="border:none;" /> + <input type="text" disabled="disabled" size="2" value="" id="wk2" style="border:none;" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>@Html.DisplayNameFor(x => x.HourRegistration.totalregularhours)</td>
+                    <td><input asp-for="HourRegistration.totalregularhours" type="number" readonly="readonly" style="width:100%;" /></td>
+                    <td>@SharedLocalizer.GetLocalizedHtmlString("Before:")</td>
+                    <td><input value="@Model.HourRegistration.totalregularhours" type="number" readonly="readonly" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td>@Html.DisplayNameFor(x => x.HourRegistration.totaloverhours50)</td>
+                    <td><input asp-for="HourRegistration.totaloverhours50" type="number" readonly="readonly" style="width:100%;" /></td>
+                    <td>@SharedLocalizer.GetLocalizedHtmlString("Before:")</td>
+                    <td><input value="@Model.HourRegistration.totaloverhours50" type="number" readonly="readonly" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td>@Html.DisplayNameFor(x => x.HourRegistration.totaloverhours100)</td>
+                    <td><input asp-for="HourRegistration.totaloverhours100" type="number" readonly="readonly" style="width:100%;" /></td>
+                    <td>@SharedLocalizer.GetLocalizedHtmlString("Before:")</td>
+                    <td><input value="@Model.HourRegistration.totaloverhours100" type="number" readonly="readonly" style="width:100%;" /></td>
+                </tr>
+            </table>
+        </div>
+        <div class="col-xs-6">
+            <table>
+                <tr>
+                    <td colspan="2">
+                        <canvas width="330" height="150" id="signature" style="border:1px solid blue;"></canvas>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:45%">
+                        <button type="button" id="accept" class="btn-hoelscher" style="width:100%;height:40px;">@SharedLocalizer.GetLocalizedHtmlString("Accept signature")</button>
+                    </td>
+                    <td style="width:45%">
+                        <button type="button" id="clear" class="btn-hoelscher" style="width:100%;height:40px;">@SharedLocalizer.GetLocalizedHtmlString("Clear signature")</button>
+                        <input type="text" id="signaturedata" hidden="hidden" />
+                        <input asp-for="HourRegistration.Signature_Supervisor" hidden="hidden" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <img width="80" height="60" id="savetarget" hidden="hidden" style="border:1px solid black">
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <img src="data:image/jpg;base64, @Model.HourRegistration.Signature_Worker" style="width:100%;">
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <button type="submit" style="width:150px;height:100px;"><b>@SharedLocalizer.GetLocalizedHtmlString("Submit Time Sheet")</b></button>
+        </div>
+        <br />
+        <br />
+    </div>
+</form>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/signature_pad.min.js"></script>
+    <script type="text/javascript">
+        var pad = null;
+        var numrows = @Model.Rows.Count();
+        var numdays = 14;
+        var totalhoursbefore = @Model.HourRegistration.totalregularhours;
+        var totaloverhours50before = @Model.HourRegistration.totaloverhours50;
+        var totaloverhours100before = @Model.HourRegistration.totaloverhours100;
+        var resultstring = "";
+        var weektype = [7.5, 7.5, 7.5, 7.5, 7.0, 0, 0, 7.5, 7.5, 7.5, 7.5, 7.0, 0, 0];
+        $(document).ready(function () {
+            $(function () {
+                var canvas = document.querySelector("#signature");
+                pad = new SignaturePad(canvas);
+                updateweek1();
+                updateweek2();
+                weektype3();
+                $('#accept').click(function () {
+                    var data = pad.toDataURL();
+                    $('#savetarget').attr('src', data);
+                    var base64signature = data.split(',')[1];
+                    $('#signaturedata').val(base64signature);
+                });
+                $('#clear').click(function () {
+                    pad.clear();
+                })
+
+            })
+        });
+        function changeProject(e) {
+            var therow = e.target.id.split("_")[1];
+            $("#alarmproj_" + therow).val(e.target.value);
+        }
+        function changeProjectAlarm(e) {
+            var therow = e.target.id.split("_")[1];
+            $("#proj_" + therow).val(e.target.value);
+        }
+        function calchours(e) {
+            var thehour = e.target.value
+            if ((thehour > 24 || thehour < 0)) {
+                document.getElementById(e.target.id).value = 0;
+            }
+            var therow = e.target.id.split("_")[1];
+            var hours = sumhours(therow);
+            $("#Rows_" + therow + "__Hours").val(hours);
+            calcHours();
+            sumTotalHours();
+            checksums();
+            checkOverHour50s();
+            checkOverHour100s();
+        }
+        function calchoursother(e) {
+            calcHours();
+            sumTotalHours();
+            checksums();
+            checkOverHour50s();
+            checkOverHour100s();
+            CalcSkurPenge();
+        }
+        function DoChecks() {
+            var outputstr = "";
+            outputstr = checksums2(outputstr);
+            outputstr = checkOverHour50s2(outputstr);
+            outputstr = checkOverHour100s2(outputstr);
+            if (outputstr != "") {
+                alert(outputstr);
+            }
+            else {
+                alert("All Correct");
+            }
+
+        }
+
+        function checkOverHour50s() {
+            overhours = calc50Hours();
+            if (overhours != +$("#overhours50total").val()) {
+                $("#overhours50total").css('background-color', 'orange');
+            }
+            else {
+                $("#overhours50total").css('background-color', "");
+            }
+        }
+        function checkOverHour50s2(resultstring) {
+            overhours = calc50Hours();
+            if (overhours != +$("#overhours50total").val()) {
+                resultstring += "\r\nCurrent 50% overhours should be: " + overhours;
+            }
+            return resultstring;
+        }
+
+        function checkOverHour100s() {
+            overhours = calc100Hours();
+            alarmhours = sumhoursalarm();
+            if ((overhours + alarmhours) != +$("#overhours100total").val()) {
+                $("#overhours100total").css('background-color', 'orange');
+            }
+            else {
+                $("#overhours100total").css('background-color', "");
+            }
+        }
+        function checkOverHour100s2(resultstring) {
+            overhours = calc100Hours();
+            alarmhours = sumhoursalarm();
+            if ((overhours + alarmhours) != +$("#overhours100total").val()) {
+                resultstring += "\r\nCurrent 100% overhours should be: " + (overhours + alarmhours);
+            }
+            return resultstring;
+        }
+        function sumhoursalarm() {
+            var thesum = 0.0;
+            for (i = 1; i < (numdays + 1); i++) {
+                for (j = 0; j < numrows; j++) {
+                    thesum += +$("#Rows_" + j + "__day" + i + "_Alarm").val();
+                }
+            }
+            return thesum;
+        }
+        function sumhours(therow) {
+            var thesum = 0.0;
+            thesum += +$("#Rows_" + therow + "__day1").val();
+            thesum += +$("#Rows_" + therow + "__day2").val();
+            thesum += +$("#Rows_" + therow + "__day3").val();
+            thesum += +$("#Rows_" + therow + "__day4").val();
+            thesum += +$("#Rows_" + therow + "__day5").val();
+            thesum += +$("#Rows_" + therow + "__day6").val();
+            thesum += +$("#Rows_" + therow + "__day7").val();
+            thesum += +$("#Rows_" + therow + "__day8").val();
+            thesum += +$("#Rows_" + therow + "__day9").val();
+            thesum += +$("#Rows_" + therow + "__day10").val();
+            thesum += +$("#Rows_" + therow + "__day11").val();
+            thesum += +$("#Rows_" + therow + "__day12").val();
+            thesum += +$("#Rows_" + therow + "__day13").val();
+            thesum += +$("#Rows_" + therow + "__day14").val();
+            return thesum;
+        }
+        function changeProject(e) {
+            var therow = e.target.id.split("_")[1];
+            $("#alarmproj_" + therow).val(e.target.value);
+        }
+        function changeProjectAlarm(e) {
+            var therow = e.target.id.split("_")[1];
+            $("#proj_" + therow).val(e.target.value);
+        }
+        function changetype() {
+            weektype3();           
+        }
+        function weektype3() {
+            var week = $("#HourRegistration_weektype").val();
+            var url = '@Url.Action("GetHourSchedule", "HourSchedules")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: "json",
+                data: {
+                    'theId': week
+                },
+                success: function (data) {
+                    weektype = data;
+                    calchoursother();
+                                      
+                },
+                error: function (output) {
+                    alert(output);
+                }
+            });
+        }
+        function status_change(e) {
+            var theobj = e.target.id.split("__")[1];
+            var theday = theobj.split("_")[0];
+            var thevalue = e.target.value;
+            if (thevalue == "W" || thevalue == "V" || thevalue == "WH" || thevalue == "½F" || thevalue == "N") {
+                for (i = 0; i < numrows; i++) {
+                    $("#Rows_" + i + "__" + theday).prop("disabled", false);
+                    $("#Rows_" + i + "__" + theday).css('background-color', 'white');
+                    $("#Rows_" + i + "__" + theday + "_Alarm").prop("disabled", false);
+                    $("#Rows_" + i + "__" + theday + "_Alarm").css('background-color', 'white');
+                }
+            }
+            else if (thevalue = "H") {
+                for (i = 0; i < 10; i++) {
+                    $("#Rows_" + i + "__" + theday).prop("disabled", false);
+                    $("#Rows_" + i + "__" + theday).css('background-color', 'grey');
+                    $("#Rows_" + i + "__" + theday + "_Alarm").prop("disabled", false);
+                    $("#Rows_" + i + "__" + theday + "_Alarm").css('background-color', 'grey');
+                }
+            }
+            else {
+                for (i = 0; i < numrows; i++) {
+                    $("#Rows_" + i + "__" + theday).val(0);
+                    $("#Rows_" + i + "__" + theday).prop("disabled", true);
+                    $("#Rows_" + i + "__" + theday).css('background-color', 'grey');
+                    $("#Rows_" + i + "__" + theday + "_Alarm").val(0);
+                    $("#Rows_" + i + "__" + theday + "_Alarm").prop("disabled", true);
+                    $("#Rows_" + i + "__" + theday + "_Alarm").css('background-color', 'grey');
+                }
+            }
+            calchoursother();
+        }
+
+        function updateweek1() {
+            $("#wk1").val($("#HourRegistration_Week1").val());
+        }
+        function updateweek2() {
+            $("#wk2").val($("#HourRegistration_Week2").val());
+        }
+        function retrieveData(e) {
+            var posting = true;
+            var result = confirm("You are about to send the hour sheet to Human resources, are you finished editing the sheet?");
+            if (result != true) {
+                posting = false;
+                e.preventDefault();
+            }
+            var s1 = document.getElementById("HourRegistration_Signature_Supervisor");
+            var signature = "";
+            signature = document.getElementById("signaturedata").value;
+            s1.value = signature;
+            if (signature == "") {
+                posting = false;
+                e.preventDefault();
+                alert("Please Sign!");
+            }
+            if (posting == true) {
+                StartSpinner();
+            }
+        }
+        function checksums() {
+            if (+$("#HourRegistration_totalregularhours").val() != +totalhoursbefore) {
+                $("#HourRegistration_totalregularhours").css('background-color', 'orange');
+            }
+            else
+            {
+                $("#HourRegistration_totalregularhours").css('background-color', "");
+            }
+            if (+$("#HourRegistration_totaloverhours50").val() != +totaloverhours50before)
+            {
+                $("#HourRegistration_totaloverhours50").css('background-color', 'orange');
+            }
+            else
+            {
+                $("#HourRegistration_totaloverhours50").css('background-color', "");
+            }
+            if (+$("#HourRegistration_totaloverhours100").val() != +totaloverhours100before)
+            {
+                $("#HourRegistration_totaloverhours100").css('background-color', 'orange');
+            }
+            else
+            {
+                $("#HourRegistration_totaloverhours100").css('background-color', "");
+            }
+        }
+        function checksums2(resultstring) {
+            if (+$("#HourRegistration_totalregularhours").val() > 74) {
+                resultstring += "\r\nTotal regular hours are above 74. Please divert some to overhours!";
+            }
+            if (+$("#HourRegistration_totalregularhours").val() != +totalhoursbefore) {
+                $("#HourRegistration_totalregularhours").css('background-color', 'orange');
+                resultstring += "\r\nTotal regular hours do not match what employee filled out." + "\r\n" + "Old was: " + totalhoursbefore.toFixed(2) + "\r\n" + "New is: " + $("#HourRegistration_totalregularhours").val();
+            }
+            else
+            {
+                $("#HourRegistration_totalregularhours").css('background-color', "");
+            }
+            if (+$("#HourRegistration_totaloverhours50").val() != +totaloverhours50before)
+            {
+                $("#HourRegistration_totaloverhours50").css('background-color', 'orange');
+                resultstring += "\r\nTotal 50% over hours do not match what employee filled out." + "\r\n" + "Old was: " + totaloverhours50before.toFixed(2) + "\r\n" + "New is: " + $("#HourRegistration_totaloverhours50").val();
+            }
+            else
+            {
+                $("#HourRegistration_totaloverhours50").css('background-color', "");
+            }
+            if (+$("#HourRegistration_totaloverhours100").val() != +totaloverhours100before)
+            {
+                $("#HourRegistration_totaloverhours100").css('background-color', 'orange');
+                resultstring += "\r\nTotal 100% over hours do not match what employee filled out." + "\r\n" + "Old was: " + totaloverhours100before.toFixed(2) + "\r\n" + "New is: " + $("#HourRegistration_totaloverhours100").val();
+            }
+            else {
+                $("#HourRegistration_totaloverhours100").css('background-color', "");
+            }
+            return resultstring;
+        }
+        //function weektype() {
+        //    return $("#HourRegistration_weektype").val();
+        //}
+        function sumTotalHours() {
+            var thesum = 0.0;
+            var thesum50 = 0.0;
+            var thesum100 = 0.0;
+            var thesumalarm = 0.0;
+            for (therow = 0; therow < numrows; therow++) {
+                thesum += (+$("#Rows_" + therow + "__Hours").val() - +$("#Rows_" + therow + "__OverHours_50").val() - +$("#Rows_" + therow + "__OverHours_100").val() + +$("#Rows_" + therow + "__Hours_Alarm").val());
+                thesumalarm += +$("#Rows_" + therow + "__Hours_Alarm").val();
+                thesum50 += +$("#Rows_" + therow + "__OverHours_50").val();
+                thesum100 += +$("#Rows_" + therow + "__OverHours_100").val();
+
+            }
+            //thesum += thesum50 + thesum100;
+            $("#HourRegistration_totalregularhours").val(thesum.toFixed(2));
+            $("#HourRegistration_totaloverhours50").val(thesum50.toFixed(2));
+            $("#HourRegistration_totaloverhours100").val(thesum100.toFixed(2));
+        }
+        function calc100Hours() {
+            var hours = 0.0;
+            var days = new Array(14 + 1).join('0').split('').map(parseFloat);
+            for (i = 0; i < days.length; i++) {
+                days[i] = 0.0;
+            }
+            for (i = 0; i < numrows; i++) {
+                days[0] += +$("#Rows_" + i + "__day1").val();
+                days[1] += +$("#Rows_" + i + "__day2").val();
+                days[2] += +$("#Rows_" + i + "__day3").val();
+                days[3] += +$("#Rows_" + i + "__day4").val();
+                days[4] += +$("#Rows_" + i + "__day5").val();
+                days[5] += +$("#Rows_" + i + "__day6").val();
+                days[6] += +$("#Rows_" + i + "__day7").val();
+                days[7] += +$("#Rows_" + i + "__day8").val();
+                days[8] += +$("#Rows_" + i + "__day9").val();
+                days[9] += +$("#Rows_" + i + "__day10").val();
+                days[10] += +$("#Rows_" + i + "__day11").val();
+                days[11] += +$("#Rows_" + i + "__day12").val();
+                days[12] += +$("#Rows_" + i + "__day13").val();
+                days[13] += +$("#Rows_" + i + "__day14").val();
+            }
+
+            for (i = 0; i < 14; i++) {
+                var type = $("#Rows_0__day" + (i + 1) + "_Type").val();
+                if (type == "N") {
+                    if (i == 6 || i == 13) {
+                        hours += days[i];
+                    }
+                    else {
+                        if (days[i] > 3) {
+                            hours += days[i] - 3.0
+                        }
+                    }
+                }
+                else if (type == "W") {
+                    if (i == 6 || i == 13) {
+                        hours += days[i];
+                    }
+                    else if (days[i] > weektype[i] + 3.0) {
+                        hours += days[i] - 3.0;
+                    }
+                    else if (days[i] > weektype[i]) {
+                        
+                    }
+                }
+                else if (type == "H") {
+
+                }
+                
+            }
+            return hours;
+        }
+        function calc50Hours() {
+            var hours = 0.0;
+            var days = new Array(14 + 1).join('0').split('').map(parseFloat);
+            for (i = 0; i < days.length; i++) {
+                days[i] = 0.0;
+            }
+
+            for (i = 0; i < numrows; i++) {
+                days[0] += +$("#Rows_" + i + "__day1").val();
+                days[1] += +$("#Rows_" + i + "__day2").val();
+                days[2] += +$("#Rows_" + i + "__day3").val();
+                days[3] += +$("#Rows_" + i + "__day4").val();
+                days[4] += +$("#Rows_" + i + "__day5").val();
+                days[5] += +$("#Rows_" + i + "__day6").val();
+                days[6] += +$("#Rows_" + i + "__day7").val();
+                days[7] += +$("#Rows_" + i + "__day8").val();
+                days[8] += +$("#Rows_" + i + "__day9").val();
+                days[9] += +$("#Rows_" + i + "__day10").val();
+                days[10] += +$("#Rows_" + i + "__day11").val();
+                days[11] += +$("#Rows_" + i + "__day12").val();
+                days[12] += +$("#Rows_" + i + "__day13").val();
+                days[13] += +$("#Rows_" + i + "__day14").val();
+            }
+            for (i = 0; i < 14; i++) {
+                var type = $("#Rows_0__day" + (i + 1) + "_Type").val();
+                if (type == "N") {
+                    if (i == 6 || i == 13) {
+
+                    }
+                    else if (days[i] > 3.0) {
+                        hours += 3.0;
+                    }
+                    else {
+                        hours += days[i];
+                    }
+                }
+                if (type == "W") {
+                    if (i == 6 || i == 13) {
+                        
+                    }
+                    else if (days[i] > weektype[i] + 3.0) {
+                        hours += 3.0;
+                    }
+                    else if (days[i] > weektype[i]) {
+                        hours += +(days[i] - weektype[i]);
+                    }
+                }
+                else if (type == "H") {
+                    
+                }
+            }
+            return hours;
+        }
+        function CalcSkurPenge() {
+            thesum = 0;
+            for (therow = 0; therow < 10; therow++) {
+                if (Math.floor($("#Rows_" + therow + "__" + "Skur_penge").val()) != 0) {
+                    $("#Rows_" + therow + "__" + "Skur_penge").val(Math.floor($("#Rows_" + therow + "__" + "Skur_penge").val()));
+                }
+                thesum += +$("#Rows_" + therow + "__" + "Skur_penge").val();
+            }
+            $("#SkurPengetotal").val(thesum);
+        }
+        function calcHours() {
+            var days = new Array(14 + 1).join('0').split('').map(parseFloat);
+            for (i = 0; i < days.length; i++) {
+                days[i] = 0.0;
+            }
+            for (i = 0; i < numrows; i++) {
+                days[0] += +$("#Rows_" + i + "__day1").val();
+                days[1] += +$("#Rows_" + i + "__day2").val();
+                days[2] += +$("#Rows_" + i + "__day3").val();
+                days[3] += +$("#Rows_" + i + "__day4").val();
+                days[4] += +$("#Rows_" + i + "__day5").val();
+                days[5] += +$("#Rows_" + i + "__day6").val();
+                days[6] += +$("#Rows_" + i + "__day7").val();
+                days[7] += +$("#Rows_" + i + "__day8").val();
+                days[8] += +$("#Rows_" + i + "__day9").val();
+                days[9] += +$("#Rows_" + i + "__day10").val();
+                days[10] += +$("#Rows_" + i + "__day11").val();
+                days[11] += +$("#Rows_" + i + "__day12").val();
+                days[12] += +$("#Rows_" + i + "__day13").val();
+                days[13] += +$("#Rows_" + i + "__day14").val();
+                $("#Rows_" + i + "__Hours").val(
+                    +$("#Rows_" + i + "__day1").val() + +$("#Rows_" + i + "__day2").val() + +$("#Rows_" + i + "__day3").val() +
+                    +$("#Rows_" + i + "__day4").val() + +$("#Rows_" + i + "__day5").val() + +$("#Rows_" + i + "__day6").val() +
+                    +$("#Rows_" + i + "__day7").val() + +$("#Rows_" + i + "__day8").val() + +$("#Rows_" + i + "__day9").val() +
+                    +$("#Rows_" + i + "__day10").val() + +$("#Rows_" + i + "__day11").val() + +$("#Rows_" + i + "__day12").val() +
+                    +$("#Rows_" + i + "__day13").val() + +$("#Rows_" + i + "__day14").val());
+            }
+            var totalhours = 0.0;
+            for (k = 1; k < 15; k++) {
+                var type = $("#Rows_0__day" + k + "_Type").val();
+                totalhours += days[k - 1];
+                $("#day" + k + "total").val(days[k - 1]);
+                if (type == "N") {
+                    if (days[k - 1] > 3.0) {
+                        $("#day" + k + "total").css('background-color', 'red');
+                    }
+                    else {
+                        $("#day" + k + "total").css('background-color', 'orange');
+                    }  
+                }
+                else if (type == "W") {
+                    if (days[k - 1] > weektype[k - 1]) {
+                        if (days[k - 1] > weektype[k - 1] + 3.0) {
+                            $("#day" + k + "total").css('background-color', 'red');
+                        }
+                        else {
+                            $("#day" + k + "total").css('background-color', 'orange');
+                        }
+                    }
+                    else {
+                        $("#day" + k + "total").css('background-color', 'lightgreen');
+                    }
+                }
+                else if (type == "H") {
+                    if (days[k - 1] > 0) {
+                        $("#day" + k + "total").css('background-color', 'red');
+                    }
+                    else {
+                        $("#day" + k + "total").css('background-color', 'lightgreen');
+                    }
+                }
+            }
+            var overhours50total = 0.0;
+            var overhours100total = 0.0;
+            var addontotal = 0.0;
+            var addonamounttotal = 0.0;
+            var skurpengetotal = 0.0;
+            for (j = 0; j < numrows; j++) {
+                overhours50total += +$("#Rows_" + j + "__OverHours_50").val();
+                overhours100total += +$("#Rows_" + j + "__OverHours_100").val();
+                addontotal += +$("#Rows_" + j + "__AddOns").val();
+                addonamounttotal += +$("#Rows_" + j + "__AddOns_Amount").val();
+                //skurpengetotal += +$("#Rows_" + j + "__Skur_penge").val();
+            }
+            $("#overhours50total").val(overhours50total);
+            $("#overhours100total").val(overhours100total);
+            $("#Addonstotal").val(addontotal);
+            $("#AddonsAmounttotal").val(addonamounttotal);
+            $("#hourstotal").val(totalhours);
+            //$("#DietsTotal").val(skurpengetotal);
+        }
+    </script>
+}

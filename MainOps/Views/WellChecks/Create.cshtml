@@ -1,0 +1,122 @@
+﻿@model MainOps.Models.WellCheck
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+
+<h4>Well Check</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="DoneBy" hidden="hidden" />
+
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <select asp-for="ProjectId" asp-items="ViewBag.ProjectId" class="form-control"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Project")</option></select>
+                <span asp-validation-for="ProjectId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="TimeStamp" class="control-label"></label>
+                <input type="datetime-local" asp-for="TimeStamp" value="@DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss")" class="form-control" />
+                <span asp-validation-for="TimeStamp" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WellName" class="control-label"></label>
+                <input asp-for="WellName" class="form-control" />
+                <span asp-validation-for="WellName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CanBeFound"></label>
+                <input asp-for="CanBeFound" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Dip" class="control-label"></label>
+                <input asp-for="Dip" type="number" min="0" step="0.01" class="form-control" />
+                <span asp-validation-for="Dip" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DiffTop" class="control-label"></label>
+                <input asp-for="DiffTop" type="number" step="0.01" class="form-control" />
+                <span asp-validation-for="DiffTop" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BottomWell" class="control-label"></label>
+                <input asp-for="BottomWell" type="number" min="0" step="0.01" class="form-control" />
+                <span asp-validation-for="BottomWell" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Dip2" class="control-label"></label>
+                <input asp-for="Dip2" type="number" min="0" step="0.01" class="form-control" />
+                <span asp-validation-for="Dip2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DiffTop2" class="control-label"></label>
+                <input asp-for="DiffTop2" type="number" step="0.01" class="form-control" />
+                <span asp-validation-for="DiffTop2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BottomWell2" class="control-label"></label>
+                <input asp-for="BottomWell2" type="number" min="0" step="0.01" class="form-control" />
+                <span asp-validation-for="BottomWell2" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Dip3" class="control-label"></label>
+                <input asp-for="Dip3" type="number" min="0" step="0.01" class="form-control" />
+                <span asp-validation-for="Dip3" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DiffTop3" class="control-label"></label>
+                <input asp-for="DiffTop3" type="number" step="0.01" class="form-control" />
+                <span asp-validation-for="DiffTop3" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BottomWell3" class="control-label"></label>
+                <input asp-for="BottomWell3" type="number" min="0" step="0.01" class="form-control" />
+                <span asp-validation-for="BottomWell3" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="NumBerOfPipes" class="control-label"></label>
+                <input type="number" min="0" max="3" value="1" step="1" asp-for="NumBerOfPipes" class="form-control" />
+                <span asp-validation-for="NumBerOfPipes" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IsCoverOk"></label>
+                <input asp-for="IsCoverOk" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="IsShaftOk"></label>
+                <input asp-for="IsShaftOk" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="WellHeads"></label>
+                <input asp-for="WellHeads" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Comments" class="control-label"></label>
+                <textarea cols="40" rows="8" asp-for="Comments"></textarea>
+                <span asp-validation-for="Comments" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>@SharedLocalizer.GetLocalizedHtmlString("Photos(take many!)")</label>
+                <input name="files" type="file" multiple="multiple" accept=".jpg,jpeg,.png" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

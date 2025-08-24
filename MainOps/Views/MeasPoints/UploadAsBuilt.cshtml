@@ -1,0 +1,10 @@
+﻿
+<h2>
+    @SharedLocalizer.GetLocalizedHtmlString("Uplaod Measurement Points to Letbanen")
+</h2>
+
+<form asp-action="UploadAsBuilt" asp-controller="MeasPoints" enctype="multipart/form-data" method="post">
+    <input type="file" accept=".csv" name="files"/>
+    <select name="ProjectId" asp-items="ViewBag.ProjectId"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Project")</option></select>
+    <button>@SharedLocalizer.GetLocalizedHtmlString("Upload")</button>
+</form>

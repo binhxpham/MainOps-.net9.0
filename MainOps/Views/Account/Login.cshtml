@@ -1,0 +1,54 @@
+﻿@model LoginViewModel
+@inject SignInManager<ApplicationUser> SignInManager
+
+@using Microsoft.AspNetCore.Mvc.Localization
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Log in with Email");
+}
+
+<h2>@ViewData["Title"]</h2>
+<hr class="col-xs-12" />
+<br />
+<div class="row">
+    <div class="col-xs-8">
+        <section>
+            <form asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Email">@SharedLocalizer.GetLocalizedHtmlString("Email")</label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Password">@SharedLocalizer.GetLocalizedHtmlString("Password")</label>
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <div class="checkbox">
+                        <label asp-for="RememberMe">
+                            <input asp-for="RememberMe" />
+                            <label asp-for="Password">@SharedLocalizer.GetLocalizedHtmlString("Remember me")?</label>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Log in")</button>
+                </div>
+                <div class="form-group">
+                    <p>
+                        <a asp-action="ForgotPassword">@SharedLocalizer.GetLocalizedHtmlString("Forgot your password?")</a>
+                    </p>
+                    <p>
+                        <a asp-action="Register" asp-route-returnurl="@ViewData["ReturnUrl"]">@SharedLocalizer.GetLocalizedHtmlString("Register as a new user?")</a>
+                    </p>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+}

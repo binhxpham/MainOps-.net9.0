@@ -1,0 +1,87 @@
+﻿@model IEnumerable<MainOps.Models.TelefonListe>
+
+@{
+    ViewData["Title"] = "Telefonlisten";
+}
+
+<h2>Telefonliste</h2>
+
+<p>
+    <a asp-action="Create">@SharedLocalizer.GetLocalizedHtmlString("Create New")</a>
+</p>
+<table class="table" border="1" style="width:100%;table-layout:fixed;word-break:break-word;">
+    <thead>
+        <tr>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Company")
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ForNavn)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Efternavn)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Titel)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Telefonnr)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Leder)
+            </th>
+            @if(User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager")) { 
+            <th>
+                @Html.DisplayNameFor(model => model.Loennr)
+            </th>
+            <th colspan="2">@SharedLocalizer.GetLocalizedHtmlString("Actions")</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Division.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ForNavn)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Efternavn)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Titel)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Telefonnr)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Leder)
+            </td>
+            @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+            {
+                <td>
+                    @Html.DisplayFor(modelItem => item.Loennr)
+                </td>
+                <td>
+                    <form asp-action="Edit" asp-controller="Telefonlisten" asp-route-id="@item.Id" method="get">
+                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                    </form>
+                </td>
+                <td>
+                    <form asp-action="Delete" asp-controller="Telefonlisten" asp-route-id="@item.Id" method="get">
+                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button>
+                    </form>
+                </td>
+            }
+        </tr>
+}
+    </tbody>
+</table>

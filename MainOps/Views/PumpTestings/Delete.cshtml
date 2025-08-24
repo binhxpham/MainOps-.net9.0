@@ -1,0 +1,111 @@
+﻿@model MainOps.Models.PumpTesting
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>PumpTesting</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.DoneBy)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DoneBy)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TimeStamp)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TimeStamp)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PumpType)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PumpType)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.PumpID)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.PumpID)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CableLength)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CableLength)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CableDamaged)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CableDamaged)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WhichCableDamaged)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WhichCableDamaged)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CanBeFixed)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CanBeFixed)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CompleteExchange)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CompleteExchange)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CableExtended)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CableExtended)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CableExtendedm)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CableExtendedm)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.InsulationTested)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.InsulationTested)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.InsulationOK)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.InsulationOK)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AllCableSubmerged)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AllCableSubmerged)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Signature)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Signature)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

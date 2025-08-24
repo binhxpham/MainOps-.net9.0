@@ -1,0 +1,41 @@
+﻿@model IEnumerable<MainOps.Models.TrackItem>
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Items</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+<body>
+    @foreach(var item in Model)
+    {
+    <font size="4">
+        <div class="col-md-5">
+            <table border="1" style="margin-bottom:2cm;margin-right:1cm;margin-left:1cm;">
+                <tbody>
+                    <tr>
+                        <td  width="240" colspan="2" rowspan="2" align="left"><img src="~/images/Divisions/Photos/@item.Project.Division.Id/@item.Project.Division.LogoPath" height="80"  /></td>
+                        <td rowspan="5" width="120" align="center"><img src='@Url.Action("GetQR4","HJItems",new { Id = item.Id })' alt="" height="140" /></td>
+                    </tr>
+                    <tr></tr>
+                    <tr>
+                        <td align="center" height="40" width="90" style="border-width:thin;border-style:solid;"><b>@Html.DisplayNameFor(modelItem => item.TAGnr)</b></td>
+                        <td align="center" height="40" width="150" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.TAGnr)</td>
+                    </tr>
+                    <tr>
+                        <td align="center" height="40" width="90" style="border-width:thin;border-style:solid;"><b>@Html.DisplayNameFor(modelItem => item.PIDnr)</b></td>
+                        <td align="center" height="40" width="150" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.PIDnr)</td>
+                    </tr>
+                    <tr>
+                        <td align="center" height="40" width="90" style="border-width:thin;border-style:solid;"><b>@Html.DisplayNameFor(modelItem => item.RUMnr)</b></td>
+                        <td align="center" height="40" width="150" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.RUMnr)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </font>
+    }
+</body>
+</html>

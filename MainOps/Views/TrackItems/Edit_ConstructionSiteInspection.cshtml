@@ -1,0 +1,481 @@
+﻿@model MainOps.Models.ConstructionSiteInspection
+@{
+    ViewData["Title"] = "WTPCheck";
+}
+<div class="row">
+    <div class="col-xs-12">
+        <form asp-action="Edit_ConstructionSiteInspection" asp-controller="TrackItems" id="theform" method="post" onsubmit="retrieveData(event);" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.HiddenFor(Model => Model.Latitude)
+            @Html.HiddenFor(Model => Model.Longitude)
+            @Html.HiddenFor(Model => Model.Signature)
+            @Html.HiddenFor(Model => Model.DoneBy)
+            <table style="width:100%;table-layout:fixed;">
+                <tr>
+                    <td colspan="2"><h2>@SharedLocalizer.GetLocalizedHtmlString("Main Data")</h2></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="ProjectId" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select Project")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="SubProjectId" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="SubProjectId" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("No Sub Projects")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="TimeStamp" class="control-label"></label></td>
+                    <td><input asp-for="TimeStamp" type="datetime" class="date-picker" value="@DateTime.Now" style="width:100%;" /></td>
+                </tr>
+
+                <tr>
+                    <td><label asp-for="Branch" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="Branch" class="form-control" style="width:100%;">
+                            <option value="HJ-DK">@SharedLocalizer.GetLocalizedHtmlString("HJ-DK")</option>
+                            <option value="Deatering">@SharedLocalizer.GetLocalizedHtmlString("Dewatering")</option>
+                            <option value="Drilling">@SharedLocalizer.GetLocalizedHtmlString("Drilling")</option>
+                            <option value="General OHS">@SharedLocalizer.GetLocalizedHtmlString("General OHS")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="NumberOfPeople" class="control-label"></label></td>
+                    <td><input asp-for="NumberOfPeople" type="number" class="date-picker" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><h2>@SharedLocalizer.GetLocalizedHtmlString("Organisation")</h2></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="WPA_Done" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="WPA_Done" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="ToolBox_Done" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="ToolBox_Done" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Hazardous_Work" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="Hazardous_Work" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><h2>@SharedLocalizer.GetLocalizedHtmlString("Workplace")</h2></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="OverAllState" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="OverAllState" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Walkways" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="Walkways" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="LaddersStepsPlatforms" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="LaddersStepsPlatforms" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="FirstAiders" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="FirstAiders" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="SafeStorage" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="SafeStorage" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="KnownContaminants" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="KnownContaminants" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="EmergencyMeasures" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="EmergencyMeasures" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="UnKnownContaminants" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="UnKnownContaminants" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="SufficientLighting" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="SufficientLighting" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Tidy" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="Tidy" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><h2>@SharedLocalizer.GetLocalizedHtmlString("Fall and construction pit protection")</h2></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="GroundSupport" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="GroundSupport" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="FloorOpenings" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="FloorOpenings" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="SloapingAreas" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="SloapingAreas" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="SafeAccessSite" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="SafeAccessSite" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><h2>@SharedLocalizer.GetLocalizedHtmlString("Waste disposal / environment")</h2></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="WasteDisposal" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="WasteDisposal" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="WasteSeperation" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="WasteSeperation" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="MeasuresPreventEnvHarm" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="MeasuresPreventEnvHarm" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><h2>@SharedLocalizer.GetLocalizedHtmlString("Personal protection")</h2></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="AllPPE" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="AllPPE" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="SpecialPPE" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="SpecialPPE" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><h2>@SharedLocalizer.GetLocalizedHtmlString("Condition of construction machinery / small equpiment")</h2></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="SafetyCondition" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="SafetyCondition" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="MarkingDevices" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="MarkingDevices" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="ConditionLoadHandling" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="ConditionLoadHandling" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><h2>@SharedLocalizer.GetLocalizedHtmlString("Sub-Contractors")</h2></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Sub_PPE" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="Sub_PPE" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Sub_SafetyCond" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="Sub_SafetyCond" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Sub_MaterialStorage" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="Sub_MaterialStorage" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="SubContractorsUsed" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="SubContractorsUsed" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><h2>@SharedLocalizer.GetLocalizedHtmlString("Others")</h2></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label asp-for="GeneralComments" class="control-label"></label></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><textarea asp-for="GeneralComments" cols="50" rows="6" style="width:100%;"></textarea></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><h2>@SharedLocalizer.GetLocalizedHtmlString("Evaluation")</h2></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="ProjectManager" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="ProjectManager" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="AdditionalInstruction" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="AdditionalInstruction" class="form-control" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
+                            <option value="false">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
+                            <option value="true">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label asp-for="PreviousProblems" class="control-label"></label></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><textarea asp-for="PreviousProblems" cols="50" rows="6" style="width:100%;"></textarea></td>
+                </tr>
+                
+                
+                <tr>
+                    <td><label>@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label></td>
+                    <td><input type="file" name="files" multiple accept=".jpg,.jpeg,.png" style="width:100%" /></td>
+                </tr>
+                
+            </table>
+            <div class="form-group">
+                <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString("Update")" class="btn-hoelscher" style="width:100%;height:70px;" />
+            </div>
+        </form>
+    </div>
+</div>
+<div>
+    <a asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        var id;
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select',
+                    firstDay: 1
+                });
+                FillSubProjects();
+            });
+        });
+
+        function retrieveData(e) {
+            var posting = true;
+            if ($("#theform").valid() == false) {
+                posting = false;
+            }
+            if (posting == true) {
+                StartSpinner();
+            }
+        }
+        function FillSubProjects() {
+            var SubProjectId = $('#SubProjectId').val();
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                        var x = document.getElementById("SubProjectId");
+                        var i;
+                        for (i = 0; i < x.length; i++) {
+                            if (x.options[i].value == SubProjectId) {
+                                x.options[i].selected = true;
+                            }
+                        }
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+        }
+    </script>
+}

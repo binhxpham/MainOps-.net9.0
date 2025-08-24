@@ -1,0 +1,93 @@
+﻿@model MainOps.Models.SummaryReport
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>SummaryReport</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Report_Date)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Report_Date)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Project)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Project.Abbreviation)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.People)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.People)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.IsSignedByHJ)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsSignedByHJ)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.IsSignedByClient)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsSignedByClient)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.signatureHJ)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.signatureHJ)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.signatureClient)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.signatureClient)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SignatureHJDateTime)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SignatureHJDateTime)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SignatureClientDateTime)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SignatureClientDateTime)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TheDailyText)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TheDailyText)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SentToClient)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SentToClient)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ClientEmail)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ClientEmail)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

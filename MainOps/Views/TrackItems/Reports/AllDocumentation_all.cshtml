@@ -1,0 +1,893 @@
+﻿@model MainOps.Models.ReportClasses.AllDocumentation
+@{
+    Layout = null;
+}
+@inject IHostingEnvironment _env;
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("All Documenation")</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+<div class="row">
+    <div class="col-xs-12">
+        @if (Model.Project.SubProjects.Count > 0)
+        {
+            foreach (var subproj in Model.Project.SubProjects)
+            {
+                if (Model.Daily_Reports.Where(x => x.SubProjectId.Equals(subproj.Id)).Count() + Model.Installations.Where(x => x.SubProjectId.Equals(subproj.Id)).Count() + Model.Arrivals.Where(x => x.SubProjectId.Equals(subproj.Id)).Count()
+                    + Model.Mobilizations.Where(x => x.SubProjectId.Equals(subproj.Id)).Count() + Model.Deinstallations.Where(x => x.SubProjectId.Equals(subproj.Id)).Count() + Model.ExtraWorks.Where(x=>x.SubProjectId.Equals(subproj.Id)).Count() > 0)
+                {
+        <div style="page-break-after:always !important">
+            <h1>@subproj.Name : @subproj.SubProjectNr</h1>
+            @foreach (var item in Model.Daily_Reports.Where(x => x.SubProjectId.Equals(subproj.Id)))
+            {
+        <table style="page-break-inside:avoid;">
+            <tr>
+                <td colspan="3">
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("Daily Report")</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Project.Name)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Name)
+                </td>
+                <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@item.Project.Division.Id/@item.Project.Division.LogoPath" width="151" height="66" /></td>
+            </tr>
+            @if (item.SubProjectId != null)
+            {
+                <tr>
+                    <td style="text-align:left;">
+                        <b>
+                            @SharedLocalizer.GetLocalizedHtmlString("Sub Project Name")
+                        </b>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubProject.Name)
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Project.ProjectNr)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.ProjectNr)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Project.Client)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Client)
+                </td>
+
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.short_Description)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.short_Description)
+                </td>
+            </tr>
+
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Report_Date)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Report_Date)
+                </td>
+            </tr>
+
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.StartHour)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StartHour)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.EndHour)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EndHour)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Amount)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Amount)
+                </td>
+            </tr>
+            @try
+            {
+                <tr>
+                    <td style="text-align:left;">
+                        <b>
+                            @Html.DisplayNameFor(modelItem => item.Title.TheTitle)
+                        </b>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title.TheTitle)
+                    </td>
+                </tr>
+            }
+            catch
+            {
+
+            }
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.DoneBy)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DoneBy)
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3"><b>@Html.DisplayNameFor(modelItem => item.Work_Performed)</b></td>
+            </tr>
+            <tr rowspan="20">
+                <td colspan="3">
+                    @if (item.Work_Performed != null && item.Work_Performed != "")
+                    {
+                        @Html.Raw(item.Work_Performed.Replace("\r\n", "<br />"))
+                    }
+                    else
+                    {
+                        @Html.DisplayFor(modelItem => item.Work_Performed)
+                    }
+                </td>
+            </tr>
+
+        </table>
+
+                <table name="phototable" style="page-break-inside:avoid;">
+                    @{ var rows = 0;}
+                    @if (item.pictures.Count % 2 == 0)
+                    {
+                        rows = item.pictures.Count() / 2;
+                    }
+                    else
+                    {
+                        rows = Convert.ToInt32(item.pictures.Count() / 2) + 1;
+                    }
+                    @{ var totalpics = item.pictures.Count();}
+                    @for (int i = 0; i < rows; i++)
+                    {
+                        if (totalpics - 2 >= 0)
+                        {
+                            <tr>
+                                <td><img src="~/AHAK/DailyReports/@item.Id.ToString()/@item.pictures[(i + 1) * 2 - 2]" style="width:100%;"/></td>
+                                <td><img src="~/AHAK/DailyReports/@item.Id.ToString()/@item.pictures[(i + 1) * 2 - 2 + 1]" style="width:100%;"/></td>
+                            </tr>
+                            totalpics -= 2;
+                        }
+                        else //enough room to add 1 picture in row
+                        {
+                            <tr>
+                                <td colspan="2"><img src="~/AHAK/DailyReports/@item.Id.ToString()/@item.pictures[(i + 1) * 2 - 2]" style="width:100%;" /></td>
+                                <td style="width:100%;"></td>
+                            </tr>
+                            totalpics -= 1;
+                        }
+
+                    }
+                </table>
+            }
+            @foreach (var item in Model.Mobilizations.Where(x => x.SubProjectId.Equals(subproj.Id)))
+            {
+                <table style="page-break-inside:avoid;">
+                    <tr>
+                        <td colspan="3">
+                            <b>@SharedLocalizer.GetLocalizedHtmlString("Mobilization")</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.Project.Name)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Project.Name)
+                        </td>
+                        <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@item.Project.Division.Id/@item.Project.Division.LogoPath" width="151" height="66" /></td>
+                    </tr>
+                    @if (item.SubProjectId != null)
+                    {
+                        <tr>
+                            <td style="text-align:left;">
+                                <b>
+                                    @SharedLocalizer.GetLocalizedHtmlString("Sub Project Name")
+                                </b>
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SubProject.Name)
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.Project.ProjectNr)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Project.ProjectNr)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.Project.Client)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Project.Client)
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.TimeStamp)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.TimeStamp.Date)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.ItemType.Item_Type)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ItemType.Item_Type)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><b>@Html.DisplayNameFor(modelItem => item.MobilizeText_Text)</b></td>
+                    </tr>
+                    <tr rowspan="20">
+                        <td colspan="3">
+                            <textarea rows="8" cols="64" class="form-control" style="width:100%;">@Html.DisplayFor(modelItem => item.MobilizeText_Text)</textarea>
+                        </td>
+                    </tr>
+                </table>
+
+                <table name="phototable" style="page-break-inside:avoid;">
+                    @{ var rows = 0;}
+                    @if (Model.Mobilized_Photos.Where(x => x.MobilizeId.Equals(item.Id)).Count() % 2 == 0)
+                    {
+                        rows = Model.Mobilized_Photos.Where(x => x.MobilizeId.Equals(item.Id)).Count() / 2;
+                    }
+                    else
+                    {
+                        rows = Convert.ToInt32(Model.Mobilized_Photos.Where(x => x.MobilizeId.Equals(item.Id)).Count() / 2) + 1;
+                    }
+                    @{ var totalpics = Model.Mobilized_Photos.Where(x => x.MobilizeId.Equals(item.Id)).Count();}
+                    @for (int i = 0; i < rows; i++)
+                    {
+                        if (totalpics - 2 >= 0)
+                        {
+                            var photo1 = Model.Mobilized_Photos.Where(x => x.MobilizeId.Equals(item.Id)).ElementAt((i + 1) * 2 - 2);
+                            var photo2 = Model.Mobilized_Photos.Where(x => x.MobilizeId.Equals(item.Id)).ElementAt((i + 1) * 2 - 2 + 1);
+                            <tr>
+                                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;"/></td>
+                                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;"/></td>
+                            </tr>
+                            totalpics -= 2;
+                        }
+                        else //enough room to add 1 picture in row
+                        {
+                            var photo1 = Model.Mobilized_Photos.Where(x => x.MobilizeId.Equals(item.Id)).ElementAt((i + 1) * 2 - 2);
+
+                            <tr>
+                                <td colspan="2"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;"/></td>
+                            </tr>
+                            totalpics -= 1;
+
+
+                        }
+
+                    }
+                </table>
+            }
+            @foreach (var item in Model.Installations.Where(x => x.SubProjectId.Equals(subproj.Id)))
+            {
+                <table style="page-break-inside:avoid;">
+                    <tr>
+                        <td colspan="3">
+                            <b>@SharedLocalizer.GetLocalizedHtmlString("Installation")</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.Project.Name)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Project.Name)
+                        </td>
+                        <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@item.Project.Division.Id/@item.Project.Division.LogoPath" width="151" height="66" /></td>
+                    </tr>
+                    @if (item.SubProjectId != null)
+                    {
+                        <tr>
+                            <td style="text-align:left;">
+                                <b>
+                                    @SharedLocalizer.GetLocalizedHtmlString("Sub Project Name")
+                                </b>
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SubProject.Name)
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.Project.ProjectNr)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Project.ProjectNr)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.Project.Client)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Project.Client)
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.TimeStamp)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.TimeStamp.Date)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.ItemType.Item_Type)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ItemType.Item_Type)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;"><b>@Html.DisplayNameFor(modelItem => item.UniqueID)</b></td>
+                        <td>@Html.DisplayFor(modelItem => item.UniqueID)</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.Amount)
+                            </b>
+                        </td>
+                        @if (item.ItemType.Install_Unit.TheUnit.Equals("pr. l"))
+                        {
+                            <td>@Html.DisplayFor(Model => item.Amount) @SharedLocalizer.GetLocalizedHtmlString("l")</td>
+                        }
+                        else if (item.ItemType.Install_Unit.TheUnit.Equals("pr. m"))
+                        {
+                            <td>@Html.DisplayFor(modelItem => item.Amount) @SharedLocalizer.GetLocalizedHtmlString("m")</td>
+                        }
+                        else
+                        {
+                            <td>@Html.DisplayFor(modelItem => item.Amount) @Html.DisplayFor(modelItem => item.ItemType.Install_Unit.TheUnit)</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;"><b>@Html.DisplayNameFor(modelItem => item.Latitude)</b></td>
+                        <td>@Html.DisplayFor(modelItem => item.Latitude)</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;"><b>@Html.DisplayNameFor(modelItem => item.Longitude)</b></td>
+                        <td>@Html.DisplayFor(modelItem => item.Longitude)</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;"><b>@Html.DisplayNameFor(modelItem => item.Location)</b></td>
+                        <td>@Html.DisplayFor(modelItem => item.Location)</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><b>@Html.DisplayNameFor(modelItem => item.Install_Text)</b></td>
+                    </tr>
+                    <tr rowspan="20">
+                        <td colspan="3">
+                            <textarea rows="8" cols="64" class="form-control" style="width:100%;">@Html.DisplayFor(modelItem => item.Install_Text)</textarea>
+                        </td>
+                    </tr>
+                </table>
+
+                <table name="phototable" style="page-break-inside:avoid;">
+                    @{ var rows = 0;}
+                    @if (Model.Install_Photos.Where(x => x.InstallId.Equals(item.Id)).Count() % 2 == 0)
+                    {
+                        rows = Model.Install_Photos.Where(x => x.InstallId.Equals(item.Id)).Count() / 2;
+                    }
+                    else
+                    {
+                        rows = Convert.ToInt32(Model.Install_Photos.Where(x => x.InstallId.Equals(item.Id)).Count() / 2) + 1;
+                    }
+                    @{ var totalpics = Model.Install_Photos.Where(x => x.InstallId.Equals(item.Id)).Count();}
+                    @for (int i = 0; i < rows; i++)
+                    {
+
+                        
+                        if (totalpics - 2 >= 0)
+                        {
+                            var photo1 = Model.Install_Photos.Where(x => x.InstallId.Equals(item.Id)).ElementAt((i + 1) * 2 - 2);
+                            var photo2 = Model.Install_Photos.Where(x => x.InstallId.Equals(item.Id)).ElementAt((i + 1) * 2 - 2 + 1);
+                            <tr>
+                                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;"/></td>
+                                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;"/></td>
+                            </tr>
+                            totalpics -= 2;
+                        }
+                        else //enough room to add 1 picture in row
+                        {
+                            var photo1 = Model.Install_Photos.Where(x => x.InstallId.Equals(item.Id)).ElementAt((i + 1) * 2 - 2);
+                            <tr>
+                                <td colspan="2"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;"/></td>
+                            </tr>
+                            totalpics -= 1;
+                        }
+
+                    }
+                </table>
+            }
+            @foreach (var item in Model.Arrivals.Where(x => x.SubProjectId.Equals(subproj.Id)))
+            {
+        <table style="page-break-inside:avoid;">
+            <tr>
+                <td colspan="3">
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("Arrival of Item")</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Project.Name)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Name)
+                </td>
+                <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@item.Project.Division.Id/@item.Project.Division.LogoPath" width="151" height="66" /></td>
+            </tr>
+            @if (item.SubProjectId != null)
+            {
+                <tr>
+                    <td style="text-align:left;">
+                        <b>
+                            @SharedLocalizer.GetLocalizedHtmlString("Sub Project Name")
+                        </b>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubProject.Name)
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Project.ProjectNr)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.ProjectNr)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Project.Client)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Client)
+                </td>
+
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.TimeStamp)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TimeStamp.Date)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.ItemType.Item_Type)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ItemType.Item_Type)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;"><b>@Html.DisplayNameFor(modelItem => item.UniqueID)</b></td>
+                <td>@Html.DisplayFor(modelItem => item.UniqueID)</td>
+            </tr>
+            <tr>
+                <td style="text-align:left;"><b>@Html.DisplayNameFor(modelItem => item.Latitude)</b></td>
+                <td>@Html.DisplayFor(modelItem => item.Latitude)</td>
+            </tr>
+            <tr>
+                <td style="text-align:left;"><b>@Html.DisplayNameFor(modelItem => item.Longitude)</b></td>
+                <td>@Html.DisplayFor(modelItem => item.Longitude)</td>
+            </tr>
+            <tr>
+                <td colspan="3"><b>@Html.DisplayNameFor(modelItem => item.Arrival_Text)</b></td>
+            </tr>
+            <tr rowspan="20">
+                <td colspan="3">
+                    <textarea rows="8" cols="64" class="form-control" style="width:100%;">@Html.DisplayFor(modelItem => item.Arrival_Text)</textarea>
+                </td>
+            </tr>
+        </table>
+
+                <table name="phototable" style="page-break-inside:avoid;">
+                    @{ var rows = 0;}
+                    @if (Model.Arrival_Photos.Where(x => x.ArrivalId.Equals(item.Id)).Count() % 2 == 0)
+                    {
+                        rows = Model.Arrival_Photos.Where(x => x.ArrivalId.Equals(item.Id)).Count() / 2;
+                    }
+                    else
+                    {
+                        rows = Convert.ToInt32(Model.Arrival_Photos.Where(x => x.ArrivalId.Equals(item.Id)).Count() / 2) + 1;
+                    }
+                    @{ var totalpics = Model.Arrival_Photos.Where(x => x.ArrivalId.Equals(item.Id)).Count();}
+                    @for (int i = 0; i < rows; i++)
+                    {
+                        if (totalpics - 2 >= 0)
+                        {
+                            var photo1 = Model.Arrival_Photos.Where(x => x.ArrivalId.Equals(item.Id)).ElementAt((i + 1) * 2 - 2);
+                            var photo2 = Model.Arrival_Photos.Where(x => x.ArrivalId.Equals(item.Id)).ElementAt((i + 1) * 2 - 2 + 1);
+                            <tr>
+                                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;"/></td>
+                                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;"/></td>
+                            </tr>
+                            totalpics -= 2;
+                        }
+                        else //enough room to add 1 picture in row
+                        {
+                            var photo1 = Model.Arrival_Photos.Where(x => x.ArrivalId.Equals(item.Id)).ElementAt((i + 1) * 2 - 2);
+                            <tr>
+                                <td colspan="2"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;"/></td>
+                            </tr>
+                            totalpics -= 1;
+                        }
+
+                    }
+                </table>
+            }
+            @foreach (var item in Model.Deinstallations.Where(x => x.SubProjectId.Equals(subproj.Id)))
+            {
+                <table style="page-break-inside:avoid;">
+                    <tr>
+                        <td colspan="3">
+                            <b>@SharedLocalizer.GetLocalizedHtmlString("Deinstallation of Item")</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.Project.Name)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Project.Name)
+                        </td>
+                        <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@item.Project.Division.Id/@item.Project.Division.LogoPath" width="151" height="66" /></td>
+                    </tr>
+                    @if (item.SubProjectId != null)
+                    {
+                        <tr>
+                            <td style="text-align:left;">
+                                <b>
+                                    @SharedLocalizer.GetLocalizedHtmlString("Sub Project Name")
+                                </b>
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SubProject.Name)
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.Project.ProjectNr)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Project.ProjectNr)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.Project.Client)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Project.Client)
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.TimeStamp)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.TimeStamp.Date)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.ItemType.Item_Type)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ItemType.Item_Type)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;"><b>@Html.DisplayNameFor(modelItem => item.Latitude)</b></td>
+                        <td>@Html.DisplayFor(modelItem => item.Latitude)</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;"><b>@Html.DisplayNameFor(modelItem => item.Longitude)</b></td>
+                        <td>@Html.DisplayFor(modelItem => item.Longitude)</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><b>@Html.DisplayNameFor(modelItem => item.DeInstall_Text)</b></td>
+                    </tr>
+                    <tr rowspan="20">
+                        <td colspan="3">
+                            <textarea rows="8" cols="64" class="form-control" style="width:100%;">@Html.DisplayFor(modelItem => item.DeInstall_Text)</textarea>
+                        </td>
+                    </tr>
+                </table>
+
+                <table name="phototable" style="page-break-inside:avoid;">
+                    @{ var rows = 0;}
+                    @if (Model.Deinstall_Photos.Where(x => x.DeinstallId.Equals(item.Id)).Count() % 2 == 0)
+                    {
+                        rows = Model.Deinstall_Photos.Where(x => x.DeinstallId.Equals(item.Id)).Count() / 2;
+                    }
+                    else
+                    {
+                        rows = Convert.ToInt32(Model.Deinstall_Photos.Where(x => x.DeinstallId.Equals(item.Id)).Count() / 2) + 1;
+                    }
+                    @{ var totalpics = Model.Deinstall_Photos.Where(x => x.DeinstallId.Equals(item.Id)).Count();}
+                    @for (int i = 0; i < rows; i++)
+                    {
+
+                        if (totalpics - 2 >= 0)
+                        {
+                            var photo1 = Model.Deinstall_Photos.Where(x => x.DeinstallId.Equals(item.Id)).ElementAt((i + 1) * 2 - 2);
+                            var photo2 = Model.Deinstall_Photos.Where(x => x.DeinstallId.Equals(item.Id)).ElementAt((i + 1) * 2 - 2 + 1);
+                            <tr>
+                                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;"/></td>
+                                <td><img src="@String.Concat("/AHAK/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;"/></td>
+                            </tr>
+                            totalpics -= 2;
+                        }
+                        else //enough room to add 1 picture in row
+                        {
+
+                            var photo1 = Model.Deinstall_Photos.Where(x => x.DeinstallId.Equals(item.Id)).ElementAt((i + 1) * 2 - 2);
+                            <tr>
+                                <td colspan="2"><img src="@String.Concat("/AHAK/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/AHAK/")[1])" style="width:100%;"/></td>
+                            </tr>
+                            totalpics -= 1;
+                        }
+
+                    }
+                </table>
+            }
+            @foreach (var item in Model.ExtraWorks.Where(x => x.SubProjectId.Equals(subproj.Id)))
+            {
+                <table style="page-break-inside:avoid;">
+                    <tr>
+                        <td colspan="3">
+                            <b>@SharedLocalizer.GetLocalizedHtmlString("Extra Work")</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.Project.Name)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Project.Name)
+                        </td>
+                        <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@Model.Project.Division.Id/@Model.Project.Division.LogoPath" width="151" height="66" /></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.Project.ProjectNr)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Project.ProjectNr)
+                        </td>
+                    </tr>
+                    @if (item.SubProjectId != null)
+                    {
+                        <tr>
+                            <td style="text-align:left;">
+                                <b>
+                                    @Html.DisplayNameFor(modelItem => item.SubProject.Name)
+                                </b>
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SubProject.Name) : @Html.DisplayFor(modelItem => item.SubProject.SubProjectNr)
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.Project.Client)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Project.Client)
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.TimeStamp)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(MmodelItem => item.TimeStamp.Date)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.EndStamp)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.EndStamp)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.Price)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Price) @Html.DisplayFor(modelItem => item.Valuta)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left;">
+                            <b>
+                                @Html.DisplayNameFor(modelItem => item.Rental_Price)
+                            </b>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Rental_Price) @Html.DisplayFor(modelItem => item.Valuta)
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><b>@Html.DisplayNameFor(modelItem => item.Description)</b></td>
+                    </tr>
+                    <tr rowspan="20">
+                        <td colspan="3">
+                            <textarea rows="8" cols="64" class="form-control" style="width:100%;">@Html.DisplayFor(modelItem => item.Description)</textarea>
+                        </td>
+                    </tr>
+                </table>
+
+                <table name="phototable" style="page-break-inside:avoid;">
+                    @{ var rows = 0;}
+                    @if (item.pictures.Count % 2 == 0)
+                    {
+                        rows = item.pictures.Count() / 2;
+                    }
+                    else
+                    {
+                        rows = Convert.ToInt32(item.pictures.Count() / 2) + 1;
+                    }
+                    @{ var totalpics = item.pictures.Count();}
+                    @for (int i = 0; i < rows; i++)
+                    {
+                        if (totalpics - 2 >= 0)
+                        {
+                            <tr>
+                                <td><img src="~/AHAK/ExtraWorks/@item.Id.ToString()/@item.pictures[(i+1)*2 - 2]" style="width:100%;" /></td>
+                                <td><img src="~/AHAK/ExtraWorks/@item.Id.ToString()/@item.pictures[(i+1)*2 - 2 +1]" style="width:100%;" /></td>
+                            </tr>
+                            totalpics -= 2;
+                        }
+                        else //enough room to add 1 picture in row
+                        {
+                            <tr>
+                                <td><img src="@_env.WebRootPath/AHAK/ExtraWorks/@item.Id.ToString()/@item.pictures[(i+1)*2 - 2])" style="width:100%;" /></td>
+                            </tr>
+                            totalpics -= 1;
+                        }
+
+                    }
+                </table>
+                @if(item.pdf2s.Count > 0)
+                {                    
+                <table style="width:100%;">
+                    @foreach (string thepdf2 in item.pdf2s)
+                    {
+                        var path = _env.WebRootPath +"/AHAK/ExtraWorks/"+ @item.Id.ToString() +"/"+ thepdf2.Replace(".pdf", ".png");
+                        <tr>
+                            <td style="width:100%;height:100%;">
+                                <img src="@path" style="width:100%;" />
+                            </td>
+                        </tr>
+                    }
+                </table>
+                }
+            }
+        </div>
+                }
+            }
+        }
+    </div>
+</div>

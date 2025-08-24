@@ -1,0 +1,20 @@
+﻿@model MainOps.Models.Feedback
+
+<form asp-action="Feedback" method="post" enctype="multipart/form-data">
+    @Html.HiddenFor(Model => Model.TimeStamp)
+    @Html.HiddenFor(Model => Model.WorkTaskId)
+    @Html.HiddenFor(Model => Model.WorkItemId)
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td style="width:30%"><label asp-for="Text" class="control-label" style="width:100%;"></label></td>
+            <td style="width:70%;"><textarea asp-for="Text" cols="40" rows="4" style="width:100%;" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Feedback..")"></textarea></td>
+        </tr>
+        <tr>
+            <td style="width:30%"><label class="control-label" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Photos")</label></td>
+            <td style="width:70%"><input name="files" type="file" multiple accept=".jpg,.jpeg,.png,.pdf" style="width:100%;" /></td>
+        </tr>
+        <tr>
+            <td colspan="2"><button class="btn-hoelscher" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Send Feedback")</button></td>
+        </tr>
+    </table>
+</form>

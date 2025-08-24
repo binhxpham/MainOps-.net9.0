@@ -1,0 +1,84 @@
+﻿@model MainOps.Models.WaterHandling
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>WaterHandling</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="MeasPointId" class="control-label"></label>
+                <select asp-for="MeasPointId" class="form-control" asp-items="ViewBag.MeasPointId"></select>
+                <span asp-validation-for="MeasPointId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ClearPumpTestId" class="control-label"></label>
+                <select asp-for="ClearPumpTestId" class="form-control" asp-items="ViewBag.ClearPumpTestId"></select>
+                <span asp-validation-for="ClearPumpTestId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DrillWaterId" class="control-label"></label>
+                <select asp-for="DrillWaterId" class="form-control" asp-items="ViewBag.DrillWaterId"></select>
+                <span asp-validation-for="DrillWaterId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WellName" class="control-label"></label>
+                <input asp-for="WellName" class="form-control" />
+                <span asp-validation-for="WellName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="WellId" class="control-label"></label>
+                <select asp-for="WellId" class="form-control" asp-items="ViewBag.WellId"></select>
+                <span asp-validation-for="WellId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PumpWaterStart" class="control-label"></label>
+                <input asp-for="PumpWaterStart" class="form-control" />
+                <span asp-validation-for="PumpWaterStart" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="PumpWaterEnd" class="control-label"></label>
+                <input asp-for="PumpWaterEnd" class="form-control" />
+                <span asp-validation-for="PumpWaterEnd" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DrillWaterStart" class="control-label"></label>
+                <input asp-for="DrillWaterStart" class="form-control" />
+                <span asp-validation-for="DrillWaterStart" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DrillWaterEnd" class="control-label"></label>
+                <input asp-for="DrillWaterEnd" class="form-control" />
+                <span asp-validation-for="DrillWaterEnd" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AmountContainerDrill" class="control-label"></label>
+                <input asp-for="AmountContainerDrill" class="form-control" />
+                <span asp-validation-for="AmountContainerDrill" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AmountContainerPump" class="control-label"></label>
+                <input asp-for="AmountContainerPump" class="form-control" />
+                <span asp-validation-for="AmountContainerPump" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

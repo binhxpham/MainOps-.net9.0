@@ -1,0 +1,92 @@
+﻿@model MainOps.Models.PhotoDocumenation
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>PhotoDocumenation</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="TimeStamp" value="@DateTime.Now" hidden="hidden" />
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Project")</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="SubProjectId" class="control-label"></label>
+                <select asp-for="SubProjectId" class="form-control">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select SubProject")</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>@SharedLocalizer.GetLocalizedHtmlString("Photos")</label>
+                <input type="file" required multiple accept=".jpg,.jpeg,.heic" name="files" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <input asp-for="Description" class="form-control" />
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <table style="width:100%;table-layout:fixed;">
+                    <tr><td colspan="2"><label>@SharedLocalizer.GetLocalizedHtmlString("Coordinates and Accuracy")</label></td></tr>
+                    <tr><td>Lat:</td><td> <input asp-for="Latitude" /></td></tr>
+                    <tr><td>Lng:</td><td> <input asp-for="Longitude" /></td></tr>
+                    <tr><td>Acc:</td><td> <input asp-for="Accuracy" /></td></tr>
+                </table>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+    function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var SubProjectId = $("#SubProjectId").val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                        if (SubProjectId != "" && SubProjectId != null) {
+                            $("#SubProjectId").val(SubProjectId);
+                        }
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+
+                }
+            });
+        }
+    </script>
+}
+
+}

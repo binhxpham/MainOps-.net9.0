@@ -1,0 +1,40 @@
+﻿@model MainOps.Models.CGJClasses.Structure
+
+@{
+    ViewData["Title"] = "Opret_Konstruktion";
+}
+
+<h2>Opret Konstruktion</h2>
+
+<h4>Konstruktion</h4>
+<hr />
+<div class="row">
+    <div class="col-xs-12">
+        <form asp-action="Create_Structure">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="path" hidden="hidden" />
+            <div class="form-group">
+                <label asp-for="ProtocolId" class="control-label"></label>
+                <select asp-for="ProtocolId" class ="form-control" asp-items="ViewBag.ProtocolId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Location" class="control-label"></label>
+                <input asp-for="Location" class="form-control" />
+                <span asp-validation-for="Location" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Opret" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="CGJensenMainMenu">Tilbage</a>
+</div>
+

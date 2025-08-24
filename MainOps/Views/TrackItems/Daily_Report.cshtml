@@ -1,0 +1,560 @@
+﻿@model MainOps.Models.ReportClasses.Daily_Report_2
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Daily Report");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Daily Report")</h2>
+
+<div class="col-xs-12">
+
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td>
+                <form asp-action="Load_Ongoing_Report" asp-controller="TrackItems" method="get">
+                    <button class="btn-hoelscher" style="height:100px;width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Load Previous report")</button>
+                </form>
+            </td>
+            <td>
+                <form asp-action="Save_Ongoing_Report" asp-controller="TrackItems" method="post" onsubmit="CollectData();">
+                    <input type="number" id="ProjectId1" name="ProjectId1" value="" hidden="hidden" />
+                    <input type="number" id="SubProjectId1" name="SubProjectId1" value="" hidden="hidden" />
+                    <input type="number" id="TitleId1" name="TitleId1" value="" hidden="hidden" />
+
+                    @*<input type="datetime" id="Report_Date1" name="Report_Date1" value="@DateTime.Now.Date" hidden="hidden" />*@
+                    <input type="date" id="Report_Date1" name="Report_Date1" value="@DateTime.Now.ToString("yyyy-MM-dd")" hidden="hidden" />
+                    <input type="date" id="InvoiceDate1" name="InvoiceDate1" value="@DateTime.Now.ToString("yyyy-MM-dd")" hidden="hidden" />
+                    <input type="text" id="short_Description1" name="short_Description1" value="" hidden="hidden" />
+                    <input type="time" id="StartHour1" name="StartHour1" value="00:00" hidden="hidden" />
+                    <input type="time" id="EndHour1" name="EndHour1" value="00:00" hidden="hidden" />
+                    <input type="time" id="StandingTime1" name="StandingTime1" value="00:00" hidden="hidden" />
+                    <input type="time" id="SafetyHours1" name="SafetyHours1" value="00:00" hidden="hidden" />
+                    <input type="number" id="Amount1" name="Amount1" value="1" hidden="hidden" />
+                    <input type="text" id="Machinery1" name="Machinery1" value="" hidden="hidden" />
+                    <input type="text" id="Work_Performed1" name="Work_Performed1" value="" hidden="hidden" />
+                    <input type="number" id="SubProjectId1" name="SubProjectId1" value="" hidden="hidden" />
+                    <input type="text" id="OtherPeople1" name="OtherPeople1" value="" hidden="hidden" />
+                    <input type="text" id="OtherPeopleIDs1" name="OtherPeopleIDs1" value="" hidden="hidden" />
+                    <input type="number" id="VariationOrderId1" name="VariationOrderId1" value="" hidden="hidden" />
+                    <button class="btn-hoelscher" style="height:100px;width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Save unfinished report for later")</button>
+                </form>
+            </td>
+
+        </tr>
+
+        <tr>
+            <td colspan="2">
+                <label>@SharedLocalizer.GetLocalizedHtmlString("Note that pictures are NOT saved when you retrieve the report later! They need to be added again!")</label>
+            </td>
+        </tr>
+    </table>
+
+
+    <form asp-action="Daily_Report" enctype="multipart/form-data" method="post" onsubmit="retrieveData(event);" id="theform">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <table style="width:100%;table-layout:fixed;">
+            <thead>
+                <tr>
+                    <th style="width:50%;">
+                    </th>
+                    <th style="width:50%;">
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><b>@Html.DisplayNameFor(x => x.ProjectId)</b></td>
+                    <td>
+                        <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillTitles()" style="width:100%">
+                            @*<option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Choose Project")</option>*@
+                        </select>
+                        <span asp-validation-for="ProjectId" class="text-danger"></span>
+                    </td>
+                </tr>
+                @if (ViewBag.SubProjectId != null)
+                {
+                    <tr>
+                        <td><b>@Html.DisplayNameFor(x => x.SubProjectId)</b></td>
+                        <td>
+                            <select asp-for="SubProjectId" asp-items="ViewBag.SubProjectId" style="width:100%;height:40px;">
+                                <option value="">@SharedLocalizer.GetLocalizedHtmlString("No Sub Projects")</option>
+                            </select>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td><b>@Html.DisplayNameFor(x => x.SubProjectId)</b></td>
+                        <td>
+                            <select asp-for="SubProjectId" style="width:100%;height:40px;">
+                                <option value="">@SharedLocalizer.GetLocalizedHtmlString("No Sub Projects")</option>
+                            </select>
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td><label asp-for="VariationOrderId" class="control-label"></label></td>
+                    <td><select asp-for="VariationOrderId" class="form-control" asp-items="ViewBag.VariationOrderId"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select VariationOrder")</option></select></td>
+                </tr>
+                <tr>
+                    <td style="width:40%;">
+                        <label asp-for="short_Description" style="width:40%;"></label>
+                    </td>
+                    <td style="width:60%;">
+                        <input asp-for="short_Description" class="form-control" style="width:100%;" /><span asp-validation-for="short_Description" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><b>@Html.DisplayNameFor(x => x.TitleId)</b></td>
+                    <td>
+                        <select asp-for="TitleId" id="TitleId" asp-items="ViewBag.TitleId" style="width:100%;height:40px;">
+                            <option value="" selected="">@SharedLocalizer.GetLocalizedHtmlString("Please choose your title")</option>
+                        </select>
+                        <span asp-validation-for="TitleId" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label asp-for="Report_Date" class="control-label"></label>
+                    </td>
+                    <td>
+                        @*<input type="datetime" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd")" asp-for="Report_Date" style="width:100%;height:36px;" />*@
+                        <input type="date" class="form-control" value="@DateTime.Now.Date.ToString("yyyy-MM-dd")" asp-for="Report_Date" style="width:100%;height:36px;" />
+                    </td>
+                </tr>
+                @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DivisionAdmin"))
+                {
+                    <tr>
+                        <td>
+                            <label asp-for="InvoiceDate" class="control-label"></label>
+                        </td>
+                        <td>
+                            <input type="date" class="form-control" value="@DateTime.Now.Date.ToString("yyyy-MM-dd")" asp-for="InvoiceDate" style="width:100%;height:36px;" />
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td><label asp-for="StartHour" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="StartHour" onchange="Updatehourminuteinput(this);" class="form-control" style="width:100%;" />
+                        <span asp-validation-for="StartHour" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr style="border-bottom:2px solid black;">
+                    <td><label asp-for="EndHour" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="EndHour" onchange="Updatehourminuteinput(this);" class="form-control" style="width:100%;" />
+                        <span asp-validation-for="EndHour" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr style="border-left: 2px solid black; border-right: 2px solid black;">
+                    <td><label asp-for="StandingTime" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="StandingTime" onchange="Updatehourminuteinput(this);" class="form-control" style="width:100%;" />
+                        <span asp-validation-for="StandingTime" class="text-danger"></span>
+                    </td>
+                </tr>
+
+                <tr style="border-left: 2px solid black; border-right: 2px solid black; border-bottom: 2px solid black;">
+                    <td><label asp-for="SafetyHours" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="SafetyHours" onchange="Updatehourminuteinput(this);" value="00:00" class="form-control" style="width:100%;" />
+                        <span asp-validation-for="SafetyHours" class="text-danger"></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><label asp-for="Amount" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="Amount" value="1" type="number" step="1" min="1" max="30" class="form-control" style="width:100%;" onchange="UnHideOtherPeople();" />
+                        <span asp-validation-for="Amount" class="text-danger"></span>
+                    </td>
+                </tr>
+                @*<tr id="otherpeopletr1">
+            <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Add Other People")</label></td>
+            <td><textarea asp-for="OtherPeople" cols="30" rows="3" readonly="readonly" style="width:100%;"></textarea></td>
+        </tr>
+        <tr id="otherpeopletr2">
+            <td>
+                <button type="button" onclick="AddUser();" class="btn-hoelscher control-label">@SharedLocalizer.GetLocalizedHtmlString("Add Co-Worker")</button>
+                <button type="button" onclick="ClearUsers();" class="btn-hoelscher control-label">@SharedLocalizer.GetLocalizedHtmlString("Clear Co-Workers")</button>
+            </td>
+            <td><select id="userid" asp-items="ViewBag.Users" style="width:100%;"></select></td>
+        </tr>*@
+                <tr id="otherpeopletr1">
+                    <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Add Other People")</label></td>
+                    <td>
+                        <select id="userid" asp-items="ViewBag.Users" style="width:100%;"></select>
+                        <textarea asp-for="OtherPeople" cols="30" rows="3" readonly="readonly" style="width:100%;"></textarea>
+                        <button type="button" onclick="AddUser();" class="btn-hoelscher" style="width:40%;">@SharedLocalizer.GetLocalizedHtmlString("Add Co-Worker")</button>
+                        <button type="button" onclick="ClearUsers();" class="btn-hoelscher" style="width:40%;">@SharedLocalizer.GetLocalizedHtmlString("Clear Co-Workers")</button>
+                    </td>
+                </tr>
+                <tr hidden="hidden">
+                    <td>@SharedLocalizer.GetLocalizedHtmlString("Users added:")</td>
+                    <td> <input type="text" asp-for="OtherPeopleIDs" /></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Machinery" class="control-label"></label></td>
+                    <td>
+                        <select id="MachineryIds" multiple="multiple" size="12" style="width:100%;">
+                            @foreach (var item in ViewBag.Machinery)
+                            {
+                                <option value="@item.Text">@item.Text</option>
+                            }
+                        </select>
+                        <input asp-for="Machinery" value="Service Car" id="textformachinery" style="width:100%;" />
+                        <button type="button" onclick="AddSelection();" class="btn-hoelscher" style="width:40%;">@SharedLocalizer.GetLocalizedHtmlString("Add Machinery")</button>
+                        <button type="button" onclick="ClearSelection();" class="btn-hoelscher" style="width:40%;">@SharedLocalizer.GetLocalizedHtmlString("Clear Machinery")</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <label asp-for="Work_Performed" class="control-label" style="width:100%;"></label><span asp-validation-for="Work_Performed" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr rowspan="20">
+                    <td colspan="2">
+                        <textarea rows="6" cols="50" class="form-control" asp-for="Work_Performed" style="width:100%;"></textarea>
+                    </td>
+                </tr>
+                <tr id="tobepaidtr">
+                    <td>
+                        <label asp-for="tobepaid" class="control-label"></label>
+                    </td>
+                    <td>
+                        <select asp-for="tobepaid" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("PLEASE SELECT")</option>
+                            <option value="1">@SharedLocalizer.GetLocalizedHtmlString("Hour Rate Payment(Extra Works)")</option>
+                            <option value="2">@SharedLocalizer.GetLocalizedHtmlString("Unit Rate Payment(Installations etc.)")</option>
+                        </select>
+                        <span asp-validation-for="tobepaid" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label></td>
+                    <td><input type="file" name="files" multiple accept=".jpg,.jpeg,.png" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><b>@SharedLocalizer.GetLocalizedHtmlString("Signature")</b></td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <canvas width="330" height="150" id="signature" style="border:1px solid blue;"></canvas>
+                        <span asp-validation-for="Signature" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:45%">
+                        <button type="button" id="accept" class="btn-hoelscher" style="width:100%;height:40px;">@SharedLocalizer.GetLocalizedHtmlString("Accept signature")</button>
+                    </td>
+                    <td style="width:45%">
+                        <button type="button" id="clear" class="btn-hoelscher" style="width:100%;height:40px;">@SharedLocalizer.GetLocalizedHtmlString("Clear signature")</button>
+                        <input type="text" id="signaturedata" hidden="hidden" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <img width="80" height="60" id="savetarget" hidden="hidden" style="border:1px solid black">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="form-group" style="font-size:large">
+            <button type="submit" class="btn-hoelscher" style="width:100%;height:60px;">@SharedLocalizer.GetLocalizedHtmlString("Add Report")</button>
+        </div>
+        <input asp-for="Signature" value="" hidden="hidden" />
+    </form>
+
+    <div>
+        <a asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+    </div>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/mvc/3.0/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/js/signature_pad.min.js"></script>
+    <script type="text/javascript">
+        var pad = null;
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select',
+                    firstDay: 1
+
+                });
+                $('.date-picker').datepicker("setDate", new Date("dd-MM-yy"));
+                //document.getElementById('ProjectId').options[1].selected = 'selected';
+                FillTitles();
+                UnHideOtherPeople();
+                FillHours();
+
+            });
+            $(function () {
+                var canvas = document.querySelector("#signature");
+                pad = new SignaturePad(canvas);
+                $('#accept').click(function () {
+                    var data = pad.toDataURL();
+                    $('#savetarget').attr('src', data);
+                    var base64signature = data.split(',')[1];
+                    $('#signaturedata').val(base64signature);
+                    });
+                    $('#clear').click(function () {
+                        pad.clear();
+                    })
+
+            })
+        });
+        //$(document).ready(function () {
+
+        //});
+        function ClearUsers() {
+            $("#OtherPeopleIDs").val("");
+            $("#OtherPeople").val("");
+        }
+        function AddUser() {
+            var selectedItem = $("#userid option:selected").val();
+            var selectedText = $("#userid option:selected").text();
+            if ($("#OtherPeopleIDs").val() == "") {
+                $("#OtherPeopleIDs").val(selectedItem);
+            }
+            else {
+                $("#OtherPeopleIDs").val($("#OtherPeopleIDs").val() + ", " + selectedItem);
+            }
+            if ($("#OtherPeople").val() == "") {
+                $("#OtherPeople").val(selectedText);
+            }
+            else {
+                $("#OtherPeople").val($("#OtherPeople").val() + ", " + selectedText);
+            }
+        }
+        function CollectData() {
+            $("#ProjectId1").val($("#ProjectId").val());
+            $("#SubProjectId1").val($("#SubProjectId").val());
+            $("#short_Description1").val($("#short_Description").val());
+            $("#VariationOrderId1").val($("#VariationOrderId").val());
+            $("#TitleId1").val($("#TitleId").val());
+            $("#Report_Date1").val($("#Report_Date").val());
+            $("#InvoiceDate1").val($("#InvoiceDate").val());
+            $("#StartHour1").val($("#StartHour").val());
+            $("#EndHour1").val($("#EndHour").val());
+            $("#StandingTime1").val($("#StandingTime").val());
+            $("#SafetyHours1").val($("#SafetyHours").val());
+            $("#Amount1").val($("#Amount").val());
+            $("#Machinery1").val($("#textformachinery").val());
+            $("#Work_Performed1").val($("#Work_Performed").val());
+            $("#OtherPeople1").val($("#OtherPeople").val());
+            $("#OtherPeopleIDs1").val($("#OtherPeopleIDs").val());
+        }
+        function AddSelection() {
+            var selected_text = $('#MachineryIds option:selected')
+                .toArray().map(item => item.text).join();
+            var currenttext = $("#textformachinery").val();
+            if (currenttext != "None") {
+                var newtext = selected_text + "," + currenttext;
+                $("#textformachinery").val(newtext);
+            }
+            else {
+                $("#textformachinery").val(selected_text);
+            }
+        }
+        function ClearSelection() {
+            $("#textformachinery").val("None");
+        }
+        function retrieveData(e) {
+            var posting = true;
+            var s1 = document.getElementById("Signature");
+            var signature = "";
+            signature = document.getElementById("signaturedata").value;
+            s1.value = signature;
+            if (signature == "") {
+                posting = false;
+                e.preventDefault();
+                alert("Please sign the report!");
+            }
+            var amount = document.getElementById("Amount").value;
+            if (amount == "") {
+                posting = false;
+                e.preventDefault();
+            }
+            else if (amount < 1) {
+                posting = false;
+                e.preventDefault();
+                alert("Amount of people cannot be negative");
+            }
+            else if (amount > 1) {
+                var otherpeople = $("#OtherPeople").val();
+                if (otherpeople == "") {
+                    posting = false;
+                    e.preventDefault();
+                    alert("Please enter who you worked with.");
+                }
+            }
+            if ($("#theform").valid() == false) {
+                e.preventDefault();
+                posting = false;
+            }
+            if (posting == true) {
+                StartSpinner();
+            }
+        }
+        function FillHours() {
+            var StandingTime = $("#StandingTime").val();
+            var SafetyHours = $("#SafetyHours").val();
+            if (StandingTime == "" || StandingTime == null) {
+                $("#StandingTime").val("00:00");
+            }
+            if (SafetyHours == "" || SafetyHours == null) {
+                $("#SafetyHours").val("00:00");
+            }
+
+        }
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var SubProjectId = $("#SubProjectId").val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                        if (SubProjectId != "" && SubProjectId != null) {
+                            $("#SubProjectId").val(SubProjectId);
+                        }
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                    FillVariationOrders();
+                }
+                
+            });
+            if (ProjectId == 40 || ProjectId == 48) {
+                if ($("#tobepaidtr").is(":hidden") == true) {
+                    $("#tobepaidtr").removeAttr('hidden');
+                }
+            }
+            else {
+                if ($("#tobepaidtr").is(":hidden") != true) {
+                    $("#tobepaidtr").attr("hidden", 1);
+                    $("#tobepaidtr").val(1);
+                }
+
+            }
+        }
+        function UnHideOtherPeople() {
+            var amount = $("#Amount").val();
+            if (amount > 1) {
+                if ($("#otherpeopletr1").is(":hidden") == true) {
+                    $("#otherpeopletr1").removeAttr('hidden');
+                }
+                //if ($("#otherpeopletr2").is(":hidden") == true) {
+                //    $("#otherpeopletr2").removeAttr('hidden');
+                //}
+            }
+            else {
+                if ($("#otherpeopletr1").is(":hidden") != true) {
+                    $("#otherpeopletr1").attr("hidden", 1);
+                    $("#otherpeopletr1").val(1);
+                }
+                //if ($("#otherpeopletr2").is(":hidden") != true) {
+                //    $("#otherpeopletr2").attr("hidden", 1);
+                //    $("#otherpeopletr2").val(1);
+                //}
+
+            }
+        }
+        function FillTitles() {
+            var ProjectId = $('#ProjectId').val();
+            var TitleId = $("#TitleId").val();
+            var url = '@Url.Action("GetTitlesProject", "Titles")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {'theId' : ProjectId},
+                success: function (data) {
+                    var s = '<option value="">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["theTitle"] + '</option>';
+                    }
+                    $("#TitleId").html(s);
+                    document.getElementById("TitleId").style.width = "100%";
+                    if (TitleId != "" && TitleId != null) {
+                        $("#TitleId").val(TitleId);
+                    }
+                    FillSubProjects();
+                }
+            });
+        }
+        function FillVariationOrders() {
+            var ProjectId = $('#ProjectId').val();
+            var variationOrderId = $('#VariationOrderId').val();
+            var url = '@Url.Action("GetVariationOrdersProject", "BoQHeadlines")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["headLine"] + '</option>';
+                    }
+                    $("#VariationOrderId").html(s);
+                    document.getElementById("VariationOrderId").style.width = "100%";
+                    var x = document.getElementById("VariationOrderId");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        if (x.options[i].value == variationOrderId) {
+                            x.options[i].selected = true;
+                        }
+                    }
+                }
+            });
+        }
+        function Updatehourminuteinput(elem) {
+            var re = new RegExp("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$");
+            if (re.test(elem.value)) {
+                if (elem.value.length == 4) {
+                    elem.value = "0" + elem.value;
+                }
+            }
+            else {
+                if (elem.value.includes(".")) {
+                    elem.value = elem.value.replace(".", ":");
+                    if (re.test(elem.value)) {
+                        if (elem.value.length == 4) {
+                            elem.value = "0" + elem.value;
+                        }
+                    }
+                }
+                if (!elem.value.includes(":") && !elem.value.includes(".") && elem.value.length < 3) {
+                    elem.value = elem.value + ":00";
+                    if (elem.value.length < 5) {
+                        elem.value = "0" + elem.value;
+                    }
+                }
+            }
+        }
+
+    </script>
+}

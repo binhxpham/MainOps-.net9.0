@@ -1,0 +1,276 @@
+﻿@model MainOps.Models.ReportClasses.Well_Drilling
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Well Drilling");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Well Drilling")</h2>
+
+<hr />
+<div class="row">
+    <div class="col-xs-8">
+        <form asp-action="Well_Drilling" enctype="multipart/form-data" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <table>
+                <tr>
+                    <td colspan="2">
+                        <label asp-for="ProjectId" class="control-label"></label>
+                    </td>
+                    <td colspan="2">
+                        <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <label asp-for="ProjectLocation" class="control-label"></label>
+                    </td>
+                    <td colspan="2">
+                        <input asp-for="ProjectLocation" class="form-control" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <label asp-for="WellName" class="control-label"></label>
+                    </td>
+                    <td colspan="2">
+                        <input asp-for="WellName" class="form-control" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <label asp-for="VersionNr" class="control-label"></label>
+                    </td>
+                    <td colspan="2">
+                        <input asp-for="VersionNr" class="form-control" />
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <label asp-for="RevisionReason" class="control-label"></label>
+                    </td>
+                    <td colspan="2">
+                        <input asp-for="RevisionReason" class="form-control" />
+                    </td>
+                </tr>
+                <tr><td colspan="4"></td></tr>
+                <tr>
+                    <td colspan="2"><label asp-for="Scetch_path" class="control-label"></label></td>
+                    <td colspan="2"><input type="file" name="files" accept=".jpg,.jpeg,.png,.gif" /></td>
+                </tr>
+                <tr><td colspan="4"></td></tr>
+                <tr>
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("")</b></td>
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Design")</b></td>
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Actual")</b></td>
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Pass/Fail")</b></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="resting_water_level" class="control-label"></label></td>
+                    <td><input asp-for="resting_water_level" class="form-control" /><span asp-validation-for="resting_water_level" class="text-danger"></span></td>
+                    <td><input asp-for="resting_water_level_actual" class="form-control" /><span asp-validation-for="resting_water_level_actual" class="text-danger"></span></td>
+                    <td style="text-align:center;">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="resting_water_level_pass" />
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Base_depth" class="control-label"></label></td>
+                    <td><input asp-for="Base_depth" class="form-control" /><span asp-validation-for="Base_depth" class="text-danger"></span></td>
+                    <td><input asp-for="Base_depth_actual" class="form-control" /><span asp-validation-for="Base_depth_actual" class="text-danger"></span></td>
+                    <td style="text-align:center;">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="Base_depth_pass" />
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Coordinates")</label></td>
+                    <td>x:<input asp-for="x_coord" class="form-control" />y:<input asp-for="y_coord" class="form-control" />z:<input asp-for="z_coord" class="form-control" /></td>
+                    <td>x:<input asp-for="x_coord_actual" class="form-control" />y:<input asp-for="y_coord_actual" class="form-control" />z:<input asp-for="z_coord_actual" class="form-control" /></td>
+                    <td style="text-align:center;">
+                        <span asp-validation-for="x_coord" class="text-danger"></span>
+                        <span asp-validation-for="x_coord_actual" class="text-danger"></span>
+                        <span asp-validation-for="y_coord" class="text-danger"></span>
+                        <span asp-validation-for="y_coord_actual" class="text-danger"></span>
+                        <span asp-validation-for="z_coord" class="text-danger"></span>
+                        <span asp-validation-for="z_coord_actual" class="text-danger"></span>
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="coord_pass" />
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Drill_Method" class="control-label"></label></td>
+                    <td><input asp-for="Drill_Method" class="form-control" /></td>
+                    <td><input asp-for="Drill_Method_actual" class="form-control" /></td>
+                    <td style="text-align:center;">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="Drill_Method_pass" />
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Drill_Casing" class="control-label"></label></td>
+                    <td><input asp-for="Drill_Casing" class="form-control" /></td>
+                    <td><label asp-for="Drill_Casing_size" class="control-label"></label></td>
+                    <td><input asp-for="Drill_Casing_size" class="form-control" /><span asp-validation-for="Drill_Casing_size" class="text-danger"></span></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Drill_Fluid" class="control-label"></label></td>
+                    <td><input asp-for="Drill_Fluid" class="form-control" /></td>
+                    <td><label asp-for="Drill_Info" class="control-label"></label></td>
+                    <td><textarea rows="5" cols="36" class="form-control" asp-for="Drill_Info"></textarea></td>
+                </tr>
+                <tr>
+                    <td colspan="4"><label asp-for="Ground_Notes" class="control-label"></label></td>
+                </tr>
+                <tr rowspan="20">
+                    <td colspan="4">
+                        <textarea rows="4" cols="64" class="form-control" asp-for="Ground_Notes"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4"><label asp-for="Change_Notes" class="control-label"></label></td>
+                </tr>
+                <tr rowspan="20">
+                    <td colspan="4">
+                        <textarea rows="4" cols="64" class="form-control" asp-for="Change_Notes"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4"><label asp-for="WL_Notes" class="control-label"></label></td>
+                </tr>
+                <tr rowspan="20">
+                    <td colspan="4">
+                        <textarea rows="4" cols="64" class="form-control" asp-for="WL_Notes"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4"><label asp-for="WL_Start_Notes" class="control-label"></label></td>
+                </tr>
+                <tr rowspan="20">
+                    <td colspan="4">
+                        <textarea rows="4" cols="64" class="form-control" asp-for="WL_Start_Notes"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4"><label asp-for="WL_End_Notes" class="control-label"></label></td>
+                </tr>
+                <tr rowspan="20">
+                    <td colspan="4">
+                        <textarea rows="4" cols="64" class="form-control" asp-for="WL_End_Notes"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Filter_Sand_Bags" class="control-label"></label></td>
+                    <td><input asp-for="Filter_Sand_Bags" class="form-control" /><span asp-validation-for="Filter_Sand_Bags" class="text-danger"></span></td>
+                    <td><label asp-for="Filter_Sand_Bags_actual" class="control-label"></label></td>
+                    <td><input asp-for="Filter_Sand_Bags_actual" class="form-control" /><span asp-validation-for="Filter_Sand_Bags_actual" class="text-danger"></span></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Filter_Pack" class="control-label"></label></td>
+                    <td><input asp-for="Filter_Pack" class="form-control" /><span asp-validation-for="Filter_Pack" class="text-danger"></span></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Filter_Pack_Start" class="control-label"></label></td>
+                    <td><input asp-for="Filter_Pack_Start" class="form-control" /><span asp-validation-for="Filter_Pack_Start" class="text-danger"></span></td>
+                    <td><label asp-for="Filter_Pack_End" class="control-label"></label></td>
+                    <td><input asp-for="Filter_Pack_End" class="form-control" /><span asp-validation-for="Filter_Pack_End" class="text-danger"></span></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Filter_Pack_pass" class="control-label"></label></td>
+                    <td><input asp-for="Filter_Pack_pass" class="form-control" /></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Bentonite_Pellet_Bags" class="control-label"></label></td>
+                    <td><input asp-for="Bentonite_Pellet_Bags" class="form-control" /><span asp-validation-for="Bentonite_Pellet_Bags" class="text-danger"></span></td>
+                    <td><label asp-for="Bentonite_Pellet_Bags_actual" class="control-label"></label></td>
+                    <td><input asp-for="Bentonite_Pellet_Bags_actual" class="form-control" /><span asp-validation-for="Bentonite_Pellet_Bags_actual" class="text-danger"></span></td>
+                </tr>
+                <tr>
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("")</b></td>
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Design")</b></td>
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Actual")</b></td>
+                    <td><b>@SharedLocalizer.GetLocalizedHtmlString("Pass/Fail")</b></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Casing_length" class="control-label"></label></td>
+                    <td><input asp-for="Casing_length" class="form-control" /><span asp-validation-for="Casing_length" class="text-danger"></span></td>
+                    <td><input asp-for="Casing_length_actual" class="form-control" /><span asp-validation-for="Casing_length_actual" class="text-danger"></span></td>
+                    <td style="text-align:center;">
+                        <div class="checkbox">
+                            <label>
+                                <input asp-for="Casing_length_pass" />
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="Standing_Time" class="control-label"></label></td>
+                    <td><input asp-for="Standing_Time" /><span asp-validation-for="Standing_Time" class="text-danger"></span></td>
+                    <td><label asp-for="Standing_Time_Notes" class="control-label"></label></td>
+                    <td><textarea rows="5" cols="36" class="form-control" asp-for="Standing_Time_Notes"></textarea></td>
+                </tr>
+
+                <tr>
+                    <td colspan="4"><label asp-for="Notes" class="control-label"></label></td>
+                </tr>
+                <tr rowspan="20">
+                    <td colspan="4">
+                        <textarea rows="8" cols="64" class="form-control" asp-for="Notes"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label asp-for="Name"></label></td>
+                    <td colspan="2"><input asp-for="Name" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><label asp-for="Date_Done"></label></td>
+                    <td colspan="2"><input type="datetime" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd")" asp-for="Date_Done" style="width:100%;height:36px;" /></td>
+                </tr>
+            </table>
+            <div class="form-group">
+                <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString("Add Report")" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datetimepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+                $('.date-picker').datetimepicker("setDate", new Date());
+
+            });
+        });
+
+    </script>
+}

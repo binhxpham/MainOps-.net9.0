@@ -1,0 +1,78 @@
+﻿@model IEnumerable<MainOps.Models.Diet>
+
+@{
+    ViewData["Title"] = "Index";
+}
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Work away from base reports")</h2>
+<table style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FullName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EmployeeNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PayPeriod)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FullName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EmployeeNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PayPeriod)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Name)
+            </td>
+            @if(item.SignatureSupervisor == null)
+                {
+                    <td>@SharedLocalizer.GetLocalizedHtmlString("Needs Signature")</td>
+                }
+                else
+                {
+                    <td></td>
+                }
+        <td>
+            @if(User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager") || User.IsInRole("Supervisor"))
+                { 
+                @if (item.SignatureSupervisor == null)
+                {
+                    <form asp-action="Edit" asp-route-id="@item.Id" method="get">
+                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit/Sign")</button>
+                    </form>
+                }
+                else
+                {
+                    <form asp-action="Edit" asp-route-id="@item.Id" method="get">
+                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                    </form>
+                }
+            }
+            <form asp-action="Details" asp-route-id="@item.Id" method="get" target="_blank">
+                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+            </form>
+            @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin"))
+            {
+                <form asp-action="Delete" asp-route-id="@item.Id" method="get">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button>
+                </form>
+            }
+        </td>
+        </tr>
+}
+    </tbody>
+</table>

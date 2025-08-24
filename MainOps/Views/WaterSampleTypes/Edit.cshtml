@@ -1,0 +1,41 @@
+﻿@model MainOps.Models.WaterSampleType
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>WaterSampleType</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Komponent" class="control-label"></label>
+                <input asp-for="Komponent" class="form-control" />
+                <span asp-validation-for="Komponent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Enhed" class="control-label"></label>
+                <input asp-for="Enhed" class="form-control" />
+                <span asp-validation-for="Enhed" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DL" class="control-label"></label>
+                <input asp-for="DL" class="form-control" />
+                <span asp-validation-for="DL" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <p><a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to Main WaterSample Page")</a></p>
+</div>
+

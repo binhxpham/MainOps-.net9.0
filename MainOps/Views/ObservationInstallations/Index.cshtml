@@ -1,0 +1,125 @@
+﻿@model IEnumerable<MainOps.Models.ObservationInstallation>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.MeasPoint)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WellName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SensorRange)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WellDepth)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SensorDepth)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WaterLevel)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.VariationOrder)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Latitude)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Longitude)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Accuracy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ObservationType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubProject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Comments)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.MeasPoint.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WellName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SensorRange)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WellDepth)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SensorDepth)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WaterLevel)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.VariationOrder.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Latitude)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Longitude)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Accuracy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ObservationType.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SubProject.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeStamp)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Comments)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DoneBy)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

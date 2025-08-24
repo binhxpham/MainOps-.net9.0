@@ -1,0 +1,42 @@
+﻿@model IEnumerable<MainOps.Models.Maintenance>
+
+<table style="width:100%;">
+    @foreach (var item in Model)
+    {
+        <tr>
+            @if (item.SubProjectId != null)
+            {
+                <td>
+                    @String.Format("{0:yyyy-MM-dd}", item.TimeStamp)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SubProject.Name)
+                </td>
+                <td>
+                    <form asp-action="MaintenanceReport_PDF" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
+                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                    </form>
+                </td>
+            }
+            else
+            {
+                <td>
+                    @String.Format("{0:yyyy-MM-dd}", item.TimeStamp)
+                </td>
+                <td colspan="2">
+                    @Html.DisplayFor(modelItem => item.Project.Name)
+                </td>
+                <td>
+                    <form asp-action="MaintenanceReport_PDF" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
+                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                    </form>
+                </td>
+            }
+
+        </tr>
+    }
+
+</table>

@@ -1,0 +1,35 @@
+﻿@model IEnumerable<MainOps.Models.HJItem>
+
+@{
+    ViewData["Title"] = "Details";
+}
+<br />
+<br />
+<br />
+@foreach (var item in Model) {
+
+
+<table style="width: 100%; border:1px black solid;">
+    <tbody>
+        <tr>
+            <td rowspan="2" width="20%" align="left"><img src="~/images/Logos/Lille Logo-hölscher-jensen-sik-CMYK Zusatz_medAddresses.jpg" height="210" /></td>
+            <td colspan="2" align="center" height="105" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.Name)</td>
+        </tr>
+        <tr>
+            <td width="20%" height="105">@Html.DisplayNameFor(modelItem => item.HJId)</td>
+            <td align="center" height="105" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.HJId)</td>
+        </tr>
+        <tr>
+            <td rowspan="2" width="20%" align="left"><img src='@Url.Action("GetQR","HJItems",new { Id = item.Id })' alt="" height="210" /></td>
+            <td width="20%" height="105">@Html.DisplayNameFor(modelItem => item.weight)</td>
+            <td align="center" height="105" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.weight)</td>
+        </tr>
+        <tr>
+            <td width="20%" height="105">@Html.DisplayNameFor(modelItem => item.Measures)</td>
+            <td align="center" height="105" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.Measures)</td>
+        </tr>
+    </tbody>
+</table>
+<br />
+<br />
+}

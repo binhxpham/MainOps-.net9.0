@@ -1,0 +1,117 @@
+﻿@model MainOps.Models.SedimentationSiteReport
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h2>Delete</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>SedimentationSiteReport</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.SedimenationCleanedAndEmptied)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SedimenationCleanedAndEmptied)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SedimentationShouldBeEmptiedAndCleaned)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SedimentationShouldBeEmptiedAndCleaned)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.GeoTubeExchanged)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.GeoTubeExchanged)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.GeoTubeShouldBeExchanged)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.GeoTubeShouldBeExchanged)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SiteCheckPerformed)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SiteCheckPerformed)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Leakages)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Leakages)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AccessWays)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AccessWays)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Safety)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Safety)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AcidExchanged)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AcidExchanged)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AcidShouldBeExchanged)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AcidShouldBeExchanged)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AlarmFunction)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AlarmFunction)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Project)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Project.Abbreviation)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SubProject)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SubProject.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TimeStamp)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TimeStamp)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Comments)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Comments)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DoneBy)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DoneBy)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

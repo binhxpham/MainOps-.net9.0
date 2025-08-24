@@ -1,0 +1,119 @@
+﻿@model MainOps.Models.Maintenance
+
+@{
+    ViewData["Title"] = "Edit_Maintenance";
+}
+
+<h2>Edit_Maintenance</h2>
+
+<h4>Maintenance</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit_Maintenance" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();"></select>
+                <span asp-validation-for="ProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SubProjectId" class="control-label"></label>
+                <select asp-for="SubProjectId" class="form-control" asp-items="ViewBag.SubProjectId"></select>
+                <span asp-validation-for="SubProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TimeStamp" class="control-label"></label>
+                <input type="datetime-local" asp-for="TimeStamp" value="@Model.TimeStamp.ToString("yyyy-MM-ddTHH:mm")" style="width:100%;height:40px;" />
+                <span asp-validation-for="TimeStamp" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="MaintenancePoint" class="control-label"></label>
+                <input asp-for="MaintenancePoint" class="form-control" />
+                <span asp-validation-for="MaintenancePoint" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LogText" class="control-label"></label>
+                <input asp-for="LogText" class="form-control" />
+                <span asp-validation-for="LogText" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="HoursSpent" class="control-label"></label>
+                <input asp-for="HoursSpent" type="time" class="form-control" />
+                <span asp-validation-for="HoursSpent" class="text-danger"></span>
+            </div>
+            <div class="from-group">
+                <label>@SharedLocalizer.GetLocalizedHtmlString("Upload Photos")</label>
+                <input name="files" type="file" multiple accept=".jpg,jpeg,.png" />
+            </div>
+            @Html.HiddenFor(Model => Model.EnteredIntoDataBase)
+            @Html.HiddenFor(Model => Model.Latitude)
+            @Html.HiddenFor(Model => Model.Longitude)
+            @Html.HiddenFor(Model => Model.InstallId)
+            @Html.HiddenFor(Model => Model.MeasPointId)
+            @Html.HiddenFor(Model => Model.HJItemId)
+            @Html.HiddenFor(Model => Model.Signature)
+            @Html.HiddenFor(Model => Model.DoneBy)
+
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+                });
+            });
+        });
+        function FillSubProjects() {
+            var SubProjectId = $('#SubProjectId').val();
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                        var x = document.getElementById("SubProjectId");
+                        var i;
+                        for (i = 0; i < x.length; i++) {
+                            if (x.options[i].value == SubProjectId) {
+                                x.options[i].selected = true;
+                            }
+                        }
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+        }
+        
+    </script>
+}

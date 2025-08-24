@@ -1,0 +1,181 @@
+﻿@model MainOps.Models.ReportClasses.Generator_Test
+
+@{
+    ViewData["Title"] = "Generator_Test";
+}
+
+<h2>Generator_Test</h2>
+
+<h4>Generator_Test</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Generator_Test">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Type" class="control-label"></label>
+                <input asp-for="Type" class="form-control" />
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Site_Manager_Name" class="control-label"></label>
+                <input asp-for="Site_Manager_Name" class="form-control" />
+                <span asp-validation-for="Site_Manager_Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Location" class="control-label"></label>
+                <input asp-for="Location" class="form-control" />
+                <span asp-validation-for="Location" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Manufacturer" class="control-label"></label>
+                <input asp-for="Manufacturer" class="form-control" />
+                <span asp-validation-for="Manufacturer" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="HD_Equipment_Id" class="control-label"></label>
+                <input asp-for="HD_Equipment_Id" class="form-control" />
+                <span asp-validation-for="HD_Equipment_Id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Oil_level_check" /> @Html.DisplayNameFor(model => model.Oil_level_check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Fuel_level" class="control-label"></label>
+                @Html.EditorFor(model => model.Fuel_level, new { htmlAttributes = new { @class = "form-control", placeholder = "%", type = "number" } })
+                <span asp-validation-for="Fuel_level" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Fuel_level_check" /> @Html.DisplayNameFor(model => model.Fuel_level_check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Battery_level" class="control-label"></label>
+                @Html.EditorFor(model => model.Battery_level, new { htmlAttributes = new { @class = "form-control", placeholder = "%", type = "number" } })
+                <span asp-validation-for="Battery_level" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Battery_status" /> @Html.DisplayNameFor(model => model.Battery_status)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Heating_check" /> @Html.DisplayNameFor(model => model.Heating_check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Cooling_check" /> @Html.DisplayNameFor(model => model.Cooling_check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Cut_power_supply_during_test" /> @Html.DisplayNameFor(model => model.Cut_power_supply_during_test)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Generator_Run_1_Hour" /> @Html.DisplayNameFor(model => model.Generator_Run_1_Hour)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Load_current_fully_overtaken" /> @Html.DisplayNameFor(model => model.Load_current_fully_overtaken)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Time_delayed_starting_of_pumps" /> @Html.DisplayNameFor(model => model.Time_delayed_starting_of_pumps)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Switching_off_generator_ok" /> @Html.DisplayNameFor(model => model.Switching_off_generator_ok)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="received_alarm" /> @Html.DisplayNameFor(model => model.received_alarm)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Hours_of_Operation" class="control-label"></label>
+                <input asp-for="Hours_of_Operation" class="form-control" />
+                <span asp-validation-for="Hours_of_Operation" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Special_events" class="control-label"></label>
+                <input asp-for="Special_events" class="form-control" />
+                <span asp-validation-for="Special_events" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="datetime" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd")" asp-for="Date_Done" style="width:250px;height:40px;" />
+                <span asp-validation-for="Date_Done" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString("Save")" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datetimepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+                $('.date-picker').datetimepicker("setDate", new Date());
+
+            });
+        });
+
+    </script>
+}

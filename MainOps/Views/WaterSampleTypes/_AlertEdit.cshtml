@@ -1,0 +1,32 @@
+﻿@model MainOps.Models.ViewModels.AlertEditWSTVM
+@{ 
+    Layout = null;
+}
+<h4>@SharedLocalizer.GetLocalizedHtmlString("Edit Alert Limits")</h4>
+<h2>@Html.DisplayFor(Model => Model.WaterSampleType.Komponent) : @Html.DisplayFor(Model => Model.WaterSamplePlace.Project.Name) : @Html.DisplayFor(Model => Model.WaterSamplePlace.Name)</h2>
+<hr />
+<div class="row">
+    <div class="col-xs-6">
+        <form asp-action="EditAlert" method="post" id="TheForm">
+            @Html.HiddenFor(x=>x.WaterSamplePlaceId)
+            @Html.HiddenFor(x=>x.WaterSampleTypeId)
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <table>
+                <tr>
+                    <td><label asp-for="Limit" class="control-label"></label></td>
+                    <td>
+                        <input type="number" name="Limit" value="@Model.Limit" class="form-control" />
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="MeanLimit" class="control-label"></label></td>
+                    <td>
+                       <input type="number" name="MeanLimit" value="@Model.MeanLimit" class="form-control" />
+                    </td>
+                </tr>
+            </table>
+            <button type="button" class="btn btn-hoelscher" onclick="doTheSubmit();" style="height:60px;width:120px;">@SharedLocalizer.GetLocalizedHtmlString("Apply Edit")</button>
+        </form>
+    </div>
+</div>
+

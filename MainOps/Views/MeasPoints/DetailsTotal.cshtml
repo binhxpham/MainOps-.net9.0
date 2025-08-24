@@ -1,0 +1,243 @@
+﻿@model MainOps.Models.MeasPointViewModel
+
+<head>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM"></script>
+</head>
+
+@{
+    ViewData["Title"] = "All details";
+}
+
+
+<input type="hidden" id="graphname" value="@Model.MeasPoint.Name" />
+<input type="hidden" id="mpId" value="@Model.MeasPoint.Id" />
+<br />
+<br />
+<br />
+
+<table border="1">
+    <thead>
+        <tr>
+
+            <th width="10%">@Html.DisplayNameFor(model => model.MeasPoint.Project)</th>
+            <th width="30%" colspan="3">@Html.DisplayNameFor(model => model.MeasPoint.Name)</th>
+            <th width="10%">@Html.DisplayNameFor(model => model.MeasPoint.MonitorType.MonitorTypeName)</th>
+            <th width="10%">@Html.DisplayNameFor(model => model.Offset)</th>
+            <th width="10%">@Html.DisplayNameFor(model => model.MeasPoint.Coordx)</th>
+            <th width="10%">@Html.DisplayNameFor(model => model.MeasPoint.Coordy)</th>
+            <th width="10%">@Html.DisplayNameFor(model => model.MeasPoint.ScadaAddress)</th>
+            <th width="10%">@Html.DisplayNameFor(model => model.MeasPoint.MeasType)</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Html.DisplayFor(model => model.MeasPoint.Project.Abbreviation)</td>
+            <td colspan="3">@Html.DisplayFor(model => model.MeasPoint.Name)</td>
+            <td>@Html.DisplayFor(model => model.MeasPoint.MonitorType.MonitorTypeName)</td>
+            <td>@Html.DisplayFor(model => model.Offset.offset)</td>
+            <td>@Html.DisplayFor(model => model.MeasPoint.Coordx)</td>
+            <td>@Html.DisplayFor(model => model.MeasPoint.Coordy)</td>
+            <td>@Html.DisplayFor(model => model.MeasPoint.ScadaAddress)</td>
+            <td>@Html.DisplayFor(model => model.MeasPoint.MeasType.Type)</td>
+
+        </tr>
+
+        <tr>
+            <td colspan="5" width="400px" height="400px">
+                <div id="myDiv" style="width:100%; height:100%"></div>
+            </td>
+            <td colspan="5" width="400px" height="400px">
+                <div id="chart1"></div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+@if(User.IsInRole("Admin") || User.IsInRole("Member") || User.IsInRole("Guest") || User.IsInRole("MemberGuest")) { 
+@Html.DropDownList("thenextid", ViewData["MeasPoints"] as IEnumerable<SelectListItem>, SharedLocalizer.GetLocalizedHtmlString("Please Select Measurement Point"), new { id ="dropd", style = "width:250px;height:40px;" })
+<button type="button" onclick="addData();">@Localizer["Add data"]</button>
+}
+
+
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.MeasPoint.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> |
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+
+@section scripts{
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js"></script>
+    <script>
+        var thename = document.getElementById('graphname').value;
+        var theid = document.getElementById('mpId').value;
+        var therealdata;
+        var columns = [];
+        var map;
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.load('visualization', '1.0', { 'packages': ['corechart'], 'callback': drawchart });
+
+        function drawchart() {
+            var data = new google.visualization.DataTable();
+            var options = {
+                title: thename,
+                width: 440,
+                height: 380,
+                legend: { position: 'top' },
+                interpolateNulls: true,
+                chartArea: {
+                    height: '90%', width: '90%',
+                    backgroundColor: { stroke: "gray", strokeWidth: 1 }
+                },
+                explorer: {
+                    actions: ['dragToZoom', 'rightClickToReset'],
+                    keepInBounds: true,
+                    maxZoomIn: 20.0
+                },
+                pointSize: 10
+            };
+            data.addColumn('datetime', 'TimeStamp');
+            data.addColumn('number', thename);
+            $.ajax({
+                type: 'post',
+                url: "@Url.Action("JsonData","MeasPoints")",
+                data: {
+                    'id': theid
+                },
+                success: function (d) {
+                    for (i = 0; i < d.length; i++) {
+                        var timeStamp = new Date(d[i].timeStamp);
+                        var time = { v: timeStamp, f: moment(timeStamp).format('YYYY-MM-DD HH:mm:ss') };
+                        var val = d[i].dataValue;
+                        data.addRow([time, val]);
+                    }
+
+                    var chart = new google.visualization.LineChart(document.getElementById('chart1'));
+                    chart.draw(data, options);
+                    window.therealdata = data;
+                },
+                error: function () {
+                    //alert("error o");
+                }
+            });
+        }
+        function addData() {
+            var dd = document.getElementById("dropd");
+            var selectedvalue = dd.options[dd.selectedIndex].value;
+            var selectedText = $("#dropd option:selected").text();
+            var options = {
+                title: "Time Series Data Graph",
+                width: 440,
+                height: 380,
+                legend: { position: 'top' },
+                interpolateNulls: true,
+                chartArea: {
+                    height: '90%', width: '90%',
+                    backgroundColor: { stroke: "gray", strokeWidth: 1 }
+                },
+                explorer: {
+                    actions: ['dragToZoom', 'rightClickToReset'],
+                    keepInBounds: true,
+                    maxZoomIn: 20.0
+                },
+                pointSize: 10
+            };
+            var data1 = new google.visualization.DataTable();
+            var data2 = window.therealdata;
+            
+            $.ajax({
+                type: 'post',
+                url: "@Url.Action("JsonData","MeasPoints")",
+                data: {
+                    'id': selectedvalue
+                },
+                success: function (d) {
+                    data1.addColumn('datetime', 'TimeStamp');
+                    data1.addColumn('number', selectedText);
+                    for (i = 0; i < d.length; i++) {
+                        var timeStamp = new Date(d[i].timeStamp);
+                        var time = { v: timeStamp, f: moment(timeStamp).format('YYYY-MM-DD HH:mm:ss') };
+                        var val = d[i].dataValue;
+                        data1.addRow([time, val]);
+                    }
+                    var keys = [];
+                    var datas = [];
+                    for (var i = 0; i < data2.getNumberOfColumns(); i++) {
+                        if (i < 2) {
+                            keys.push(0);
+                        }
+                        if (i != 0) {
+                            datas.push(i);
+                        }
+                    }
+                    
+                    var joinData = new google.visualization.data.join(data2, data1, 'full', [keys], datas, [1]);
+                    var chart = new google.visualization.LineChart(document.getElementById('chart1'));
+
+                    //google.visualization.events.addListener(chart, 'select', selectHandler2);
+                    chart.draw(joinData, options);
+                    window.therealdata = joinData;
+                    $.getJSON("@Url.Action("SomeAction","MeasPoints")", 
+                    { id: selectedvalue },
+                        function (data) {
+                            addmarker(data.foo, data.baz, data.name);
+                        }
+                    );
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+        }
+        $(document).ready(function () {
+            DisplayGoogleMap();
+        });
+
+        function DisplayGoogleMap() {
+            //Set the Latitude and Longitude of the Map
+           
+            var myLatLng = { lat: @Model.MeasPoint.Lati, lng: @Model.MeasPoint.Longi };
+            //Create Options or set different Characteristics of Google Map
+            var mapOptions = {
+                center: myLatLng,
+                zoom: 11,
+                minZoom: 4,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            //Display the Google map in the div control with the defined Options
+            window.map = new google.maps.Map(document.getElementById("myDiv"), mapOptions);
+
+
+            var marker = new google.maps.Marker({
+                  map: window.map,
+                    position: { lat: @Model.MeasPoint.Lati, lng: @Model.MeasPoint.Longi },
+                  title: "hi",
+            });
+            marker['infowindow'] = new google.maps.InfoWindow({
+                content: "@Model.MeasPoint.Project.Name : @Model.MeasPoint.Name"
+            });
+
+            google.maps.event.addListener(marker, 'click', function () {
+                this['infowindow'].open(map, this);
+            });
+
+            marker.setMap(window.map);
+        }
+        function addmarker(lati, longi, name) {
+             var marker = new google.maps.Marker({
+                  map: window.map,
+                    position: { lat: lati, lng: longi },
+                  title: "hi",
+            });
+            marker['infowindow'] = new google.maps.InfoWindow({
+                content: name
+            });
+            google.maps.event.addListener(marker, 'click', function () {
+                this['infowindow'].open(window.map, this);
+            });
+            marker.setMap(map);
+        }
+        
+
+    </script>
+}

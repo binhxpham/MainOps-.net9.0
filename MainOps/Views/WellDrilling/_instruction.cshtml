@@ -1,0 +1,1075 @@
+﻿@model MainOps.Models.WellDrillingInstruction
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Instruction</title>
+    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+</head>
+<body>
+    <div style="width:100%;">
+        <div id="test"></div>
+        <table border="1" style="width:100%;border-collapse:unset;">
+            <tr>
+                <td rowspan="5" style="border-left:medium;border-top:medium;width:25%;"><h2>@SharedLocalizer.GetLocalizedHtmlString("Drilling Instruction")</h2></td>
+                <td rowspan="5" align="right" style="border-right:medium;border-top:medium;width:25%;"><img src="~/images/Divisions/Photos/@Model.Project.DivisionId/@Model.Project.Division.LogoPath" style="width:100%;" /></td>
+                <td colspan="2" style="width:40%;"><b>@SharedLocalizer.GetLocalizedHtmlString("Drilling Information")</b></td>
+            </tr>
+
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.Borerig)</td>
+                <td>@Html.DisplayFor(Model => Model.Borerig)</td>
+            </tr>
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.Boringstype)</td>
+                <td>@Html.DisplayFor(Model => Model.Boringstype)</td>
+            </tr>
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.Boremetode)</td>
+                <td>@Html.DisplayFor(Model => Model.Boremetode)</td>
+            </tr>
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.Belaegning)</td>
+                <td>@Html.DisplayFor(Model => Model.Belaegning)</td>
+            </tr>
+            <tr>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Project Nr")</td>
+                <td>@Html.DisplayFor(Model => Model.Project.ProjectNr)</td>
+                <td colspan="2"><b>@SharedLocalizer.GetLocalizedHtmlString("Permits")</b></td>
+            </tr>
+            <tr>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Contact Person")</td>
+                <td>@Html.DisplayFor(Model => Model.Project.Responsible_Person)</td>
+                <td>@Html.DisplayNameFor(Model => Model.Boretilladelse)</td>
+                <td>@Html.DisplayFor(Model => Model.Boretilladelse)</td>
+            </tr>
+            <tr>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Date")</td>
+                <td>@string.Format("{0:yyyy-MM-dd}", Model.Date)</td>
+                <td>@Html.DisplayNameFor(Model => Model.Gravetilladelse)</td>
+                <td>@Html.DisplayFor(Model => Model.Gravetilladelse)</td>
+            </tr>
+            <tr>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Address")</td>
+                @if (Model.Address == null || Model.Address == "")
+                {
+                    <td>@Html.DisplayFor(Model => Model.Project.Address)</td>
+                }
+                else
+                {
+                    <td>@Html.DisplayFor(Model => Model.Address)</td>
+                }
+                <td>@Html.DisplayNameFor(Model => Model.RaadenOverVej)</td>
+                <td>@Html.DisplayFor(Model => Model.RaadenOverVej)</td>
+            </tr>
+            <tr>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Drill Place")</td>
+                <td>@Html.DisplayFor(Model => Model.DrillPlace) </td>
+                <td>@Html.DisplayNameFor(Model => Model.Ledningsoplysninger)</td>
+                <td>@Html.DisplayFor(Model => Model.Ledningsoplysninger)</td>
+            </tr>
+            <tr>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Well ID")</td>
+                <td>@Html.DisplayFor(Model => Model.WellID) </td>
+                <td>@Html.DisplayNameFor(Model => Model.Afledningstilladelse)</td>
+                <td>@Html.DisplayFor(Model => Model.Afledningstilladelse)</td>
+            </tr>
+            <tr>
+                @if (Model.ToFiltre.Equals(true))
+                {
+                    <td colspan="2" rowspan="50" style="width:100%">
+                        <table id="myTable" style="width:100%;height:800px;margin-left:auto;margin-right:auto;table-layout:fixed;border-collapse:unset;font-size:10px;">
+                            @{
+                                int counter1 = 0;
+                                int counter7 = 0;
+                                decimal[] percents = Model.Layers.Select(x => x.Percent).ToArray();
+                                var inbentonitelayer = false;
+                                var infilter1layer = false;
+                                var infilter2layer = false;
+                                var beforefilter1layer = false;
+                                var beforefilter2layer = false;
+                                var afterfilter1layer = false;
+                                var afterfilter2layer = false;
+                                var BentoniteLayersStart = Model.BentoniteLayers.Select(x => x.CellStart).ToList();
+                                var BentoniteLayersEnd = Model.BentoniteLayers.Select(x => x.CellEnd).ToList();
+                                var Filter1LayersStart = Model.Filter1_Layers.Select(x => x.CellStart).ToList();
+                                var Filter1LayersEnd = Model.Filter1_Layers.Select(x => x.CellEnd).ToList();
+                                var Filter2LayersStart = Model.Filter2_Layers.Select(x => x.CellStart).ToList();
+                                var Filter2LayersEnd = Model.Filter2_Layers.Select(x => x.CellEnd);
+                                var Pipe1RowSpan = Filter1LayersStart.First() - 1;
+                                if (Model.Filter1_Layers.Last().Under > 0)
+                                {
+                                    Pipe1RowSpan -= 1;
+                                }
+                                var Pipe2RowSpan = 0;
+
+                                var BlindPipe1 = 0;
+                                var BlindPipe2 = 0;
+                                if (Model.BlindPipe1.Equals(true))
+                                {
+                                    BlindPipe1 = Convert.ToInt32(Filter1LayersEnd.Last()) + 1;
+                                }
+                                if (Model.ToFiltre.Equals(true) && Model.BlindPipe2.Equals(true))
+                                {
+                                    BlindPipe2 = Convert.ToInt32(Filter2LayersEnd.Last()) + 1;
+                                }
+                                if (Model.ToFiltre.Equals(true))
+                                {
+                                    Pipe2RowSpan = Convert.ToInt32(Filter2LayersStart.First()) - 1;
+                                    if (Model.Filter2_Layers.LastOrDefault() != null)
+                                    {
+                                        if (Model.Filter2_Layers.Last().Under > 0)
+                                        {
+                                            Pipe2RowSpan -= 1;
+                                        }
+                                    }
+                                    //    Filter2LayersStart = Model.Filter2_Layers.Select(x => x.CellStart);
+                                    //    Filter2LayersEnd = Model.Filter2_Layers.Select(x => x.CellEnd);
+                                }
+
+                            }
+                            @for (int i = 1; i <= 100; i++)
+                            {
+                                inbentonitelayer = false;
+                                infilter1layer = false;
+                                infilter2layer = false;
+                                beforefilter1layer = false;
+                                beforefilter2layer = false;
+                                afterfilter1layer = false;
+                                afterfilter2layer = false;
+                                for (int k = 0; k < BentoniteLayersStart.Count(); k++)
+                                {
+                                    if (i >= BentoniteLayersStart.ElementAt(k) && i <= BentoniteLayersEnd.ElementAt(k))
+                                    {
+                                        inbentonitelayer = true;
+                                    }
+                                }
+                                for (int k = 0; k < Filter1LayersStart.Count(); k++)
+                                {
+                                    if (i >= Filter1LayersStart.ElementAt(k) && i <= Filter1LayersEnd.ElementAt(k))
+                                    {
+                                        infilter1layer = true;
+                                    }
+                                    else if (i < Filter1LayersStart.ElementAt(0))
+                                    {
+                                        beforefilter1layer = true;
+                                    }
+
+                                    else
+                                    {
+                                        afterfilter1layer = true;
+                                    }
+                                }
+                                if (Model.ToFiltre.Equals(true))
+                                {
+                                    for (int k = 0; k < Filter2LayersStart.Count(); k++)
+                                    {
+                                        if (i >= Filter2LayersStart.ElementAt(k) && i <= Filter2LayersEnd.ElementAt(k))
+                                        {
+                                            infilter2layer = true;
+                                        }
+                                        else if (i < Filter2LayersStart.ElementAt(0))
+                                        {
+                                            beforefilter2layer = true;
+                                        }
+
+                                        else
+                                        {
+                                            afterfilter2layer = true;
+                                        }
+                                    }
+                                }
+                                <tr id="row_@i">
+                                    @for (int j = 1; j <= 7; j++)
+                                    {
+                                        int sum1 = 1;
+                                        int sum7 = 1;
+                                        for (int n = 0; n <= counter1; n++)
+                                        {
+                                            sum1 += Convert.ToInt32(percents[n]);
+                                        }
+                                        for (int n = 0; n <= counter7; n++)
+                                        {
+                                            sum7 += Convert.ToInt32(percents[n]);
+                                        }
+                                        if (Model.ToFiltre)
+                                        {
+
+                                            if (j == 1 || j == 7)
+                                            {
+                                                if (i == 1)
+                                                {
+                                                    if (j == 1)
+                                                    {
+                                                        var pixelheight = (double)800.0 * (double)percents[counter1] / 100.0;
+                                                        var heightstr = String.Concat(pixelheight, "px");
+                                    <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@Convert.ToInt32(percents[counter1])" class="Layer" style="width:20%;height:@heightstr;word-break:break-word;border-top:none;border-left:none;border-right:none;text-align:center;color:@Model.Layers.ElementAt(counter1).Layer.TextColor;background-image:url('@String.Concat("/Images/LayerBackGroundImages/", Model.Layers.ElementAt(counter1).Id.ToString(), ".jpg")');">@Model.Layers.ElementAt(counter1).Layer.LayerType</td>
+
+                                                        counter1 += 1;
+                                                    }
+                                                    else
+                                                    {
+                                                        var pixelheight = (double)800.0 * (double)percents[counter7] / 100.0;
+                                                        var heightstr = String.Concat(pixelheight, "px");
+                                                        <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@Convert.ToInt32(percents[counter7])" class="Layer" style="width:20%;height:@heightstr;word-break:break-word;border-top:none;border-left:none;border-right:none;text-align:center;color:@Model.Layers.ElementAt(counter7).Layer.TextColor;background-image:url('@String.Concat("/Images/LayerBackGroundImages/",Model.Layers.ElementAt(counter7).Id.ToString(),".jpg")');">@Model.Layers.ElementAt(counter7).Layer.LayerType</td>
+                                                        counter7 += 1;
+                                                    }
+
+                                                }
+                                                else
+                                                {
+                                                    if (j == 1)
+                                                    {
+                                                        if (i == (sum1 - Convert.ToInt32(percents[counter1])))
+                                                        {
+                                                            if (Model.Layers.ElementAt(counter1).Layer.LayerType == "Bund af Brønd")
+                                                            {
+                                                                @if (j == 1)
+                                                                {
+                                                                    var pixelheight = (double)800.0 * (double)percents[counter1] / 100.0;
+                                                                    var heightstr = String.Concat(pixelheight, "px");
+                                                                    <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" colspan="7" rowspan="@Convert.ToInt32(percents[counter1])" class="Layer" style="height:@heightstr; color:white;background-color:black;word-break:break-word;border-top:none;border-left:none;border-right:none;text-align:center;">@Model.Layers.ElementAt(counter1).Layer.LayerType</td>
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                var pixelheight = (double)800.0 * (double)percents[counter1] / 100.0;
+                                                                var heightstr = String.Concat(pixelheight, "px");
+                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@Convert.ToInt32(percents[counter1])" class="Layer" style="height:@heightstr;word-break:break-word;border-top:none;border-left:none;border-right:none;text-align:center;color:@Model.Layers.ElementAt(counter1).Layer.TextColor;background-image:url('@String.Concat("/Images/LayerBackGroundImages/",Model.Layers.ElementAt(counter1).Id.ToString(),".jpg")');">@Model.Layers.ElementAt(counter1).Layer.LayerType</td>
+                                                                counter1 += 1;
+                                                            }
+
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        if (i == (sum7 - Convert.ToInt32(percents[counter7])))
+                                                        {
+                                                            if (Model.Layers.ElementAt(counter7).Layer.LayerType == "Bund af Brønd")
+                                                            {
+
+                                                            }
+                                                            else
+                                                            {
+                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@Convert.ToInt32(percents[counter7])" class="Layer" style="word-break:break-word;border-top:none;border-left:none;border-right:none;text-align:center;color:@Model.Layers.ElementAt(counter7).Layer.TextColor;background-image:url('@String.Concat("/Images/LayerBackGroundImages/",Model.Layers.ElementAt(counter7).Id.ToString(),".jpg")');">@Model.Layers.ElementAt(counter7).Layer.LayerType</td>
+                                                                counter7 += 1;
+                                                            }
+
+                                                        }
+                                                    }
+
+                                                }
+                                            }
+
+                                            else if ((j == 2 || j == 4 || j == 6) && i < 100)
+                                            {
+                                                @if (i == 1)
+                                                {
+                                                    if (j == 2 || j == 6)
+                                                    {
+                                                        <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" style="width:15%;word-break:break-all;border-top:none;"></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" style="width:10%;word-break:break-all;border-top:none;"></td>
+                                                    }
+
+                                                }
+                                                else
+                                                {
+
+                                                    if (inbentonitelayer == true)
+                                                    {
+
+                                                        if (BentoniteLayersStart.Contains(i))
+                                                        {
+                                                            var index = BentoniteLayersStart.IndexOf(i);
+                                                            var rowspan = BentoniteLayersEnd.ElementAt(index) - i + 1;
+                                                            var pixelheight = (double)800.0 * (double)rowspan / 100.0;
+                                                            var heightstr = String.Concat(pixelheight, "px");
+                                                            <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@rowspan" class="Bentonite" style="height: @heightstr;text-align: center;word-break: break-all;border-top: none;background-size: 100% 100%;background-image: url('https://drive.google.com/u/0/uc?id=1ndXaVByAfoVs1_gMfCadLRX4Y54ZVWIg&export=download');">Bentonit</td>
+                                                        }
+
+
+                                                    }
+                                                    else
+                                                    {
+                                                        if (BentoniteLayersStart.Contains(i + 1)) //next will start a bentonite layer, so we check if arrow is needed
+                                                        {
+                                                            var index = BentoniteLayersStart.IndexOf(i + 1);
+                                                            var under = Model.BentoniteLayers.ElementAt(index).Under;
+                                                            if (under > 0) //insert Grus arrow
+                                                            {
+                                                                <td id="cell_@String.Concat((i+1).ToString(),"_",j.ToString())" class="GrusA" style="text-align: center; border-left: 1px; border-right: 1px; background-size: 100% 100%; color: red; background-image: url('https://drive.google.com/u/0/uc?id=1L6p3Ng3x5FeeY_KISMj7CiOZwCcxFe11&export=download'); word-break: break-all; border-top: none; ">@under m </td>
+                                                            }
+                                                        }
+                                                        else if (BentoniteLayersEnd.Contains(i - 1)) // check if arrow after bentonite layer
+                                                        {
+                                                            var index = BentoniteLayersEnd.IndexOf(i - 1);
+                                                            var over = Model.BentoniteLayers.ElementAt(index).Over;
+                                                            if (over > 0) //insert Grus arrow
+                                                            {
+                                                                <td id="cell_@String.Concat((i+1).ToString(),"_",j.ToString())" class="GrusA" style="text-align: center; border-left: 1px; border-right: 1px; background-size: 100% 100%; color: red; background-image: url('https://drive.google.com/u/0/uc?id=1L6p3Ng3x5FeeY_KISMj7CiOZwCcxFe11&export=download'); word-break: break-all; border-top: none; ">@over m </td>
+                                                            }
+                                                            else //No Arrow needed, proceed as with (i-2)
+                                                            {
+                                                                if (BentoniteLayersStart.ElementAtOrDefault(index + 1) != null)
+                                                                {
+                                                                    var rowspan = BentoniteLayersStart.ElementAt(index + 1) - BentoniteLayersEnd.ElementAt(index) - 1;
+                                                                    <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@rowspan" class="Grus" style="text-align: center; border-left: 1px; background-size: 100% 100%; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none; ">Grus</td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    var rowspan = 99 - BentoniteLayersEnd.ElementAt(index);
+                                                                    <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@rowspan" class="Grus" style="text-align:center;border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none;">Grus</td>
+                                                                }
+                                                            }
+                                                        }
+                                                        else if (i == 2 && BentoniteLayersStart.FirstOrDefault() != 2) //Special start - check if bentonite from top of well
+                                                        {
+                                                            if (BentoniteLayersStart.FirstOrDefault() != null)
+                                                            {
+                                                                var rowspan = BentoniteLayersStart.First() - 2;
+                                                                if (Model.BentoniteLayers.First().Over > 0) //make room for arrow
+                                                                {
+                                                                    rowspan = rowspan - 1;
+                                                                }
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@rowspan" class="Grus" style="text-align: center; border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none; ">Grus</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                var rowspan = 97;
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@rowspan" class="Grus" style="text-align: center; border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none; ">Grus</td>
+                                                            }
+
+                                                        }
+                                                        else if (i == 2 && BentoniteLayersStart.First() == 2)
+                                                        {
+
+                                                        }
+                                                        else if (BentoniteLayersEnd.Contains(i - 2)) //bentonite layer just ended and an arrow has been put there, fill gravel until next or whole way through well
+                                                        {
+                                                            var index = BentoniteLayersEnd.IndexOf(i - 2);
+                                                            if (BentoniteLayersStart.ElementAtOrDefault(index + 1) != null)
+                                                            {
+                                                                var rowspan = BentoniteLayersStart.ElementAt(index + 1) - BentoniteLayersEnd.ElementAt(index) - 1 - 1;
+                                                                if (Model.BentoniteLayers.ElementAt(index + 1).Under > 0)
+                                                                {
+                                                                    rowspan = rowspan - 1;
+                                                                }
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@rowspan" class="Grus" style="text-align: center; border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none; ">Grus</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                var rowspan = 99 - BentoniteLayersEnd.ElementAt(index);
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@rowspan" class="Grus" style="text-align:center;border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none;">Grus</td>
+                                                            }
+
+                                                        }
+                                                    }
+
+                                                }
+
+                                            }
+                                            else if (j == 3 && i < 100)
+                                            {
+                                                if (i == 1)
+                                                {
+                                                    <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@Pipe1RowSpan" class="Pipe" style="width:10%;word-break:break-all;border-top:none;border-left:2px solid red;border-right:2px solid red;text-align:center;">@Model.Filter1_Dim</td>
+                                                }
+
+                                                else
+                                                {
+                                                    if (beforefilter1layer) //dont put anything because pipe continues!
+                                                    {
+                                                        if (i == Pipe1RowSpan + 1 && Model.Filter1_Layers.Last().Under > 0)
+                                                        {
+                                                            <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="ArrowP" style="width: 10%; word-break: break-all; border-top: none; border-left: 2px solid red; border-right: 2px solid red; text-align: center; background-size: 100% 100%; color: red; background-image: url('https://drive.google.com/u/0/uc?id=1FsVU_xvH2cDP_QAxCqa9CE8evQ9jsjEl&export=download')">@Model.Filter1_Layers.Last().Under m</td>
+                                                        }
+                                                    }
+                                                    else if (infilter1layer)
+                                                    {
+                                                        if (Filter1LayersStart.Contains(i))
+                                                        {
+                                                            var index = Filter1LayersStart.IndexOf(i);
+                                                            var rowspan = Filter1LayersEnd.ElementAt(index) - i + 1;
+                                                            if (Model.Filter1_Layers.ElementAt(index).Length > 0)
+                                                            {
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="ArrowF" rowspan="@rowspan" style="word-break: break-all; border-top: none; text-align: center; color: red; border-bottom: 2px solid green; border-top: 2px solid green; border-left: 2px solid green; border-right: 2px solid green; background-size: 100% 100%; background-image: url('https://drive.google.com/u/0/uc?id=1XtDzZx1nVASmoJs44w80CMcmAp16d3If&export=download')">@Model.Filter1_Layers.ElementAt(index).Length m</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="ArrowF" rowspan="@rowspan" style="word-break: break-all; border-top: none; text-align: center; color: red; border-bottom: 2px solid green; border-top: 2px solid green; border-left: 2px solid green; border-right: 2px solid green; background-size: 100% 100%; background-image: url('https://drive.google.com/u/0/uc?id=1XtDzZx1nVASmoJs44w80CMcmAp16d3If&export=download')">X m</td>
+                                                            }
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+                                                        if (i == BlindPipe1)
+                                                        {
+                                                            <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="Blind" style="word-break: break-all; border-top: none; border-left: 2px solid red; border-right: 2px solid red; border-bottom: 2px solid red; text-align: center; color: red; background-size: 100% 100%; background-image: url('https://drive.google.com/u/0/uc?id=1FsVU_xvH2cDP_QAxCqa9CE8evQ9jsjEl&export=download');">@Model.BlindPipe1m m</td>
+                                                        }
+                                                        else if (afterfilter1layer && inbentonitelayer)
+                                                        {
+                                                            if (BentoniteLayersStart.Contains(i))
+                                                            {
+                                                                var index = BentoniteLayersStart.IndexOf(i);
+                                                                var rowspan = BentoniteLayersEnd.ElementAt(index) - i + 1;
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@rowspan" class="Bentonite" style="word-break: break-all; border-top: none; background-size: 100% 100%; background-image: url('https://drive.google.com/u/0/uc?id=1ndXaVByAfoVs1_gMfCadLRX4Y54ZVWIg&export=download');">Bentonit</td>
+                                                            }
+                                                        }
+                                                        else if (Model.BlindPipe1.Equals(true) && i == BlindPipe1 + 1)
+                                                        {
+                                                            if (BentoniteLayersEnd.LastOrDefault() != null)
+                                                            {
+                                                                if (BentoniteLayersEnd.Last() >= i)
+                                                                {
+                                                                    var rowspan = BentoniteLayersStart.Last() - i;
+                                                                    <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="Grus" rowspan="@rowspan" style="text-align:center;border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none;">Grus</td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    var rowspan = 99 - (BlindPipe1);
+                                                                    <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="Grus" rowspan="@rowspan" style="text-align:center;border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none;">Grus</td>
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                var rowspan = 99 - i;
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="Grus" rowspan="@rowspan" style="text-align:center;border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none;">Grus</td>
+                                                            }
+
+                                                        }
+
+                                                    }
+
+                                                }
+
+                                            }
+                                            else if (j == 5 && i < 100)
+                                            {
+                                                if (i == 1)
+                                                {
+                                                    <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@Pipe2RowSpan" class="Pipe" style="width:10%;word-break:break-all;border-top:none;border-left:2px solid red;border-right:2px solid red;text-align:center;">@Model.Filter2_Dim</td>
+                                                }
+
+                                                else
+                                                {
+
+                                                    if (beforefilter2layer) //dont put anything because pipe continues!
+                                                    {
+                                                        if (i == Pipe2RowSpan + 1 && Model.Filter2_Layers.LastOrDefault() != null)
+                                                        {
+                                                            if (Model.Filter2_Layers.Last().Under > 0.0)
+                                                            {
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="ArrowP" style="width: 10%; word-break: break-all; border-top: none; border-left: 2px solid red; border-right: 2px solid red; text-align: center; background-size: 100% 100%; color: red; background-image: url('https://drive.google.com/u/0/uc?id=1FsVU_xvH2cDP_QAxCqa9CE8evQ9jsjEl&export=download');">@Model.Filter1_Layers.Last().Under m</td>
+                                                            }
+
+                                                        }
+                                                    }
+                                                    else if (infilter2layer)
+                                                    {
+                                                        if (Filter2LayersStart.Contains(i))
+                                                        {
+                                                            var index = Filter2LayersStart.IndexOf(i);
+                                                            var rowspan = Filter2LayersEnd.ElementAt(index) - i + 1;
+                                                            if (Model.Filter2_Layers.ElementAt(index).Length > 0)
+                                                            {
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="ArrowF" rowspan="@rowspan" style="word-break: break-all; border-top: none; text-align: center; color: red; border-bottom: 2px solid green; border-top: 2px solid green; border-left: 2px solid green; border-right: 2px solid green; background-size: 100% 100%; background-image: url('https://drive.google.com/u/0/uc?id=1XtDzZx1nVASmoJs44w80CMcmAp16d3If&export=download');">@Model.Filter2_Layers.ElementAt(index).Length m</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="ArrowF" rowspan="@rowspan" style="word-break: break-all; border-top: none; text-align: center; color: red; border-bottom: 2px solid green; border-top: 2px solid green; border-left: 2px solid green; border-right: 2px solid green; background-size: 100% 100%; background-image: url('https://drive.google.com/u/0/uc?id=1XtDzZx1nVASmoJs44w80CMcmAp16d3If&export=download');">X m</td>
+                                                            }
+
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+                                                        if (i == BlindPipe2)
+                                                        {
+                                                            <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="Blind" style="word-break: break-all; border-top: none; border-left: 2px solid red; border-right: 2px solid red; border-bottom: 2px solid red; text-align: center; color: red; background-size: 100% 100%; background-image: url('https://drive.google.com/u/0/uc?id=1FsVU_xvH2cDP_QAxCqa9CE8evQ9jsjEl&export=download');">@Model.BlindPipe2m m</td>
+                                                        }
+                                                        else if (afterfilter2layer && inbentonitelayer)
+                                                        {
+                                                            if (BentoniteLayersStart.Contains(i))
+                                                            {
+                                                                var index = BentoniteLayersStart.IndexOf(i);
+                                                                var rowspan = BentoniteLayersEnd.ElementAt(index) - i + 1;
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@rowspan" class="Bentonite" style="word-break: break-all; border-top: none; background-size: 100% 100%; background-image: url('https://drive.google.com/u/0/uc?id=1ndXaVByAfoVs1_gMfCadLRX4Y54ZVWIg&export=download');">Bentonit</td>
+                                                            }
+                                                        }
+                                                        else if (Model.BlindPipe2.Equals(true) && i == BlindPipe2 + 1 && BlindPipe2 < BentoniteLayersEnd.Last())
+                                                        {
+                                                            if (BentoniteLayersEnd.LastOrDefault() != null)
+                                                            {
+                                                                if (BentoniteLayersEnd.Last() >= i)
+                                                                {
+                                                                    var rowspan = BentoniteLayersStart.Last() - i;
+                                                                    <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="Grus" rowspan="@rowspan" style="text-align:center;border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none;">Grus</td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    var rowspan = 99 - (BlindPipe2);
+                                                                    <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="Grus" rowspan="@rowspan" style="text-align:center;border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none;">Grus</td>
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                var rowspan = 99 - i;
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="Grus" rowspan="@rowspan" style="text-align:center;border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none;">Grus</td>
+                                                            }
+
+                                                        }
+                                                        else if (i == (BentoniteLayersEnd.LastOrDefault() + 1))
+                                                        {
+                                                            var rowspan = 99 - BentoniteLayersEnd.LastOrDefault();
+                                                            <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="Grus" rowspan="@rowspan" style="text-align:center;border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none;">Grus</td>
+                                                        }
+
+
+                                                    }
+
+                                                }
+                                            }
+
+                                        }
+
+
+                                    }
+                                </tr>
+                            }
+                        </table>
+                    </td>
+                    <td>@Html.DisplayNameFor(Model => Model.Forgravning)</td>
+                    <td>@Html.DisplayFor(Model => Model.Forgravning)</td>
+                }
+                else // ONLY ONE PIPE HERE!!!!!!!!!!!!!
+                {
+                    <td colspan="2" rowspan="50" style="width:100%">
+                        <table id="myTable" style="width:100%;height:800px;margin-left:auto;margin-right:auto;table-layout:fixed;border-collapse:unset;font-size:10px;">
+                            @{
+                                int counter1 = 0;
+                                int counter7 = 0;
+                                decimal[] percents = Model.Layers.Select(x => x.Percent).ToArray();
+                                var inbentonitelayer = false;
+                                var infilter1layer = false;
+                                var beforefilter1layer = false;
+                                var afterfilter1layer = false;
+                                var BentoniteLayersStart = Model.BentoniteLayers.Select(x => x.CellStart).ToList();
+                                var BentoniteLayersEnd = Model.BentoniteLayers.Select(x => x.CellEnd).ToList();
+                                var Filter1LayersStart = Model.Filter1_Layers.Select(x => x.CellStart).ToList();
+                                var Filter1LayersEnd = Model.Filter1_Layers.Select(x => x.CellEnd).ToList();
+                                var Pipe1RowSpan = Filter1LayersStart.First() - 1;
+                                if (Model.Filter1_Layers.Last().Under > 0)
+                                {
+                                    Pipe1RowSpan -= 1;
+                                }
+                                
+
+                                var BlindPipe1 = 0;
+
+                                if (Model.BlindPipe1.Equals(true))
+                                {
+                                    BlindPipe1 = Convert.ToInt32(Filter1LayersEnd.Last()) + 1;
+                                }
+                            }
+                            @for (int i = 1; i <= 100; i++)
+                            {
+                                inbentonitelayer = false;
+                                infilter1layer = false;
+                                beforefilter1layer = false;
+                                afterfilter1layer = false;
+                                for (int k = 0; k < BentoniteLayersStart.Count(); k++)
+                                {
+                                    if (i >= BentoniteLayersStart.ElementAt(k) && i <= BentoniteLayersEnd.ElementAt(k))
+                                    {
+                                        inbentonitelayer = true;
+                                    }
+                                }
+                                for (int k = 0; k < Filter1LayersStart.Count(); k++)
+                                {
+                                    if (i >= Filter1LayersStart.ElementAt(k) && i <= Filter1LayersEnd.ElementAt(k))
+                                    {
+                                        infilter1layer = true;
+                                    }
+                                    else if (i < Filter1LayersStart.ElementAt(0))
+                                    {
+                                        beforefilter1layer = true;
+                                    }
+
+                                    else
+                                    {
+                                        afterfilter1layer = true;
+                                    }
+                                }
+                                
+                                <tr id="row_@i">
+                                    @for (int j = 1; j <= 5; j++)
+                                    {
+                                        int sum1 = 1;
+                                        int sum7 = 1;
+                                        for (int n = 0; n <= counter1; n++)
+                                        {
+                                            sum1 += Convert.ToInt32(percents[n]);
+                                        }
+                                        for (int n = 0; n <= counter7; n++)
+                                        {
+                                            sum7 += Convert.ToInt32(percents[n]);
+                                        }
+                                        if (Model.ToFiltre.Equals(false))
+                                        {
+
+                                            if (j == 1 || j == 5)
+                                            {
+                                                if (i == 1)
+                                                {
+                                                    if (j == 1)
+                                                    {
+                                                        var pixelheight = (double)800.0 * (double)percents[counter1] / 100.0;
+                                                        var heightstr = String.Concat(pixelheight, "px");
+                                    <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@Convert.ToInt32(percents[counter1])" class="Layer" style="width:20%;height:@heightstr;word-break:break-word;border-top:none;border-left:none;border-right:none;text-align:center;color:@Model.Layers.ElementAt(counter1).Layer.TextColor;background-image:url('@String.Concat("/Images/LayerBackGroundImages/",Model.Layers.ElementAt(counter1).Id.ToString(),".jpg")');">@Model.Layers.ElementAt(counter1).Layer.LayerType</td>
+
+                                                        counter1 += 1;
+                                                    }
+                                                    else
+                                                    {
+                                                        var pixelheight = (double)800.0 * (double)percents[counter7] / 100.0;
+                                                        var heightstr = String.Concat(pixelheight, " px");
+                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@Convert.ToInt32(percents[counter7])" class="Layer" style="width:20%;height:@heightstr;word-break:break-word;border-top:none;border-left:none;border-right:none;text-align:center;color:@Model.Layers.ElementAt(counter7).Layer.TextColor;background-image:url('@String.Concat("/Images/LayerBackGroundImages/",Model.Layers.ElementAt(counter7).Id.ToString(),".jpg")');">@Model.Layers.ElementAt(counter7).Layer.LayerType</td>
+                                                        counter7 += 1;
+                                                    }
+
+                                                }
+                                                else
+                                                {
+                                                    if (j == 1)
+                                                    {
+                                                        if (i == (sum1 - Convert.ToInt32(percents[counter1])))
+                                                        {
+                                                            if (Model.Layers.ElementAt(counter1).Layer.LayerType == "Bund af Brønd")
+                                                            {
+                                                                @if (j == 1)
+                                                                {
+                                                                    var pixelheight = (double)800.0 * (double)percents[counter1] / 100.0;
+                                                                    var heightstr = String.Concat(pixelheight, "px");
+                                                                    <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" colspan="7" rowspan="@Convert.ToInt32(percents[counter1])" class="Layer" style="height:@heightstr; color:white;background-color:black;word-break:break-word;border-top:none;border-left:none;border-right:none;text-align:center;">@Model.Layers.ElementAt(counter1).Layer.LayerType</td>
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                var pixelheight = (double)800.0 * (double)percents[counter1] / 100.0;
+                                                                var heightstr = String.Concat(pixelheight, "px");
+                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@Convert.ToInt32(percents[counter1])" class="Layer" style="height:@heightstr;word-break:break-word;border-top:none;border-left:none;border-right:none;text-align:center;color:@Model.Layers.ElementAt(counter1).Layer.TextColor;background-image:url('@String.Concat("/Images/LayerBackGroundImages/",Model.Layers.ElementAt(counter1).Id.ToString(),".jpg")');">@Model.Layers.ElementAt(counter1).Layer.LayerType</td>
+                                                                counter1 += 1;
+                                                            }
+
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        if (i == (sum7 - Convert.ToInt32(percents[counter7])))
+                                                        {
+                                                            if (Model.Layers.ElementAt(counter7).Layer.LayerType == "Bund af Brønd")
+                                                            {
+
+                                                            }
+                                                            else
+                                                            {
+                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@Convert.ToInt32(percents[counter7])" class="Layer" style="word-break:break-word;border-top:none;border-left:none;border-right:none;text-align:center;color:@Model.Layers.ElementAt(counter7).Layer.TextColor;background-image:url('@String.Concat("/Images/LayerBackGroundImages/",Model.Layers.ElementAt(counter7).Id.ToString(),".jpg")');">@Model.Layers.ElementAt(counter7).Layer.LayerType</td>
+                                                                counter7 += 1;
+                                                            }
+
+                                                        }
+                                                    }
+
+                                                }
+                                            }
+
+                                            else if ((j == 2 || j == 4) && i < 100)
+                                            {
+                                                @if (i == 1)
+                                                {
+                                                  <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" style="width:20%;word-break:break-all;border-top:none;"></td>
+                                                }
+                                                else
+                                                {
+
+                                                    if (inbentonitelayer == true)
+                                                    {
+
+                                                        if (BentoniteLayersStart.Contains(i))
+                                                        {
+                                                            var index = BentoniteLayersStart.IndexOf(i);
+                                                            var rowspan = BentoniteLayersEnd.ElementAt(index) - i + 1;
+                                                            var pixelheight = (double)800.0 * (double)rowspan / 100.0;
+                                                            var heightstr = String.Concat(pixelheight, "px");
+                                                            <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@rowspan" class="Bentonite" style="height: @heightstr;text-align: center;word-break: break-all;border-top: none;background-size: 100% 100%;background-image: url('https://drive.google.com/u/0/uc?id=1ndXaVByAfoVs1_gMfCadLRX4Y54ZVWIg&export=download');">Bentonit</td>
+                                                        }
+
+
+                                                    }
+                                                    else
+                                                    {
+                                                        if (BentoniteLayersStart.Contains(i + 1)) //next will start a bentonite layer, so we check if arrow is needed
+                                                        {
+                                                            var index = BentoniteLayersStart.IndexOf(i + 1);
+                                                            var under = Model.BentoniteLayers.ElementAt(index).Under;
+                                                            if (under > 0) //insert Grus arrow
+                                                            {
+                                                                <td id="cell_@String.Concat((i+1).ToString(),"_",j.ToString())" class="GrusA" style="text-align: center; border-left: 1px; border-right: 1px; background-size: 100% 100%; color: red; background-image: url('https://drive.google.com/u/0/uc?id=1L6p3Ng3x5FeeY_KISMj7CiOZwCcxFe11&export=download'); word-break: break-all; border-top: none; ">@under m </td>
+                                                            }
+                                                        }
+                                                        else if (BentoniteLayersEnd.Contains(i - 1)) // check if arrow after bentonite layer
+                                                        {
+                                                            var index = BentoniteLayersEnd.IndexOf(i - 1);
+                                                            var over = Model.BentoniteLayers.ElementAt(index).Over;
+                                                            if (over > 0) //insert Grus arrow
+                                                            {
+                                                                <td id="cell_@String.Concat((i+1).ToString(),"_",j.ToString())" class="GrusA" style="text-align: center; border-left: 1px; border-right: 1px; background-size: 100% 100%; color: red; background-image: url('https://drive.google.com/u/0/uc?id=1L6p3Ng3x5FeeY_KISMj7CiOZwCcxFe11&export=download'); word-break: break-all; border-top: none; ">@over m </td>
+                                                            }
+                                                            else //No Arrow needed, proceed as with (i-2)
+                                                            {
+                                                                if (BentoniteLayersStart.ElementAtOrDefault(index + 1) != null)
+                                                                {
+                                                                    var rowspan = BentoniteLayersStart.ElementAt(index + 1) - BentoniteLayersEnd.ElementAt(index) - 1;
+                                                                    <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@rowspan" class="Grus" style="text-align: center; border-left: 1px; background-size: 100% 100%; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none; ">Grus</td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    var rowspan = 99 - BentoniteLayersEnd.ElementAt(index);
+                                                                    <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@rowspan" class="Grus" style="text-align:center;border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none;">Grus</td>
+                                                                }
+                                                            }
+                                                        }
+                                                        else if (i == 2 && BentoniteLayersStart.FirstOrDefault() != 2) //Special start - check if bentonite from top of well
+                                                        {
+                                                            if (BentoniteLayersStart.FirstOrDefault() != null)
+                                                            {
+                                                                var rowspan = BentoniteLayersStart.First() - 2;
+                                                                if (Model.BentoniteLayers.First().Over > 0) //make room for arrow
+                                                                {
+                                                                    rowspan = rowspan - 1;
+                                                                }
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@rowspan" class="Grus" style="text-align: center; border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none; ">Grus</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                var rowspan = 97;
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@rowspan" class="Grus" style="text-align: center; border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none; ">Grus</td>
+                                                            }
+
+                                                        }
+                                                        else if (i == 2 && BentoniteLayersStart.First() == 2)
+                                                        {
+
+                                                        }
+                                                        else if (BentoniteLayersEnd.Contains(i - 2)) //bentonite layer just ended and an arrow has been put there, fill gravel until next or whole way through well
+                                                        {
+                                                            var index = BentoniteLayersEnd.IndexOf(i - 2);
+                                                            if (BentoniteLayersStart.ElementAtOrDefault(index + 1) != null)
+                                                            {
+                                                                var rowspan = BentoniteLayersStart.ElementAt(index + 1) - BentoniteLayersEnd.ElementAt(index) - 1 - 1;
+                                                                if (Model.BentoniteLayers.ElementAt(index + 1).Under > 0)
+                                                                {
+                                                                    rowspan = rowspan - 1;
+                                                                }
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@rowspan" class="Grus" style="text-align: center; border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none; ">Grus</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                var rowspan = 99 - BentoniteLayersEnd.ElementAt(index);
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@rowspan" class="Grus" style="text-align:center;border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none;">Grus</td>
+                                                            }
+
+                                                        }
+                                                    }
+
+                                                }
+
+                                            }
+                                            else if (j == 3 && i < 100)
+                                            {
+                                                if (i == 1)
+                                                {
+                                                    <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@Pipe1RowSpan" class="Pipe" style="width:20%;word-break:break-all;border-top:none;border-left:2px solid red;border-right:2px solid red;text-align:center;">@Model.Filter1_Dim</td>
+                                                }
+
+                                                else
+                                                {
+                                                    if (beforefilter1layer) //dont put anything because pipe continues!
+                                                    {
+                                                        if (i == Pipe1RowSpan + 1 && Model.Filter1_Layers.Last().Under > 0)
+                                                        {
+                                                            <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="ArrowP" style="width: 10%; word-break: break-all; border-top: none; border-left: 2px solid red; border-right: 2px solid red; text-align: center; background-size: 100% 100%; color: red; background-image: url('https://drive.google.com/u/0/uc?id=1FsVU_xvH2cDP_QAxCqa9CE8evQ9jsjEl&export=download')">@Model.Filter1_Layers.Last().Under m</td>
+                                                        }
+                                                    }
+                                                    else if (infilter1layer)
+                                                    {
+                                                        if (Filter1LayersStart.Contains(i))
+                                                        {
+                                                            var index = Filter1LayersStart.IndexOf(i);
+                                                            var rowspan = Filter1LayersEnd.ElementAt(index) - i + 1;
+                                                            if (Model.Filter1_Layers.ElementAt(index).Length > 0)
+                                                            {
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="ArrowF" rowspan="@rowspan" style="word-break: break-all; border-top: none; text-align: center; color: red; border-bottom: 2px solid green; border-top: 2px solid green; border-left: 2px solid green; border-right: 2px solid green; background-size: 100% 100%; background-image: url('https://drive.google.com/u/0/uc?id=1XtDzZx1nVASmoJs44w80CMcmAp16d3If&export=download')">@Model.Filter1_Layers.ElementAt(index).Length m</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="ArrowF" rowspan="@rowspan" style="word-break: break-all; border-top: none; text-align: center; color: red; border-bottom: 2px solid green; border-top: 2px solid green; border-left: 2px solid green; border-right: 2px solid green; background-size: 100% 100%; background-image: url('https://drive.google.com/u/0/uc?id=1XtDzZx1nVASmoJs44w80CMcmAp16d3If&export=download')">X m</td>
+                                                            }
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+                                                        if (i == BlindPipe1)
+                                                        {
+                                                            <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="Blind" style="word-break: break-all; border-top: none; border-left: 2px solid red; border-right: 2px solid red; border-bottom: 2px solid red; text-align: center; color: red; background-size: 100% 100%; background-image: url('https://drive.google.com/u/0/uc?id=1FsVU_xvH2cDP_QAxCqa9CE8evQ9jsjEl&export=download');">@Model.BlindPipe1m m</td>
+                                                        }
+                                                        else if (afterfilter1layer && inbentonitelayer)
+                                                        {
+                                                            if (BentoniteLayersStart.Contains(i))
+                                                            {
+                                                                var index = BentoniteLayersStart.IndexOf(i);
+                                                                var rowspan = BentoniteLayersEnd.ElementAt(index) - i + 1;
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" rowspan="@rowspan" class="Bentonite" style="word-break: break-all; border-top: none; background-size: 100% 100%; background-image: url('https://drive.google.com/u/0/uc?id=1ndXaVByAfoVs1_gMfCadLRX4Y54ZVWIg&export=download');">Bentonit</td>
+                                                            }
+                                                        }
+                                                        else if (Model.BlindPipe1.Equals(true) && i == BlindPipe1 + 1)
+                                                        {
+                                                            if (BentoniteLayersEnd.LastOrDefault() != null)
+                                                            {
+                                                                if (BentoniteLayersEnd.Last() >= i)
+                                                                {
+                                                                    var rowspan = BentoniteLayersStart.Last() - i;
+                                                                    <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="Grus" rowspan="@rowspan" style="text-align:center;border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none;">Grus</td>
+                                                                }
+                                                                else
+                                                                {
+                                                                    var rowspan = 99 - (BlindPipe1);
+                                                                    <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="Grus" rowspan="@rowspan" style="text-align:center;border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none;">Grus</td>
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                var rowspan = 99 - i;
+                                                                <td id="cell_@String.Concat(i.ToString(),"_",j.ToString())" class="Grus" rowspan="@rowspan" style="text-align:center;border-left: 1px; border-right: 1px; background-image: url('https://drive.google.com/u/0/uc?id=1whcitLgWXYGzgCv0E3cSXV5c4Q_lCc72&export=download'); word-break: break-all; border-top: none;">Grus</td>
+                                                            }
+
+                                                        }
+
+                                                    }
+
+                                                }
+                                            }
+                                        }
+                                    }
+                                </tr>
+                            }
+                        </table>
+                    </td>
+                    <td>@Html.DisplayNameFor(Model => Model.Forgravning)</td>
+                    <td>@Html.DisplayFor(Model => Model.Forgravning)</td>
+                }
+            </tr>
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.Reetablering)</td>
+                <td>@Html.DisplayFor(Model => Model.Reetablering)</td>
+            </tr>
+            <tr>
+                <td colspan="2"><b>@SharedLocalizer.GetLocalizedHtmlString("Filters and Gravel")</b></td>
+            </tr>
+            @if (Model.ToFiltre.Equals(true))
+            {
+                <tr>
+                    <td>@Html.DisplayNameFor(Model => Model.Filter1_Dim)</td>
+                    <td>@Html.DisplayFor(Model => Model.Filter1_Dim)</td>
+                </tr>
+                <tr>
+                    <td>@Html.DisplayNameFor(Model => Model.Filter2_Dim)</td>
+                    <td>@Html.DisplayFor(Model => Model.Filter2_Dim)</td>
+                </tr>
+                <tr>
+                    <td>@Html.DisplayNameFor(Model => Model.Filterroer1)</td>
+                    <td>@Html.DisplayFor(Model => Model.Filterroer1)</td>
+                </tr>
+                <tr>
+                    <td>@Html.DisplayNameFor(Model => Model.Filterroer2)</td>
+                    <td>@Html.DisplayFor(Model => Model.Filterroer2)</td>
+                </tr>
+                @if (Model.BlindPipe1.Equals(true))
+                {
+                    <tr>
+                        <td>@Html.DisplayNameFor(Model => Model.Blindroer1)</td>
+                        <td>@Html.DisplayFor(Model => Model.Blindroer1)</td>
+                    </tr>
+                }
+                @if (Model.BlindPipe2.Equals(true))
+                {
+                    <tr>
+                        <td>@Html.DisplayNameFor(Model => Model.Blindroer2)</td>
+                        <td>@Html.DisplayFor(Model => Model.Blindroer2)</td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td>@Html.DisplayNameFor(Model => Model.Blindroer2)</td>
+                        <td>@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td>@Html.DisplayNameFor(Model => Model.Filter1_Dim)</td>
+                    <td>@Html.DisplayFor(Model => Model.Filter1_Dim)</td>
+                </tr>
+                <tr>
+                    <td>@Html.DisplayNameFor(Model => Model.Filterroer1)</td>
+                    <td>@Html.DisplayFor(Model => Model.Filterroer1)</td>
+                </tr>
+                @if (Model.BlindPipe1.Equals(true))
+                {
+                    <tr>
+                        <td>@Html.DisplayNameFor(Model => Model.Blindroer1)</td>
+                        <td>@Html.DisplayFor(Model => Model.Blindroer1)</td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td>@Html.DisplayNameFor(Model => Model.Blindroer1)</td>
+                        <td>@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                    </tr>
+                }
+            }
+
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.Filterslidser)</td>
+                <td>@Html.DisplayFor(Model => Model.Filterslidser)</td>
+            </tr>
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.Grustype)</td>
+                <td>@Html.DisplayFor(Model => Model.Grustype)</td>
+            </tr>
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.Taetningsringe)</td>
+                <td>@Html.DisplayFor(Model => Model.Taetningsringe)</td>
+            </tr>
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.Filterstyr)</td>
+                <td>@Html.DisplayFor(Model => Model.Filterstyr)</td>
+            </tr>
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.Forsegling)</td>
+                <td>@Html.DisplayFor(Model => Model.Forsegling)</td>
+            </tr>
+            <tr rowspan="5">
+                <td>@Html.DisplayNameFor(Model => Model.Registrering)</td>
+                <td>@Html.DisplayFor(Model => Model.Registrering)</td>
+            </tr>
+            <tr>
+                <td colspan="2"><b>@SharedLocalizer.GetLocalizedHtmlString("Remarks")</b></td>
+            </tr>
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.ProeveFrekvens)</td>
+                <td>1 @SharedLocalizer.GetLocalizedHtmlString("Sample pr.") @Html.DisplayFor(Model => Model.ProeveFrekvens) m (@SharedLocalizer.GetLocalizedHtmlString("However, at least 1 sample per. layer")</td>
+            </tr>
+            <tr>
+                <td colspan="2"><b>Filter 1</b></td>
+            </tr>
+            @if (Model.Filter1_Layers.ElementAt(0).Under == 0 && Model.Filter1_Layers.ElementAt(0).Over == 0 && Model.Filter1_Laengde > 0)
+            {
+                <tr>
+                    <td colspan="2">
+                        @Model.Filter1_Laengde m @SharedLocalizer.GetLocalizedHtmlString("in") @Model.Layers.ElementAt(Convert.ToInt32(Model.Filter1_Layers.ElementAt(0).LayerTypeUnderId - 1)).Layer.LayerType
+                    </td>
+                </tr>
+            }
+            else
+            {
+                <tr>
+                    <td>@Html.DisplayFor(Model => Model.Filter1_Layers.ElementAt(0).Under) m under @Model.Layers.ElementAt(Convert.ToInt32(Model.Filter1_Layers.ElementAt(0).LayerTypeUnderId - 1)).Layer.LayerType</td>
+                    <td>@Html.DisplayFor(Model => Model.Filter1_Layers.ElementAt(0).Over) m over @Model.Layers.ElementAt(Convert.ToInt32(Model.Filter1_Layers.ElementAt(0).LayerTypeOverId - 1)).Layer.LayerType</td>
+                </tr>
+                @if (Model.Filter1_Laengde > 0)
+                {
+                    <tr>
+                        <td>@Html.DisplayNameFor(Model => Model.Filter1_Laengde)</td>
+                        <td>@Html.DisplayFor(Model => Model.Filter1_Laengde) m</td>
+                    </tr>
+                }
+            }
+            @if (Model.BlindPipe1.Equals(true))
+            {
+                <tr>
+                    <td>@Html.DisplayNameFor(Model => Model.BlindPipe1m)</td>
+                    <td>@Html.DisplayFor(Model => Model.BlindPipe1m) m</td>
+                </tr>
+            }
+            @if (Model.ToFiltre.Equals(true))
+            {
+                <tr>
+                    <td colspan="2"><b>Filter 2</b></td>
+                </tr>
+                @if (Model.Filter2_Layers.ElementAt(0).Under == 0 && Model.Filter2_Layers.ElementAt(0).Over == 0 && Model.Filter2_Laengde > 0)
+                {
+                    <tr>
+                        <td colspan="2">
+                            @Model.Filter2_Laengde m @SharedLocalizer.GetLocalizedHtmlString("in") @Model.Layers.ElementAt(Convert.ToInt32(Model.Filter2_Layers.ElementAt(0).LayerTypeUnderId - 1)).Layer.LayerType
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(Model => Model.Filter2_Layers.ElementAt(0).Under) m under @Model.Layers.ElementAt(Convert.ToInt32(Model.Filter2_Layers.ElementAt(0).LayerTypeUnderId - 1)).Layer.LayerType</td>
+                        <td>@Html.DisplayFor(Model => Model.Filter2_Layers.ElementAt(0).Over) m over @Model.Layers.ElementAt(Convert.ToInt32(Model.Filter2_Layers.ElementAt(0).LayerTypeOverId - 1)).Layer.LayerType</td>
+                    </tr>
+                    @if (Model.Filter2_Laengde > 0)
+                    {
+                        <tr>
+                            <td>@Html.DisplayNameFor(Model => Model.Filter2_Laengde)</td>
+                            <td>@Html.DisplayFor(Model => Model.Filter2_Laengde) m</td>
+                        </tr>
+                    }
+                }
+                @if (Model.BlindPipe2.Equals(true))
+                {
+                    <tr>
+                        <td>@Html.DisplayNameFor(Model => Model.BlindPipe2m)</td>
+                        <td>@Html.DisplayFor(Model => Model.BlindPipe2m) m</td>
+                    </tr>
+                }
+            }
+            <tr>
+                <td colspan="2"><b>@SharedLocalizer.GetLocalizedHtmlString("Bentonite Layers")</b></td>
+            </tr>
+            @foreach (var item in Model.BentoniteLayers)
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.Under) m under @Model.Layers.ElementAt(Convert.ToInt32(item.LayerTypeUnderId - 1)).Layer.LayerType</td>
+                    <td>@Html.DisplayFor(modelItem => item.Over) m over @Model.Layers.ElementAt(Convert.ToInt32(item.LayerTypeOverId - 1)).Layer.LayerType</td>
+                </tr>
+            }
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.BoreDybde)</td>
+                <td>@Html.DisplayFor(Model => Model.BoreDybde) m Max</td>
+            </tr>
+            <tr>
+                <td>@Html.DisplayNameFor(Model => Model.DoneBy)</td>
+                <td>@Html.DisplayFor(Model => Model.DoneBy)</td>
+            </tr>
+        </table>
+    </div>
+</body>
+
+</html>

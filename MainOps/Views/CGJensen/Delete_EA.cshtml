@@ -1,0 +1,41 @@
+﻿@model MainOps.Models.CGJClasses.EA
+
+@{
+    ViewData["Title"] = "Slet_Ekstraarbejde";
+}
+
+<h2>Slet Ekstraarbejde</h2>
+
+<h3>Er du sikker på du vil slette dette ekstra arbejde?</h3>
+<div>
+    <h4>EA</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.EAnr)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.EAnr)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Opgave)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Opgave)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Sagsnummer)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Sagsnummer)
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete_EA">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Slet" class="btn btn-default" />
+        <br />
+        <br />
+        <a asp-action="Ekstraarbejder">Tilbage</a>
+    </form>
+</div>

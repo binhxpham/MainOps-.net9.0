@@ -1,0 +1,108 @@
+﻿@model MainOps.Models.HourSchedule
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>HourSchedule</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.day01)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.day01)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.day02)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.day02)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.day03)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.day03)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.day04)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.day04)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.day05)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.day05)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.day06)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.day06)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.day07)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.day07)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.day08)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.day08)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.day09)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.day09)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.day10)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.day10)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.day11)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.day11)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.day12)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.day12)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.day13)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.day13)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.day14)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.day14)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

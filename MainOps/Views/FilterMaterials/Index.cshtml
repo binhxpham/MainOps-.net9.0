@@ -1,0 +1,56 @@
+﻿@model IEnumerable<MainOps.Models.WTPClasses.MainClasses.FilterMaterial>
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Filtermaterials");
+}
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Filtermaterials")</h2>
+<hr />
+<p>
+    <a asp-action="Create">@SharedLocalizer.GetLocalizedHtmlString("Create New")</a>
+</p>
+<table>
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th class="hidden-sm hidden-xs">
+                @Html.DisplayNameFor(model => model.contaminations)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.device)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.water_type.water_type)
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Manage")
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td class="hidden-sm hidden-xs">
+                    @Html.DisplayFor(modelItem => item.contaminations)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.device)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.water_type.water_type)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> |
+                    <a asp-action="Details" asp-route-id="@item.id">@SharedLocalizer.GetLocalizedHtmlString("Details")</a> |
+                    <a asp-action="Delete" asp-route-id="@item.id">@SharedLocalizer.GetLocalizedHtmlString("Delete")</a> |
+                    <a asp-action="ManageContaminations" asp-route-id="@item.id">@SharedLocalizer.GetLocalizedHtmlString("Manage Contaminations")</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,31 @@
+﻿@model IEnumerable<PersonalFile>
+
+@{Layout = null;}
+
+<form asp-action="RemoveAllPersonalFiles" asp-controller="Home" method="post">
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Remove All Files!")</td>
+            <td><button class="btn-hoelscher" onclick="confirm('Are you sure you want to delete all your downloaded files?');">@SharedLocalizer.GetLocalizedHtmlString("Remove them all!")</button></td>
+        </tr>
+    </table>
+</form>
+
+<table style="width:100%;table-layout:fixed;">
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                <form asp-action="DownloadPersonalFile" asp-controller="Home" asp-route-id="@item.Id" method="get">                    
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Download")</button>
+                </form>
+            </td>
+            <td>@Html.DisplayFor(modelItem => item.FileName) </td>
+            <td>
+                <form asp-action="RemovePersonalFile" asp-controller="Home" asp-route-id="@item.Id" method="post">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Remove")</button>
+                </form>
+            </td>
+        </tr>
+    }
+</table>

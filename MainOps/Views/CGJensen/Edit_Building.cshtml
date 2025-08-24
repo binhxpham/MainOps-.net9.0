@@ -1,0 +1,45 @@
+﻿@model MainOps.Models.CGJClasses.Building
+
+@{
+    ViewData["Title"] = "Rediger_Bygning";
+}
+
+<h2>Rediger Bygning</h2>
+
+<h4>Bygning</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit_Building" enctype="multipart/form-data" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input asp-for="path" hidden="hidden" />
+            <div class="form-group">
+                <label asp-for="ProtocolId" class="control-label"></label>
+                <select asp-for="ProtocolId" class="form-control" asp-items="ViewBag.ProtocolId"></select>
+                <span asp-validation-for="ProtocolId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Location" class="control-label"></label>
+                <input asp-for="Location" class="form-control" />
+                <span asp-validation-for="Location" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Address" class="control-label"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="path" class="control-label"></label>
+                <input name="file" type="file" accept=".jpg,.jpeg,.png,.pdf" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Gem" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+<div>
+    <a asp-action="CGJensenMainMenu">Tilbage</a>
+</div>
+

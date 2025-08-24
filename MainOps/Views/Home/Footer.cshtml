@@ -1,0 +1,106 @@
+﻿@model MainOps.Models.Well
+@{ Layout = null;}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <style>
+        .webgrid-table thead {
+            display: table-header-group;
+        }
+
+        .webgrid-table tfoot {
+            display: table-row-group;
+        }
+
+        .webgrid-table tr {
+            page-break-inside: avoid;
+        }
+    </style>
+</head>
+<body>
+
+    <table class="webgrid-table" style="width:100%;min-height:4cm;max-height:4cm;height:4cm !important; table-layout:fixed;break-inside:avoid;">
+        <tr style="height: 0.5cm !important; min-height: 0.5cm !important; max-height: 0.5cm !important;">
+            <td style="height: 0.5cm !important; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"></td>
+            <td colspan="18" style="height:100%;border-top:1px solid black;border-bottom:1px solid black;"></td>
+            <td colspan="4" rowspan="8" style="height:100%;width:50%;border:1px solid black;">
+                <textarea readonly="readonly" rows="8" cols="60" style="height: 100%; border: none; resize: none;overflow:hidden;">@Model.Well_Type @Environment.NewLine @Environment.NewLine @SharedLocalizer.GetLocalizedHtmlString("Stand Pipe") 1: @Model.PipeDiameter , @SharedLocalizer.GetLocalizedHtmlString("Slots") @Model.FilterLayers.First().Slitsize - T.O.P : @String.Format("{0:N3} mDVR90",Model.Coord_z) @Environment.NewLine @Environment.NewLine @Environment.NewLine @SharedLocalizer.GetLocalizedHtmlString("Method"): @Model.Drill_Method @Environment.NewLine @SharedLocalizer.GetLocalizedHtmlString("Coordinate System"): @Model.CoordSystem.system @Environment.NewLine x: @Model.Coord_x , y: @Model.Coord_y</textarea>
+            </td>
+        </tr>
+        <tr style="height: 0.5cm !important; min-height: 0.5cm !important; max-height: 0.5cm !important;">
+            <td style="height: 100%; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"></td>
+            <td colspan="18" style="height: 100%; border-top: 1px solid black; border-bottom: 1px solid black;"></td>
+        </tr>
+        <tr style="height: 0.5cm !important; min-height: 0.5cm !important; max-height: 0.5cm !important;">
+            <td style="height: 100%; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"></td>
+            <td colspan="18" style="height: 100%; border-top: 1px solid black; border-bottom: 1px solid black;"></td>
+        </tr>
+        <tr style="height: 0.5cm !important; min-height: 0.5cm !important; max-height: 0.5cm !important;">
+            <td style="height: 100%; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"></td>
+            <td colspan="18" style="height: 100%; border-top: 1px solid black; border-bottom: 1px solid black;"></td>
+        </tr>
+        <tr style="height: 0.5cm !important; min-height: 0.5cm !important; max-height: 0.5cm !important;">
+            <td style="height: 100%; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"></td>
+            <td colspan="18" style="height: 100%; border-top: 1px solid black; border-bottom: 1px solid black;"></td>
+        </tr>
+        <tr style="height: 0.5cm !important; min-height: 0.5cm !important; max-height: 0.5cm !important;">
+            <td style="border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"></td>
+            <td colspan="18" style="border-top:1px solid black;border-bottom:1px solid black;"></td>
+
+        </tr>
+        <tr style="height: 0.5cm !important; min-height: 0.5cm !important; max-height: 0.5cm !important;">
+            <td style="height:100%;border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"></td>
+            <td colspan="18" style="height: 100%; border-top: 1px solid black; border-bottom: 1px solid black;"></td>
+        </tr>
+        <tr style="height: 0.5cm !important; min-height: 0.5cm !important; max-height: 0.5cm !important;">
+            <td style="height: 100%; border-top: 1px solid black; border-bottom: 1px solid black; border-left: 1px solid black;"></td>
+            <td colspan="18" style="height: 100%; border-top: 1px solid black; border-bottom: 1px solid black;"></td>
+        </tr>
+        <tr style="height:2px;border:1px solid black;"><td colspan="23"></td></tr>
+    </table>
+    <table style="width:100%;table-layout:fixed;border:1px solid black;margin-bottom:8px;">
+        <tr style="font-size:15px;">
+            <td colspan="2" style="border:0;"><label asp-for="Project">@SharedLocalizer.GetLocalizedHtmlString("Project")</label>:</td>
+            <td colspan="2" style="border:0;">@Model.Project.ProjectNr</td>
+            <td colspan="2" style="border:0">@Model.Project.Name</td>
+
+            <td colspan="2" style="border:0;"><label asp-for="SubProject">@SharedLocalizer.GetLocalizedHtmlString("SubProject")</label>:</td>
+            <td colspan="2" style="border:0;">@Html.DisplayFor(Model => Model.SubProject.Name) </td>
+
+            else
+            {
+            <td colspan="4" style="border:0;"></td>
+            }
+
+        </tr>
+
+
+        <tr style="font-size:11px;">
+            <td><label asp-for="Project.Division">@SharedLocalizer.GetLocalizedHtmlString("Drilled by")</label>:</td>
+            <td>@Html.DisplayFor(Model => Model.Project.Division.Name)</td>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Date")</label>:</td>
+            <td>@String.Format("{0:yyyy-MM-dd}", Model.Drill_Date_End)</td>
+            <td><label asp-for="Assessed_By"></label>:</td>
+            <td>@Html.DisplayFor(Model => Model.Assessed_By)</td>
+            <td><label asp-for="DGU_Number"></label>:</td>
+            <td>@Html.DisplayFor(Model => Model.DGU_Number) </td>
+            <td><label asp-for="WellName"></label>:</td>
+            <td>@Html.DisplayFor(Model => Model.WellName)</td>
+        </tr>
+        <tr style="font-size:11px;">
+            <td><label asp-for="Done_By"></label>:</td>
+            <td>@Html.DisplayFor(Model => Model.Done_By)</td>
+            <td><label asp-for="Approved_By"></label>:</td>
+            <td>@Html.DisplayFor(Model => Model.Approved_By)</td>
+            <td colspan="2"><label asp-for="Approved_Date"></label>:</td>
+            <td>@String.Format("{0:yyyy-MM-dd}", Model.Approved_Date)</td>
+            <td></td>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Attachments"):</label></td>
+            <td></td>
+
+        </tr>
+    </table>
+
+</body>
+</html>

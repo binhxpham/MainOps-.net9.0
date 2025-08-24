@@ -1,0 +1,34 @@
+﻿@model MainOps.Models.SystemCheck
+
+@{
+    ViewData["Title"] = "SystemCheckWithComment";
+}
+
+<h2>System Chec</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="SystemCheckWithComment">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.HiddenFor(Model => Model.TimeChecked)
+            @Html.HiddenFor(Model => Model.DoneBy)
+            @Html.HiddenFor(Model => Model.DivisionId)
+            <div class="form-group">
+                <label asp-for="Comments" class="control-label"></label>
+                <input asp-for="Comments" class="form-control" />
+                <span asp-validation-for="Comments" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Add System Check")</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="SystemChecks">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,89 @@
+﻿@model IEnumerable<MainOps.Models.ReportClasses.AccidentReport>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+<form asp-action="Index" asp-controller="AccidentReports" method="get">
+    <select name="ProjectId" asp-items="ViewBag.ProjectId"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Project")</option></select>
+    <button type="submit" class="btn-hoelscher">
+        <span class="glyphicon glyphicon-search"></span>
+    </button>
+</form>
+
+<table class="table" style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            
+            <th>
+                @Html.DisplayNameFor(model => model.AccidentWithAbsence)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AccidentWithoutAbsence)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EnvironmentAccident)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NearMiss)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.HJSubContractor)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Other)
+            </th>
+          
+            <th>
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AccidentWithAbsence)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.AccidentWithoutAbsence)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EnvironmentAccident)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NearMiss)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.HJSubContractor)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Other)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DoneBy)
+            </td>
+            <td>
+                @if(User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager")) 
+                {
+                    <a asp-action="Edit" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> 
+                 }
+                <a asp-action="GetAccidentReport" asp-route-id="@item.Id" target="_blank">@SharedLocalizer.GetLocalizedHtmlString("View")</a> 
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

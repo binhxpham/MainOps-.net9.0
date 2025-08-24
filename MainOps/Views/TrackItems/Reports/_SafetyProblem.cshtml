@@ -1,0 +1,140 @@
+﻿@model MainOps.Models.SafetyProblem
+
+@{
+    Layout = null;
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("Safety Report")</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+
+
+<div class="row">
+    <div class="col-xs-12">
+        <table>
+            <tr>
+                <td colspan="3">
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("Safety Report")</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.Project.Name)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.Project.Name)
+                </td>
+                <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@Model.Project.Division.Id/@Model.Project.Division.LogoPath" width="151" height="66" /></td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.Project.ProjectNr)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.Project.ProjectNr)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.Project.Client)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.Project.Client)
+                </td>
+
+            </tr>
+
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.TimeStamp)
+                    </b>
+                </td>
+                <td>
+                    @String.Format("{0:yyyy-MM-dd}", Model.TimeStamp)
+                   @*@Html.DisplayFor(x => x.TimeStamp)*@
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.safetyproblemtype)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.safetyproblemtype)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(x => x.DoneBy)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(x => x.DoneBy)
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3"><b>@Html.DisplayNameFor(x => x.LogText)</b></td>
+            </tr>
+            <tr rowspan="20">
+                <td colspan="3">
+                    <textarea rows="8" cols="64" class="form-control" style="width:100%;">@Html.DisplayFor(x => x.LogText)</textarea>
+                </td>
+            </tr>
+        </table>
+
+        <table name="phototable" style="page-break-inside:avoid;width:100%;table-layout:fixed;">
+            @{ var rows = 0;}
+            @if (Model.pictures.Count % 3 == 0)
+            {
+                rows = Model.pictures.Count() / 3;
+            }
+            else
+            {
+                rows = Convert.ToInt32(Model.pictures.Count() / 3) + 1;
+            }
+            @{ var totalpics = Model.pictures.Count();}
+            @for (int i = 0; i < rows; i++)
+            {
+                @if (totalpics - 3 >= 0) //enough room to add whole row
+                {
+                    <tr>
+                        <td style="width:100%;"><img src="~/AHAK/SafetyProblems/@Model.Id.ToString()/@Model.pictures[(i+1)*3 - 3]" style="width:100%;"/></td>
+                        <td style="width:100%;"><img src="~/AHAK/SafetyProblems/@Model.Id.ToString()/@Model.pictures[(i+1)*3 - 3 +1]" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="~/AHAK/SafetyProblems/@Model.Id.ToString()/@Model.pictures[(i+1)*3 - 3 +2]" style="width:100%;" /></td>
+                    </tr>
+                    totalpics -= 3;
+                }
+                else if (totalpics - 2 >= 0)
+                {
+                    <tr>
+                        <td style="width:100%;"><img src="~/AHAK/SafetyProblems/@Model.Id.ToString()/@Model.pictures[(i+1)*3 - 3]" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="~/AHAK/SafetyProblems/@Model.Id.ToString()/@Model.pictures[(i+1)*3 - 3 +1]" style="width:100%;" /></td>
+                        <td style="width:100%;"></td>
+                    </tr>
+                    totalpics -= 2;
+                }
+                else //enough room to add 1 picture in row
+                {
+        <tr>
+            <td style="width:100%;"><img src="~/AHAK/SafetyProblems/@Model.Id.ToString()/@Model.pictures[(i+1)*3 - 3]" style="width:100%;" /></td>
+            <td style="width:100%;"></td>
+            <td style="width:100%;"></td>
+        </tr>
+                    totalpics -= 1;
+                }
+
+            }
+        </table>
+    </div>
+</div>
+

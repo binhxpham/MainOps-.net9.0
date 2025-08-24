@@ -1,0 +1,221 @@
+﻿@model MainOps.Models.DataLoggerInstall
+
+@{
+    ViewData["Title"] = "Edit_Data Logger Install";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Edit Data Logger Installation")</h2>
+
+<h4>@SharedLocalizer.GetLocalizedHtmlString("Data Logger Installation")</h4>
+<hr />
+<form asp-action="Edit_DataLoggerInstallation" enctype="multipart/form-data" method="post">
+    <input asp-for="Id" hidden="hidden" />
+    <input asp-for="Latitude" hidden="hidden" />
+    <input asp-for="Longitude" hidden="hidden" />
+    <input asp-for="DoneBy" hidden="hidden" />
+    <input asp-for="Signature" hidden="hidden" />
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td><label asp-for="ProjectId" class="control-label"></label></td>
+            <td>
+                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select Project")</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><label asp-for="SubProjectId" class="control-label"></label></td>
+            <td>
+                <select asp-for="SubProjectId" class="form-control" asp-items="ViewBag.SubProjectId" onchange="GetItemsSubProject();">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select SubProject")</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td><label asp-for="TimeStamp" class="control-label"></label><span asp-validation-for="TimeStamp" class="text-danger"></span></td>
+            <td><input asp-for="TimeStamp" type="datetime-local" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" class="form-control" /></td>
+        </tr>
+        <tr>
+            <td><label asp-for="MeasPointId" class="control-label"></label></td>
+            <td><select asp-for="MeasPointId" class="form-control" asp-items="ViewBag.MeasPointId" onchange="UpdateProjectMeasPoint();"></select></td>
+        </tr>
+        <tr>
+            <td><label asp-for="DataLoggerNumber" class="control-label"></label> <span asp-validation-for="DataLoggerNumber" class="text-danger"></span></td>
+            <td><input asp-for="DataLoggerNumber" class="form-control" /></td>
+        </tr>
+        <tr>
+            <td><label asp-for="WellName" class="control-label"></label><span asp-validation-for="WellName" class="text-danger"></span></td>
+            <td><input asp-for="WellName" class="form-control" /></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Dip_Pipe_1" class="control-label"></label><span asp-validation-for="Dip_Pipe_1" class="text-danger"></span></td>
+            <td><input asp-for="Dip_Pipe_1" class="form-control" /></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Diff_GL_Top_Pipe_1" class="control-label"></label><span asp-validation-for="Diff_GL_Top_Pipe_1" class="text-danger"></span></td>
+            <td><input asp-for="Diff_GL_Top_Pipe_1" class="form-control" /></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Raw_Value_Pipe_1" class="control-label"></label><span asp-validation-for="Raw_Value_Pipe_1" class="text-danger"></span></td>
+            <td><input asp-for="Raw_Value_Pipe_1" class="form-control" /></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Depth_Sensor_1" class="control-label"></label> <span asp-validation-for="Depth_Sensor_1" class="text-danger"></span></td>
+            <td><input asp-for="Depth_Sensor_1" class="form-control" /></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Type_Sensor_1" class="control-label"></label> <span asp-validation-for="Type_Sensor_1" class="text-danger"></span></td>
+            <td>
+                <select asp-for="Type_Sensor_1" class="form-control">
+                    <option value="20m">20m</option>
+                    <option value="10m">10m</option>
+                    <option value="30m">30m</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td> <label asp-for="Dip_Pipe_2" class="control-label"></label><span asp-validation-for="Dip_Pipe_2" class="text-danger"></span></td>
+            <td><input asp-for="Dip_Pipe_2" class="form-control" /></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Diff_GL_Top_Pipe_2" class="control-label"></label><span asp-validation-for="Diff_GL_Top_Pipe_2" class="text-danger"></span></td>
+            <td> <input asp-for="Diff_GL_Top_Pipe_2" class="form-control" /></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Raw_Value_Pipe_2" class="control-label"></label><span asp-validation-for="Raw_Value_Pipe_2" class="text-danger"></span></td>
+            <td><input asp-for="Raw_Value_Pipe_2" class="form-control" /></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Depth_Sensor_2" class="control-label"></label><span asp-validation-for="Depth_Sensor_2" class="text-danger"></span></td>
+            <td><input asp-for="Depth_Sensor_2" class="form-control" /></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Type_Sensor_2" class="control-label"></label><span asp-validation-for="Type_Sensor_2" class="text-danger"></span></td>
+            <td>
+                <select asp-for="Type_Sensor_2" class="form-control">
+                    <option value="10m">10m</option>
+                    <option value="20m">20m</option>
+                    <option value="30m">30m</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><label asp-for="Comments" class="control-label"></label><span asp-validation-for="Comments" class="text-danger"></span></td>
+        </tr>
+        <tr>
+            <td colspan="2"><textarea asp-for="Comments" cols="50" rows="8" style="width:100%;"></textarea></td>
+        </tr>
+        <tr>
+            <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label></td>
+            <td><input type="file" name="files" multiple accept=".jpg,.jpeg,.png" /></td>
+        </tr>
+    </table>
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <input type="submit" value="Save" class="btn-hoelscher" />
+    </div>
+</form>
+
+<div>
+    <a asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                    FillMeasPoints();
+                }
+            });
+        }
+
+        function GetItemsSubProject() {
+            var SubProjectId = $("#SubProjectId").val();
+            var url = '@Url.Action("GetMeasPointsSubProjectLevel", "TrackItems")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': SubProjectId,
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select MeasPoint Item</option>';
+                    for (var prop in data) {
+                        if (data[prop]["measType"]["type"] == "Water Level") {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                    }
+                    $("#MeasPointId").html(s);
+                    document.getElementById("MeasPointId").style.width = "100%";
+                    }
+            });
+        }
+        function FillMeasPoints() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetMeasPointsProjectLevel", "TrackItems")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select MeasPoint</option>';
+                    for (var prop in data) {
+                        if (data[prop]["measType"]["type"] == "Water Level") {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                    }
+                    $("#MeasPointId").html(s);
+                    document.getElementById("MeasPointId").style.width = "100%";
+                }
+            });
+        }
+
+        function UpdateProjectMeasPoint() {
+            var selected_text = $('#MeasPointId option:selected')
+                .toArray().map(item => item.text).join();
+            $("#WellName").val(selected_text);
+            GetSubProjectMP($("#MeasPointId").val());
+        }
+
+        function GetSubProjectMP(idx) {
+            var url = '@Url.Action("GetSubProjectMP", "TrackItems")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': idx },
+                success: function (data) {
+                     $("#SubProjectId").val(data);
+                }
+            });
+        }
+
+    </script>
+}

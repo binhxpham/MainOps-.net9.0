@@ -1,0 +1,50 @@
+﻿table {
+    width: 100%;
+    border: 1px solid darkgray;
+    page-break-inside: auto
+}
+body {
+    font-family: 'Segoe UI', Arial;
+}
+tfoot { 
+    display:table-footer-group;
+}
+th {
+    background-color: dodgerblue;
+    color: white;
+}
+thead {
+    display: table-header-group;
+}
+td, th {
+    /*border: 1px solid darkgray;*/
+    text-align:center;
+}
+tr {
+    page-break-inside: avoid;
+    page-break-after: auto;
+}
+.isAlteredOld {
+    border:2px solid red;
+}   
+
+/* Safari */
+@-webkit-keyframes spin {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

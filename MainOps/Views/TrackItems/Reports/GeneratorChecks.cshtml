@@ -1,0 +1,102 @@
+﻿@model IEnumerable<MainOps.Models.GeneratorCheck>
+
+@{
+    ViewData["Title"] = "Generator Checks";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Generator Tests")</h2>
+
+<table class="table" style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubProject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Generator_Hours)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EnteredIntoDataBase)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            if (item.Diesel_Level < 50 || item.Coolant == false || item.Equipment_Started.Equals("No")
+                || item.Equipment_Started_After.Equals("No") || item.Generator_Started.Equals("No") || item.Generator_Stopped.Equals("No")
+                || item.Oil_Level == false)
+            {
+                <tr style="background-color:red;">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubProject.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TimeStamp)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Generator_Hours)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EnteredIntoDataBase)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DoneBy)
+                    </td>
+                    <td>
+                        <form asp-controller="TrackItems" asp-action="GeneratorCheckReport_PDF"  asp-route-id="@item.Id" method="get" target="_blank">
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                        </form>
+                        <a asp-action="Edit_GeneratorCheck" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        }
+                    </td>
+                </tr>
+            }
+            else
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubProject.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TimeStamp)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Generator_Hours)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EnteredIntoDataBase)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DoneBy)
+                    </td>
+                    <td>
+                        <form asp-controller="TrackItems" asp-action="GeneratorCheckReport_PDF" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                        </form>
+                        <a asp-action="Edit_GeneratorCheck" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

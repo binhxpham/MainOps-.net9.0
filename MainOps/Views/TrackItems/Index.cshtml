@@ -1,0 +1,346 @@
+﻿@model IEnumerable<MainOps.Models.TrackItem>
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Index");
+}
+<div class="row">
+    <div class="col-xs-12">
+        @if (User.IsInRole("Admin"))
+        {
+            <table>
+                <tr>
+                    <td><a asp-action="Create">@SharedLocalizer.GetLocalizedHtmlString("Create New")</a></td>
+                    <td><a asp-action="UploadItems">@SharedLocalizer.GetLocalizedHtmlString("Upload Items")</a></td>
+                    <td>
+                        <form asp-controller="TrackItems" asp-action="ItemTagsAll" target="_blank">
+                            @Html.DropDownList("filterchoice", ViewData["filterchoices"] as SelectList, @SharedLocalizer.GetLocalizedHtmlString("All"))
+                            <input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoComplete", "MeasPoints")" />
+                            <button type="submit" class="btn-hoelscher">
+                                @SharedLocalizer.GetLocalizedHtmlString("Item Tags HTML All")
+                            </button>
+                        </form>
+                    </td>
+                    <td>
+                        <form asp-controller="TrackItems" asp-action="ItemTagsAllPdf" target="_blank">
+                            @Html.DropDownList("filterchoice", ViewData["filterchoices"] as SelectList, @SharedLocalizer.GetLocalizedHtmlString("All"))
+                            <input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoComplete", "MeasPoints")" />
+                            <button type="submit" class="btn-hoelscher">
+                                @SharedLocalizer.GetLocalizedHtmlString("Item Tags All PDF")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            </table>
+
+        }
+        <form asp-controller="TrackItems" asp-action="Combsearch">
+            <div class="form-group">
+                <table>
+                    <tr>
+                        <td>
+                            <label style="width:180px;">@SharedLocalizer.GetLocalizedHtmlString("Search Project:")</label>
+                        </td>
+                        <td>
+                            @Html.DropDownList("filterchoice", ViewData["filterchoices"] as SelectList, @SharedLocalizer.GetLocalizedHtmlString("All"), new { style = "width:200px" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <label style="width:180px;">@SharedLocalizer.GetLocalizedHtmlString("Search Point:")</label>
+                        </td>
+                        <td>
+                            <input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoComplete","Meas")" style="width:200px;" />
+                        </td>
+                    </tr>
+                </table>
+                <table border="1">
+                    <thead>
+                        <tr>
+                            <th width="20%">
+                                @SharedLocalizer.GetLocalizedHtmlString("Status choice")
+                            </th>
+                            <th width="40%">
+                                @SharedLocalizer.GetLocalizedHtmlString("Filter specifically ON or OFF")
+                            </th>
+                            <th width="40%">
+                                @SharedLocalizer.GetLocalizedHtmlString("Filter both ON and OFF")
+                            </th>
+                        </tr>
+                    </thead>
+                    <tr>
+                        <td align="center"><label>@SharedLocalizer.GetLocalizedHtmlString("Packed")</label></td>
+                        @if (Convert.ToBoolean(ViewBag.f11) == true)
+                        {
+                            <td align="center"><input name="packedbox1" id="packedbox1" type="checkbox" value="true" onchange="toggle(this);" checked="checked" /></td>
+                        }
+                        else
+                        {
+                            <td align="center"><input name="packedbox1" id="packedbox1" type="checkbox" value="false" onchange="toggle(this);" /></td>
+                        }
+                        @if (Convert.ToBoolean(ViewBag.f21) == true)
+                        {
+                            <td align="center"><input name="packedboxall" id="packedboxall" type="checkbox" value="true" checked="checked" onchange="toggle(this);" /></td>
+                        }
+                        else
+                        {
+                            <td align="center"><input name="packedboxall" id="packedboxall" type="checkbox" value="false" onchange="toggle(this);" /></td>
+                        }
+
+                    </tr>
+                    <tr>
+                        <td align="center"><label>@SharedLocalizer.GetLocalizedHtmlString("Sent")</label></td>
+                        @if (Convert.ToBoolean(ViewBag.f12) == true)
+                        {
+                            <td align="center"><input name="sentbox1" id="sentbox1" type="checkbox" value="true" onchange="toggle(this);" checked="checked" /></td>
+                        }
+                        else
+                        {
+                            <td align="center"><input name="sentbox1" id="sentbox1" type="checkbox" value="false" onchange="toggle(this);" /></td>
+                        }
+                        @if (Convert.ToBoolean(ViewBag.f22) == true)
+                        {
+                            <td align="center"><input name="sentboxall" id="sentboxall" type="checkbox" value="true" onchange="toggle(this);" checked="checked" /></td>
+                        }
+                        else
+                        {
+                            <td align="center"><input name="sentboxall" id="sentboxall" type="checkbox" value="false" onchange="toggle(this);" /></td>
+                        }
+
+
+                    </tr>
+                    <tr>
+                        <td align="center"><label>@SharedLocalizer.GetLocalizedHtmlString("Received")</label></td>
+                        @if (Convert.ToBoolean(ViewBag.f13) == true)
+                        {
+                            <td align="center"><input name="receivedbox1" id="receivedbox1" type="checkbox" value="true" onchange="toggle(this);" checked="checked" /></td>
+                        }
+                        else
+                        {
+                            <td align="center"><input name="receivedbox1" id="receivedbox1" type="checkbox" value="false" onchange="toggle(this);" /></td>
+
+                        }
+                        @if (Convert.ToBoolean(ViewBag.f23) == true)
+                        {
+                            <td align="center"><input name="receivedboxall" id="receivedboxall" type="checkbox" value="true" onchange="toggle(this);" checked="checked" /></td>
+                        }
+                        else
+                        {
+                            <td align="center"><input name="receivedboxall" id="receivedboxall" type="checkbox" value="false" onchange="toggle(this);" /></td>
+                        }
+                    </tr>
+                    <tr>
+                        <td align="center"><label>@SharedLocalizer.GetLocalizedHtmlString("Installed")</label></td>
+                        @if (Convert.ToBoolean(ViewBag.f14) == true)
+                        {
+                            <td align="center"><input name="installedbox1" id="installedbox1" type="checkbox" value="true" onchange="toggle(this);" checked="checked" /></td>
+                        }
+                        else
+                        {
+                            <td align="center"><input name="installedbox1" id="installedbox1" type="checkbox" value="false" onchange="toggle(this);" /></td>
+                        }
+                        @if (Convert.ToBoolean(ViewBag.f24) == true)
+                        {
+                            <td align="center"><input name="installedboxall" id="installedboxall" type="checkbox" value="true" onchange="toggle(this);" checked="checked" /></td>
+                        }
+                        else
+                        {
+                            <td align="center"><input name="installedboxall" id="installedboxall" type="checkbox" value="false" onchange="toggle(this);" /></td>
+                        }
+
+                    </tr>
+                    <tr>
+                        <td align="center"><label>@SharedLocalizer.GetLocalizedHtmlString("Error")</label></td>
+                        @if (Convert.ToBoolean(ViewBag.f15) == true)
+                        {
+                            <td align="center"><input name="errorbox1" id="errorbox1" type="checkbox" value="true" onchange="toggle(this);" checked="checked" /></td>
+                        }
+                        else
+                        {
+                            <td align="center"><input name="errorbox1" id="errorbox1" type="checkbox" value="false" onchange="toggle(this);" /></td>
+                        }
+
+                        @if (Convert.ToBoolean(ViewBag.f25) == true)
+                        {
+                            <td align="center"><input name="errorboxall" id="errorboxall" type="checkbox" value="true" onchange="toggle(this);" checked="checked" /></td>
+                        }
+                        else
+                        {
+                            <td align="center"><input name="errorboxall" id="errorboxall" type="checkbox" value="false" onchange="toggle(this);" /></td>
+                        }
+
+                    </tr>
+                </table>
+                <div class="form-group">
+                    <button type="submit" class="btn-hoelscher"><span class="glyphicon glyphicon-search"></span></button>
+                </div>
+
+            </div>
+        </form>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.TAGnr))
+                    </th>
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.PIDnr))
+                    </th>
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.RUMnr))
+                    </th>
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.HOFOR_Description))
+                    </th>
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Packed))
+                    </th>
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Sent))
+                    </th>
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Received))
+                    </th>
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Installed))
+                    </th>
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.IsError))
+                    </th>
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Project))
+                    </th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TAGnr)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PIDnr)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RUMnr)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.HOFOR_Description)
+                    </td>
+                    @if (item.Packed)
+                    {
+                        <td style="background-color:green">
+                            @Html.DisplayFor(modelItem => item.Packed)
+                        </td>
+                    }
+                    else
+                    {
+                        <td style="background-color:red">
+                            @Html.DisplayFor(modelItem => item.Packed)
+                        </td>
+                    }
+
+                    @if (item.Sent)
+                    {
+                        <td style="background-color:green">
+                            @Html.DisplayFor(modelItem => item.Sent)
+                        </td>
+                    }
+                    else
+                    {
+                        <td style="background-color:red">
+                            @Html.DisplayFor(modelItem => item.Sent)
+                        </td>
+                    }
+                    @if (item.Received)
+                    {
+                        <td style="background-color:green">
+                            @Html.DisplayFor(modelItem => item.Received)
+                        </td>
+                    }
+                    else
+                    {
+                        <td style="background-color:red">
+                            @Html.DisplayFor(modelItem => item.Received)
+                        </td>
+                    }
+                    @if (item.Installed)
+                    {
+                        <td style="background-color:green">
+                            @Html.DisplayFor(modelItem => item.Installed)
+                        </td>
+                    }
+                    else
+                    {
+                        <td style="background-color:red">
+                            @Html.DisplayFor(modelItem => item.Installed)
+                        </td>
+                    }
+                    @if (!item.IsError)
+                    {
+                        <td style="background-color:green">
+                            @Html.DisplayFor(modelItem => item.IsError)
+                        </td>
+                    }
+                    else
+                    {
+                        <td style="background-color:red">
+                            @Html.DisplayFor(modelItem => item.IsError)
+                        </td>
+                    }
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+                    </td>
+                    <td>
+                        <button type="button" class="btn-hoelscher" onclick="toggleManage(@item.Id)">@SharedLocalizer.GetLocalizedHtmlString("Manage Point")</button>
+                    </td>
+                    <td id="td_@item.Id" style="display:none">
+                        <form asp-controller="TrackItems" asp-action="Main" asp-route-id="@item.Id" target="_blank">
+                            <button class="btn btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Details")</button>
+                        </form>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <form asp-controller="TrackItems" asp-action="Edit" asp-route-id="@item.Id" target="_blank">
+                                <button class="btn btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                            </form>
+                            <form asp-controller="TrackItems" asp-action="ItemTag" asp-route-id="@item.Id" target="_blank">
+                                <button class="btn btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("QR")</button>
+                            </form>
+                            <form asp-controller="TrackItems" asp-action="ItemTagPdf" asp-route-id="@item.Id" target="_blank">
+                                <button class="btn btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("QR PDF")</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        
+        function toggle(elem) {
+            var x = elem.checked;
+            if (x === true) {
+                elem.value = true;
+            }
+            else {
+                elem.value = false;
+            }
+        }
+        function toggleManage(theindex) {
+            var x = document.getElementById("td_" + theindex)
+            if (x.style.display === "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+        }
+
+    </script>
+    
+}

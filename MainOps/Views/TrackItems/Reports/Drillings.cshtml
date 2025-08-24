@@ -1,0 +1,67 @@
+﻿@model IEnumerable<MainOps.Models.Drill>
+
+@{
+    ViewData["Title"] = "Drillings";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Drillings")</h2>
+
+<table style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubProject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WellID)
+            </th>            
+            <th>
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Name)
+            </td>
+            @if (item.SubProjectId != null)
+            {
+                <td>
+                    @Html.DisplayFor(modelItem => item.SubProject.Name)
+                </td>
+            }
+            else
+            {
+              <td></td>
+            }
+
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeStamp)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.WellID)
+            </td>           
+            <td>
+                @Html.DisplayFor(modelItem => item.DoneBy)
+            </td>           
+            <td>
+                <form asp-action="Edit_Drilling" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" >
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                </form>
+                <form asp-action="Drill_PDF" asp-route-id="@item.Id" asp-controller="TrackItems" method="get">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                </form>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

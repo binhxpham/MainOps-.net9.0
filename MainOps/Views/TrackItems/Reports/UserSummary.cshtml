@@ -1,0 +1,236 @@
+﻿@model MainOps.Models.UserSummaryVM
+
+<form asp-action="GenerateUserSummary" asp-controller="TrackItems" method="post">
+    <table>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Choose User")</td>
+            <td><select name="userfullname" asp-items="ViewBag.UserId"></select></td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Start Date")</td>
+            <td><input type="datetime" name="startdate" id="startid" value="@DateTime.Now.AddYears(-10)" class="date-picker"></td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("End Date")</td>
+            <td><input type="datetime" name="enddate" id="endid" value="@DateTime.Now" class="date-picker"></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Request User Summary")</button>
+            </td>
+        </tr>
+    </table>
+</form>
+
+<div class="row">
+    <div class="col-xs-12">
+        <table style="page-break-inside:avoid;width:100%;">
+            <tr>
+                <td>
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("User Action Summary") @Html.DisplayFor(x => x.StartDate) - @Html.DisplayFor(x => x.EndDate)</b>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Daily Report texts")</h4></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <textarea asp-for="TheDailyText" cols="120" rows="40"></textarea>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Logs")</h4></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <textarea asp-for="LogText" cols="120" rows="40"></textarea>
+                </td>
+            </tr>
+        </table>
+        <table style="width:100%;page-break-inside:avoid">
+            @if (Model.GeneratorChecks.Count > 0)
+            {
+                <tr><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Generator Tests")</h4></td></tr>
+                @foreach (var item in Model.GeneratorChecks)
+                {
+                    <tr>
+                        @if (item.SubProjectId != null)
+                        {
+                            <td>@item.Project.Name : @item.SubProject.Name</td>
+                        }
+                        else
+                        {
+                            <td>@item.Project.Name</td>
+                        }
+                        <td>@item.TimeStamp</td>
+                        <td>
+                            <form asp-action="GeneratorCheckReport_PDF" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
+                                <button>@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            @if (Model.WTPChecks.Count > 0)
+            {
+                <tr><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("WTP Checks")</h4></td></tr>
+                @foreach (var item in Model.WTPChecks)
+                {
+                    <tr>
+                        @if (item.SubProjectId != null)
+                        {
+                            <td>@item.Project.Name : @item.SubProject.Name</td>
+                        }
+                        else
+                        {
+                            <td>@item.Project.Name</td>
+                        }
+                        <td>@item.TimeStamp</td>
+                        <td>
+                            <form asp-action="WTPCheckReport_PDF" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
+                                <button>@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+
+            @if (Model.SensorsChecks.Count > 0)
+            {
+                <tr><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Sensors Checks")</h4></td></tr>
+                @foreach (var item in Model.SensorsChecks)
+                {
+                    <tr>
+                        @if (item.SubProjectId != null)
+                        {
+                            <td>@item.Project.Name : @item.SubProject.Name</td>
+                        }
+                        else
+                        {
+                            <td>@item.Project.Name</td>
+                        }
+                        <td>@item.TimeStamp</td>
+                        <td>
+                            <form asp-action="SensorsCheckReport_PDF" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
+                                <button>@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+
+            @if (Model.ConstructionSiteChecks.Count > 0)
+            {
+                <tr><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Construction Site Checks")</h4></td></tr>
+                @foreach (var item in Model.ConstructionSiteChecks)
+                {
+                    <tr>
+                        @if (item.SubProjectId != null)
+                        {
+                            <td>@item.Project.Name : @item.SubProject.Name</td>
+                        }
+                        else
+                        {
+                            <td>@item.Project.Name</td>
+                        }
+                        <td>@item.TimeStamp</td>
+                        <td>
+                            <form asp-action="ConstructionSiteInspectionReport_PDF" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
+                                <button>@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            @if (Model.Decommissions.Count > 0)
+            {
+                <tr><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Decommissionings")</h4></td></tr>
+                @foreach (var item in Model.Decommissions)
+                {
+                    <tr>
+                        @if (item.SubProjectId != null)
+                        {
+                            <td>@item.Project.Name : @item.SubProject.Name</td>
+                        }
+                        else
+                        {
+                            <td>@item.Project.Name</td>
+                        }
+                        <td>@item.TimeStamp : @item.Wellname</td>
+                        <td>
+                            <form asp-action="DecommissionReport_PDF" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
+                                <button>@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            @if (Model.ThreeStepTests.Count > 0)
+            {
+                <tr><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Three Step Tests")</h4></td></tr>
+                @foreach (var item in Model.ThreeStepTests)
+                {
+                    <tr>
+                        @if (item.SubProjectId != null)
+                        {
+                            <td>@item.Project.Name : @item.SubProject.Name</td>
+                        }
+                        else
+                        {
+                            <td>@item.Project.Name</td>
+                        }
+                        <td>@item.Report_Date : @item.Wellname</td>
+                        <td>
+                            <form asp-action="StepTestReport" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
+                                <button>@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            @if (Model.ClearPumpTests.Count > 0)
+            {
+                <tr><td colspan="3"><h4>@SharedLocalizer.GetLocalizedHtmlString("Clear Pump Tests")</h4></td></tr>
+                @foreach (var item in Model.ClearPumpTests)
+                {
+                    <tr>
+                        @if (item.SubProjectId != null)
+                        {
+                            <td>@item.Project.Name : @item.SubProject.Name</td>
+                        }
+                        else
+                        {
+                            <td>@item.Project.Name</td>
+                        }
+                        <td>@item.Report_Date : @item.Wellname</td>
+                        <td>
+                            <form asp-action="ClearPumpTestReport" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
+                                <button>@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+        </table>
+    </div>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script src="~/js/signature_pad.min.js"></script>
+    <script type="text/javascript">
+        var pad = null;
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+            });
+        });
+    </script>
+}

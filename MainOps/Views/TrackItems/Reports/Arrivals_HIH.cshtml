@@ -1,0 +1,211 @@
+﻿@model IEnumerable<MainOps.Models.Arrival>
+@inject UserManager<ApplicationUser> _userManager;
+@{
+    ViewData["Title"] = "Stock Overview";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Stock List")</h2>
+<h4>@SharedLocalizer.GetLocalizedHtmlString("Items are free for rental when they are not on a subproject!")</h4>
+<div id="myModal" class="ThreeModal">
+    <div class="ThreeModal-content">
+        <div class="ThreeModal-header">
+            <span class="close" onclick="CloseModal();">&times;</span>
+            <h2>@SharedLocalizer.GetLocalizedHtmlString("Project Information")</h2>
+        </div>
+        <div class="ThreeModal-body" id="thecontentFive">
+            <p>Some text in the Modal Body</p>
+            <p>Some other text...</p>
+        </div>
+    </div>
+</div>
+    <div style="width:100%;">
+        <form asp-action="MainMenu_HIH" asp-controller="TrackItems">
+            <button class="btn-hoelscher" style="width:100%;height:36px;">
+                @SharedLocalizer.GetLocalizedHtmlString("Back to Main Menu")
+            </button>
+        </form>
+    </div>
+    <form asp-controller="TrackItems" asp-action="CombsearchArrivalHIH">
+        <table style="width:100%;table-layout:fixed;">
+            <tr>
+                <td>
+                    <label>@SharedLocalizer.GetLocalizedHtmlString("Item"):</label>
+                </td>
+                <td>
+                    @Html.DropDownList("filterchoice", ViewData["ItemTypeId"] as IEnumerable<SelectListItem>, @SharedLocalizer.GetLocalizedHtmlString("All"), new { @class = "form-control" })
+                </td>
+            </tr>
+            <tr>
+                <td><label>@SharedLocalizer.GetLocalizedHtmlString("Project"):</label></td>
+                <td>
+                    <select id="ProjectId" name="filterchoice2" class="form-control" asp-items="ViewBag.ProjectId">
+                        <option value="@null">@SharedLocalizer.GetLocalizedHtmlString("All")</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoCompleteArrival","TrackItems")" /></td>
+                <td>
+                    <button type="submit" class="btn-hoelscher">
+                        <span class="glyphicon glyphicon-search"></span>
+                    </button>
+                </td>
+            </tr>
+        </table>
+    </form>
+
+
+    <table class="table" style="width:100%;">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Project)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.SubProject)
+                </th>
+                <th style="width:22%;">
+                    @Html.DisplayNameFor(model => model.ItemType)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Amount)
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString("Total On Site")
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString("Rental Price")
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString("Unit")
+                </th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <button type="button" class="btn-hoelscher" onclick="getInfoProject(@item.ProjectId)">@Html.DisplayFor(modeItem => item.Project.Name)</button>
+                    </td>
+                    @if (item.SubProjectId != null)
+                    {
+                    <td>
+                        <button type="button" class="btn-hoelscher" onclick="getInfoSubProject(@item.SubProjectId)">@Html.DisplayFor(modeItem => item.SubProject.Name)</button>
+                    </td>
+                    }
+                    else
+                    {
+                        <td>
+                            <b>@SharedLocalizer.GetLocalizedHtmlString("FREE")</b>
+                        </td>
+                    }
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ItemType.Item_Type)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Amount)
+                    </td>
+                    <td>
+                        @Model.Where(x => x.ItemTypeId.Equals(item.ItemTypeId) && x.EndStamp == null && x.SubProjectId.Equals(item.SubProjectId)).Sum(x => x.Amount)
+                    </td>
+                    <td><input type="text" disabled="disabled" class="ToGetRent" id="Rent_@item.Id" value="0" size="10" style="border:none;" /></td>
+                    <td><input type="text" disabled="disabled" class="ToGetUnit" id="Unit_@item.Id" value="" size="22" style="border:none;" /></td>
+
+                    @if ((await _userManager.GetUserAsync(User)).DivisionId.Equals(item.Project.DivisionId))
+                    {
+                        <td>
+                            <form asp-action="SendBackOrTransfer" asp-route-id="@item.Id" method="get">
+                                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Send back or transfer")</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form asp-action="Edit_Arrival" asp-route-id="@item.Id" method="get">
+                                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit Items")</button>
+                            </form>
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+        <script type="text/javascript">
+            window.onclick = function (event) {
+                var modal = document.getElementById("myModal");
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+            $(document).ready(function () {  
+                
+            $(".ToGetRent").each(function () {
+                var theid = $(this).attr('id');
+                var index = theid.split("_")[1];
+                var url = '@Url.Action("GetRent", "ItemTypes")';
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    data: { 'theId': index },
+                    success: function (data) {
+                        document.getElementById(theid).value = data + " €";
+                        //$(this).val(data);
+                    }
+                });
+            });
+            $(".ToGetUnit").each(function () {
+                var theid = $(this).attr('id');
+                var index = theid.split("_")[1];
+                var url = '@Url.Action("GetRentalUnit", "ItemTypes")';
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    data: { 'theId': index },
+                    success: function (data) {
+                        document.getElementById(theid).value = data;
+                        //$(this).val(data);
+                    }
+                });
+            });
+        });
+            function getInfoProject(idx) {
+                var url = '@Url.Action("Details_Partial", "Projects")';
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    data: { 'id': idx },
+                    success: function (data) {
+                        $('#thecontentFive').html(data);
+                        var themodal = document.getElementById("myModal");                        
+                        themodal.style.display = "block";
+                    },
+                    error: function (lol) {
+                        alert("Error");
+                    }
+                });
+            }
+            function getInfoSubProject(idx) {
+                var url = '@Url.Action("Details_Partial", "SubProjects")';
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    data: { 'id': idx },
+                    success: function (data) {
+                        $('#thecontentFive').html(data);
+                        var themodal = document.getElementById("myModal");                        
+                        themodal.style.display = "block";
+                    },
+                    error: function (lol) {
+                        alert("Error");
+                    }
+                });
+            }
+            function CloseModal() {
+                var themodal = document.getElementById("myModal");
+                themodal.style.display = "none";
+            }
+        </script>
+    }

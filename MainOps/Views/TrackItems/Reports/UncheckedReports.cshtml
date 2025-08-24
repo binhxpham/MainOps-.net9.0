@@ -1,0 +1,307 @@
+﻿@model IEnumerable<MainOps.Models.ReportClasses.Daily_Report_2>
+
+@{
+    ViewData["Title"] = "UncheckedReports";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Unchecked Reports")</h2>
+@if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+{
+    <form asp-action="DailyReports" method="get">
+        <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Back to all daily reports")</button>
+    </form>
+    <form asp-controller="TrackItems" asp-action="ShowUncheckedDailyReports" method="get">
+        <table>
+            <tr>
+                <td><label>@SharedLocalizer.GetLocalizedHtmlString("Project"):</label></td>
+                <td>
+                    <select id="ProjectId" name="ProjectId" class="form-control" onchange="FillSubProjects();" asp-items="ViewBag.ProjectId">
+                        <option value="@null">@SharedLocalizer.GetLocalizedHtmlString("All")</option>
+                    </select>
+                    <select id="SubProjectId" name="SubProjectId" class="form-control" asp-items="ViewBag.SubProjectId">
+                        <option value="@null">@SharedLocalizer.GetLocalizedHtmlString("All")</option>
+                    </select>
+                    @if (ViewBag.all == true)
+                    {
+                        <label>@SharedLocalizer.GetLocalizedHtmlString("Get All Reports:")</label><input type="checkbox" name="all" value="true" checked="checked" onchange="this.checked ? this.value = true : this.value = false; applytheall(this);" />
+                    }
+                    else
+                    {
+                        <label>@SharedLocalizer.GetLocalizedHtmlString("Get All Reports:")</label><input type="checkbox" name="all" value="false" onchange="this.checked ? this.value = true : this.value = false; applytheall(this);" />
+                    }
+
+                </td>
+                <td>
+                    <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Update")</button>
+                </td>
+            </tr>
+        </table>
+    </form>
+    <table style="width:100%;table-layout:fixed;">
+        <thead>
+            <tr>
+                <th style="width:9%;">
+                    @Html.DisplayNameFor(model => model.Project.Name)
+                </th>
+                
+                <th style="width:8%;">
+                    @Html.DisplayNameFor(model => model.short_Description)
+                </th>
+                <th style="width:5%;">
+                    @Html.DisplayNameFor(model => model.tobepaid)
+                </th>
+                <th style="width:9%;">
+                    @Html.DisplayNameFor(model => model.Report_Date)
+                </th>
+                <th style="width:8%;">
+                    @Html.DisplayNameFor(model => model.Hours)
+                </th>
+                <th style="width:15%;">
+                    @Html.DisplayNameFor(model => model.Work_Performed)
+                </th>
+                <th style="width:9%;">
+                    @Html.DisplayNameFor(model => model.DoneBy)
+                </th>
+                <th style="width:4%;">
+                    @Html.DisplayNameFor(model => model.Amount)
+                </th>
+                <th>@Html.DisplayNameFor(model => model.VariationOrder)</th>
+                <th style="width:25%;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @if (item.SubProjectId != null)
+                        {
+                            <text>
+                                @Html.DisplayFor(modelItem => item.Project.Abbreviation) - @Html.DisplayFor(modelItem => item.SubProject.Name)
+                            </text>
+                        }
+                        else
+                        {
+                            @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+                        }
+
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.short_Description)
+                    </td>
+                    @if (item.tobepaid == null)
+                    {
+                        <td style="background-color:yellow;overflow-wrap:break-word;">@SharedLocalizer.GetLocalizedHtmlString("Undefined")</td>
+                    }
+                    else if (item.tobepaid == 1)
+                    {
+                        <td style="background-color:lightgreen;">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    }
+                    else
+                    {
+                        <td style="background-color:lightcoral;">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                    }
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Report_Date)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Hours)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Work_Performed)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DoneBy)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Amount)
+                    </td>
+                    <td>
+                        @if (item.VariationOrderId != null)
+                        {
+                            @Html.DisplayFor(modelItem => item.VariationOrder.HeadLine)
+                        }
+
+                    </td>
+                    <td>
+                        <table style="width:100%;table-layout:fixed;">
+                            <tr>
+                                <td>
+                                    @*<form asp-action="MakePaid" method="post" asp-route-id="@item.Id" >*@
+                                        <button onclick="MakePaid(@item.Id);" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Make Paid")</button>
+                                        @if (ViewBag.all == true)
+                                        {
+                                            <input type="checkbox"  class="allclass" name="all" value="true" checked="checked" hidden="hidden" />
+                                        }
+                                        else
+                                        {
+                                            <input type="checkbox" class="allclass" name="all" value="false" hidden="hidden" />
+                                        }
+                                    @*</form>*@
+                                </td>
+                                <td>
+                                    @*<form asp-action="MakeUnPaid" method="post" asp-route-id="@item.Id">*@
+                                        <button onclick="MakeUnPaid(@item.Id);"class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Make Unpaid")</button>
+                                        @if (ViewBag.all == true)
+                                        {
+                                            <input type="checkbox"  class="allclass" name="all" value="true" checked="checked" hidden="hidden" />
+                                        }
+                                        else
+                                        {
+                                            <input type="checkbox"  class="allclass" name="all" value="false" hidden="hidden" />
+                                        }
+                                    @*</form>*@
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    @*<form asp-action="Approve_DailyReport" method="post" asp-route-id="@item.Id">*@
+                                        <button onclick="Approve(@item.Id);" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Approve Report")</button>
+                                        @if (ViewBag.all == true)
+                                        {
+                                            <input type="checkbox" class="allclass" name="all" value="true" checked="checked" hidden="hidden" />
+                                        }
+                                        else
+                                        {
+                                            <input type="checkbox" class="allclass" name="all" value="false" hidden="hidden" />
+                                        }
+                                    @*</form>*@
+                                </td>
+                                <td>
+                                    <form asp-action="Edit_DailyReport_2" asp-route-id="@item.Id" method="get" target="_blank">
+                                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit Report")</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <form asp-action="Daily_Report_2_DetailsPdf" method="get" asp-route-id="@item.Id" target="_blank">
+                                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View Report")</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form asp-action="Delete_DailyReport" method="get" asp-route-id="@item.Id" target="_blank">
+                                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Delete Report")</button>
+                                    </form>
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>
+                                    <form asp-action="MakeDrillRigDownTime" method="post" asp-route-id="@item.Id">
+                                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Make Drill Rig DownTime")</button>
+                                    </form>
+                                </td>
+                                <td>
+                                    <form asp-controller="DailyReport" asp-action="SplitDailyReport" asp-route-id="@item.Id" method="get" target="_blank">
+                                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Split")</button>
+                                    </form>
+                                </td>
+                            </tr>
+                          
+                        </table>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+
+                FillSubProjects();
+            });
+        });
+
+
+
+        const applytheall = (elem) => {
+                var array = document.getElementsByClassName("allclass");
+                for (var i = 0; i < array.length; i++) {
+                    if (array[i].type == "checkbox") {
+                        if (array[i].className == "allclass") {
+                            array[i].checked = elem.value;
+                            array[i].value = elem.value;
+                        } else if (array[i].checked) {
+                            array[i].checked = elem.value;
+                            array[i].value = elem.value;
+                        }
+                    }
+
+                }
+            }
+        function MakePaid(theid) {
+            var url = '@Url.Action("MakePaidAjax", "TrackItems")';
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: { 'id': theid },
+                success: function (data) {
+                    alert("Made Paid");
+                }
+
+            });
+        }
+        function MakeUnPaid(theid) {
+            var url = '@Url.Action("MakeUnPaidAjax", "TrackItems")';
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: { 'id': theid },
+                success: function (data) {
+                    alert("Made UnPaid");
+                }
+
+            });
+        }
+        function Approve(theid) {
+            var url = '@Url.Action("ApproveAjax", "TrackItems")';
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: { 'id': theid },
+                success: function (data) {
+                    alert("Approved");
+                }
+
+            });
+        }
+        function FillSubProjects() {
+            var SubProjectId = $('#SubProjectId').val();
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                        var x = document.getElementById("SubProjectId");
+                        var i;
+                        for (i = 0; i < x.length; i++) {
+                            if (x.options[i].value == SubProjectId) {
+                                x.options[i].selected = true;
+                            }
+                        }
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+        }
+    </script>
+}

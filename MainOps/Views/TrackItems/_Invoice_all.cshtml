@@ -1,0 +1,1944 @@
+﻿@model MainOps.Models.ReportClasses.InvoiceModel
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Invoice</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+@{
+    Layout = null;
+    var thevaluta = "";
+    var numRecords = 0;
+    var firstitem = Model.allItems.Where(x => x.ItemTypeId != 0 && x.ItemTypeId != null).FirstOrDefault();
+    @if (firstitem != null)
+    {
+        if (firstitem.ItemType.Valuta.Equals("EURO"))
+        {
+            thevaluta = "€";
+        }
+        else
+        {
+            thevaluta = "DKK";
+        }
+    }
+    else
+    {
+        var firstextraitem = Model.allItems.Where(x => x.ExtraWorkId != null).FirstOrDefault();
+        if (firstextraitem != null)
+        {
+            thevaluta = firstextraitem.ExtraWork.Valuta;
+        }
+        else
+        {
+            thevaluta = "DKK";
+        }
+
+    }
+}
+
+@{
+    var totaltotalcost = (decimal)0.0;
+}
+@if (Model.Project.SubProjects.Count > 0)
+{
+    foreach (var subproj in Model.Project.SubProjects)
+    {
+        totaltotalcost = (decimal)0.0;
+        if (Model.items.Where(x => x.SubProjectId.Equals(subproj.Id)).Count() > 0)
+        {
+            <table>
+                <tr>
+                    <td colspan="3">
+                        <b>@SharedLocalizer.GetLocalizedHtmlString("Basis for Invoice")</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:left;"><b>@SharedLocalizer.GetLocalizedHtmlString("Start:")</b></td>
+                    <td>@String.Format("{0:yyyy-MM-dd}", @Model.starttime)</td>
+                    <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@Model.Project.Division.Id/@Model.Project.Division.LogoPath" width="151" height="66" /></td>
+                </tr>
+                <tr>
+                    <td style="text-align:left;"><b>@SharedLocalizer.GetLocalizedHtmlString("End:")</b></td>
+                    <td>@String.Format("{0:yyyy-MM-dd}", @Model.endtime)</td>
+                </tr>
+                <tr>
+                    <td style="text-align:left;">
+                        <b>
+                            @Html.DisplayNameFor(x => x.ReportDate)
+                        </b>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(x => x.ReportDate.Date)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:left;">
+                        <b>
+                            @Html.DisplayNameFor(x => x.Project.Name)
+                        </b>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(x => x.Project.Name)
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <td style="text-align:left;">
+                        <b>
+                            @SharedLocalizer.GetLocalizedHtmlString("Sub Project")
+                        </b>
+                    </td>
+                    <td>
+                        @subproj.Name
+                    </td>
+
+                </tr>
+                <tr>
+                    <td style="text-align:left;">
+                        <b>
+                            @SharedLocalizer.GetLocalizedHtmlString("Sub Project Nr")
+                        </b>
+                    </td>
+                    <td>
+                        @subproj.SubProjectNr
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:left;">
+                        <b>
+                            @Html.DisplayNameFor(x => x.Project.Client)
+                        </b>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(x => x.Project.Client)
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align:left;">
+                        <b>
+                            @Html.DisplayNameFor(x => x.SubProject.ClientContact)
+                        </b>
+                    </td>
+                    <td>
+                        @subproj.ClientContact
+                    </td>
+
+                </tr>
+            </table>
+            @foreach (var boqheadline in Model.headlines.OrderBy(x => x.BoQnum).ThenBy(x => x.HeadLine))
+            {
+                if (boqheadline.Type.Equals("Mobilization"))
+                {
+                    numRecords = Model.items.Where(x =>x.SubProjectId.Equals(subproj.Id) && x.MobilizationId != null && x.Mobilize.VariationOrderId == null && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (boqheadline.BoQnum + (decimal)1.0)).Count();
+                    if (numRecords > 0)
+                    {
+                        <h2>@SharedLocalizer.GetLocalizedHtmlString(boqheadline.HeadLine)</h2>
+                        var cost = (decimal)0.0;
+                        <table style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th style="width:40%;text-align:left">
+                                        @Html.DisplayNameFor(x => x.items.First().Item_Name)
+                                    </th>
+                                    <th style="width:10%;text-align:left">
+                                        @Html.DisplayNameFor(x => x.items.First().Install_date)
+                                    </th>
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        <th style="width:15%;text-align:right">
+                                            @Html.DisplayNameFor(x => x.items.First().price)
+                                        </th>
+                                    }
+                                    <th style="width:15%;text-align:right">
+                                        @Html.DisplayNameFor(x => x.items.First().Amount)
+                                    </th>
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        <th style="width:20%;text-align:right">
+                                            @SharedLocalizer.GetLocalizedHtmlString("Subtotal")
+                                        </th>
+                                    }
+                                </tr>
+                            </thead>
+                            @foreach (var item in Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.MobilizationId != null && x.Mobilize.VariationOrderId == null && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (boqheadline.BoQnum + (decimal)1.0)).OrderBy(x => x.BoQNr).ThenBy(x => x.Install_date))
+                            {
+                                var subtotal = Convert.ToDecimal(item.price);
+                                <tr>
+                                    @if (item.Mobilize.UniqueID != null && item.Mobilize.UniqueID != "N/A")
+                                    {
+                                        <td style="text-align:left">@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Mobilize.UniqueID))</td>
+                                    }
+                                    else
+                                    {
+                                        <td style="text-align:left">@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name)</td>
+                                    }
+
+                                    <td style="text-align:left">@Html.DisplayFor(Model => item.Install_date)</td>
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        <td style="text-align:right">@String.Format("{0:N2} ", item.ItemType.price)@thevaluta</td>
+                                    }
+                                    <td style="text-align:right">@Html.DisplayFor(Model => item.Amount) @Html.DisplayFor(Model => item.ItemType.Install_Unit.TheUnit)</td>
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        <td style="text-align:right">@String.Format("{0:N2} ", subtotal)@thevaluta</td>
+                                    }
+                                </tr>
+                                cost += subtotal;
+                                totaltotalcost += subtotal;
+                            }
+                            @if (Model.NoMoneyNumbers.Equals(false))
+                            {
+                                <tr style="border-bottom:double;">
+                                    <td style="text-align:left"><b>@SharedLocalizer.GetLocalizedHtmlString("Total ") @boqheadline.HeadLine</b></td>
+                                    <td style="text-align:left"></td>
+                                    <td style="text-align:right"></td>
+                                    <td style="text-align:right"></td>
+                                    <td style="text-align:right"><b>@String.Format("{0:N2} ", cost)@thevaluta</b></td>
+                                </tr>
+                            }
+                        </table>
+                    }
+                }
+                else if (boqheadline.Type.Equals("Installation"))
+                {
+                    numRecords = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.InstallationId != null && x.Install.VariationOrderId == null && x.Invoice_date.Date >= Model.starttime.Date && x.Invoice_date.Date <= Model.endtime.Date && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (decimal)(boqheadline.BoQnum + 1) && (x.price > (decimal)0.0 || x.price < (decimal)0.0)).Count();
+                    if (numRecords > 0)
+                    {
+                        <h2>@SharedLocalizer.GetLocalizedHtmlString(boqheadline.HeadLine)</h2>
+                        var cost = (decimal)0.0;
+                        <table style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th style="width:40%;text-align:left">
+                                        @Html.DisplayNameFor(x => x.items.First().Item_Name)
+                                    </th>
+                                    <th style="width:10%;text-align:left">
+                                        @Html.DisplayNameFor(x => x.items.First().Install_date)
+                                    </th>
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        <th style="width:15%;text-align:right">
+                                            @Html.DisplayNameFor(x => x.items.First().price)
+                                        </th>
+                                    }
+                                    <th style="width:15%;text-align:right">
+                                        @Html.DisplayNameFor(x => x.items.First().Amount)
+                                    </th>
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        <th style="width:20%;text-align:right">
+                                            @SharedLocalizer.GetLocalizedHtmlString("Subtotal")
+                                        </th>
+                                    }
+                                </tr>
+                            </thead>
+                            @foreach (var item in Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.InstallationId != null && x.Install.VariationOrderId == null && x.Invoice_date.Date >= Model.starttime.Date && x.Invoice_date.Date <= Model.endtime.Date && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (decimal)(boqheadline.BoQnum + 1) && (x.price > (decimal)0.0 || x.price < (decimal)0.0)).OrderBy(x => x.BoQNr).ThenBy(x => x.Install_date).ThenBy(x => x.Install.UniqueID))
+                            {
+                                var subtotal = Convert.ToDecimal(item.price);
+                                <tr>
+                                    @if (item.Install.UniqueID != null && item.Install.UniqueID != "N/A")
+                                    {
+                                        @if (item.Install.Location != "" && item.Install.Location != null)
+                                        {
+                                            <td style="text-align:left">@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Install.UniqueID)) : @Html.DisplayFor(modelItem => item.location)</td>
+                                        }
+                                        else
+                                        {
+                                            <td style="text-align:left">@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Install.UniqueID))</td>
+                                        }
+                                    }
+                                    else if (item.Install.Location != "" && item.Install.Location != null)
+                                    {
+                                        <td style="text-align:left">@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) : @Html.DisplayFor(modelItem => item.location)</td>
+                                    }
+                                    else
+                                    {
+                                        <td style="text-align:left">@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name)</td>
+                                    }
+                                    <td style="text-align:left">@Html.DisplayFor(Model => item.Install_date)</td>
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        @if (item.ItemType.Install_Unit.TheUnit.Equals("pcs"))
+                                        {
+                                            <td style="text-align:right">@Html.DisplayFor(Model => item.ItemType.price) @thevaluta/@Html.DisplayFor(Model => item.ItemType.Install_Unit.TheUnit)</td>
+                                        }
+                                        else
+                                        {
+                                            <td style="text-align:right">@Html.DisplayFor(Model => item.ItemType.price) @thevaluta @Html.DisplayFor(Model => item.ItemType.Install_Unit.TheUnit)</td>
+                                        }
+                                    }
+                                    @if (item.ItemType.Install_Unit.TheUnit.Equals("pr. m"))
+                                    {
+                                        <td style="text-align:right">@String.Format("{0:N2} ", item.Amount) m</td>
+                                    }
+                                    else if (item.ItemType.Install_Unit.TheUnit.Equals("pr. l"))
+                                    {
+                                        <td style="text-align:right">@String.Format("{0:N2} ", item.Amount) l</td>
+                                    }
+                                    else if (item.ItemType.Install_Unit.TheUnit.Equals("pr. kg"))
+                                    {
+                                        <td style="text-align:right">@String.Format("{0:N2} ", item.Amount) kg</td>
+                                    }
+                                    else
+                                    {
+                                        <td style="text-align:right">@Html.DisplayFor(Model => item.Amount) @Html.DisplayFor(Model => item.ItemType.Install_Unit.TheUnit)</td>
+                                    }
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        <td style="text-align:right">@String.Format("{0:N2} ", subtotal)@thevaluta</td>
+                                    }
+                                </tr>
+                                cost += subtotal;
+                                totaltotalcost += subtotal;
+
+                                if (item.Total_Discount_Installation > (decimal)0.01)
+                                {
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        <tr>
+                                            <td colspan="4" style="text-align:left;">@SharedLocalizer.GetLocalizedHtmlString("Discount")</td>
+                                            <td style="text-align:right;">@String.Format("{0:N2} ", -item.Total_Discount_Installation)@thevaluta</td>
+                                        </tr>
+                                    }
+                                    cost -= (decimal)item.Total_Discount_Installation;
+                                    totaltotalcost -= (decimal)item.Total_Discount_Installation;
+                                }
+                            }
+                            @if (Model.NoMoneyNumbers.Equals(false))
+                            {
+                                <tr style="border-bottom:double;">
+                                    <td style="text-align:left"><b>@SharedLocalizer.GetLocalizedHtmlString("Total Cost")</b></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td style="text-align:right"><b>@String.Format("{0:N2} ", cost)@thevaluta</b></td>
+                                </tr>
+                            }
+                        </table>
+                    }
+                }
+                else if (boqheadline.Type.Equals("Rental"))
+                {
+                    numRecords = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ArrivalId != null && x.Arrival.VariationOrderId == null && (x.BoQNr_Rental >= boqheadline.BoQnum && x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0)) && (x.rental_price > (decimal)0.0 || x.rental_price < (decimal)0.0)).Count();
+                    if (numRecords > 0)
+                    {
+                        <h2>@SharedLocalizer.GetLocalizedHtmlString(boqheadline.HeadLine)</h2>
+                        var cost = (decimal)0.0;
+                        <table style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th style="width:28%;text-align:left">
+                                        @Html.DisplayNameFor(x => x.items.First().Item_Name)
+                                    </th>
+                                    <th style="width:10%;text-align:left">
+                                        @SharedLocalizer.GetLocalizedHtmlString("Start Date")
+                                    </th>
+                                    <th style="width:10%;text-align:left">
+                                        @SharedLocalizer.GetLocalizedHtmlString("End Date")
+                                    </th>
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        <th style="width:22%;text-align:right">
+                                            @SharedLocalizer.GetLocalizedHtmlString("Rental Price Unit")
+                                        </th>
+                                    }
+                                    <th style="width:5%;text-align:right">
+                                        @Html.DisplayNameFor(x => x.items.First().Amount)
+                                    </th>
+                                    <th style="width:8%;text-align:right">
+                                        @SharedLocalizer.GetLocalizedHtmlString("Period")
+                                    </th>
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        <th style="width:17%;text-align:right">
+                                            @SharedLocalizer.GetLocalizedHtmlString("Subtotal")
+                                        </th>
+                                    }
+                                </tr>
+                            </thead>
+                            @try
+                            {
+                                @foreach (var item in Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ArrivalId != null && x.Arrival.VariationOrderId == null && (x.BoQNr_Rental >= boqheadline.BoQnum && x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0)) && (x.rental_price > (decimal)0.0 || x.rental_price < (decimal)0.0)).OrderBy(x => x.BoQNr).ThenBy(x => x.location.Split(":")[1]).ThenBy(x => x.Install_date).ThenBy(x => x.Arrival.UniqueID))
+                                {
+                                    var subtotal = Convert.ToDecimal(item.rental_price);//Convert.ToDecimal(item.ItemType.rental_price * (decimal)item.Days * (decimal)item.Amount);
+                                    var period = "Days";
+                                    if (item.ItemType.Rental_UnitId.Equals(16) || item.ItemType.Rental_UnitId.Equals(18))
+                                    {
+                                        period = SharedLocalizer.GetLocalizedHtmlString("Months");
+                                    }
+                                    else if (item.ItemType.Rental_UnitId.Equals(17))
+                                    {
+                                        period = SharedLocalizer.GetLocalizedHtmlString("Weeks");
+                                    }
+
+                                    <tr>
+                                        @if (item.Arrival != null)
+                                        {
+                                            if (item.Arrival.UniqueID != null && item.Arrival.UniqueID != "N/A")
+                                            {
+                                                if (item.location != null && item.location != "" && item.location != "N/A")
+                                                {
+                                                    <td style="text-align:left">@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) : @Html.DisplayFor(modelItem => item.Arrival.UniqueID) : @Html.DisplayFor(modelItem => item.location)</td>
+                                                }
+                                                else
+                                                {
+                                                    <td style="text-align:left">@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) : @Html.DisplayFor(modelItem => item.Arrival.UniqueID)</td>
+                                                }
+
+                                            }
+                                            else
+                                            {
+                                                if (item.location != null && item.location != "" && item.location != "N/A")
+                                                {
+                                                    <td style="text-align:left">@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) : @Html.DisplayFor(modelItem => item.location)</td>
+                                                }
+                                                else
+                                                {
+                                                    <td style="text-align:left">@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name)</td>
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (item.location != null && item.location != "" && item.location != "N/A")
+                                            {
+                                                <td style="text-align:left">@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) : @Html.DisplayFor(modelItem => item.location)</td>
+                                            }
+                                            else
+                                            {
+                                                <td style="text-align:left"> @String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name)</td>
+                                            }
+                                        }
+                                        <td style="text-align:left">@Html.DisplayFor(Model => item.Install_date)</td>
+                                        @if (item.Arrival != null)
+                                        {
+                                            @if (item.Arrival.EndStamp != null)
+                                            {
+                                                <td style="text-align:left">@Html.DisplayFor(Model => item.Arrival.EndStamp)</td>
+                                            }
+                                            else
+                                            {
+                                                <td style="text-align:left">@Html.DisplayFor(Model => item.Install.DeinstallDate)</td>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <td style="text-align:left">@Html.DisplayFor(Model => item.Install.DeinstallDate)</td>
+                                        }
+                                        @if (Model.NoMoneyNumbers.Equals(false))
+                                        {
+                                            @if (item.ItemType.Rental_Unit.TheUnit.Equals("pr. m pr. calender day"))
+                                            {
+                                                <td style="text-align:right">@Html.DisplayFor(Model => item.ItemType.rental_price) @thevaluta @Html.DisplayFor(Model => item.ItemType.Rental_Unit.TheUnit)</td>
+                                            }
+                                            else
+                                            {
+                                                <td style="text-align:right">@Html.DisplayFor(Model => item.ItemType.rental_price) @thevaluta/pcs @Html.DisplayFor(Model => item.ItemType.Rental_Unit.TheUnit)</td>
+                                            }
+                                        }
+                                        @if (item.ItemType.Install_Unit.TheUnit.Equals("pr. m"))
+                                        {
+                                            <td style="text-align:right">@Html.DisplayFor(Model => item.Amount) m</td>
+                                        }
+                                        else
+                                        {
+                                            <td style="text-align:right">@Html.DisplayFor(Model => item.Amount) @Html.DisplayFor(Model => item.ItemType.Install_Unit.TheUnit)</td>
+                                        }
+
+                                        <td style="text-align:right">@Html.DisplayFor(Model => item.Days) @period</td>
+                                        @if (Model.NoMoneyNumbers.Equals(false))
+                                        {
+                                            <td style="text-align:right">@String.Format("{0:N2} ", subtotal)@thevaluta</td>
+                                        }
+                                    </tr>
+                                    cost += subtotal;
+                                    totaltotalcost += subtotal;
+                                    if (item.Total_Discount > (decimal)0.01)
+                                    {
+                                        <tr>
+                                            <td colspan="6" style="text-align:left;">@SharedLocalizer.GetLocalizedHtmlString("Discount")</td>
+                                            @if (Model.NoMoneyNumbers.Equals(false))
+                                            {
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", -item.Total_Discount)@thevaluta</td>
+                                            }
+                                        </tr>
+                                        cost -= (decimal)item.Total_Discount;
+                                        totaltotalcost -= (decimal)item.Total_Discount;
+                                    }
+                                }
+                            }
+                            catch
+                            {
+                                @foreach (var item in Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ArrivalId != null && x.Arrival.VariationOrderId == null && (x.BoQNr_Rental >= boqheadline.BoQnum && x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0)) && (x.rental_price > (decimal)0.0 || x.rental_price < (decimal)0.0)).OrderBy(x => x.BoQNr).ThenBy(x => x.Install_date))
+                                {
+                                    var subtotal = (decimal)item.rental_price; // Convert.ToDecimal(item.ItemType.rental_price * (decimal)item.Days * (decimal)item.Amount);
+                                    var period = "Days";
+                                    if (item.ItemType.Rental_UnitId.Equals(16) || item.ItemType.Rental_UnitId.Equals(18))
+                                    {
+                                        period = SharedLocalizer.GetLocalizedHtmlString("Months");
+                                    }
+                                    else if (item.ItemType.Rental_UnitId.Equals(17))
+                                    {
+                                        period = SharedLocalizer.GetLocalizedHtmlString("Weeks");
+                                    }
+                                    <tr>
+                                        @if (item.Arrival != null)
+                                        {
+                                            if (item.Arrival.UniqueID != null && item.Arrival.UniqueID != "N/A")
+                                            {
+                                                if (item.location != null && item.location != "" && item.location != "N/A")
+                                                {
+                                                    <td style="text-align:left">@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) : @Html.DisplayFor(modelItem => item.Arrival.UniqueID) : @Html.DisplayFor(modelItem => item.location)</td>
+                                                }
+                                                else
+                                                {
+                                                    <td style="text-align:left">@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) : @Html.DisplayFor(modelItem => item.Arrival.UniqueID)</td>
+                                                }
+
+                                            }
+                                            else
+                                            {
+                                                if (item.location != null && item.location != "" && item.location != "N/A")
+                                                {
+                                                    <td style="text-align:left">@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) : @Html.DisplayFor(modelItem => item.location)</td>
+                                                }
+                                                else
+                                                {
+                                                    <td style="text-align:left">@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name)</td>
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (item.location != null && item.location != "" && item.location != "N/A")
+                                            {
+                                                <td style="text-align:left">@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) : @Html.DisplayFor(modelItem => item.location)</td>
+                                            }
+                                            else
+                                            {
+                                                <td style="text-align:left">@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name)</td>
+                                            }
+                                        }
+                                        <td style="text-align:left">@Html.DisplayFor(Model => item.Install_date)</td>
+                                        @if (item.Arrival != null)
+                                        {
+                                            @if (item.Arrival.EndStamp != null)
+                                            {
+                                                <td style="text-align:left">@Html.DisplayFor(Model => item.Arrival.EndStamp)</td>
+                                            }
+                                            else
+                                            {
+                                                <td style="text-align:left">@Html.DisplayFor(Model => item.Install.DeinstallDate)</td>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <td style="text-align:left">@Html.DisplayFor(Model => item.Install.DeinstallDate)</td>
+                                        }
+                                        @if (Model.NoMoneyNumbers.Equals(false))
+                                        {
+                                            @if (item.ItemType.Rental_Unit.TheUnit.Equals("pr. m pr. calender day"))
+                                            {
+                                                <td style="text-align:right">@Html.DisplayFor(Model => item.ItemType.rental_price) @thevaluta @Html.DisplayFor(Model => item.ItemType.Rental_Unit.TheUnit)</td>
+                                            }
+                                            else
+                                            {
+                                                <td style="text-align:right">@Html.DisplayFor(Model => item.ItemType.rental_price) @thevaluta/pcs @Html.DisplayFor(Model => item.ItemType.Rental_Unit.TheUnit)</td>
+                                            }
+                                        }
+                                        @if (item.ItemType.Install_Unit.TheUnit.Equals("pr. m"))
+                                        {
+                                            <td style="text-align:right">@Html.DisplayFor(Model => item.Amount) m</td>
+                                        }
+                                        else
+                                        {
+                                            <td style="text-align:right">@Html.DisplayFor(Model => item.Amount) @Html.DisplayFor(Model => item.ItemType.Install_Unit.TheUnit)</td>
+                                        }
+
+                                        <td style="text-align:right">@Html.DisplayFor(Model => item.Days) @period</td>
+                                        @if (Model.NoMoneyNumbers.Equals(false))
+                                        {
+                                            <td style="text-align:right">@String.Format("{0:N2} ", subtotal)@thevaluta</td>
+                                        }
+                                    </tr>
+                                    cost += subtotal;
+                                    totaltotalcost += subtotal;
+                                    if (item.Total_Discount > (decimal)0.01)
+                                    {
+                                        <tr>
+                                            <td colspan="6" style="text-align:left;">@SharedLocalizer.GetLocalizedHtmlString("Discount")</td>
+                                            @if (Model.NoMoneyNumbers.Equals(false))
+                                            {
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", -item.Total_Discount)@thevaluta</td>
+                                            }
+                                        </tr>
+                                        cost -= (decimal)item.Total_Discount;
+                                        totaltotalcost -= (decimal)item.Total_Discount;
+                                    }
+                                }
+                            }
+
+                            @if (Model.NoMoneyNumbers.Equals(false))
+                            {
+                                <tr style="border-bottom:double;">
+                                    <td style="text-align:left"><b>@SharedLocalizer.GetLocalizedHtmlString("Total Rental Cost")</b></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td style="text-align:right"><b>@String.Format("{0:N2} ", cost)@thevaluta</b></td>
+                                </tr>
+                            }
+                        </table>
+                    }
+                }
+                else if (boqheadline.Type.Equals("Hours"))
+                {
+                    numRecords = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId == null && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (decimal)(boqheadline.BoQnum + 1)).Count();
+                    if (numRecords > 0)
+                    {
+                        <h2>@SharedLocalizer.GetLocalizedHtmlString(boqheadline.HeadLine)</h2>
+                        var cost = (decimal)0.0;
+                        <table style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th style="width:35%;text-align:left">
+                                        @Html.DisplayNameFor(x => x.items.First().Item_Name)
+                                    </th>
+                                    <th style="width:10%;text-align:left">
+                                        @Html.DisplayNameFor(x => x.items.First().Install_date)
+                                    </th>
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        <th style="width:15%;text-align:right">
+                                            @SharedLocalizer.GetLocalizedHtmlString("Hour Rate")
+                                        </th>
+                                    }
+                                    <th style="width:10%;text-align:right">
+                                        @SharedLocalizer.GetLocalizedHtmlString("People")
+                                    </th>
+                                    <th style="width:10%;text-align:right">
+                                        @SharedLocalizer.GetLocalizedHtmlString("Hours(excl. Break)")
+                                    </th>
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        <th style="width:20%;text-align:right">
+                                            @SharedLocalizer.GetLocalizedHtmlString("Subtotal")
+                                        </th>
+                                    }
+                                </tr>
+                            </thead>
+                            @foreach (var item in Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId == null && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (decimal)(boqheadline.BoQnum + 1)).OrderBy(x => x.BoQNr).ThenBy(x => x.Install_date))
+                            {
+                                var subtotal = (decimal)0.0;
+                                @if (item.rental_price != null && item.price != null)
+                                {
+                                    subtotal = Convert.ToDecimal(item.rental_price) + Convert.ToDecimal(item.price);
+                                }
+                                else
+                                {
+                                    if (item.rental_price != null)
+                                    {
+                                        subtotal = Convert.ToDecimal(item.rental_price);
+                                    }
+                                    else
+                                    {
+                                        subtotal = Convert.ToDecimal(item.price);
+                                    }
+                                }
+
+                                <tr>
+                                    <td style="text-align:left">
+                                        @if (item.Daily_Report_2.short_Description != null && item.Daily_Report_2.short_Description != "")
+                                        {
+                                            <text>
+                                                @String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) (@item.Daily_Report_2.short_Description)
+                                            </text>
+                                        }
+                                        else
+                                        {
+                                            <text>
+                                                @String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name)
+                                            </text>
+                                        }
+                                    </td>
+                                    <td>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name)</td>
+                                    <td style="text-align:left">@Html.DisplayFor(modelItem => item.Install_date)</td>
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        @if (item.ItemType.Rental_UnitId.Equals(19))
+                                        {
+                                            <td style="text-align:right">@String.Format("{0:N2}", item.ItemType.rental_price * (decimal)100.00) @SharedLocalizer.GetLocalizedHtmlString("% Surcharge") </td>
+                                        }
+                                        else
+                                        {
+                                            <td style="text-align:right">@Html.DisplayFor(modelItem => item.ItemType.rental_price) @thevaluta/@SharedLocalizer.GetLocalizedHtmlString("Hour") </td>
+                                        }
+                                    }
+                                    <td style="text-align:right">@Html.DisplayFor(modelItem => item.Amount) @SharedLocalizer.GetLocalizedHtmlString("People")</td>
+                                    <td style="text-align:right">@String.Format("{0:N2} ", item.Days) @SharedLocalizer.GetLocalizedHtmlString("Hours")</td>
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        <td style="text-align:right">@String.Format("{0:N2} ", subtotal)@thevaluta</td>
+                                    }
+                                </tr>
+                                cost += subtotal;
+                                totaltotalcost += subtotal;
+                                if (item.Total_Discount > (decimal)0.01)
+                                {
+                                    <tr>
+                                        <td colspan="5" style="text-align:left;">@SharedLocalizer.GetLocalizedHtmlString("Discount")</td>
+                                        @if (Model.NoMoneyNumbers.Equals(false))
+                                        {
+                                            <td style="text-align:right;">@String.Format("{0:N2} ", -item.Total_Discount)@thevaluta</td>
+                                        }
+                                    </tr>
+                                    cost -= (decimal)item.Total_Discount;
+                                    totaltotalcost -= (decimal)item.Total_Discount;
+                                }
+                            }
+                            @if (Model.NoMoneyNumbers.Equals(false))
+                            {
+                                <tr style="border-bottom:double;">
+                                    <td style="text-align:left"><b>@SharedLocalizer.GetLocalizedHtmlString("Total ") @boqheadline.HeadLine</b></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td style="text-align:right"><b>@String.Format("{0:N2} ", cost)@thevaluta</b></td>
+                                </tr>
+                            }
+                        </table>
+                    }
+                }
+                else if (boqheadline.Type.Equals("ExtraWork"))
+                {
+                    numRecords = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && (x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId.Equals(boqheadline.Id)) || (x.MobilizationId != null && x.Mobilize.VariationOrderId.Equals(boqheadline.Id)) || (x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId.Equals(boqheadline.Id))).Count();
+                    if (numRecords > 0)
+                    {
+                        var cost = (decimal)0.0;
+                        <h2>@boqheadline.HeadLine</h2>
+                        <table style="width:100%">
+                            <thead>
+                                <tr>
+                                    <th style="width:30%;text-align:left">
+                                        @Html.DisplayNameFor(x => x.items.First().Item_Name)
+                                    </th>
+                                    <th style="width:10%;text-align:right">
+                                        @Html.DisplayNameFor(x => x.items.First().ExtraWork.TimeStamp)
+                                    </th>
+                                    <th style="width:10%;text-align:right">
+                                        @Html.DisplayNameFor(x => x.items.First().ExtraWork.EndStamp)
+                                    </th>
+                                    <th style="width:5%;text-align:right">
+                                        @Html.DisplayNameFor(x => x.items.First().Amount)
+                                    </th>
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        <th style="width:10%;text-align:right">
+                                            @SharedLocalizer.GetLocalizedHtmlString("Install Price")
+                                        </th>
+                                        <th style="width:10%;text-align:right">
+                                            @SharedLocalizer.GetLocalizedHtmlString("Rental")
+                                        </th>
+                                    }
+                                    <th style="width:5%;text-align:right">
+                                        @SharedLocalizer.GetLocalizedHtmlString("Period Unit")
+                                    </th>
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        <th style="width:10%;text-align:right">
+                                            @SharedLocalizer.GetLocalizedHtmlString("Rental Total")
+                                        </th>
+                                        <th style="width:15%;text-align:right">
+                                            @SharedLocalizer.GetLocalizedHtmlString("Subtotal")
+                                        </th>
+                                    }
+                                </tr>
+                            </thead>
+                            @foreach (var item in Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && (x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId.Equals(boqheadline.Id)) || (x.MobilizationId != null && x.Mobilize.VariationOrderId.Equals(boqheadline.Id)) || (x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId.Equals(boqheadline.Id)) || (x.ArrivalId != null && x.Arrival.VariationOrderId.Equals(boqheadline.Id))))
+                            {
+                                var subtotal = (decimal)0.0;
+                                @if (item.rental_price != null && item.price != null)
+                                {
+                                    subtotal = Convert.ToDecimal(item.rental_price) + Convert.ToDecimal(item.price);
+                                }
+                                else
+                                {
+                                    if (item.rental_price != null)
+                                    {
+                                        subtotal = Convert.ToDecimal(item.rental_price);
+                                    }
+                                    else
+                                    {
+                                        subtotal = Convert.ToDecimal(item.price);
+                                    }
+                                }
+
+                                <tr>
+                                    @if (item.InstallationId == null && item.Daily_Report_2Id == null && item.ArrivalId == null && item.MobilizationId == null)
+                                    {
+                                        <td style="text-align:left">@Html.DisplayFor(modelItem => item.Item_Name)</td>
+                                        <td style="text-align:right">@Html.DisplayFor(Model => item.ExtraWork.TimeStamp)</td>
+                                        <td style="text-align:right">@Html.DisplayFor(Model => item.ExtraWork.EndStamp)</td>
+                                        <td style="text-align:right">1</td>
+                                    }
+                                    else if (item.InstallationId != null)
+                                    {
+                                        <td style="text-align:left">
+                                            @if (item.Install.UniqueID != null && item.Install.UniqueID != "N/A")
+                                            {
+                                                @Html.DisplayFor(modelItem => item.Item_Name) <text>(@Html.DisplayFor(modelItem => item.Install.UniqueID))</text>
+
+                                            }
+                                            else
+                                            {
+                                                @Html.DisplayFor(modelItem => item.Item_Name)
+
+                                            }
+
+                                        </td>
+                                        <td style="text-align:right">@Html.DisplayFor(Model => item.Install.TimeStamp)</td>
+                                        <td style="text-align:right">@Html.DisplayFor(Model => item.Install.DeinstallDate)</td>
+                                        <td style="text-align:right">@Html.DisplayFor(Model => item.Install.Amount)</td>
+                                    }
+                                    else if (item.MobilizationId != null)
+                                    {
+                                        <td style="text-align:left">
+                                            @if (item.Mobilize.UniqueID != null && item.Mobilize.UniqueID != "N/A")
+                                            {
+
+                                                @Html.DisplayFor(modelItem => item.Item_Name) <text>(@Html.DisplayFor(modelItem => item.Mobilize.UniqueID))</text>
+
+                                            }
+                                            else
+                                            {
+                                                @Html.DisplayFor(modelItem => item.Item_Name)
+
+                                            }
+
+                                        </td>
+                                        <td style="text-align:right">@Html.DisplayFor(Model => item.Mobilize.TimeStamp)</td>
+                                        <td style="text-align:right">@Html.DisplayFor(Model => item.Mobilize.TimeStamp)</td>
+                                        <td style="text-align:right">@Html.DisplayFor(Model => item.Mobilize.Amount)</td>
+                                    }
+                                    else if (item.ArrivalId != null)
+                                    {
+                                        <td style="text-align:left">
+                                            @if (item.Arrival.UniqueID != null && item.Arrival.UniqueID != "N/A")
+                                            {
+                                                @Html.DisplayFor(modelItem => item.Item_Name) <text>(@Html.DisplayFor(modelItem => item.Arrival.UniqueID))</text>
+
+                                            }
+                                            else
+                                            {
+                                                @Html.DisplayFor(modelItem => item.Item_Name)
+
+                                            }
+
+                                        </td>
+                                        <td style="text-align:right">@Html.DisplayFor(Model => item.Arrival.TimeStamp)</td>
+                                        <td style="text-align:right">@Html.DisplayFor(Model => item.Arrival.EndStamp)</td>
+                                        <td style="text-align:right">@Html.DisplayFor(Model => item.Arrival.Amount)</td>
+                                    }
+                                    else
+                                    {
+                                        <td style="text-align:left">
+                                            @if (item.Daily_Report_2.short_Description != null && item.Daily_Report_2.short_Description != "")
+                                            {
+                                                @Html.DisplayFor(modelItem => item.Item_Name) <text>(@Html.DisplayFor(modelItem => item.Daily_Report_2.short_Description)</text>
+
+                                            }
+                                            else
+                                            {
+                                                @Html.DisplayFor(modelItem => item.Item_Name)
+
+                                            }
+
+                                        </td>
+                                        <td style="text-align:right">@String.Format("{0:yyyy-MM-dd}", item.Daily_Report_2.Report_Date)</td>
+                                        <td style="text-align:right">@String.Format("{0:yyyy-MM-dd}", item.Daily_Report_2.Report_Date)</td>
+                                        <td style="text-align:right">@Html.DisplayFor(Model => item.Daily_Report_2.Amount)</td>
+                                    }
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        @if (item.price != null)
+                                        {
+                                            <td style="text-align:right">@Html.DisplayFor(Model => item.price) @thevaluta</td>
+                                        }
+                                        else
+                                        {
+                                            <td style="text-align:right">0.00 @thevaluta</td>
+                                        }
+
+
+                                        @if (Model.NoMoneyNumbers.Equals(false))
+                                        {
+                                            if (item.InstallationId == null && item.Daily_Report_2Id == null && item.ArrivalId == null && item.MobilizationId == null)
+                                            {
+                                                if (item.ExtraWork.Rental_Price != 0)
+                                                {
+                                                    <td style="text-align:right">@Html.DisplayFor(Model => item.ExtraWork.Rental_Price) @thevaluta/@SharedLocalizer.GetLocalizedHtmlString("calender day")</td>
+                                                    <td style="text-align:right">@Html.DisplayFor(Model => item.Days) @SharedLocalizer.GetLocalizedHtmlString("Days")</td>
+                                                }
+                                                else
+                                                {
+                                                    <td></td>
+                                                    <td></td>
+                                                }
+
+                                            }
+                                            else if (item.Daily_Report_2Id == null)
+                                            {
+                                                if (item.InstallationId != null || item.MobilizationId != null)
+                                                {
+                                                    <td style="text-align:right"></td>
+                                                    <td style="text-align:right"></td>
+                                                }
+                                                else
+                                                {
+                                                    var theunit = "Days";
+                                                    if (item.ItemType.Rental_UnitId.Equals(16))
+                                                    {
+                                                        theunit = "Months";
+                                                    }
+                                                    else if (item.ItemType.Rental_UnitId.Equals(17))
+                                                    {
+                                                        theunit = "Weeks";
+                                                    }
+                                                    else if (item.ItemType.Rental_UnitId.Equals(18))
+                                                    {
+                                                        theunit = "m-Months";
+                                                    }
+                                                    <td style="text-align:right">@Html.DisplayFor(Model => item.Arrival.ItemType.rental_price) @thevaluta  @item.Arrival.ItemType.Rental_Unit.TheUnit </td>
+                                                    <td style="text-align:right">@Html.DisplayFor(Model => item.Days) @SharedLocalizer.GetLocalizedHtmlString(theunit)</td>
+                                                }
+                                            }
+                                            else
+                                            {
+
+
+                                                @if (item.ItemType.Rental_UnitId.Equals(19))
+                                                {
+                                                    <td style="text-align:right">@String.Format("{0:N2}", item.ItemType.rental_price * (decimal)100.00) @SharedLocalizer.GetLocalizedHtmlString("% Surcharge") </td>
+                                                    <td style="text-align:right">@Html.DisplayFor(Model => item.Days) @SharedLocalizer.GetLocalizedHtmlString("Hours")</td>
+                                                }
+                                                else
+                                                {
+                                                    <td style="text-align:right">@Html.DisplayFor(Model => item.Daily_Report_2.Title.ItemType.rental_price) @thevaluta/@SharedLocalizer.GetLocalizedHtmlString("pr. Hour")</td>
+                                                    <td style="text-align:right">@Html.DisplayFor(Model => item.Days) @SharedLocalizer.GetLocalizedHtmlString("Hours")</td>
+                                                }
+
+                                            }
+                                        }
+                                        @if (Model.NoMoneyNumbers.Equals(false))
+                                        {
+                                            @if (item.rental_price != null && item.rental_price != 0)
+                                            {
+
+
+                                                <td style="text-align:right">@Html.DisplayFor(Model => item.rental_price) @thevaluta</td>
+                                            }
+                                            else
+                                            {
+                                                <td></td>
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        @if (Model.NoMoneyNumbers.Equals(false))
+                                        {
+                                            <td style="text-align:right"></td>
+                                        }
+                                        <td style="text-align:right"></td>
+                                        @if (Model.NoMoneyNumbers.Equals(false))
+                                        {
+                                            <td style="text-align:right"></td>
+                                        }
+                                    }
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        <td style="text-align:right">@String.Format("{0:N2} ", subtotal)@thevaluta</td>
+                                    }
+                                </tr>
+                                cost += subtotal;
+                                totaltotalcost += subtotal;
+                            }
+                            @if (Model.NoMoneyNumbers.Equals(false))
+                            {
+                                <tr style="border-bottom:double;">
+                                    <td style="text-align:left"><b>@SharedLocalizer.GetLocalizedHtmlString("Total ")@boqheadline.HeadLine</b></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td style="text-align:right"><b>@String.Format("{0:N2} ", cost)@thevaluta</b></td>
+                                </tr>
+                            }
+                        </table>
+                    }
+                }
+                else
+                {
+                    @SharedLocalizer.GetLocalizedHtmlString("BLAH BLAH BLAH HOW TO HANDLE SHIT")
+                }
+            }
+
+            @if (Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId == null).Count() > 0)
+            {
+                var cost = (decimal)0.0;
+                <h2>@SharedLocalizer.GetLocalizedHtmlString("Extra Works")</h2>
+                <table style="width:100%">
+                    <thead>
+                        <tr>
+                            <th style="width:30%;text-align:left">
+                                @Html.DisplayNameFor(x => x.items.First().Item_Name)
+                            </th>
+                            <th style="width:10%;text-align:right">
+                                @Html.DisplayNameFor(x => x.items.First().ExtraWork.TimeStamp)
+                            </th>
+                            <th style="width:10%;text-align:right">
+                                @Html.DisplayNameFor(x => x.items.First().ExtraWork.EndStamp)
+                            </th>
+                            <th style="width:5%;text-align:right">
+                                @Html.DisplayNameFor(x => x.items.First().Amount)
+                            </th>
+                            @if (Model.NoMoneyNumbers.Equals(false))
+                            {
+                                <th style="width:10%;text-align:right">
+                                    @SharedLocalizer.GetLocalizedHtmlString("Install Price")
+                                </th>
+                                <th style="width:10%;text-align:right">
+                                    @SharedLocalizer.GetLocalizedHtmlString("Rental")
+                                </th>
+                            }
+                            <th style="width:5%;text-align:right">
+                                @Html.DisplayNameFor(x => x.items.First().Days)
+                            </th>
+                            @if (Model.NoMoneyNumbers.Equals(false))
+                            {
+                                <th style="width:10%;text-align:right">
+                                    @SharedLocalizer.GetLocalizedHtmlString("Rental Total")
+                                </th>
+                                <th style="width:15%;text-align:right">
+                                    @SharedLocalizer.GetLocalizedHtmlString("Subtotal")
+                                </th>
+                            }
+                        </tr>
+                    </thead>
+                    @foreach (var item in Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId == null))
+                    {
+                        var subtotal = (decimal)0.0;
+                        @if (item.rental_price != null && item.price != null)
+                        {
+                            subtotal = Convert.ToDecimal(item.rental_price) + Convert.ToDecimal(item.price);
+                        }
+                        else
+                        {
+                            if (item.rental_price != null)
+                            {
+                                subtotal = Convert.ToDecimal(item.rental_price);
+                            }
+                            else
+                            {
+                                subtotal = Convert.ToDecimal(item.price);
+                            }
+                        }
+
+                        <tr>
+                            <td style="text-align:left">@Html.DisplayFor(modelItem => item.Item_Name)</td>
+                            <td style="text-align:right">@Html.DisplayFor(Model => item.ExtraWork.TimeStamp)</td>
+                            <td style="text-align:right">@Html.DisplayFor(Model => item.ExtraWork.EndStamp)</td>
+                            <td style="text-align:right">1</td>
+                            @if (Model.NoMoneyNumbers.Equals(false))
+                            {
+                                @if (item.price != null)
+                                {
+                                    <td style="text-align:right">@Html.DisplayFor(Model => item.price) @thevaluta</td>
+                                }
+                                else
+                                {
+                                    <td style="text-align:right">0.00 @thevaluta</td>
+                                }
+                                @if (item.rental_price > (decimal)0.0)
+                                {
+                                    <td style="text-align:right">@Html.DisplayFor(Model => item.ExtraWork.Rental_Price) @thevaluta/@SharedLocalizer.GetLocalizedHtmlString("calender day")</td>
+                                }
+                                else
+                                {
+                                    <td style="text-align:right">0.00 @thevaluta/@SharedLocalizer.GetLocalizedHtmlString("calender day")</td>
+                                }
+                            }
+                            <td style="text-align:right">@Html.DisplayFor(Model => item.Days)</td>
+                            @if (Model.NoMoneyNumbers.Equals(false))
+                            {
+                                <td style="text-align:right">@Html.DisplayFor(Model => item.rental_price) @thevaluta</td>
+                                <td style="text-align:right">@String.Format("{0:N2} ", subtotal)@thevaluta</td>
+                            }
+                        </tr>
+                        cost += subtotal;
+                        totaltotalcost += subtotal;
+                    }
+                    @if (Model.NoMoneyNumbers.Equals(false))
+                    {
+                        <tr style="border-bottom:double;">
+                            <td style="text-align:left"><b>@SharedLocalizer.GetLocalizedHtmlString("Total Extra Work Cost")</b></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td style="text-align:right"><b>@String.Format("{0:N2} ", cost)@thevaluta</b></td>
+                        </tr>
+                    }
+                </table>
+            }
+            <br />
+            <br />
+            @if (Model.NoMoneyNumbers.Equals(false))
+            {
+                <table style="width:100%;page-break-after:always;">
+                    <tr style="border-bottom:double;">
+                        <td style="text-align:left;"><b>@SharedLocalizer.GetLocalizedHtmlString("Total (excl. VAT)")</b></td>
+                        <td colspan="5" style="text-align:right"><b>@String.Format("{0:N2} ", totaltotalcost)@thevaluta</b></td>
+                    </tr>
+                    <tr style="border-bottom:double;">
+                        <td style="text-align:left;"><b>@SharedLocalizer.GetLocalizedHtmlString("Previously Applied (excl. VAT)")</b></td>
+                        <td colspan="5" style="text-align:right"><b>@String.Format("{0:N2} ", Model.Payments.Sum(x => x.Amount))@thevaluta</b></td>
+                    </tr>
+                    <tr style="border-bottom:double;">
+                        <td style="text-align:left;"><b>@SharedLocalizer.GetLocalizedHtmlString("Remainder to be paid (excl. VAT)")</b></td>
+                        <td colspan="5" style="text-align:right"><b>@String.Format("{0:N2} ", totaltotalcost - Model.Payments.Sum(x => x.Amount))@thevaluta</b></td>
+                    </tr>
+                    <tr style="border-bottom:double;">
+                        <td style="text-align:left;"><b>@SharedLocalizer.GetLocalizedHtmlString("Previously Invoiced (excl. VAT)")</b></td>
+                        <td colspan="5" style="text-align:right"><b>@String.Format("{0:N2} ", Model.Invoices.Sum(x => x.Amount))@thevaluta</b></td>
+                    </tr>
+                    <tr style="border-bottom:double;">
+                        <td style="text-align:left;"><b>@SharedLocalizer.GetLocalizedHtmlString("Remainder to be invoiced (excl. VAT)")</b></td>
+                        <td colspan="5" style="text-align:right"><b>@String.Format("{0:N2} ", totaltotalcost - Model.Invoices.Sum(x => x.Amount))@thevaluta</b></td>
+                    </tr>
+                </table>
+            }
+            @if (Model.HideOldItems.Equals(false))
+            {
+                <h2>@SharedLocalizer.GetLocalizedHtmlString("Summary Table")</h2>
+            }
+            else
+            {
+                <h2>@SharedLocalizer.GetLocalizedHtmlString("Summary Table - Old items hidden.")</h2>
+            }
+            var totalalways = (decimal)0.0;
+            var totalthis = (decimal)0.0;
+            <table style="width:100%;page-break-inside:avoid;page-break-after:always !important">
+                <thead>
+                    <tr>
+                        <th style="text-align:left;">@SharedLocalizer.GetLocalizedHtmlString("Item Name")</th>
+                        <th style="text-align:right;">@SharedLocalizer.GetLocalizedHtmlString("Total Cumulative Amount")</th>
+                        <th style="text-align:right;">@SharedLocalizer.GetLocalizedHtmlString("Total Expected Amount")</th>
+                        @if (Model.NoMoneyNumbers.Equals(false))
+                        {
+                            <th style="text-align:right;">@SharedLocalizer.GetLocalizedHtmlString("Total Cumulative Cost")</th>
+                        }
+                        <th style="text-align:right;">@SharedLocalizer.GetLocalizedHtmlString("Total This Period")</th>
+                        @if (Model.NoMoneyNumbers.Equals(false))
+                        {
+                            <th style="text-align:right;">@SharedLocalizer.GetLocalizedHtmlString("Total This Period Cost")</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var boqheadline in Model.headlines.OrderBy(x => x.BoQnum).ThenBy(x => x.HeadLine))
+                    {
+
+                        if (boqheadline.Type.Equals("Mobilization"))
+                        {
+                            numRecords = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.MobilizationId != null && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (boqheadline.BoQnum + (decimal)1.0)).GroupBy(x => x.Item_Name).Count();
+                            if (numRecords > 0)
+                            {
+                                <tr style="text-align:left;">
+                                    <td colspan="6" style="text-align:left;">
+                                        <b>@SharedLocalizer.GetLocalizedHtmlString(boqheadline.HeadLine)</b>
+                                    </td>
+                                </tr>
+                                @foreach (var itemtype in Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.MobilizationId != null && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (boqheadline.BoQnum + (decimal)1.0)).OrderBy(x => x.BoQNr).GroupBy(x => x.Item_Name))
+                                {
+                                    var totalamountmobilized = Model.items.Where(x => x.ItemTypeId.Equals(itemtype.First().ItemTypeId)).Sum(x => x.Amount);
+                                    var totalamountmobilizedalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ItemTypeId.Equals(itemtype.First().ItemTypeId)).Sum(x => x.Amount);
+                                    var totalcostMobilizedalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && x.MobilizationId != null).Sum(x => x.price);
+                                    var totalcostMobilized = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && x.MobilizationId != null).Sum(x => x.price);
+                                    totalalways += (decimal)totalcostMobilizedalways;
+                                    totalthis += (decimal)totalcostMobilized;
+                                    if (Model.HideOldItems.Equals(false))
+                                    {
+
+
+                                        <tr>
+                                            <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                            <td style="text-align:right;">@totalamountmobilizedalways @itemtype.First().ItemType.Install_Unit.TheUnit </td>
+                                            <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmount @itemtype.First().ItemType.Install_Unit.TheUnit</td>
+                                            @if (Model.NoMoneyNumbers.Equals(false))
+                                            {
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalcostMobilizedalways)@thevaluta</td>
+                                            }
+                                            <td style="text-align:right;">@totalamountmobilized @itemtype.First().ItemType.Install_Unit.TheUnit </td>
+                                            @if (Model.NoMoneyNumbers.Equals(false))
+                                            {
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalcostMobilized)@thevaluta</td>
+                                            }
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        if (totalamountmobilized > 0)
+                                        {
+                                            <tr>
+                                                <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                                <td style="text-align:right;">@totalamountmobilizedalways</td>
+                                                <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmount @itemtype.First().ItemType.Install_Unit.TheUnit</td>
+                                                @if (Model.NoMoneyNumbers.Equals(false))
+                                                {
+                                                    <td style="text-align:right;">@String.Format("{0:N2} ", totalcostMobilizedalways)@thevaluta</td>
+                                                }
+                                                <td style="text-align:right;">@totalamountmobilized</td>
+                                                @if (Model.NoMoneyNumbers.Equals(false))
+                                                {
+                                                    <td style="text-align:right;">@String.Format("{0:N2} ", totalcostMobilized)@thevaluta</td>
+                                                }
+                                            </tr>
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else if (boqheadline.Type.Equals("Installation"))
+                        {
+                            numRecords = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.InstallationId != null && x.Install.VariationOrderId == null && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (decimal)(boqheadline.BoQnum + 1) && (x.price > (decimal)0.0 || x.price < (decimal)0.0)).Count();
+                            if (numRecords > 0)
+                            {
+
+                                <tr style="text-align:left;">
+                                    <td colspan="5" style="text-align:left;">
+                                        <b>@SharedLocalizer.GetLocalizedHtmlString(boqheadline.HeadLine)</b>
+                                    </td>
+                                </tr>
+                                @foreach (var itemtype in Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.InstallationId != null && x.Install.VariationOrderId == null && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (decimal)(boqheadline.BoQnum + 1)).OrderBy(x => x.BoQNr).GroupBy(x => x.Item_Name))
+                                {
+                                    var totalamountinstalled = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.InstallationId != null && x.Install.VariationOrderId == null && x.Invoice_date.Date >= Model.starttime.Date && x.Invoice_date.Date <= Model.endtime.Date && x.Item_Name.Equals(itemtype.First().Item_Name) && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (decimal)(boqheadline.BoQnum + 1)).Sum(x => x.Amount);
+                                    var totalamountinstalledalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && x.InstallationId != null && x.Install.VariationOrderId == null && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (decimal)(boqheadline.BoQnum + 1)).Sum(x => x.Amount);
+                                    var totalcostInstalledalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && x.InstallationId != null && x.Install.VariationOrderId == null && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (decimal)(boqheadline.BoQnum + 1)).Sum(x => x.price - x.Total_Discount_Installation);
+                                    var totalcostInstalled = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && x.InstallationId != null && x.Install.VariationOrderId == null && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (decimal)(boqheadline.BoQnum + 1)).Sum(x => x.price - x.Total_Discount_Installation);
+                                    //var totalamountinstalled = Model.items.Where(x => x.InstallationId != null && x.Install.VariationOrderId == null && x.Invoice_date.Date >= Model.starttime.Date && x.Invoice_date.Date <= Model.endtime.Date && x.ItemTypeId.Equals(itemtype.First().ItemTypeId) && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (decimal)(boqheadline.BoQnum + 1)).Sum(x => x.Amount);
+                                    //var totalamountinstalledalways = Model.allItems.Where(x => x.ItemTypeId.Equals(itemtype.First().ItemTypeId) && x.InstallationId != null && x.Install.VariationOrderId == null && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (decimal)(boqheadline.BoQnum + 1)).Sum(x => x.Amount);
+                                    //var totalcostInstalledalways = Model.allItems.Where(x => x.Item_Name.Equals(itemtype.First().Item_Name) && x.InstallationId != null && x.Install.VariationOrderId == null && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (decimal)(boqheadline.BoQnum + 1)).Sum(x => x.price - x.Total_Discount_Installation);
+                                    //var totalcostInstalled = Model.items.Where(x => x.Item_Name.Equals(itemtype.First().Item_Name) && x.InstallationId != null && x.Install.VariationOrderId == null && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (decimal)(boqheadline.BoQnum + 1)).Sum(x => x.price - x.Total_Discount_Installation);
+
+                                    totalalways += (decimal)totalcostInstalledalways;
+                                    totalthis += (decimal)totalcostInstalled;
+                                    if (Model.HideOldItems.Equals(false))
+                                    {
+
+
+                                        <tr>
+                                            <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                            @if (itemtype.First().ItemType.Install_Unit.TheUnit.ToLower().Contains("pr. m"))
+                                            {
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalamountinstalledalways) @SharedLocalizer.GetLocalizedHtmlString("Meters")</td>
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", itemtype.First().ItemType.ExpectedAmount) @SharedLocalizer.GetLocalizedHtmlString("Meters")</td>
+                                            }
+                                            else if (itemtype.First().ItemType.Install_Unit.TheUnit.ToLower().Contains("pr. l"))
+                                            {
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalamountinstalledalways) @SharedLocalizer.GetLocalizedHtmlString("Liters")</td>
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", itemtype.First().ItemType.ExpectedAmount) @SharedLocalizer.GetLocalizedHtmlString("Liters")</td>
+                                            }
+                                            else if (itemtype.First().ItemType.Install_Unit.TheUnit.ToLower().Contains("pr. kg"))
+                                            {
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalamountinstalledalways) @SharedLocalizer.GetLocalizedHtmlString("Kg")</td>
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", itemtype.First().ItemType.ExpectedAmount) @SharedLocalizer.GetLocalizedHtmlString("Kg")</td>
+                                            }
+                                            else
+                                            {
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalamountinstalledalways) @itemtype.First().ItemType.Install_Unit.TheUnit </td>
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", itemtype.First().ItemType.ExpectedAmount) @itemtype.First().ItemType.Install_Unit.TheUnit</td>
+                                            }
+
+                                            @if (Model.NoMoneyNumbers.Equals(false))
+                                            {
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalcostInstalledalways)@thevaluta</td>
+                                            }
+                                            @if (itemtype.First().ItemType.Install_Unit.TheUnit.ToLower().Contains("pr. m"))
+                                            {
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalamountinstalled) @SharedLocalizer.GetLocalizedHtmlString("Meters")</td>
+                                            }
+                                            else if (itemtype.First().ItemType.Install_Unit.TheUnit.ToLower().Contains("pr. l"))
+                                            {
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalamountinstalled) @SharedLocalizer.GetLocalizedHtmlString("Liters")</td>
+                                            }
+                                            else if (itemtype.First().ItemType.Install_Unit.TheUnit.ToLower().Contains("pr. kg"))
+                                            {
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalamountinstalled) @SharedLocalizer.GetLocalizedHtmlString("Kg")</td>
+                                            }
+                                            else
+                                            {
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalamountinstalled) @itemtype.First().ItemType.Install_Unit.TheUnit </td>
+                                            }
+                                            @if (Model.NoMoneyNumbers.Equals(false))
+                                            {
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalcostInstalled)@thevaluta</td>
+                                            }
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        if (totalamountinstalled > 0)
+                                        {
+                                            <tr>
+                                                <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalamountinstalledalways)</td>
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", itemtype.First().ItemType.ExpectedAmount) @itemtype.First().ItemType.Install_Unit.TheUnit</td>
+                                                @if (Model.NoMoneyNumbers.Equals(false))
+                                                {
+                                                    <td style="text-align:right;">@String.Format("{0:N2} ", totalcostInstalledalways)@thevaluta</td>
+                                                }
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalamountinstalled)</td>
+                                                @if (Model.NoMoneyNumbers.Equals(false))
+                                                {
+                                                    <td style="text-align:right;">@String.Format("{0:N2} ", totalcostInstalled)@thevaluta</td>
+                                                }
+                                            </tr>
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else if (boqheadline.Type.Equals("Rental"))
+                        {
+                            numRecords = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ArrivalId != null && x.Arrival.VariationOrderId == null && (x.BoQNr_Rental >= boqheadline.BoQnum && (x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0))) && (x.rental_price > (decimal)0.0 || x.rental_price < (decimal)0.0)).Count();
+                            if (numRecords > 0)
+                            {
+                                <tr style="text-align:left;">
+                                    <td colspan="6" style="text-align:left;">
+                                        <b>@SharedLocalizer.GetLocalizedHtmlString(boqheadline.HeadLine)</b>
+                                    </td>
+                                </tr>
+                                @foreach (var itemtype in Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ArrivalId != null && x.Arrival.VariationOrderId == null && (x.BoQNr_Rental >= boqheadline.BoQnum && (x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0))) && (x.rental_price > (decimal)0.0 || x.rental_price < (decimal)0.0)).OrderBy(x => x.BoQNr_Rental).GroupBy(x => x.Item_Name))
+                                {
+                                    if (Model.allItems.First(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.Key)).ItemType.Rental_UnitId.Equals(11))
+                                    {
+                                        var totalamountarrived = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ItemTypeId.Equals(itemtype.First().ItemTypeId) && x.Arrival.VariationOrderId == null && x.ArrivalId != null && x.Days > 0 && x.BoQNr_Rental >= boqheadline.BoQnum && (x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0))).Sum(x => x.Amount * x.Days);
+                                        var totalamountarrivedalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ItemTypeId.Equals(itemtype.First().ItemTypeId) && x.Arrival.VariationOrderId == null && x.ArrivalId != null && x.Days > 0 && x.BoQNr_Rental >= boqheadline.BoQnum && (x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0))).Sum(x => x.Amount * x.Days);
+                                        var totalcostarrivedalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ItemTypeId.Equals(itemtype.First().ItemTypeId) && x.Arrival.VariationOrderId == null && x.ArrivalId != null && x.Days > 0 && x.BoQNr_Rental >= boqheadline.BoQnum && (x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0))).Sum(x => x.rental_price - (decimal)x.Total_Discount);
+                                        var totalcostarrived = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && x.Arrival.VariationOrderId == null && x.Days > 0 && x.ArrivalId != null && x.Install_date.Date <= Model.endtime.Date && (x.Arrival.EndStamp == null || x.Arrival.EndStamp >= Model.starttime) && x.BoQNr_Rental >= boqheadline.BoQnum && (x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0))).Sum(x => x.rental_price - (decimal)x.Total_Discount);
+                                        totalalways += (decimal)totalcostarrivedalways;
+                                        totalthis += (decimal)totalcostarrived;
+
+                                        if (Model.HideOldItems.Equals(false))
+                                        {
+
+
+                                            <tr>
+                                                <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                                <td style="text-align:right;">@totalamountarrivedalways @SharedLocalizer.GetLocalizedHtmlString("Days")</td>
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", itemtype.First().ItemType.ExpectedAmountRental) @SharedLocalizer.GetLocalizedHtmlString("Days")</td>
+                                                @if (Model.NoMoneyNumbers.Equals(false))
+                                                {
+                                                    <td style="text-align:right;">@String.Format("{0:N2} ", totalcostarrivedalways)@thevaluta</td>
+                                                }
+                                                <td style="text-align:right;">@totalamountarrived</td>
+                                                @if (Model.NoMoneyNumbers.Equals(false))
+                                                {
+                                                    <td style="text-align:right;">@String.Format("{0:N2} ", totalcostarrived)@thevaluta</td>
+                                                }
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            if (totalamountarrived > 0)
+                                            {
+                                                <tr>
+                                                    <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                                    <td style="text-align:right;">@totalamountarrivedalways @SharedLocalizer.GetLocalizedHtmlString("Days")</td>
+                                                    <td style="text-align:right;">@String.Format("{0:N2} ", itemtype.First().ItemType.ExpectedAmountRental) @SharedLocalizer.GetLocalizedHtmlString("Days")</td>
+                                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                                    {
+                                                        <td style="text-align:right;">@String.Format("{0:N2} ", totalcostarrivedalways)@thevaluta</td>
+                                                    }
+                                                    <td style="text-align:right;">@totalamountarrived</td>
+                                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                                    {
+                                                        <td style="text-align:right;">@String.Format("{0:N2} ", totalcostarrived)@thevaluta</td>
+                                                    }
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        var totalamountarrived = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ItemTypeId.Equals(itemtype.First().ItemTypeId) && x.ArrivalId != null && x.Arrival.VariationOrderId == null && (x.Days > 0 || x.rental_price < 0) && x.BoQNr_Rental >= boqheadline.BoQnum && (x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0))).Sum(x => x.Amount * x.Days);
+                                        var totalamountarrivedalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ItemTypeId.Equals(itemtype.First().ItemTypeId) && x.ArrivalId != null && x.Arrival.VariationOrderId == null && (x.Days > 0 || x.rental_price < 0) && x.BoQNr_Rental >= boqheadline.BoQnum && (x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0))).Sum(x => x.Amount * x.Days);
+                                        var totalcostarrivedalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ItemTypeId.Equals(itemtype.First().ItemTypeId) && x.ArrivalId != null && x.Arrival.VariationOrderId == null && (x.Days > 0 || x.rental_price < 0) && x.BoQNr_Rental >= boqheadline.BoQnum && (x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0))).Sum(x => x.Arrival == null ? x.rental_price - (decimal)x.Total_Discount : x.Item_Name.ToLower().Contains("idle") ? x.rental_price - (decimal)x.Total_Discount : x.rental_price - (decimal)x.Total_Discount + Convert.ToDecimal(x.Arrival.PayedAmount));
+                                        var totalcostarrived = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && (x.Days > 0 || x.rental_price < 0) && x.ArrivalId != null && x.Arrival.VariationOrderId == null && x.Install_date.Date <= Model.endtime.Date && (x.Arrival.EndStamp == null || x.Arrival.EndStamp >= Model.starttime) && x.BoQNr_Rental >= boqheadline.BoQnum && (x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0))).Sum(x => x.rental_price - (decimal)x.Total_Discount);
+                                        totalalways += (decimal)totalcostarrivedalways;
+                                        totalthis += (decimal)totalcostarrived;
+
+                                        if (Model.HideOldItems.Equals(false))
+                                        {
+
+
+                                            <tr>
+                                                <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                                @if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("day"))
+                                                {
+                                                    if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("pr. m"))
+                                                    {
+                                                        <td style="text-align:right;">@totalamountarrivedalways @SharedLocalizer.GetLocalizedHtmlString("m-Days")</td>
+                                                        <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmountRental @SharedLocalizer.GetLocalizedHtmlString("m-Days")</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td style="text-align:right;">@totalamountarrivedalways @SharedLocalizer.GetLocalizedHtmlString("Days")</td>
+                                                        <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmountRental @SharedLocalizer.GetLocalizedHtmlString("Days")</td>
+                                                    }
+
+                                                }
+                                                else if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("month"))
+                                                {
+                                                    if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("pr. m pr."))
+                                                    {
+                                                        <td style="text-align:right;">@totalamountarrivedalways @SharedLocalizer.GetLocalizedHtmlString("m-Months")</td>
+                                                        <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmountRental @SharedLocalizer.GetLocalizedHtmlString("m-Months")</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td style="text-align:right;">@totalamountarrivedalways @SharedLocalizer.GetLocalizedHtmlString("Months")</td>
+                                                        <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmountRental @SharedLocalizer.GetLocalizedHtmlString("Months")</td>
+                                                    }
+
+                                                }
+                                                else if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("week"))
+                                                {
+                                                    if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("pr. m pr."))
+                                                    {
+                                                        <td style="text-align:right;">@totalamountarrivedalways @SharedLocalizer.GetLocalizedHtmlString("m-Weeks")</td>
+                                                        <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmountRental @SharedLocalizer.GetLocalizedHtmlString("m-Weeks")</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td style="text-align:right;">@totalamountarrivedalways @SharedLocalizer.GetLocalizedHtmlString("Weeks")</td>
+                                                        <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmount @SharedLocalizer.GetLocalizedHtmlString("Weeks")</td>
+                                                    }
+
+                                                }
+                                                else
+                                                {
+                                                    <td style="text-align:right;">@totalamountarrivedalways</td>
+                                                }
+                                                @if (Model.NoMoneyNumbers.Equals(false))
+                                                {
+                                                    <td style="text-align:right;">@String.Format("{0:N2} ", totalcostarrivedalways)@thevaluta</td>
+                                                }
+                                                @if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("day"))
+                                                {
+                                                    if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("pr. m"))
+                                                    {
+                                                        <td style="text-align:right;">@totalamountarrived @SharedLocalizer.GetLocalizedHtmlString("m-Days")</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td style="text-align:right;">@totalamountarrived @SharedLocalizer.GetLocalizedHtmlString("Days")</td>
+                                                    }
+
+                                                }
+                                                else if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("month"))
+                                                {
+                                                    if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("pr. m"))
+                                                    {
+                                                        <td style="text-align:right;">@totalamountarrived @SharedLocalizer.GetLocalizedHtmlString("m-Months")</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td style="text-align:right;">@totalamountarrived @SharedLocalizer.GetLocalizedHtmlString("Months")</td>
+                                                    }
+
+                                                }
+                                                else if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("week"))
+                                                {
+                                                    if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("pr. m"))
+                                                    {
+                                                        <td style="text-align:right;">@totalamountarrived @SharedLocalizer.GetLocalizedHtmlString("m-Weeks")</td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td style="text-align:right;">@totalamountarrived @SharedLocalizer.GetLocalizedHtmlString("Weeks")</td>
+                                                    }
+
+                                                }
+                                                else
+                                                {
+                                                    <td style="text-align:right;">@totalamountarrived</td>
+                                                }
+
+                                                @if (Model.NoMoneyNumbers.Equals(false))
+                                                {
+                                                    <td style="text-align:right;">@String.Format("{0:N2} ", totalcostarrived)@thevaluta</td>
+                                                }
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            if (totalamountarrived > 0)
+                                            {
+                                                <tr>
+                                                    <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                                    @if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("day"))
+                                                    {
+                                                        if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("pr. m"))
+                                                        {
+                                                            <td style="text-align:right;">@totalamountarrivedalways @SharedLocalizer.GetLocalizedHtmlString("m-Days")</td>
+                                                            <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmountRental  @SharedLocalizer.GetLocalizedHtmlString("m-Days")</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td style="text-align:right;">@totalamountarrivedalways @SharedLocalizer.GetLocalizedHtmlString("Days")</td>
+                                                            <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmountRental  @SharedLocalizer.GetLocalizedHtmlString("Days")</td>
+                                                        }
+
+                                                    }
+                                                    else if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("month"))
+                                                    {
+                                                        if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("pr. m pr."))
+                                                        {
+                                                            <td style="text-align:right;">@totalamountarrivedalways @SharedLocalizer.GetLocalizedHtmlString("m-Months")</td>
+                                                            <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmountRental  @SharedLocalizer.GetLocalizedHtmlString("m-Months")</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td style="text-align:right;">@totalamountarrivedalways @SharedLocalizer.GetLocalizedHtmlString("Months")</td>
+                                                            <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmountRental  @SharedLocalizer.GetLocalizedHtmlString("Months")</td>
+                                                        }
+
+                                                    }
+                                                    else if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("week"))
+                                                    {
+                                                        if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("pr. m pr."))
+                                                        {
+                                                            <td style="text-align:right;">@totalamountarrivedalways @SharedLocalizer.GetLocalizedHtmlString("m-Weeks")</td>
+                                                            <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmountRental  @SharedLocalizer.GetLocalizedHtmlString("m-Weeks")</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td style="text-align:right;">@totalamountarrivedalways @SharedLocalizer.GetLocalizedHtmlString("Weeks")</td>
+                                                            <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmountRental  @SharedLocalizer.GetLocalizedHtmlString("Weeks")</td>
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+                                                        <td style="text-align:right;">@totalamountarrivedalways</td>
+                                                    }
+                                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                                    {
+                                                        <td style="text-align:right;">@String.Format("{0:N2} ", totalcostarrivedalways)@thevaluta</td>
+                                                    }
+                                                    @if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("day"))
+                                                    {
+                                                        if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("pr. m"))
+                                                        {
+                                                            <td style="text-align:right;">@totalamountarrived @SharedLocalizer.GetLocalizedHtmlString("m-Days")</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td style="text-align:right;">@totalamountarrived @SharedLocalizer.GetLocalizedHtmlString("Days")</td>
+                                                        }
+
+                                                    }
+                                                    else if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("month"))
+                                                    {
+                                                        if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("pr. m"))
+                                                        {
+                                                            <td style="text-align:right;">@totalamountarrived @SharedLocalizer.GetLocalizedHtmlString("m-Months")</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td style="text-align:right;">@totalamountarrived @SharedLocalizer.GetLocalizedHtmlString("Months")</td>
+                                                        }
+
+                                                    }
+                                                    else if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("week"))
+                                                    {
+                                                        if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("pr. m"))
+                                                        {
+                                                            <td style="text-align:right;">@totalamountarrived @SharedLocalizer.GetLocalizedHtmlString("m-Weeks")</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td style="text-align:right;">@totalamountarrived @SharedLocalizer.GetLocalizedHtmlString("Weeks")</td>
+                                                        }
+
+                                                    }
+                                                    else
+                                                    {
+                                                        <td style="text-align:right;">@totalamountarrived</td>
+                                                    }
+                                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                                    {
+                                                        <td style="text-align:right;">@String.Format("{0:N2} ", totalcostarrived)@thevaluta</td>
+                                                    }
+                                                </tr>
+                                            }
+                                        }
+                                    }
+
+                                }
+                                //removed on 2024-01-02 !!
+                                @foreach (var itemtype in Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.InstallationId != null && x.Install.VariationOrderId == null && x.rental_price > (decimal)0.0 && (Convert.ToInt32(x.BoQNr_Rental).Equals(Convert.ToInt32(boqheadline.BoQnum)) && x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0))).OrderBy(x => x.BoQNr_Rental).GroupBy(x => x.Item_Name))
+                                {
+                                    //here centrifugals are added again!!!!
+                                    //change from items to allitems!!
+                                    var arrivalitem = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ArrivalId != null && x.ItemTypeId.Equals(itemtype.First().ItemTypeId)).ToList();
+                                    if (arrivalitem.Count() < 1)
+                                    {
+                                        var totalamountinstalled = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Install_date.Date >= Model.starttime.Date && x.ItemTypeId.Equals(itemtype.First().ItemTypeId) && x.InstallationId != null).Sum(x => x.Amount);
+                                        var totalamountinstalledalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ItemTypeId.Equals(itemtype.First().ItemTypeId) && x.InstallationId != null).Sum(x => x.Amount);
+                                        var totalcostInstalledalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && x.InstallationId != null).Sum(x => x.rental_price);
+                                        var totalcostInstalled = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && x.InstallationId != null).Sum(x => x.rental_price);
+                                        totalalways += (decimal)totalcostInstalledalways;
+                                        totalthis += (decimal)totalcostInstalled;
+                                        if (Model.HideOldItems.Equals(false))
+                                        {
+
+
+                                            <tr>
+                                                <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                                <td style="text-align:right;">@totalamountinstalledalways</td>
+                                                <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmount @itemtype.First().ItemType.Install_Unit.TheUnit</td>
+                                                @if (Model.NoMoneyNumbers.Equals(false))
+                                                {
+                                                    <td style="text-align:right;">@String.Format("{0:N2} ", totalcostInstalledalways)@thevaluta</td>
+                                                }
+                                                <td style="text-align:right;">@totalamountinstalled</td>
+                                                @if (Model.NoMoneyNumbers.Equals(false))
+                                                {
+                                                    <td style="text-align:right;">@String.Format("{0:N2} ", totalcostInstalled)@thevaluta</td>
+                                                }
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            if (totalamountinstalled > 0)
+                                            {
+                                                <tr>
+                                                    <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                                    <td style="text-align:right;">@totalamountinstalledalways</td>
+                                                    <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmount @itemtype.First().ItemType.Install_Unit.TheUnit</td>
+                                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                                    {
+                                                        <td style="text-align:right;">@String.Format("{0:N2} ", totalcostInstalledalways)@thevaluta</td>
+                                                    }
+                                                    <td style="text-align:right;">@totalamountinstalled</td>
+                                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                                    {
+                                                        <td style="text-align:right;">@String.Format("{0:N2} ", totalcostInstalled)@thevaluta</td>
+                                                    }
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else if (boqheadline.Type.Equals("Hours"))
+                        {
+                            numRecords = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId == null && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (decimal)(boqheadline.BoQnum + 1)).GroupBy(x => x.Item_Name).Count();
+                            if (numRecords > 0)
+                            {
+                                <tr style="text-align:left;">
+                                    <td colspan="6" style="text-align:left;">
+                                        <b>@SharedLocalizer.GetLocalizedHtmlString(boqheadline.HeadLine)</b>
+                                    </td>
+                                </tr>
+                                @foreach (var itemtype in Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId == null && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (decimal)(boqheadline.BoQnum + 1)).GroupBy(x => x.Item_Name))
+                                {
+                                    var totalamounthours = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ItemTypeId.Equals(itemtype.First().ItemTypeId) && x.InstallationId == null && x.MobilizationId == null && x.ArrivalId == null && x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId == null).Sum(x => x.Days);
+                                    var totalamounthoursalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ItemTypeId.Equals(itemtype.First().ItemTypeId) && x.InstallationId == null && x.MobilizationId == null && x.ArrivalId == null && x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId == null).Sum(x => x.Days);
+                                    var totalcostHoursalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ItemTypeId.Equals(itemtype.First().ItemTypeId) && x.ArrivalId == null && x.InstallationId == null && x.MobilizationId == null && x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId == null).Sum(x => x.Total_Discount == null ? x.rental_price : x.rental_price - x.Total_Discount);
+                                    var totalcostHours = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ItemTypeId.Equals(itemtype.First().ItemTypeId) && x.ArrivalId == null && x.InstallationId == null && x.MobilizationId == null && x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId == null).Sum(x => x.Total_Discount == null ? x.rental_price : x.rental_price - x.Total_Discount);
+                                    if (itemtype.First().ItemType.Rental_UnitId.Equals(19))
+                                    {
+                                        totalamounthours = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && x.InstallationId == null && x.MobilizationId == null && x.ArrivalId == null && x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId == null).Sum(x => x.Days);
+                                        totalamounthoursalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && x.InstallationId == null && x.MobilizationId == null && x.ArrivalId == null && x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId == null).Sum(x => x.Days);
+                                        totalcostHoursalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && x.ArrivalId == null && x.InstallationId == null && x.MobilizationId == null && x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId == null).Sum(x => x.Total_Discount == null ? x.rental_price : x.rental_price - x.Total_Discount);
+                                        totalcostHours = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && x.ArrivalId == null && x.InstallationId == null && x.MobilizationId == null && x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId == null).Sum(x => x.Total_Discount == null ? x.rental_price : x.rental_price - x.Total_Discount);
+
+                                    }
+                                    totalalways += (decimal)totalcostHoursalways;
+                                    totalthis += (decimal)totalcostHours;
+                                    if (Model.HideOldItems.Equals(false))
+                                    {
+                                        <tr>
+                                            <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                            <td style="text-align:right;">@String.Format("{0:N2} ", totalamounthoursalways) @SharedLocalizer.GetLocalizedHtmlString("Hours")</td>
+                                            <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmount @SharedLocalizer.GetLocalizedHtmlString("Hours")</td>
+                                            @if (Model.NoMoneyNumbers.Equals(false))
+                                            {
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalcostHoursalways)@thevaluta</td>
+                                            }
+                                            <td style="text-align:right;">@String.Format("{0:N2} ", totalamounthours) @SharedLocalizer.GetLocalizedHtmlString("Hours")</td>
+                                            @if (Model.NoMoneyNumbers.Equals(false))
+                                            {
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalcostHours)@thevaluta</td>
+                                            }
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        if (totalamounthours > 0)
+                                        {
+                                            <tr>
+                                                <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalamounthoursalways) @SharedLocalizer.GetLocalizedHtmlString("Hours")</td>
+                                                <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmount @SharedLocalizer.GetLocalizedHtmlString("Hours")</td>
+                                                @if (Model.NoMoneyNumbers.Equals(false))
+                                                {
+                                                    <td style="text-align:right;">@String.Format("{0:N2} ", totalcostHoursalways)@thevaluta</td>
+                                                }
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalamounthours) @SharedLocalizer.GetLocalizedHtmlString("Hours")</td>
+                                                @if (Model.NoMoneyNumbers.Equals(false))
+                                                {
+                                                    <td style="text-align:right;">@String.Format("{0:N2} ", totalcostHours)@thevaluta</td>
+                                                }
+                                            </tr>
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else if (boqheadline.Type.Equals("ExtraWork"))
+                        {
+                            numRecords = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && (x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId.Equals(boqheadline.Id)) || (x.MobilizationId != null && x.Mobilize.VariationOrderId.Equals(boqheadline.Id)) || (x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId.Equals(boqheadline.Id)) || (x.ArrivalId != null && x.Arrival.VariationOrderId.Equals(boqheadline.Id))).Count();
+
+                            if (numRecords > 0)
+                            {
+                                <tr style="text-align:left;">
+                                    <td colspan="6" style="text-align:left;">
+                                        <b>@boqheadline.HeadLine</b>
+                                    </td>
+                                </tr>
+
+                                @foreach (var itemtype in Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && (x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId.Equals(boqheadline.Id)) || (x.MobilizationId != null && x.Mobilize.VariationOrderId.Equals(boqheadline.Id)) || (x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId.Equals(boqheadline.Id)) || (x.ArrivalId != null && x.Arrival.VariationOrderId.Equals(boqheadline.Id))).GroupBy(x => String.Concat(x.Item_Name, "_", x.InstallationId == null ? "" : "1", "_", x.ArrivalId == null ? "" : "1")))
+                                {
+                                    var totalamountExtraWork = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId.Equals(boqheadline.Id)) || (x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.Amount);
+                                    var totalamountExtraWorkalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId.Equals(boqheadline.Id)) || (x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.Amount);
+                                    var totalcostExtraWorkalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId.Equals(boqheadline.Id)) || (x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId.Equals(boqheadline.Id)) || (x.ArrivalId != null && x.Arrival.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.rental_price == null ? x.price : x.price == null ? x.rental_price : x.rental_price + x.price);
+                                    var totalcostExtraWorkalwaysrental = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId.Equals(boqheadline.Id)) || (x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId.Equals(boqheadline.Id)) || (x.ArrivalId != null && x.Arrival.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.rental_price);
+                                    var totalcostExtraWork = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId.Equals(boqheadline.Id)) || (x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId.Equals(boqheadline.Id)) || (x.ArrivalId != null && x.Arrival.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.rental_price == null ? x.price : x.price == null ? x.rental_price : x.rental_price + x.price);
+                                    var totalcostExtraWorkrental = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId.Equals(boqheadline.Id)) || (x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId.Equals(boqheadline.Id)) || (x.ArrivalId != null && x.Arrival.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.rental_price);
+                                    var theunit = "pcs";
+                                    if (itemtype.First().Daily_Report_2Id != null)
+                                    {
+                                        totalamountExtraWork = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId.Equals(boqheadline.Id)) || (x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.Days); // x.Amount * x.Days
+                                        totalamountExtraWorkalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId.Equals(boqheadline.Id)) || (x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.Days); // x.Amount * x.Days
+                                        theunit = "Hours";
+                                    }
+
+                                    else if (itemtype.First().InstallationId != null || itemtype.First().MobilizationId != null)
+                                    {
+                                        totalamountExtraWork = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.MobilizationId != null && x.Mobilize.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.Amount);
+                                        totalamountExtraWorkalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.MobilizationId != null && x.Mobilize.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.Amount);
+                                        totalcostExtraWorkalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.MobilizationId != null && x.Mobilize.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.price);
+                                        totalcostExtraWorkalwaysrental = 0;
+                                        totalcostExtraWork = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.MobilizationId != null && x.Mobilize.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.price);
+                                        totalcostExtraWorkrental = 0;
+                                        if (itemtype.First().ItemType.Install_Unit.TheUnit.Equals("pr. m"))
+                                        {
+                                            theunit = "m";
+                                        }
+                                        else if (itemtype.First().ItemType.Install_Unit.TheUnit.Equals("pr. l"))
+                                        {
+                                            theunit = "l";
+                                        }
+                                        else if (itemtype.First().ItemType.Install_Unit.TheUnit.Equals("pr. kg"))
+                                        {
+                                            theunit = "kg";
+                                        }
+                                        else
+                                        {
+                                            theunit = itemtype.First().ItemType.Install_Unit.TheUnit;
+                                        }
+                                    }
+                                    else if (itemtype.First().ArrivalId != null)
+                                    {
+                                        totalamountExtraWork = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.ArrivalId != null && x.Arrival.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.Days);
+                                        totalamountExtraWorkalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.ArrivalId != null && x.Arrival.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.Days);
+                                        totalcostExtraWorkalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.ArrivalId != null && x.Arrival.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.rental_price);
+                                        totalcostExtraWorkalwaysrental = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.ArrivalId != null && x.Arrival.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.rental_price);
+                                        totalcostExtraWork = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.ArrivalId != null && x.Arrival.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.rental_price);
+                                        totalcostExtraWorkrental = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.ArrivalId != null && x.Arrival.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.rental_price);
+                                        theunit = SharedLocalizer.GetLocalizedHtmlString("Days");
+                                        if (itemtype.First().ItemType.Rental_UnitId.Equals(16) || itemtype.First().ItemType.Rental_UnitId.Equals(18))
+                                        {
+                                            theunit = SharedLocalizer.GetLocalizedHtmlString("Months");
+                                        }
+                                        else if (itemtype.First().ItemType.Rental_UnitId.Equals(17))
+                                        {
+                                            theunit = SharedLocalizer.GetLocalizedHtmlString("Weeks");
+                                        }
+
+                                    }
+                                    if (Model.HideOldItems.Equals(false))
+                                    {
+                                        <tr>
+                                            <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                            <td style="text-align:right;">@totalamountExtraWorkalways @theunit</td>
+                                            <td style="text-align:right;"></td>
+                                            @if (Model.NoMoneyNumbers.Equals(false))
+                                            {
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalcostExtraWorkalways)@thevaluta</td>
+                                            }
+                                            <td style="text-align:right;">@totalamountExtraWork @theunit</td>
+                                            @if (Model.NoMoneyNumbers.Equals(false))
+                                            {
+                                                <td style="text-align:right;">@String.Format("{0:N2} ", totalcostExtraWork)@thevaluta</td>
+                                            }
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        if (totalamountExtraWork > 0)
+                                        {
+                                            <tr>
+                                                <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                                <td style="text-align:right;">@totalamountExtraWorkalways @theunit</td>
+                                                <td style="text-align:right;"></td>
+                                                @if (Model.NoMoneyNumbers.Equals(false))
+                                                {
+                                                    <td style="text-align:right;">@String.Format("{0:N2} ", totalcostExtraWorkalways)@thevaluta</td>
+                                                }
+                                                <td style="text-align:right;">@totalamountExtraWork @theunit</td>
+                                                @if (Model.NoMoneyNumbers.Equals(false))
+                                                {
+                                                    <td style="text-align:right;">@String.Format("{0:N2} ", totalcostExtraWork)@thevaluta</td>
+                                                }
+                                            </tr>
+                                        }
+                                    }
+                                    totalalways += (decimal)totalcostExtraWorkalways;
+                                    totalthis += (decimal)totalcostExtraWork;
+
+                                }
+                            }
+                        }
+                    }
+                    @{ numRecords = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId == null).Count();}
+                    @if (numRecords > 0)
+                    {
+                        <tr style="text-align:left;">
+                            <td colspan="6" style="text-align:left;">
+                                <b>@SharedLocalizer.GetLocalizedHtmlString("Extra Works")</b>
+                            </td>
+                        </tr>
+                        @foreach (var itemtype in Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId == null).GroupBy(x => x.Item_Name))
+                        {
+                            var totalamountExtraWork = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && x.ExtraWorkId != null).Sum(x => x.Amount);
+                            var totalamountExtraWorkalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && x.ExtraWorkId != null).Sum(x => x.Amount);
+                            var totalcostExtraWorkalways = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && x.ExtraWorkId != null).Sum(x => x.rental_price == null ? x.price : x.price == null ? x.rental_price : x.rental_price + x.price);
+                            var totalcostExtraWorkalwaysrental = Model.allItems.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && x.ExtraWorkId != null).Sum(x => x.rental_price);
+                            var totalcostExtraWork = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && x.ExtraWorkId != null).Sum(x => x.rental_price == null ? x.price : x.price == null ? x.rental_price : x.rental_price + x.price);
+                            var totalcostExtraWorkrental = Model.items.Where(x => x.SubProjectId.Equals(subproj.Id) && x.Item_Name.Equals(itemtype.First().Item_Name) && x.ExtraWorkId != null).Sum(x => x.rental_price);
+                            totalalways += (decimal)totalcostExtraWorkalways;
+                            totalthis += (decimal)totalcostExtraWork;
+                            if (Model.HideOldItems.Equals(false))
+                            {
+                                <tr>
+                                    <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                    <td style="text-align:right;">@totalamountExtraWorkalways</td>
+                                    <td style="text-align:right;"></td>
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        <td style="text-align:right;">@String.Format("{0:N2} ", totalcostExtraWorkalways)@thevaluta</td>
+                                    }
+                                    <td style="text-align:right;">@totalamountExtraWork</td>
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        <td style="text-align:right;">@String.Format("{0:N2} ", totalcostExtraWork)@thevaluta</td>
+                                    }
+                                </tr>
+                            }
+                            else
+                            {
+                                if (totalamountExtraWork > 0)
+                                {
+                                    <tr>
+                                        <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                        <td style="text-align:right;">@totalamountExtraWorkalways</td>
+                                        <td style="text-align:right;"></td>
+                                        @if (Model.NoMoneyNumbers.Equals(false))
+                                        {
+                                            <td style="text-align:right;">@String.Format("{0:N2} ", totalcostExtraWorkalways)@thevaluta</td>
+                                        }
+                                        <td style="text-align:right;">@totalamountExtraWork</td>
+                                        @if (Model.NoMoneyNumbers.Equals(false))
+                                        {
+                                            <td style="text-align:right;">@String.Format("{0:N2} ", totalcostExtraWork)@thevaluta</td>
+                                        }
+                                    </tr>
+                                }
+                            }
+                        }
+                    }
+                    @if (Model.NoMoneyNumbers.Equals(false))
+                    {
+                        <tr style="border-bottom:double">
+                            <td style="text-align:left;"><b>@SharedLocalizer.GetLocalizedHtmlString("Total (excl. VAT)")</b></td>
+                            <td style="text-align:right;"></td>
+                            <td style="text-align:right;"></td>
+                            <td style="text-align:right;"><b>@String.Format("{0:N2} ", totalalways)@thevaluta</b></td>
+                            <td style="text-align:right;"></td>
+                            <td style="text-align:right;"><b>@String.Format("{0:N2} ", totalthis)@thevaluta</b></td>
+                        </tr>
+                        <tr style="border-bottom:double;">
+                            <td style="text-align:left;"><b>@SharedLocalizer.GetLocalizedHtmlString("Previously Applied (excl. VAT)")</b></td>
+                            <td style="text-align:right;"></td>
+                            <td style="text-align:right;"></td>
+                            <td style="text-align:right;"><b>@String.Format("{0:N2} ", Model.AllPayments.Sum(x => x.Amount))@thevaluta</b></td>
+                            <td style="text-align:right;"></td>
+                            <td style="text-align:right;"><b>@String.Format("{0:N2} ", Model.Payments.Sum(x => x.Amount))@thevaluta</b></td>
+                        </tr>
+                        <tr style="border-bottom:double;">
+                            <td style="text-align:left;"><b>@SharedLocalizer.GetLocalizedHtmlString("Remainder to be Paid (excl. VAT)")</b></td>
+                            <td style="text-align:right;"></td>
+                            <td style="text-align:right;"></td>
+                            <td style="text-align:right;"><b>@String.Format("{0:N2} ", totalalways - Model.AllPayments.Sum(x => x.Amount))@thevaluta</b></td>
+                            <td style="text-align:right;"></td>
+                            <td style="text-align:right;"><b>@String.Format("{0:N2} ", totalthis - Model.Payments.Sum(x => x.Amount))@thevaluta</b></td>
+                        </tr>
+                        <tr style="border-bottom:double;">
+                            <td style="text-align:left;"><b>@SharedLocalizer.GetLocalizedHtmlString("Previously Invoiced (excl. VAT)")</b></td>
+                            <td style="text-align:right;"></td>
+                            <td style="text-align:right;"></td>
+                            <td style="text-align:right;"><b>@String.Format("{0:N2} ", Model.AllInvoices.Sum(x => x.Amount))@thevaluta</b></td>
+                            <td style="text-align:right;"></td>
+                            <td style="text-align:right;"><b>@String.Format("{0:N2} ", Model.Invoices.Sum(x => x.Amount))@thevaluta</b></td>
+                        </tr>
+                        <tr style="border-bottom:double;">
+                            <td style="text-align:left;"><b>@SharedLocalizer.GetLocalizedHtmlString("Remainder to be Invoiced (excl. VAT)")</b></td>
+                            <td style="text-align:right;"></td>
+                            <td style="text-align:right;"></td>
+                            <td style="text-align:right;"><b>@String.Format("{0:N2} ", totalalways - Model.AllInvoices.Sum(x => x.Amount))@thevaluta</b></td>
+                            <td style="text-align:right;"></td>
+                            <td style="text-align:right;"><b>@String.Format("{0:N2} ", totalthis - Model.Invoices.Sum(x => x.Amount))@thevaluta</b></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    }
+}

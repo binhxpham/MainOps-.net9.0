@@ -1,0 +1,75 @@
+﻿@model MainOps.Models.Project
+
+<h2>@ViewData["Title"]</h2>
+
+<div>
+    <h4>@SharedLocalizer.GetLocalizedHtmlString("Project")</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @SharedLocalizer.GetLocalizedHtmlString("Is Template?")
+        </dt>
+        <dd>
+            @if (Model.IsTemplate.Equals(true))
+            {
+                @SharedLocalizer.GetLocalizedHtmlString("Yes")
+            }
+            else
+            {
+                @SharedLocalizer.GetLocalizedHtmlString("No")
+            }
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ProjectNr)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ProjectNr)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Abbreviation)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Abbreviation)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Responsible_Person)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Responsible_Person)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Client)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Client)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ClientEmail)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ClientEmail)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CoordSystem.system)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CoordSystem.system)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Address)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Address)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> |
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>

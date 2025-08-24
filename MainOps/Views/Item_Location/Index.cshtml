@@ -1,0 +1,166 @@
+﻿@model IEnumerable<MainOps.Models.Item_Location>
+@using System.Globalization; 
+
+@{
+    ViewData["Title"] = "Index";
+    DateTime? start = ViewBag.Startdate;
+    DateTime? end = ViewBag.Enddate;
+    var nfi = new NumberFormatInfo();
+    nfi.NumberDecimalSeparator = Model.FirstOrDefault().Project.Division.CurrencyDecimalSeperator;
+    nfi.NumberGroupSeparator = Model.FirstOrDefault().Project.Division.CurrencyGroupSeperator;
+    string Currency = Model.FirstOrDefault().Project.Division.Currency;
+
+}
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Location of Items with internal rent")</h2>
+<p>
+    <a asp-action="Create">@SharedLocalizer.GetLocalizedHtmlString("Create new location")</a>
+</p>
+<div class="row">
+    <form asp-controller="Item_Location" asp-action="CurrentItemLocations" method="get">
+        <div class="col-xs-4">
+            <table style="width:100%;">
+                <tr>
+                    <td><label style="width:180px;">@SharedLocalizer.GetLocalizedHtmlString("Start date")</label></td>
+                    <td><label style="width:180px;">@SharedLocalizer.GetLocalizedHtmlString("End date")</label></td>
+                </tr>
+                <tr>
+                    <td><input type="datetime-local" value="@String.Format("{0:yyyy-MM-ddT00:00}",start)" name="Start" id="Start1" onchange="SetStart2();" /></td>
+                    <td><input type="datetime-local" value="@String.Format("{0:yyyy-MM-ddT00:00}",end)" name="End" id="End1" onchange="SetEnd2();" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><button type="submit" class="btn-hoelscher"><span class="glyphicon glyphicon-search"></span></button></td>
+                </tr>
+            </table>
+        </div>
+    </form>
+    
+</div>
+<div class="row">
+    <form asp-controller="Item_Location" asp-action="CurrentItemLocations_PDF" method="get" target="_blank">
+        <div class="col-xs-4">
+            <table style="width:100%;">
+                <tr hidden="hidden">
+                    <td><label style="width:180px;">@SharedLocalizer.GetLocalizedHtmlString("Start date")</label></td>
+                    <td><label style="width:180px;">@SharedLocalizer.GetLocalizedHtmlString("End date")</label></td>
+                </tr>
+                <tr hidden="hidden">
+                    <td><input type="datetime-local" value="@String.Format("{0:yyyy-MM-ddT00:00}",start)" name="Start" id="Start2" onchange="SetStart1();" /></td>
+                    <td><input type="datetime-local" value="@String.Format("{0:yyyy-MM-ddT00:00}",end)" name="End" id="End2" onchange="SetEnd1();" /></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Get PDF")</button></td>
+                </tr>
+            </table>
+        </div>
+    </form>
+</div>
+<br />
+@foreach (Project p in Model.Select(x => x.Project).Distinct())
+{
+    double projecttotal = 0.0;
+    <h2>@p.ProjectNr : @p.Name </h2>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Project)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.SubProject)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.HJItem)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.StartTime)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.EndTime)
+                </th>
+                @if (start != null && end != null)
+                {
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString("Rent Calculated")
+                    </th>
+                }
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Where(x => x.Project.Name.Equals(p.Name)))
+            {
+                var calcrent = item.CalculatedRent(Convert.ToDateTime(start), Convert.ToDateTime(end));
+                if(calcrent >= 0) { 
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+                    </td>
+                    <td>
+                        @if (item.SubProjectId != null)
+                        {
+                            @Html.DisplayFor(modelItem => item.SubProject.Name)
+                        }
+                        else
+                        {
+                        }
+
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.HJItem.HJId) : @Html.DisplayFor(modelItem => item.HJItem.HJItemClass.ClassName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StartTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EndTime)
+                    </td>
+
+                    @if (start != null & end != null)
+                    {
+                <td>
+                    @String.Format("{0:N2} {1}", item.CalculatedRent(Convert.ToDateTime(start), Convert.ToDateTime(end)), Currency, nfi)
+                    @{projecttotal += item.CalculatedRent(Convert.ToDateTime(start), Convert.ToDateTime(end));}
+                </td>
+                    }
+
+
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+                }
+                                }
+            <tr style="border-top: 3px solid black;border-bottom:double dashed black;">
+                <td colspan="5" style="text-align:left;">@SharedLocalizer.GetLocalizedHtmlString("Sum:")</td>
+                <td> @String.Format("{0:N2} {1}", projecttotal, Currency, nfi)</td>
+            </tr>
+        </tbody>
+    </table>
+}
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            SetStart2();
+            SetEnd2();
+        });
+        function SetStart1() {
+            document.getElementById("Start1").value = document.getElementById("Start2").value;
+        }
+        function SetEnd1() {
+            document.getElementById("End1").value = document.getElementById("End2").value;
+        }
+        function SetStart2() {
+            document.getElementById("Start2").value = document.getElementById("Start1").value;
+        }
+        function SetEnd2() {
+            document.getElementById("End2").value = document.getElementById("End1").value;
+        }
+        
+    </script>
+}

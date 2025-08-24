@@ -1,0 +1,25 @@
+﻿@model MainOps.Models.ViewModels.AcidDataUploadVM
+@{
+    ViewData["Title"] = "Upload Acid Treatment Data";
+}
+
+@using (Html.BeginForm("UploadAcidTreatmentData", "AcidTreatments", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <table style="width:100%;">
+        <tr>
+            <td><b>@Html.DisplayNameFor(x => x.AcidTreatmentId)</b></td>
+            <td>
+                <input asp-for="AcidTreatmentId" id="AcidTreatmentId" style="width:100%;height:40px;">
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2"><input type="file" id="postedFile" name="postedFile" class="form-control" accept=".csv" /></td>
+        </tr>
+        <tr>
+            <td>
+                <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload")</button>
+            </td>
+        </tr>
+    </table>
+}
+

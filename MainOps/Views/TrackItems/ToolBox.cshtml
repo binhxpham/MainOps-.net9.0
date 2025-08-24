@@ -1,0 +1,220 @@
+﻿@model MainOps.Models.ViewModels.ToolBoxVM
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("ToolBox");
+}
+
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("ToolBox")</h2>
+<form asp-action="Toolbox" asp-controller="TrackItems" method="post" autocomplete="off" onsubmit="retrieveData();">
+    <table style="width:100%;table-layout:fixed;border:3px solid blue">
+        <tr>
+            <td>
+                <b>@Html.DisplayNameFor(x => x.DoneBy)</b>
+            </td>
+            <td>
+                <input asp-for="DoneBy" type="text" style="width:100%;" />
+            </td>
+            <td><button type="button" onclick="loadlast();" style="width:100%;height:100%;">@SharedLocalizer.GetLocalizedHtmlString("Load last")</button></td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(x => x.ProjectId)</b></td>
+            <td><select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>
+                <b>@Html.DisplayNameFor(x => x.Report_Date)</b>
+            </td>
+            <td>
+                <input asp-for="Report_Date" type="datetime-local" value="@DateTime.Now.ToString("yyyy-MM-dd HH:mm") style="width:100%;" />
+            </td>
+            <td><label style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Instructed")</label></td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(x => x.Work_Tasks)</b></td>
+            <td><textarea asp-for="Work_Tasks" cols="30" rows="6" style="width:100%;"></textarea></td>
+            <td><input asp-for="Work_Instructed" type="checkbox" checked="checked" /></td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(x => x.Safety_Aspects)</b></td>
+            <td><textarea asp-for="Safety_Aspects" cols="30" rows="6" style="width:100%;"></textarea></td>
+            <td><input asp-for="Safety_Instructed" type="checkbox" checked="checked" /></td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(x => x.Dangerous_Work)</b></td>
+            <td><textarea asp-for="Dangerous_Work" cols="30" rows="6" style="width:100%;"></textarea></td>
+            <td><input asp-for="Dangerous_Work_Instructed" type="checkbox" checked="checked" /></td>
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(x => x.Comments)</b></td>
+            <td><textarea asp-for="Comments" cols="30" rows="6" style="width:100%;"></textarea></td>
+            <td></td>
+        </tr>
+
+    </table>
+    <input type="text" id="Names" name="Names" value="" hidden="hidden" />
+    <input type="text" id="Signatures" name="Signatures" value="" hidden="hidden" />
+    <table style="width:100%;table-layout:fixed;">
+            @for (int i = 0; i < 20; i++)
+            {
+                <tr style="border-left:3px solid green;border-top:3px solid green;border-right:3px solid green;">
+                    <td colspan="3" style="width:60%;">@SharedLocalizer.GetLocalizedHtmlString("Name")</td>
+                    <td>@SharedLocalizer.GetLocalizedHtmlString("Signature used")</td>
+                </tr>
+                <tr style="border-left:3px solid green;border-right:3px solid green;">
+                    <td><input type="text" id="name_@i" style="width:100%;" /></td>
+                    @*readonly onfocus="this.removeAttribute('readonly');"*@
+                    <td>
+                        <button type="button" id="accept_@i" class="btn-hoelscher" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Accept signature")</button>
+                    </td>
+                    <td>
+                        <button type="button" id="clear_@i" class="btn-hoelscher" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Clear signature")</button>
+                        <input type="text" id="signaturedata_@i" hidden="hidden" />
+                    </td>
+                    <td><img width="80" height="60" id="savetarget_@i" style="border:1px solid black"></td>
+                </tr>
+                <tr style="border-left:3px solid green;border-right:3px solid green;">
+                    <td colspan="4">@SharedLocalizer.GetLocalizedHtmlString("Signature")</td>
+                </tr>
+                <tr style="border-bottom:3px solid green;border-left:3px solid green;border-right:3px solid green;">
+                    <td colspan="4">
+                        <canvas width="440" height="150" id="signature_@i" style="border:1px solid blue;"></canvas>
+                    </td>
+                </tr>
+            }
+    </table>
+</form>
+
+@section Scripts{
+    <script src="~/js/signature_pad.min.js"></script>
+    <script type="text/javascript">
+        var pads = [];
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select',
+                    firstDay: 1
+
+                });
+                $('.date-picker').datepicker("setDate", new Date("dd-MM-yy"));
+                document.getElementById('ProjectId').options[0].selected = 'selected';
+            });
+        });
+        
+        $(document).ready(function () {
+            $(function () {
+                for (var i = 0; i < 20; i++) {
+                    var canvas = document.querySelector("#signature_" + i);
+                    var pad = new SignaturePad(canvas);
+                    pads.push(pad);
+                    $('#accept_' + i).click(function () {
+                        var theindex = this.id.split("_")[1];
+                        var data = pads[theindex].toDataURL();
+                        $('#savetarget_' + theindex).attr('src', data);
+                        var base64signature = data.split(',')[1];
+                        //$('#signaturedata_' + theindex).val(data);
+                        $('#signaturedata_' + theindex).val(base64signature);
+                        //pads[theindex].off();
+                        tempsave();
+                        if ($('#name_' + theindex).val() == "") {
+                            document.getElementById("name_" + theindex).focus();
+                        }
+                    });
+                    $('#clear_' + i).click(function () {
+                        var theindex = this.id.split("_")[1];
+                        pads[theindex].clear();
+                    })
+                }
+            })
+        });
+        function loadlast() {
+            var doneby = $("#DoneBy").val();
+            $.ajax({
+                type: 'GET',
+                url: "@Url.Action("LoadToolBox", "TrackItems")",
+                dataType: 'JSON',
+                data: {
+                    'doneby': doneby,
+                },
+                success: function (data) {
+                    $("#ProjectId").val(data["projectId"]);
+                    $("#Report_Date").val(data["report_Date"]);
+                    $("#Work_Tasks").val(data["work_Tasks"]);
+                    $("#Comments").val(data["comments"]);
+                    $("#Safety_Aspects").val(data["safety_Aspects"]);
+                    $("#Dangerous_Work").val(data["dangerous_Work"]);
+                    $("#Work_Instructed").val(data["work_Instructed"]);
+                    $("#Safety_Instructed").val(data["safety_Instructed"]);
+                    $("#Dangerous_Work_Instructed").val(data["dangerous_Work_Instructed"]);        
+                },
+                
+            });
+        }
+        function tempsave() {
+            var ProjectId = $("#ProjectId").val();
+            var doneby = $("#DoneBy").val();
+            var report_date = $("#Report_Date").datepicker("getDate").toUTCString();
+            var work_tasks = $("#Work_Tasks").val();
+            var Comments = $("#Comments").val();
+            var Safety_Aspects = $("#Safety_Aspects").val();
+            var Dangerous_Work = $("#Dangerous_Work").val();
+            var Work_Instructed = $("#Work_Instructed").is(':checked');
+            var Safety_Instructed = $("#Safety_Instructed").is(':checked');
+            var Dangerous_Work_Instructed = $("#Dangerous_Work_Instructed").is(':checked');
+            var names = "";
+            var signatures = "";
+
+            for (i = 0; i < 20; i++) {
+                names = names + document.getElementById("name_" + i).value + ",";
+                signatures = signatures + document.getElementById("signaturedata_" + i).value + ",";
+            }
+            $.ajax({
+                type: 'POST',
+                url: "@Url.Action("TempSaveToolBox", "TrackItems")",
+                data: {
+                    'ProjectId': ProjectId,
+                    'doneby': doneby,
+                    'report_dateIn': report_date,
+                    'work_tasks': work_tasks,
+                    'Safety_Aspects': Safety_Aspects,
+                    'Dangerous_Work': Dangerous_Work,
+                    'Comments': Comments,
+                    'Work_Instructed': Work_Instructed,
+                    'Safety_Instructed': Safety_Instructed,
+                    'Dangerous_Work_Instructed': Dangerous_Work_Instructed,
+                    'names': names,
+                    'signatures': signatures,
+                },
+                success: function (data) {
+                    alert("saved");
+                },
+                error: function (data) {
+                    alert("error");
+                }
+            });
+        }
+        function retrieveData() {
+
+            var s1 = document.getElementById("Names");
+            var s2 = document.getElementById("Signatures");
+
+            var names = "";
+            var signatures = "";
+
+            for (i = 0; i < 20; i++) {
+                names = names + document.getElementById("name_" + i).value + ",";
+                signatures = signatures + document.getElementById("signaturedata_" + i).value + ",";
+
+            }
+            s1.value = names;
+            s2.value = signatures;
+            StartSpinner();
+
+        }
+    </script>
+}
+

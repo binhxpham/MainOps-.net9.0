@@ -1,0 +1,59 @@
+﻿@model IEnumerable<MainOps.Models.PipeCut>
+
+@{
+    ViewData["Title"] = "PipeCuts";
+}
+
+<h2>PipeCuts/Extensions</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.MeasPoint)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cut_Or_Extended)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Meters_Cut)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.MeasPoint.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Cut_Or_Extended)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Meters_Cut)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeStamp)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DoneBy)
+            </td>
+            <td>
+                <form asp-action="Edit_PipeCut" asp-route-id="@item.Id" method="get">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                </form>
+                <form asp-action="PipeCut_Details" asp-route-id="@item.Id" method="get" target="_blank">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                </form>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

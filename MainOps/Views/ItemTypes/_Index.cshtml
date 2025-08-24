@@ -1,0 +1,78 @@
+﻿@model IEnumerable<MainOps.Models.ItemType>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Invoice</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+@{
+    ViewData["Title"] = "BoQ";
+    Layout = null;
+}
+
+<table class="table" style="table-layout:fixed;width:100%;">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Item_Type)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BoQnr)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BoQnr_Rental)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.rental_price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Install_Unit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rental_Unit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AgreementNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AgreementDate)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Item_Type)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BoQnr)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.BoQnr_Rental)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.rental_price)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Install_Unit.TheUnit)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Rental_Unit.TheUnit)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AgreementNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AgreementDate)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

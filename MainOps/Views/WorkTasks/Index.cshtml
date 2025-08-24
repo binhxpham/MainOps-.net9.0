@@ -1,0 +1,317 @@
+﻿@model IEnumerable<MainOps.Models.WorkTask>
+
+@{
+    ViewData["Title"] = "Index";
+}
+@inject UserManager<ApplicationUser> _userManager;
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Tasks")</h2>
+
+<p>
+    <a asp-action="Create">@SharedLocalizer.GetLocalizedHtmlString("Create new task")</a>
+</p>
+<table border="1" style="width:100%;table-layout:fixed;">
+    <tr>
+        <th>
+            <label>@SharedLocalizer.GetLocalizedHtmlString("Show All Tasks")</label>
+        </th>
+        <th>
+            <label>@SharedLocalizer.GetLocalizedHtmlString("Show Started Tasks")</label>
+        </th>
+        <th>
+            <label>@SharedLocalizer.GetLocalizedHtmlString("And/Or")</label>
+        </th>
+        <th>
+            <label>@SharedLocalizer.GetLocalizedHtmlString("Show Finished Tasks")</label>
+        </th>
+    </tr>
+    <tr>
+        <td><input id="All" type="checkbox" value="true" checked onclick="$(this).val(this.checked ? true : false)" /></td>
+        <td><input id="Started" type="checkbox" value="true" checked onclick="$(this).val(this.checked ? true : false)" /></td>
+        <td>
+            <select id="AndOr">
+                <option value="Or" selected>@SharedLocalizer.GetLocalizedHtmlString("Or")</option>
+                <option value="And">@SharedLocalizer.GetLocalizedHtmlString("And")</option>
+            </select>
+        </td>
+        <td><input id="Finished" type="checkbox" value="true" checked onclick="$(this).val(this.checked ? true : false)" /></td>
+    </tr>
+    <tr>
+        <td colspan="4"><button type="button" class="btn-hoelscher" onclick="ApplyFilter();" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Filter")</button></td>
+    </tr>
+</table>
+<table class="table" style="width:100%;table-layout:fixed;word-break:break-word;">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            @if (Model.Count(x => x.SubProjectId != null) > 0)
+            {
+                <th>
+                    @Html.DisplayNameFor(model => model.SubProject)
+                </th>
+            }
+            <th>
+                @Html.DisplayNameFor(model => model.IsStarted)
+
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsFinished)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateToDo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InChargeId)/@Html.DisplayNameFor(model => model.WorkerId)
+            </th>
+            <th style="width:25%;"></th>
+        </tr>
+    </thead>
+    <tbody>
+        @{ int i = 1;}
+        @foreach (var item in Model)
+        {
+            <tr class="tasks" id="tasks_@i">
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+                </td>
+                @if (Model.Count(x => x.SubProjectId != null) > 0)
+                {
+                    <td>
+                        @if (item.SubProjectId != null)
+                        {
+                            @Html.DisplayFor(modelItem => item.SubProject.Name)
+                        }
+                    </td>
+                }
+                <td id="started_@i">
+                    @if (item.IsStarted.Equals(true))
+                    {
+                        <input id="startedval_@i" checked="checked" value="true" class="check-box" disabled="disabled" type="checkbox">
+                    }
+                    else
+                    {
+                        <input id="startedval_@i" class="check-box" value="false" disabled="disabled" type="checkbox">
+                    }
+                </td>
+                <td id="ended_@i">
+                    @if (item.IsFinished.Equals(true))
+                    {
+                        <input id="endedval_@i" checked="checked" value="true" class="check-box" disabled="disabled" type="checkbox">
+                    }
+                    else
+                    {
+                        <input id="endedval_@i" class="check-box" value="false" disabled="disabled" type="checkbox">
+                    }
+                </td>
+                <td>
+                    @String.Format("{0:yyyy-MM-dd}", item.DateToDo)
+                </td>
+                <td>
+                    @{var incharge = await _userManager.FindByIdAsync(item.InChargeId);}
+                    @{var worker = await _userManager.FindByIdAsync(item.WorkerId);}
+                    @incharge.full_name() // @worker.full_name()
+                </td>
+                <td>
+                    @if ((await _userManager.GetUserAsync(User)).Id.Equals(item.InChargeId) || User.IsInRole("Admin"))
+                    {
+                        <table style="width:100%;table-layout:fixed;">
+                            <tr>
+                                <td>
+                                    <button class="btn-hoelscher" style="width:100%;" onclick="ShowWorkItems(@item.Id);">@SharedLocalizer.GetLocalizedHtmlString("Show subtasks")</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <button class="btn-hoelscher" style="width:100%;" onclick="ShowFeedbackTask(@item.Id);">@SharedLocalizer.GetLocalizedHtmlString("Show Feedback")</button>
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    <form asp-action="GenerateDailyReportFromTasks" asp-controller="WorkTasks" asp-route-id="@item.Id" method="get">
+                                        <button class="btn-hoelscher" style="width:100%;" onclick="confirm('Are you sure you want to DELETE this task?')">@SharedLocalizer.GetLocalizedHtmlString("Generate Report")</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <form asp-action="EndTask3" asp-controller="WorkTasks" asp-route-id="@item.Id" method="get">
+                                        <button class="btn-hoelscher" style="width:100%;" onclick="confirm('Are you sure you want to END this task?')">@SharedLocalizer.GetLocalizedHtmlString("End Work Task")</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            
+                        </table>
+
+                    }
+
+                </td>
+            </tr>
+            foreach (var feedback in item.Feedbacks.Where(x=>x.WorkItemId.Equals(null)))
+            {
+
+                <tr class="feedback_task_@item.Id" style="display:none;">
+                    @{var countphotos = feedback.Photos.Count();}
+                    <td style="width:100%;text-align:center;vertical-align:middle;">@SharedLocalizer.GetLocalizedHtmlString("Feedback"):</td>
+                    <td style="width:100%;text-align:center;vertical-align:middle;">@String.Format("{0:yyyy-MM-dd hh:mm}", feedback.TimeStamp.ToLocalTime())</td>
+                    @if (countphotos < 1)
+                    {
+                        <td colspan="4" style="width:100%;text-align:center;vertical-align:middle;">@feedback.Text</td>
+                    }
+                    else
+                    {
+                        <td colspan="2" style="width:100%;text-align:center;vertical-align:middle;">@feedback.Text</td>
+                        <td colspan="2">
+                            <div id="myCarousel_@feedback.Id" class="carousel slide" data-ride="carousel" data-interval="20000" style="position:center;">
+                                <ol class="carousel-indicators">
+                                    <li data-target="#myCarousel_@feedback.Id" data-slide-to="0" class="active"></li>
+                                    @for (int j = 1; j <= countphotos - 1; j++)
+                                    {
+                                        <li data-target="#myCarousel_@feedback.Id" data-slide-to="@j"></li>
+                                    }
+                                </ol>
+                                <div class="carousel-inner" role="listbox">
+                                    <div class="item active">
+                                        <img src="~/Tasks/Feedbacks/@feedback.Id/@feedback.Photos.ElementAt(0).path.Split("\\")[feedback.Photos.ElementAt(0).path.Split("\\").Length - 1]" class="img-responsive" style="width:100%;height:200px;" />
+                                    </div>
+                                    @foreach (var photo in feedback.Photos.Where(x => !x.Id.Equals(feedback.Photos.ElementAt(0).Id)))
+                                    {
+                                        <div class="item">
+                                            <img src="~/Tasks/Feedbacks/@feedback.Id/@photo.path.Split("\\")[photo.path.Split("\\").Length - 1]" class="img-responsive" style="width:100%;height:200px;" />
+                                        </div>
+                                    }
+                                </div>
+                                <a class="left carousel-control" href="#myCarousel_@feedback.Id" role="button" data-slide="prev">
+                                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                                    <span class="sr-only">@SharedLocalizer.GetLocalizedHtmlString("<")</span>
+                                </a>
+                                <a class="right carousel-control" href="#myCarousel_@feedback.Id" role="button" data-slide="next">
+                                    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                                    <span class="sr-only">@SharedLocalizer.GetLocalizedHtmlString(">")</span>
+                                </a>
+                            </div>
+                        </td>
+                    }
+                </tr>
+            }
+            @foreach (var workitem in item.WorkItems)
+            {
+                <tr class="workitem_@item.Id" style="display:none;border-top:2px dotted blue;border-bottom:2px dotted blue;">
+                    @if (!workitem.IsFinished.Equals(true))
+                    {
+                        <td style="text-align:center;vertical-align:middle;">
+                            <span class="dot" id="dot_@item.Id" style="background-color: red;"></span>
+                        </td>
+                    }
+                    else
+                    {
+                        <td style="text-align:center;vertical-align:middle;">
+                            <span class="dot" id="dot_@String.Concat(workitem.Id, "_", item.Id)" style="background-color: lightgreen;"><span class="glyphicon glyphicon-ok" style="vertical-align:middle;text-align:center;"></span></span>
+                        </td>
+                    }
+                    @if (Model.Count(x => x.SubProjectId != null) > 0)
+                    {
+                        <td colspan="5" style="width:100%;text-align:center;vertical-align:middle;">@workitem.Description</td>
+                    }
+                    else
+                    {
+                        <td colspan="4" style="width:100%;text-align:center;vertical-align:middle;">@workitem.Description</td>
+                    }
+                    <td>
+                        <button class="btn-hoelscher" style="width:100%;" onclick="ShowFeedbacks(@workitem.Id);">@SharedLocalizer.GetLocalizedHtmlString("Show Feedback")</button>
+                    </td>
+
+                </tr>
+                foreach (var feedback in workitem.Feedbacks)
+                {
+                    var countphotos = feedback.Photos.Count();
+                    <tr class="feedback_@workitem.Id" style="display:none;">
+                        <td style="width:100%;text-align:center;vertical-align:middle;">@SharedLocalizer.GetLocalizedHtmlString("Feedback"):</td>
+                        <td style="width:100%;text-align:center;vertical-align:middle;">@String.Format("{0:yyyy-MM-dd hh:mm}", feedback.TimeStamp.ToLocalTime())</td>
+                        @if (countphotos < 1)
+                        {
+                            <td colspan="4" style="width:100%;text-align:center;vertical-align:middle;">@feedback.Text</td>
+                        }
+                        else
+                        {
+                            <td colspan="2" style="width:100%;text-align:center;vertical-align:middle;">@feedback.Text</td>
+                            <td colspan="3">
+                                <div id="myCarousel_@feedback.Id" class="carousel slide" data-ride="carousel" data-interval="20000" style="position:center;">
+                                    <ol class="carousel-indicators">
+                                        <li data-target="#myCarousel_@feedback.Id" data-slide-to="0" class="active"></li>
+                                        @for (int j = 1; j <= countphotos - 1; j++)
+                                        {
+                                            <li data-target="#myCarousel_@feedback.Id" data-slide-to="@j"></li>
+                                        }
+                                    </ol>
+                                    <div class="carousel-inner" role="listbox">
+                                        <div class="item active">
+                                            <img src="~/Tasks/Feedbacks/@feedback.Id/@feedback.Photos.ElementAt(0).path.Split("\\")[feedback.Photos.ElementAt(0).path.Split("\\").Length - 1]" class="img-responsive" style="width:100%;height:200px;" />
+                                        </div>
+                                        @foreach (var photo in feedback.Photos.Where(x => !x.Id.Equals(feedback.Photos.ElementAt(0).Id)))
+                                        {
+                                            <div class="item">
+                                                <img src="~/Tasks/Feedbacks/@feedback.Id/@photo.path.Split("\\")[photo.path.Split("\\").Length - 1]" class="img-responsive" style="width:100%;height:200px;" />
+                                            </div>
+                                        }
+                                    </div>
+                                    <a class="left carousel-control" href="#myCarousel_@feedback.Id" role="button" data-slide="prev">
+                                        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                                        <span class="sr-only">@SharedLocalizer.GetLocalizedHtmlString("<")</span>
+                                    </a>
+                                    <a class="right carousel-control" href="#myCarousel_@feedback.Id" role="button" data-slide="next">
+                                        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                                        <span class="sr-only">@SharedLocalizer.GetLocalizedHtmlString(">")</span>
+                                    </a>
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                }
+            }
+
+            i += 1;
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        function ApplyFilter() {
+            var all = $("#All").val();
+            var started = $("#Started").val();
+            var ended = $("#Finished").val();
+            var andor = $("#AndOr").val();
+            if (all == "false") {
+                $(".tasks").each(function () {
+                    var id = this.id.split("_")[1];
+                    if (andor == "And") {
+                        if (started == $("#startedval_" + id).val() && ended == $("#endedval_" + id).val()) {
+                            $("#tasks_" + id).show();
+                        }
+                        else {
+                            $("#tasks_" + id).hide();
+                        }
+                    }
+                    else if (andor == "Or") {
+                        if (started == $("#startedval_" + id).val() || ended == $("#endedval_" + id).val()) {
+                            $("#tasks_" + id).show();
+                        }
+                        else {
+                            $("#tasks_" + id).hide();
+                        }
+                    }
+                });
+            }
+            else {
+                $(".tasks").each(function () {
+                    var id = this.id.split("_")[1];
+                    $("#tasks_" + id).show();
+                });
+            }
+        }
+
+    </script>
+}

@@ -1,0 +1,70 @@
+﻿@model IEnumerable<MainOps.Models.ToolBox>
+
+@{
+    ViewData["Title"] = "Toolboxes";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Toolbox Talks")</h2>
+
+<table style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Report_Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Work_Instructed)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Safety_Instructed)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Dangerous_Work_Instructed)
+            </th>
+            <th>@Html.DisplayNameFor(model => model.First().users)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Report_Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DoneBy)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Work_Instructed)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Safety_Instructed)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Dangerous_Work_Instructed)
+            </td>
+            <td>@item.users.Count()</td>
+            <td>
+                @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+                {
+                    <form asp-controller="TrackItems" asp-action="Edit_ToolBox" asp-route-id="@item.Id" method="get">
+                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                    </form>
+                }
+                    <form asp-controller="TrackItems" asp-action="Details_ToolBox" asp-route-id="@item.Id" method="get" target="_blank">
+                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                    </form>
+                </td>
+        </tr>
+}
+    </tbody>
+</table>

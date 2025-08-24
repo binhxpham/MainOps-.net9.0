@@ -1,0 +1,40 @@
+﻿@model IEnumerable<MainOps.Models.ViewModels.SamplingLog>
+@{
+    ViewData["Title"] = "Packages";
+}
+<p>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to main page")</a>
+</p>
+<table style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Place")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Week")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Date")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Package(s)")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Test Name")
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var item in Model)
+            {
+        <tr>
+            <td>@Html.DisplayFor(modelItem => item.WaterSamplePlace.Name)</td>
+            <td>@item.WeekNumber</td>
+            <td>@String.Format("{0:yyyy-MM-dd}", item.Dato)</td>
+            <td>@String.Join(", ", item.WaterSamplePackages.Select(x => x.Annotation).ToArray())</td>
+            <td>@item.SampleFileName</td>
+        </tr>
+            }
+    </tbody>
+</table>

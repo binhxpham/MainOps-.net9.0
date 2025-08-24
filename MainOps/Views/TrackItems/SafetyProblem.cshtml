@@ -1,0 +1,99 @@
+﻿@model MainOps.Models.ViewModels.SafetyProblemVM
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Safety Problem");
+}
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Safety Problem")</h2>
+<div class="row">
+        <form asp-controller="TrackItems" asp-action="SafetyProblem" method="post" enctype="multipart/form-data" onsubmit="StartSpinner();">
+            <table style="width:100%;table-layout:fixed;">
+                <tr>
+                    <td><label asp-for="ProjectId">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(x => x.ProjectId))</label></td>
+                    <td><select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" style="width:100%;"></select></td>
+                </tr>
+                <tr>
+                    <td><label asp-for="TimeStamp" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.TimeStamp))</label></td>
+                    <td>
+                        <input type="text" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd")" asp-for="TimeStamp" id="thetime" style="width:100%;height:40px;" />
+                        <span asp-validation-for="TimeStamp" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label asp-for="safetyproblemtype"></label></td>
+                    <td>
+                        <select asp-for="safetyproblemtype" style="width:100%;">
+                            <option value="Unsafe Conditions" selected="selected">@SharedLocalizer.GetLocalizedHtmlString("Unsafe Conditions")</option>
+                            <option value="Near Miss">@SharedLocalizer.GetLocalizedHtmlString("Near Miss")</option>
+                            <option value="Accident">@SharedLocalizer.GetLocalizedHtmlString("Accident")</option>
+                            <option value="Environment Accident">@SharedLocalizer.GetLocalizedHtmlString("Environment Accident")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label>@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(x => x.LogText))</label>
+                    </td>
+                    <td>
+                        <textarea rows="6" cols="32" name="LogText" id="LogText" style="width:100%;"></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label></td>
+                    <td><input type="file" name="files" multiple accept=".jpg,.jpeg,.png" style="width:100%;" /></td>
+                </tr>
+                <tr>
+                    <td><label>@SharedLocalizer.GetLocalizedHtmlString("Current Accuracy")</label></td>
+                    <td><input type="number" value="0" name="accuracy" id="accuracy" style="width:100%;" /></td>
+                </tr>
+            </table>
+            <input type="number" id="latinput" value="0" name="Latitude" hidden="hidden" />
+            <input type="number" id="longinput" value="0" name="Longitude" hidden="hidden" />
+            <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Create")</button>
+        </form>
+    </div>
+<div>
+    <a asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        var myLat = 0, myLng = 0, myAcc = 0;
+        var id;
+        if (navigator.geolocation) {
+           id = navigator.geolocation.watchPosition(function (position) {
+               myLat = position.coords.latitude;
+               myLng = position.coords.longitude;
+               myAcc = position.coords.accuracy;
+               getPos(myLat, myLng,myAcc);
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                                                //alert("error");
+                    }
+
+                }, { maximumAge: 0, timeout: 8000, enableHighAccuracy: true });
+        }
+        function getPos(lat, lng,acc) {
+            $("#accuracy").val(acc);
+            $("#latinput").val(lat);
+            $("#longinput").val(lng);
+        }
+        
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-2:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select',
+                    firstDay: 1
+                });
+                $('.date-picker').datepicker("setDate", new Date());
+                document.getElementById('ProjectId').options[0].selected = 'selected';
+            });
+        });
+
+    </script>
+}
+

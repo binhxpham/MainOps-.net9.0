@@ -1,0 +1,506 @@
+﻿@model MainOps.Models.WellVM
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("DrillWell");
+}
+<form asp-action="DrilLWell" asp-controller="WellDrilling" method="post">
+    <input type="hidden" asp-for="WellId" />
+    <input type="hidden" asp-for="Attachments" />
+    <input type="hidden" asp-for="Done_By" />
+    <input type="hidden" asp-for="Approved_By" />
+    <input type="hidden" asp-for="Approved_Date" />
+    <input type="hidden" asp-for="Assessed_By" />
+    <input type="hidden" asp-for="Assessed_Date" />
+    <input type="hidden" asp-for="DrillMethod" />
+    <input type="hidden" asp-for="TopOfPipe" />
+
+    <div id="SoilModal" class="TwoModal">
+        <div class="TwoModal-content">
+            <div class="TwoModal-header">
+                <span id="closerbuttonsoil" class="closer" onclick="closethepopupsoil();">&times;</span>
+                <h3>@SharedLocalizer.GetLocalizedHtmlString("Soil Samples")</h3>
+            </div>
+            <div class="TwoModal-body">
+                <div id="thesamples">
+                    <table style="width:100%;table-layout:fixed;">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label asp-for="Samples.First().Code">@SharedLocalizer.GetLocalizedHtmlString("Sample Code")</label>
+                                </th>
+                                <th>
+                                    <label asp-for="Samples.First().sample_meter">@SharedLocalizer.GetLocalizedHtmlString("meter")</label>
+                                </th>
+                                <th>
+                                    <label asp-for="Samples.First().Odour">@SharedLocalizer.GetLocalizedHtmlString("Odour")</label>
+                                </th>
+                                <th>
+                                    <label asp-for="Samples.First().SoilColor">@SharedLocalizer.GetLocalizedHtmlString("Color")</label>
+                                </th>
+                                <th><label asp-for="Samples.First().IsWet">@SharedLocalizer.GetLocalizedHtmlString("is sample wet?")</label></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.Samples.Count; i++)
+                            {
+                                <tr>
+                                    <td><input asp-for="Samples[i].Code" type="text" style="width:100%;" /></td>
+                                    <td><input asp-for="Samples[i].sample_meter" type="number" min="0.0" step="0.1" max="100" style="width:100%;" /></td>
+                                    <td><input asp-for="Samples[i].Odour" type="text" style="width:100%;" /></td>
+                                    <td><input asp-for="Samples[i].SoilColor" type="text" style="width:100%;" /></td>
+                                    <td><input asp-for="Samples[i].IsWet" type="checkbox" value="false" onclick="this.checked ? this.value = true : this.value = false;" style="width:100%;" /></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="SandModal" class="TwoModal">
+        <div class="TwoModal-content">
+            <div class="TwoModal-header">
+                <span id="closerbuttonsand" class="closer" onclick="closethepopupsand();">&times;</span>
+                <h3>@SharedLocalizer.GetLocalizedHtmlString("Sand Layers")</h3>
+            </div>
+            <div class="TwoModal-body">
+                <div id="thesamples">
+                    <table style="width:100%;table-layout:fixed;">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label asp-for="SandLayers.First().SandTypeId">@SharedLocalizer.GetLocalizedHtmlString("Sand Type")</label>
+                                </th>
+                                <th>
+                                    <label asp-for="SandLayers.First().meter_start">@SharedLocalizer.GetLocalizedHtmlString("meter start")</label>
+                                </th>
+                                <th>
+                                    <label asp-for="SandLayers.First().meter_end">@SharedLocalizer.GetLocalizedHtmlString("meter end")</label>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.SandLayers.Count; i++)
+                            {
+                                <tr>
+                                    <td><select asp-for="SandLayers[i].SandTypeId" asp-items="ViewBag.SandTypeId" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Sand Type")</option></select></td>
+                                    <td><input asp-for="SandLayers[i].meter_start" type="number" min="0.0" step="0.1" max="100" style="width:100%;" /></td>
+                                    <td><input asp-for="SandLayers[i].meter_end" type="number" min="0.0" step="0.1" max="100" style="width:100%;" /></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="BentoniteModal" class="TwoModal">
+        <div class="TwoModal-content">
+            <div class="TwoModal-header">
+                <span id="closerbuttonbentonite" class="closer" onclick="closethepopupbentonite();">&times;</span>
+                <h3>@SharedLocalizer.GetLocalizedHtmlString("Casting Layers")</h3>
+            </div>
+            <div class="TwoModal-body">
+                <div id="thesamples">
+                    <table style="width:100%;table-layout:fixed;">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label asp-for="BentoniteLayers.First().meter_start">@SharedLocalizer.GetLocalizedHtmlString("meter start")</label>
+                                </th>
+                                <th>
+                                    <label asp-for="BentoniteLayers.First().meter_end">@SharedLocalizer.GetLocalizedHtmlString("meter end")</label>
+                                </th>
+                                <th>
+                                    <label asp-for="BentoniteLayers.First().CastingTypeId">@SharedLocalizer.GetLocalizedHtmlString("Type of Casting")</label>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.BentoniteLayers.Count; i++)
+                            {
+                                <tr>
+                                    <td><input asp-for="BentoniteLayers[i].meter_start" type="number" min="0.0" step="0.1" max="100" style="width:100%;" /></td>
+                                    <td><input asp-for="BentoniteLayers[i].meter_end" type="number" min="0.0" step="0.1" max="100" style="width:100%;" /></td>
+                                    <td><select asp-for="BentoniteLayers[i].CastingTypeId" asp-items="ViewBag.CastingTypeId"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Casting Type")</option></select></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="FilterModal" class="TwoModal">
+        <div class="TwoModal-content">
+            <div class="TwoModal-header">
+                <span id="closerbuttonfilter" class="closer" onclick="closethepopupfilter();">&times;</span>
+                <h3>@SharedLocalizer.GetLocalizedHtmlString("Filter Layers")</h3>
+            </div>
+            <div class="TwoModal-body">
+                <div id="thesamples">
+                    <table style="width:100%;table-layout:fixed;">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <label asp-for="FilterLayers.First().meter_start">@SharedLocalizer.GetLocalizedHtmlString("meter start")</label>
+                                </th>
+                                <th>
+                                    <label asp-for="FilterLayers.First().meter_end">@SharedLocalizer.GetLocalizedHtmlString("meter end")</label>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.FilterLayers.Count; i++)
+                            {
+                                <tr>
+                                    <td><input asp-for="FilterLayers[i].meter_start" type="number" min="0.0" step="0.1" max="100" style="width:100%;" /></td>
+                                    <td><input asp-for="FilterLayers[i].meter_end" type="number" min="0.0" step="0.1" max="100" style="width:100%;" /></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td colspan="4"><h3>@SharedLocalizer.GetLocalizedHtmlString("General Info")</h3></td>
+        </tr>
+        <tr>
+            <td><label asp-for="ProjectId">@SharedLocalizer.GetLocalizedHtmlString("Project")</label></td>
+            <td colspan="3"><select asp-for="ProjectId" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Project")</option></select></td>
+        </tr>
+        <tr>
+            <td><label asp-for="SubProjectId">@SharedLocalizer.GetLocalizedHtmlString("SubProject")</label></td>
+            <td colspan="3"><select asp-for="SubProjectId" asp-items="ViewBag.SubProjectId" onchange="FillMeasPoints2();" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select SubProject")</option></select></td>
+        </tr>
+        <tr>
+
+            <td><label asp-for="WellName">@SharedLocalizer.GetLocalizedHtmlString("Well Name")</label></td>
+            <td colspan="2"><select asp-for="WellName" asp-items="ViewBag.MeasPointId" style="width:100%;" onchange="ShowLoadButton();"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Well")</option></select></td>
+            <td>
+                <button id="otherbutton" type="button" class="btn-hoelscher" hidden="hidden" onclick="LoadOtherPipe();">@SharedLocalizer.GetLocalizedHtmlString("Load from other pipe")</button>
+            </td>
+        </tr>
+        <tr>
+
+            <td><label asp-for="WellTypeId">@SharedLocalizer.GetLocalizedHtmlString("Well Type")</label></td>
+            <td colspan="3"><select asp-for="WellTypeId" asp-items="ViewBag.WellTypeId" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Well Type")</option></select></td>
+        </tr>
+        @if ((Model.DGU != null && Model.DGU != "") || User.IsInRole("Manager"))
+        {
+            <tr>
+                <td><label asp-for="DGU">@SharedLocalizer.GetLocalizedHtmlString("DGU number")</label></td>
+                <td colspan="3"><input asp-for="DGU" type="text" style="width:100%;" /></td>
+            </tr>
+        }
+        else
+        {
+        @Html.HiddenFor(Model => Model.DGU)
+        }
+        <tr>
+            <td><label asp-for="WaterLevel">@SharedLocalizer.GetLocalizedHtmlString("Water Level(m)")</label></td>
+            <td colspan="3"><input asp-for="WaterLevel" type="number" step="0.01" min="0" style="width:100%;" /></td>
+        </tr>
+        <tr>
+            <td colspan="4">
+                <label>@SharedLocalizer.GetLocalizedHtmlString("Coordinates (x,y,z)")</label>
+            </td>
+        </tr>
+        @if (Model.Coord_x != null || Model.Coord_y != null || Model.Coord_z != null)
+        {
+            <tr>
+                <td>(x,y,z)</td>
+                <td colspan="3">
+                    <div style="width:100%;">
+                        <input asp-for="Coord_x" type="number" style="width:30%;" />
+                        <input asp-for="Coord_y" type="number" style="width:30%;" />
+                        <input asp-for="Coord_z" type="number" style="width:30%;" />
+                    </div>
+                </td>
+
+            </tr>
+        }
+        else
+        {
+            <tr>
+                <td></td>
+                <td colspan="3">
+                    <div style="width:100%;">
+                        <input asp-for="Coord_x" type="number" style="width:30%;" hidden="hidden" />
+                        <input asp-for="Coord_y" type="number" style="width:30%;" hidden="hidden" />
+                        <input asp-for="Coord_z" type="number" style="width:30%;" hidden="hidden" />
+                    </div>
+                </td>
+
+            </tr>
+        }
+        @if (Model.CoordSystemId != null)
+        {
+            <tr>
+                <td><label asp-for="CoordSystemId">@SharedLocalizer.GetLocalizedHtmlString("Coordinate System")</label></td>
+                <td colspan="3"><select asp-for="CoordSystemId" asp-items="ViewBag.CoordSystems" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Coordinate System")</option> </select></td>
+            </tr>
+        }
+        else
+        {
+            @Html.HiddenFor(Model => Model.CoordSystemId)
+        }
+        <tr>
+            <td><label asp-for="WellDiameter">@SharedLocalizer.GetLocalizedHtmlString("Well Diameter")</label></td>
+            <td colspan="3"><input asp-for="WellDiameter" type="text" style="width:100%;" /></td>
+        </tr>
+        <tr>
+            <td><label asp-for="PipeDiameter">@SharedLocalizer.GetLocalizedHtmlString("Pipe Diameter")</label></td>
+            <td colspan="3"><input asp-for="PipeDiameter" type="text" style="width:100%;" /></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Drill_Date_Start">@SharedLocalizer.GetLocalizedHtmlString("Start of Drilling")</label></td>
+            <td colspan="3"><input asp-for="Drill_Date_Start" type="date" style="width:100%;" /></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Drill_Date_End">@SharedLocalizer.GetLocalizedHtmlString("End of Drilling")</label></td>
+            <td colspan="3"><input asp-for="Drill_Date_End" type="date" style="width:100%;" /></td>
+        </tr>
+        <tr>
+            <td colspan="4"><h3>@SharedLocalizer.GetLocalizedHtmlString("Layers")</h3></td>
+        </tr>
+        <tr>
+            <td><label asp-for="Layers.First().LayerId">@SharedLocalizer.GetLocalizedHtmlString("Layer Type")</label></td>
+            <td><label asp-for="Layers.First().Start_m">@SharedLocalizer.GetLocalizedHtmlString("Start(m)")</label></td>
+            <td><label asp-for="Layers.First().End_m">@SharedLocalizer.GetLocalizedHtmlString("End(m)")</label></td>
+            <td><label asp-for="Layers.First().Description">@SharedLocalizer.GetLocalizedHtmlString("Comments")</label></td>
+        </tr>
+        @for (int i = 0; i < Model.Layers.Count; i++)
+        {
+            <tr>
+                <td><select asp-for="Layers[i].LayerId" asp-items="ViewBag.Layers" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Layer Type")</option></select></td>
+                <td><input asp-for="Layers[i].Start_m" type="number" style="width:100%;" /></td>
+                <td><input asp-for="Layers[i].End_m" type="number" style="width:100%;" /></td>
+                <td><input asp-for="Layers[i].Description" type="text" style="width:100%;" /></td>
+            </tr>
+        }
+        <tr>
+            <td colspan="2"><button type="button" class="btn-hoelscher" onclick="showSoil();">@SharedLocalizer.GetLocalizedHtmlString("Show Soil Samples")</button></td>
+            <td colspan="2"><button class="btn-hoelscher" type="button" onclick="showFilter();">@SharedLocalizer.GetLocalizedHtmlString("Filter Layers")</button></td>
+        </tr>
+        <tr>
+            <td colspan="2"><button class="btn-hoelscher" type="button" onclick="showBentonite();">@SharedLocalizer.GetLocalizedHtmlString("Casting Layers")</button></td>
+            <td colspan="2"><button class="btn-hoelscher" type="button" onclick="showSand();">@SharedLocalizer.GetLocalizedHtmlString("Sand Layers")</button></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <button class="btn-hoelscher" onclick="checkdata(event);">@SharedLocalizer.GetLocalizedHtmlString("Save")</button>
+
+            </td>
+            <td colspan="2">
+                <a asp-action="Index" asp-controller="WellDrilling" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Back")</a>
+            </td>
+        </tr>
+
+    </table>
+</form>
+<form id="theotherform" asp-action="DrillWell" asp-controller="WellDrilling" method="get" >
+    <input name="TheWellName" id="TheWellName" hidden="hidden" value="@Model.WellName" />
+</form>
+@section Scripts
+    {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript">
+    var SoilModal = document.getElementById('SoilModal');
+    var SandModal = document.getElementById('SandModal');
+    var BentoniteModal = document.getElementById('BentoniteModal');
+    var FilterModal = document.getElementById('FilterModal');
+    var span4 = document.getElementById('closerbuttonsoil');
+    var span5 = document.getElementById('closerbuttonsand');
+    var span6 = document.getElementById('closerbuttonbentonite');
+    var span7 = document.getElementById('closerbuttonfilter');
+        $(function () {
+            span4.onclick = function () {
+                SoilModal.style.display = "none";
+            }
+            span5.onclick = function () {
+                SandModal.style.display = "none";
+            }
+            span6.onclick = function () {
+                BentoniteModal.style.display = "none";
+            }
+            span7.onclick = function () {
+                FilterModal.style.display = "none";
+            }
+            window.onclick = function (event) {
+                if (event.target == SoilModal) {
+                    SoilModal.style.display = "none";
+                }
+                if (event.target == SandModal) {
+                    SandModal.style.display = "none";
+                }
+                if (event.target == BentoniteModal) {
+                    BentoniteModal.style.display = "none";
+                }
+                if (event.target == FilterModal) {
+                    FilterModal.style.display = "none";
+                }
+            }
+        });
+    function LoadOtherPipe() {
+        $("#TheWellName").val(document.getElementById("WellName").value);
+        $("#theotherform").submit();
+    }
+    function ShowLoadButton() {
+        $("#otherbutton").show();
+    }
+    function checkdata(e) {
+    }
+        function closethepopupSoil() {
+            SoilModal.style.display = "none";
+        }
+        function closethepopupSand() {
+            SandModal.style.display = "none";
+        }
+        function closethepopupBentonite() {
+            BentoniteModal.style.display = "none";
+        }
+        function closethepopupFilter() {
+            FilterModal.style.display = "none";
+        }
+        function showSoil() {
+            SoilModal.style.display = "block";
+        }
+        function showSand() {
+            SandModal.style.display = "block";
+        }
+        function showBentonite() {
+            BentoniteModal.style.display = "block";
+        }
+        function showFilter() {
+            FilterModal.style.display = "block";
+    }
+    function FillWellTypes() {
+            var ProjectId = $('#ProjectId').val();
+            var WellTypeId = $('#WellTypeId').val();
+        var url = '@Url.Action("JsonWellTypes", "ItemTypes")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                'theId': ProjectId,
+                },
+                success: function (data) {
+                    var s = '<option value="">Select Well Type</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["type"] + '</option>' ;
+                    }
+                    $("#WellTypeId").html(s);
+                        document.getElementById("WellTypeId").style.width="100%" ;
+                    var x = document.getElementById("WellTypeId");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        if (x.options[i].value == WellTypeId) {
+                            x.options[i].selected = true;
+                        }
+                    }
+                }
+
+            });
+        }
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var SubProjectId = $('#SubProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                        var x = document.getElementById("SubProjectId");
+                        var i;
+                        for (i = 0; i < x.length; i++) {
+                            if (x.options[i].value == SubProjectId) {
+                                x.options[i].selected = true;
+                            }
+                        }
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                    FillMeasPoints();
+
+                }
+            });
+    }
+    function FillMeasPoints() {
+        var MeasPointId = '@Model.WellName';
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetWellsProject", "Projects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                },
+                success: function (data) {
+                    var s = '<option value="">Select Well</option>';
+                    for (var prop in data) {
+                        if (data[prop]["name"] == MeasPointId) {
+                            s += '<option value="' + data[prop]["name"] + '" selected="selected">' + data[prop]["name"] + '</option>';
+                        }
+                        else {
+                            s += '<option value="' + data[prop]["name"] + '">' + data[prop]["name"] + '</option>';
+                        }
+
+                    }
+                    $("#WellName").html(s);
+
+                }
+            });
+            FillWellTypes();
+    }
+    function FillMeasPoints2() {
+        var MeasPointId = '@Model.WellName';
+            var SubProjectId = $('#SubProjectId').val();
+            var url = '@Url.Action("GetWellsSubProject", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': SubProjectId,
+                },
+                success: function (data) {
+                    alert(data);
+                    var s = '<option value="">Select Well</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["name"] + '">' + data[prop]["name"] + '</option>';
+                    }
+                    $("#WellName").html(s);
+                    document.getElementById("WellName").style.width = "100%";
+                    var x = document.getElementById("WellName");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        if (x.options[i].value == MeasPointId) {
+                            alert("why");
+                            x.options[i].selected = true;
+                        }
+                    }
+                }
+            });
+    }
+    $(document).ready(function () {
+        FillSubProjects();
+    })
+</script>
+}

@@ -1,0 +1,168 @@
+﻿@model IEnumerable<MainOps.Models.ViewModels.AlertEditVM>
+
+@{
+    ViewData["Title"] = "All Alert Settings";
+}
+<div id="ModalInput" class="TwoModal">
+    <div class="TwoModal-content">
+        <div class="TwoModal-header">
+            <span class="closer" onclick="closethepopup();">&times;</span>
+            <h2>@SharedLocalizer.GetLocalizedHtmlString("Edit Alert Limits")</h2>
+        </div>
+        <div class="TwoModal-body">
+            <div id="theMPContent"></div>
+        </div>
+    </div>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.MeasPoint.Project.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MeasPoint.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Lower_Lower_Limit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Middle_Lower_Limit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Middle_Upper_Limit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Upper_Upper_Limit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Flow_Lower_Lower_Limit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Flow_Middle_Lower_Limit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Flow_Middle_Upper_Limit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Flow_Upper_Upper_Limit)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+            @if (item.MeasPoint.MeasType.Type.ToLower().Equals("water meter"))
+            {
+            <td>
+                @Html.DisplayFor(modelItem => item.MeasPoint.Project.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MeasPoint.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Lower_Lower_Limit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Middle_Lower_Limit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Middle_Upper_Limit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Upper_Upper_Limit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Flow_Lower_Lower_Limit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Flow_Middle_Lower_Limit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Flow_Middle_Upper_Limit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Flow_Upper_Upper_Limit)
+            </td>
+            <td>
+                <button type="button" onclick="editAlerts(@item.MeasPointId)">@SharedLocalizer.GetLocalizedHtmlString("Edit Alert Limit")</button>
+            </td>
+        }
+        else
+        {
+            <td>
+                @Html.DisplayFor(modelItem => item.MeasPoint.Project.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MeasPoint.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Lower_Lower_Limit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Middle_Lower_Limit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Middle_Upper_Limit)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Upper_Upper_Limit)
+            </td>
+            <td>
+                N/A
+            </td>
+            <td>
+                N/A
+            </td>
+            <td>
+                N/A
+            </td>
+            <td>
+                N/A
+            </td>
+            <td>
+                <button type="button" onclick="editAlerts(@item.MeasPointId)">@SharedLocalizer.GetLocalizedHtmlString("Edit Alert Limit")</button>
+            </td>
+        }
+            </tr>
+        }
+        </tbody>
+    </table>
+@section scripts{
+    <script>
+        var AlertModal = document.getElementById('ModalInput');
+        var span4 = document.getElementByClassName("closer")[2];
+        $(function () {
+            span4.onclick = function () {
+                AlertModal.style.display = "none";
+            }
+            window.onclick = function (event) {
+                if (event.target == AlertModal) {
+                    AlertModal.style.display = "none";
+                }
+            }
+        });
+        function editAlerts(theindex) {
+            alert(theindex);
+            $.ajax({
+                type: 'post',
+                url: '/MeasPoints/GetAlerts',
+                data: {
+                    'Id': theindex
+                },
+                success: function (response) {
+                    $('#theMPContent').html(response);
+                    AlertModal.style.display = "block";
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+        }
+        function closethepopup() {
+            AlertModal.style.display = "none";
+        }
+    </script>
+}

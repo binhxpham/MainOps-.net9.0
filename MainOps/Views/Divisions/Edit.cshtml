@@ -1,0 +1,60 @@
+﻿@model MainOps.Models.Division
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>Division</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="LogoPath" />
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Currency" class="control-label"></label>
+                <input asp-for="Currency" class="form-control" />
+                <span asp-validation-for="Currency" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CurrencyDecimalSeperator" class="control-label"></label>
+                <input asp-for="CurrencyDecimalSeperator" class="form-control" />
+                <span asp-validation-for="CurrencyDecimalSeperator" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CurrencyGroupSeperator" class="control-label"></label>
+                <input asp-for="CurrencyGroupSeperator" class="form-control" />
+                <span asp-validation-for="CurrencyGroupSeperator" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="HourSheetEmail" class="control-label"></label>
+                <input asp-for="HourSheetEmail" class="form-control" />
+                <span asp-validation-for="HourSheetEmail" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+        <form asp-action="UploadPhotoDivision" asp-controller="Divisions" enctype="multipart/form-data" method="post">
+            <input type="file" name="files" accept=".jpg,.jpeg,.png,.gif" />
+            <input hidden="hidden" name="id" value="@Model.Id" />
+            <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload Logo")</button>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

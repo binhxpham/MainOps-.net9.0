@@ -1,0 +1,181 @@
+﻿@model MainOps.Models.MeasMoreVM
+<link href="~/css/jquery-ui-timepicker-addon.min.css" rel="stylesheet" />
+<head>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM&sensor=false&libraries=places"></script>
+</head>
+@inject UserManager<ApplicationUser> _userManager;
+@{ var theuser = await _userManager.GetUserAsync(User);}
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Create Measurements")</h2>
+<hr />
+
+<div class="row">
+    <div class="col-xs-12">
+        <form asp-action="CreateMore" id="theform">
+            <input asp-for="Latitude" hidden id="latinput" />
+            <input asp-for="Longitude" hidden id="longinput" />
+            <input asp-for="DoneBy" value="@theuser.full_name()" hidden />
+            <input asp-for="ProjectId" value = "@Model.ProjectId" hidden="hidden" />
+            
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <table style="width:100%;table-layout:fixed;">
+                <tr>
+                    <td><label asp-for="BaseName"></label></td>
+                    <td colspan="2"><input asp-for="BaseName" value="@Model.BaseName" readonly="readonly" style="width:100%;" /></td>
+
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <h3><b>@SharedLocalizer.GetLocalizedHtmlString("Level Readings")</b></h3>
+                    </td>
+                </tr>
+                @for (int i = 0; i < Model.MeasPointLevelIds.Count; i++)
+                {
+                    <tr>
+                        <td><label class="control-label">@Model.MeasPointNameLevelIds[i]</label></td>
+                        <td colspan="2"><input asp-for="MeasPointLevelMeasures[i]" class="form-control" /> <input hidden="hidden" asp-for="MeasPointLevelIds[i]" /></td>
+
+                    </tr>
+                    <tr style="border-bottom:2px dotted black;">
+                        <td><label asp-for="MeasPointLevelComment" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.MeasPointLevelComment))</label></td>
+                        <td colspan="2">
+                            <input asp-for="MeasPointLevelComment[i]" type="text" class="form-control" />
+
+                        </td>
+                    </tr>
+                }
+                @if (Model.MeasPointFlowIds.Count > 0)
+                {
+                    <tr>
+                        <td colspan="3">
+                            <h3><b>@SharedLocalizer.GetLocalizedHtmlString("Flow Readings")</b></h3>
+                        </td>
+                    </tr>
+
+                    @for (int i = 0; i < Model.MeasPointFlowIds.Count; i++)
+                    {
+                        <tr>
+                            <td><label class="control-label">@Model.MeasPointNameFlowIds[i]</label></td>
+                            <td colspan="2"><input asp-for="MeasPointFlowMeasures[i]" type="number" class="form-control" /> <input hidden="hidden" asp-for="MeasPointFlowIds[i]" /></td>
+
+                        </tr>
+                        <tr style="border-bottom:2px dotted black;">
+                            <td><label asp-for="MeasPointFlowComment" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.MeasPointFlowComment))</label></td>
+                            <td colspan="2">
+                                <input asp-for="MeasPointFlowComment[i]" class="form-control" />
+                                <span asp-validation-for="MeasPointFlowComment" type="text" class="text-danger"></span>
+                            </td>
+                        </tr>
+                    }
+                }
+                <tr>
+                    <td colspan="3">
+                        <h3><b>@SharedLocalizer.GetLocalizedHtmlString("Water Meter Readings")</b></h3>
+                    </td>
+                </tr>
+                @for (int i = 0; i < Model.MeasPointWMIds.Count; i++)
+                {
+                    <tr>
+                        <td><label class="control-label">@Model.MeasPointNameWMIds[i]</label></td>
+                        <td colspan="2"><input asp-for="MeasPointWMMeasures[i]" type="number" class="form-control" /> <input hidden="hidden" asp-for="MeasPointWMIds[i]" /></td>
+
+                    </tr>
+                    <tr style="border-bottom:2px dotted black;">
+                        <td><label asp-for="MeasPointWMComment" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.MeasPointWMComment))</label></td>
+                        <td colspan="2">
+                            <input asp-for="MeasPointWMComment[i]"  type="text" class="form-control" />
+                            <span asp-validation-for="MeasPointWMComment" class="text-danger"></span>
+                        </td>
+                    </tr>
+                }
+                <tr>
+                    <td><label asp-for="TheComment" class="control-label">@SharedLocalizer.GetLocalizedHtmlString("General Comment - All Measures")</label></td>
+                    <td colspan="2">
+                        @Html.DropDownListFor(m => m.CommentId, ViewData["CommentId"] as IEnumerable<SelectListItem>, "Select Reason", new { style = "width:100%;height:40px;" })
+                        <span asp-validation-for="TheComment" class="text-danger"></span>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><label asp-for="When" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.When))</label></td>
+                    <td colspan="2">
+                        <input type="datetime" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd HH:mm")" asp-for="When" id="thetime" style="width:100%;height:40px;" />
+                        <span asp-validation-for="When" class="text-danger"></span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <button class="btn-hoelscher" style="width:100%;height:50px;">@SharedLocalizer.GetLocalizedHtmlString("Create")</button>
+                    </td>
+                </tr>
+            </table>
+            <input id="accuracy" value="1000" type="number" step="0.001" hidden="hidden" />
+            
+        </form>
+    </div>
+</div>
+<br />
+<br />
+<br />
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        var myLat = 0, myLng = 0, myAcc;
+        var myLatLng = { lat: 0, lng: 0 };
+        var id;
+        var isfound = false;
+
+        if (navigator.geolocation) {
+            id = navigator.geolocation.watchPosition(function (position) {
+                myLat = position.coords.latitude;
+                myLng = position.coords.longitude;
+                myAcc = position.coords.accuracy;
+                getPos(myLat, myLng, myAcc);
+
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                                                //alert("error");
+                    }
+
+                }, { maximumAge: 8000, timeout: 8000, enableHighAccuracy: true });
+        }
+        
+        
+        function getPos(lat, lng, acc) {
+
+            $("#latinput").val(lat);
+            $("#longinput").val(lng);
+            $("#accuracy").val(acc);
+          
+
+        }
+        
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datetimepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-10:+0",
+                    dateFormat: "dd-MM-yy",
+                    timeFormat: "HH:mm",
+                    showSecond: false,
+                    showMillisec: false,
+                    showMicrosec: false,
+                    showTimezone: false,
+                    controlType: 'select',
+                    firstDay: 1
+
+                });
+                $('.date-picker').datetimepicker("setDate", new Date());
+                
+
+            });
+        });
+
+    </script>
+}

@@ -1,0 +1,78 @@
+﻿@model IEnumerable<BoQHeadLine>
+
+@{Layout = null;}
+
+<table style="width:100%;table-layout:fixed;">
+    @foreach (var proj in Model.GroupBy(x => x.ProjectId))
+    {
+
+        int j = 0;
+        @foreach (var item in Model.Where(x => x.ProjectId.Equals(proj.Key)))
+        {
+            if (j == 0)
+            {
+    <tr style="border:5px solid blue;">
+        <td>@Html.DisplayFor(modelItem => item.Project.ProjectNr) : @Html.DisplayFor(modelItem => item.Project.Name)</td>
+        @if(User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DivisionAdmin")) { 
+        <td>
+            <form asp-action="BoQProjectDetails" asp-controller="Documents" asp-route-id="@proj.Key" method="get" target="_blank">
+                <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("View Original BoQ")</button>
+            </form>
+        </td>
+        }
+        
+    </tr>
+            }
+            j = j + 1;
+            <tr>
+                <td style="border:2px solid blue;">
+                    <table style="width:100%;table-layout:fixed;">
+                        <tr>
+                            <td colspan="2">
+                                <text>@Html.DisplayFor(modelItem => item.BoQnum) - @Html.DisplayFor(modelItem => item.HeadLine)</text>
+                            </td>
+                            @if(User.IsInRole("Manager") ||User.IsInRole("DivisionAdmin") || User.IsInRole("Admin")) { 
+                            <td>
+                                <button class="btn-hoelscher" onclick="GetBoQExtraWorkItems(@item.Id);">@SharedLocalizer.GetLocalizedHtmlString("Show BoQItems")</button>
+                            </td>
+                            <td></td>
+                            }
+                        </tr>
+                        @if (item.ExtraWorkBoQs.Count > 0)
+                        {
+
+                            foreach (var ewbq in item.ExtraWorkBoQs)
+                            {
+                                int i = 1;
+                                foreach (var desc in ewbq.Descriptions)
+                                {
+
+                    <tr>
+                        <td style="width:40px;">@Html.DisplayFor(modelItem => desc.Topic)</td>
+                        @if (User.IsInRole("Manager") || User.IsInRole("DivisionAdmin") || User.IsInRole("Admin"))
+                        {
+                            <td colspan="2" style="width:100%;">@Html.DisplayFor(modelItem => desc.Description)</td>
+                        }
+                        else
+                        {
+                            <td style="width:100%;">@Html.DisplayFor(modelItem => desc.Description)</td>
+                        }
+                        @if (desc.IsRelatedToBoQ)
+                        {
+                            <td>@SharedLocalizer.GetLocalizedHtmlString("BOQ")</td>
+                        }
+
+                    </tr>
+                                    { i = i + 1; }
+                                }
+                            }
+
+                        }
+                    </table>
+                </td>
+            </tr>
+
+
+        }
+    }
+</table>

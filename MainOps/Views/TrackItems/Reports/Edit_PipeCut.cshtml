@@ -1,0 +1,58 @@
+﻿@model MainOps.Models.PipeCut
+
+@{
+    ViewData["Title"] = "Edit_PipeCut";
+}
+
+<h2>Edit_PipeCut</h2>
+
+<h4>PipeCut</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit_PipeCut" enctype="multipart/form-data" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="MeasPointId" class="control-label"></label>
+                <select asp-for="MeasPointId" class="form-control" asp-items="ViewBag.MeasPointId"></select>
+                <span asp-validation-for="MeasPointId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Cut_Or_Extended" class="control-label"></label>
+                <select asp-for="Cut_Or_Extended" class="form-control">
+                    <option value="Cut">@SharedLocalizer.GetLocalizedHtmlString("Cut")</option>
+                    <option value="Extended">@SharedLocalizer.GetLocalizedHtmlString("Extended")</option>
+                </select>
+                <span asp-validation-for="Cut_Or_Extended" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Meters_Cut" class="control-label"></label>
+                <input type="number" asp-for="Meters_Cut" step="0.01" class="form-control" />
+                <span asp-validation-for="Meters_Cut" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DoneBy" class="control-label"></label>
+                <input type="text" asp-for="DoneBy" class="form-control" />
+                <span asp-validation-for="DoneBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TimeStamp" class="control-label"></label>
+                <input asp-for="TimeStamp" class="form-control" />
+                <span asp-validation-for="TimeStamp" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Photos</label>
+                <input name="files" type="file" multiple accept=".jpg,.jpeg,.png" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="PipeCuts">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+

@@ -1,0 +1,1207 @@
+﻿@model IEnumerable<MainOps.Models.CoordTrack2>
+<head>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM&libraries=places"></script>
+</head>
+@inject UserManager<ApplicationUser> UserManager
+@{
+    ViewData["Title"] = "Overview";
+}
+<div class="row" hidden="hidden">
+    <div class="col-xs-2">
+            <table style="width:100%;table-layout:fixed;">
+                <tr>
+                    <td><label>@SharedLocalizer.GetLocalizedHtmlString("Accuracy:")</label></td>
+                    <td><input type="text" id="accuracy" value="0.0" name="accuracy" /></td>
+                </tr>
+                <tr>
+                    <td><label>@SharedLocalizer.GetLocalizedHtmlString("Latitude:")</label></td>
+                    <td><input type="text" id="latinput" value="0.0" name="Latitude" /></td>
+                </tr>
+                <tr>
+                    <td><label>@SharedLocalizer.GetLocalizedHtmlString("Longitude:")</label></td>
+                    <td><input type="text" id="longinput" value="0.0" name="Longitude" /></td>
+                </tr>
+                <tr>
+                    <td><button class="btn-hoelscher" type="button" onclick="getKMPoint();">@SharedLocalizer.GetLocalizedHtmlString("GET KM POINT")</button></td>
+                    <td><input type="text" id="kpinput" value="0.0" /></td>
+                </tr>
+            </table>
+    </div>
+</div>
+<input type="text" id="latinputdragged" value="0.0" hidden="hidden" disabled="disabled" />
+<input type="text" id="lnginputdragged" value="0.0" hidden="hidden" disabled="disabled" />
+<input type="text" id="indexdragged" value="0.0" hidden="hidden" disabled="disabled" />
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Overview")</h2>
+<table style="width:100%;table-layout:fixed;">
+    <tr>
+        <td colspan="2"><button type="button" onclick="setthecenter();" class="btn-hoelscher" style="width:100px;height:50px;">@SharedLocalizer.GetLocalizedHtmlString("Center Map")</button></td>
+        <td><label>@SharedLocalizer.GetLocalizedHtmlString("Choose Project")</label></td>
+        <td><select id="ProjectId" asp-items="ViewBag.ProjectId" onchange="FillItems()" style="width:100%;"></select></td>
+        <td>
+            <label>@SharedLocalizer.GetLocalizedHtmlString("Filter Items")</label>
+        </td>
+        <td>
+            @Html.DropDownList("ItemTypeId", ViewData["ItemTypeId"] as SelectList, @SharedLocalizer.GetLocalizedHtmlString("All"), new { @id = "TheItemType", @onchange = "UpdateList(this.value)", @style = "width:100%;" })
+        </td>
+    </tr>
+    <tr>
+        <td>
+            @SharedLocalizer.GetLocalizedHtmlString("Distance between rabbits(m):")
+        </td>
+        <td><input type="checkbox" id="AddRabbits" onclick="AddRemoveRabbits();"/></td>
+        <td>
+            <input id="distance" type="number" value="0" style="width:100%;" />
+        </td>
+        <td>@SharedLocalizer.GetLocalizedHtmlString("Show deinstalled:")</td>
+        <td><input id="deinstalledcheckbox" type="checkbox" value="true" checked="checked" onchange="ToggleVisibleDeinstalls(this);" /></td>
+        <td>@SharedLocalizer.GetLocalizedHtmlString("Show Installed:")</td>
+        <td><input id="installedcheckbox" type="checkbox" value="true" checked="checked" onchange="ToggleVisibleInstalls(this);" /></td>
+    </tr>
+    <tr>
+        <td>@SharedLocalizer.GetLocalizedHtmlString("Search Unique ID:")</td>
+        <td><input type="text" onchange="SearchUniqueID(this.value);" /></td>
+        <td colspan="5"></td>
+    </tr>
+</table>
+<br />
+<div class="row" id="timelapsediv2" style="text-align:center;">
+    <button onclick="RemoveDayToTimeLapse()" style="width:30px;">-</button>
+    <input id="timelapsedate" type="date" value="@DateTime.Now.Date.ToString("yyyy-MM-dd")" onchange="ShowItemsAtDay(event);" />
+    <button onclick="AddDayToTimeLapse()" style="width:30px;">+</button>
+</div>
+<div id="myDiv" style="width:95%;height:600px;"></div>
+<div id="InstallPartial" style="width:100%;"></div>
+@section Scripts {
+    <style type="text/css">
+        #ui-datepicker-div {
+            z-index: 9999999 !important;
+        }
+    </style>
+    <script type="text/javascript">
+        var myLat = 0, myLng = 0, myAcc = 0;
+        var id;
+        var markers = [];
+        var current_id = 0;
+        var myposmarker;
+        var isfound = false;
+        var marker1;
+        var marker2;
+        var kmlLayer;
+        var kmlLayer2;
+    var new_id;
+    var hasmoved = false;
+    var myLatLng = { lat: 55.312440, lng: 11.491625 };
+    var mapOptions = {
+        center: myLatLng,
+        zoom: 16,
+        minZoom: 4,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        var pipes = [];
+    //Display the Google map in the div control with the defined Options
+    const map = new google.maps.Map(document.getElementById("myDiv"), mapOptions);
+        if (navigator.geolocation) {
+            id = navigator.geolocation.watchPosition(function (position) {
+                myLat = position.coords.latitude;
+                myLng = position.coords.longitude;
+                myAcc = position.coords.accuracy;
+                getPos(myLat, myLng, myAcc);
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                        alert("error permission denied");
+                    }
+
+                }, { maximumAge: 0, timeout: 8000, enableHighAccuracy: true });
+        }
+        function RemoveDayToTimeLapse() {
+            var date = new Date(document.getElementById("timelapsedate").value);
+            date.setDate(date.getDate() - 1);
+            document.getElementById("timelapsedate").valueAsDate = date;
+            $(document.getElementById("timelapsedate")).trigger("change");
+        }
+        function AddDayToTimeLapse() {
+            var date = new Date(document.getElementById("timelapsedate").value);
+            date.setDate(date.getDate() + 1);
+            document.getElementById("timelapsedate").valueAsDate = date;
+            $(document.getElementById("timelapsedate")).trigger("change");
+        }
+        function ShowItemsAtDay(e) {
+            var thedate = new Date(e.target.value);
+            var ProjectId = $("#ProjectId").val();
+            var ItemTypeId = $("#TheItemType").val();
+            var showinstalled = document.getElementById("installedcheckbox").checked;
+            var showdeinstalled = document.getElementById("deinstalledcheckbox").checked;
+
+            for (i = 0; i < markers.length; i++) {
+                if (markers[i].project == ProjectId) {
+                    if (markers[i].itemtypeid == ItemTypeId || ItemTypeId == null || ItemTypeId == "") {
+                        if (new Date(markers[i].timestamp) <= thedate) {
+                            if (new Date(markers[i].deinstalltimestamp) > thedate) {
+                                if (showinstalled == true) {
+                                    markers[i].setVisible(true);
+                                }
+                                else {
+                                    markers[i].setVisible(false);
+                                }
+
+                            }
+                            else {
+                                if (showdeinstalled == true) {
+                                    markers[i].setVisible(true);
+                                }
+                                else {
+                                    markers[i].setVisible(false);
+                                }
+
+                            }
+                        }
+                        else {
+                            markers[i].setVisible(false);
+                        }
+                    }
+                    else {
+                        markers[i].setVisible(false);
+                    }
+                }
+                else {
+                    markers[i].setVisible(false);
+                }
+
+            }
+        }
+        function changeMarker(marker, isinstalled) {
+            if (isinstalled == false) {
+                marker.setIcon({
+                    url: 'https://maps.google.com/mapfiles/ms/icons/red.png',
+                    scaledSize: new google.maps.Size(50, 50)
+                });
+            }
+            else {
+                if (marker.itemtype.includes("pump") || marker.itemtype.includes("well point system")) {
+
+                }
+            }
+
+            @*@if (item.TypeCoord == "Installed")
+            {
+                if (item.Install.isInstalled.Equals(false))
+                {
+                    <text>
+
+                    </text>
+                }
+                else
+                {
+                    @if (item.Install.ItemType.Item_Type.ToLower().Contains("pump") || item.Install.ItemType.Item_Type.ToLower().Contains("well point system"))
+                {
+                    @if (item.Install.IsInOperation)
+                    {
+                    <text>
+                        marker.setIcon({
+                            url: 'https://drive.google.com/u/0/uc?id=19yF4cZ6iBNiHy_N5Pt321BSKTf5XmA38&export=download',
+                        scaledSize: new google.maps.Size(50, 50)
+                        })
+                    </text>
+                    }
+                    else
+                    {
+                    <text>
+                        marker.setIcon({
+                            url: 'https://drive.google.com/u/0/uc?id=1M3vu6d3d867bdZcsylFJhclW_gKH13bA&export=download',
+                        scaledSize: new google.maps.Size(50, 50)
+                        })
+                    </text>
+                    }
+
+                }
+                else if (item.Install.ItemType.Item_Type.ToLower().Contains("tank"))
+                {
+                    <text>
+                        marker.setIcon({
+                            url: 'https://maps.google.com/mapfiles/ms/icons/purple.png',
+                            scaledSize: new google.maps.Size(50, 50)
+                        })
+                    </text>
+                }
+                else if (item.Install.ItemType.Item_Type.ToLower().Contains("point"))
+                {
+                    <text>
+                        marker.setIcon({
+                            url: 'https://maps.google.com/mapfiles/ms/icons/orange.png',
+                            scaledSize: new google.maps.Size(50, 50)
+                        })
+                    </text>
+                }
+                else
+                {
+                    <text>
+                        marker.setIcon({
+                            url: 'https://maps.google.com/mapfiles/ms/icons/blue.png',
+                            scaledSize: new google.maps.Size(50, 50)
+                        })
+                    </text>
+                }
+                }
+
+
+            }
+            else if (item.TypeCoord == "DeInstalled")
+            {
+               <text>
+            marker.setIcon({
+                url: 'https://maps.google.com/mapfiles/ms/icons/red.png',
+                scaledSize: new google.maps.Size(50, 50)
+            })
+               </text>
+            }
+            else
+            {
+               <text>
+            marker.setIcon({
+                url: 'https://maps.google.com/mapfiles/ms/icons/purple.png',
+                scaledSize: new google.maps.Size(50, 50)
+            })
+               </text>
+            }*@
+        }
+        function ToggleVisibleDeinstalls(elem) {
+            var ProjectId = $("#ProjectId").val();
+            var itemtype = $("#TheItemType").val();
+            var title = "";
+            if (itemtype == null || itemtype == "") {
+                if (elem.checked == true) {
+                    for (i = 0; i < markers.length; i++) {
+                        if (markers[i].project == ProjectId) {
+                            if (markers[i].isinstalled == "False") {
+                                markers[i].setVisible(true);
+                            }
+                        }
+                    }
+                }
+                else {
+                    for (i = 0; i < markers.length; i++) {
+                        if (markers[i].project == ProjectId) {
+                            if (markers[i].isinstalled == "False") {
+                                markers[i].setVisible(false);
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                $.ajax({
+                    url: '@Url.Action("getItemType", "TrackItems")',
+                    data: { id: itemtype },
+                    type: "GET",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        title = data;
+                        for (i = 0; i < markers.length; i++) {
+                            if (elem.checked == true) {
+                                for (i = 0; i < markers.length; i++) {
+                                    if (markers[i].project == ProjectId && markers[i].title == title) {
+                                        if (markers[i].isinstalled == "False") {
+                                            markers[i].setVisible(true);
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+                                for (i = 0; i < markers.length; i++)
+                                {
+                                    if (markers[i].project == ProjectId)
+                                    {
+                                        if (markers[i].isinstalled == "False" && markers[i].title == title)
+                                        {
+                                            markers[i].setVisible(false);
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    },
+                    error: function (data) {
+                        for (i = 0; i < markers.length; i++) {
+                            markers[i].setVisible(true);
+                        }
+                    },
+                });
+            }
+
+        }
+
+        function ToggleVisibleInstalls(elem) {
+            var ProjectId = $("#ProjectId").val();
+            var itemtype = $("#TheItemType").val();
+            var title = "";
+            if (itemtype == null || itemtype == "") {
+                if (elem.checked == true) {
+                    for (i = 0; i < markers.length; i++) {
+                        if (markers[i].project == ProjectId) {
+                            if (markers[i].isinstalled == "True") {
+                                markers[i].setVisible(true);
+                            }
+                        }
+                    }
+                }
+                else {
+                    for (i = 0; i < markers.length; i++) {
+                        if (markers[i].project == ProjectId) {
+                            if (markers[i].isinstalled == "True") {
+
+                                markers[i].setVisible(false);
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                $.ajax({
+                    url: '@Url.Action("getItemType", "TrackItems")',
+                    data: { id: itemtype },
+                    type: "GET",
+                    contentType: "application/json; charset=utf-8",
+                    success: function (data) {
+                        title = data;
+                        for (i = 0; i < markers.length; i++) {
+                            if (elem.checked == true) {
+                                for (i = 0; i < markers.length; i++) {
+                                    if (markers[i].project == ProjectId && markers[i].title == title) {
+                                        if (markers[i].isinstalled == "True") {
+                                            markers[i].setVisible(true);
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+                                for (i = 0; i < markers.length; i++)
+                                {
+                                    if (markers[i].project == ProjectId)
+                                    {
+                                        if (markers[i].isinstalled == "True" && markers[i].title == title)
+                                        {
+                                            markers[i].setVisible(false);
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    },
+                    error: function (data) {
+                        for (i = 0; i < markers.length; i++) {
+                            markers[i].setVisible(true);
+                        }
+                    },
+                });
+            }
+
+        }
+        function setPos(lat, lng) {
+            var initialLocation = new google.maps.LatLng(lat, lng);
+            if (myposmarker == null) {
+                myposmarker = new google.maps.Marker({
+                    map: map,
+                    position: { lat: lat, lng: lng },
+                    title: "You",
+
+                });
+                marker1 = new google.maps.Marker({
+                    map: map,
+                    position: { lat: lat, lng: lng },
+                    title: "Position 1",
+                    draggable: true,
+
+                });
+                marker2 = new google.maps.Marker({
+                    map: map,
+                    position: { lat: lat, lng: lng },
+                    title: "Position 2",
+                    draggable: true,
+                });
+                marker1.setIcon({
+                    url: 'https://drive.google.com/u/0/uc?id=1RE8IE31GsWLpFWrtTJLquSu3SfYGX30N&export=download',
+                    scaledSize: new google.maps.Size(40, 40)
+                })
+                marker2.setIcon({
+                    url: 'https://drive.google.com/u/0/uc?id=1RE8IE31GsWLpFWrtTJLquSu3SfYGX30N&export=download',
+                    scaledSize: new google.maps.Size(40, 40)
+                })
+                myposmarker.setIcon({
+                    url: 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
+                    scaledSize: new google.maps.Size(70, 70)
+                })
+
+                myposmarker['infowindow'] = new google.maps.InfoWindow({
+                    content: 'Your Position!'
+                });
+                marker1['infowindow'] = new google.maps.InfoWindow({
+                    content: 'Position 1 for distance!'
+                });
+                marker2['infowindow'] = new google.maps.InfoWindow({
+                    content: 'Position 2 for distance'
+                });
+                myposmarker.setMap(map);
+                marker1.setMap(map);
+                marker2.setMap(map);
+                marker1.setVisible(false);
+                marker2.setVisible(false);
+                map.setCenter(new google.maps.LatLng(lat, lng));
+            }
+            google.maps.event.addListener(myposmarker, 'click', function () {
+                this['infowindow'].open(map, this);
+            });
+            google.maps.event.addListener(marker1, 'dragend', function () {
+                getDistBetweenTwoPlaces();
+            });
+            google.maps.event.addListener(marker2, 'dragend', function () {
+                getDistBetweenTwoPlaces();
+            });
+            google.maps.event.addListener(marker1, 'click', function () {
+                this['infowindow'].open(map, this);
+            });
+            google.maps.event.addListener(marker2, 'click', function () {
+                this['infowindow'].open(map, this);
+            });
+            map.setCenter(initialLocation);
+        }
+        function getPos(lat, lng, acc) {
+            $("#accuracy").val(acc);
+            $("#latinput").val(lat);
+            $("#longinput").val(lng);
+            if (!isfound) {
+                setPos(lat, lng);
+                isfound = true;
+            }
+        }
+        function rad(x) {
+            return x * Math.PI / 180;
+        };
+        function getDistBetweenTwoPlaces() {
+            var p1 = marker1.getPosition();
+            var p2 = marker2.getPosition();
+            var R = 6378137; // Earth’s mean radius in meter
+            var dLat = rad(p2.lat() - p1.lat());
+            var dLong = rad(p2.lng() - p1.lng());
+            var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(rad(p1.lat())) * Math.cos(rad(p2.lat())) *
+                Math.sin(dLong / 2) * Math.sin(dLong / 2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            var d = R * c;
+            $("#distance").val(d);
+        }
+        function AddRemoveRabbits() {
+            var ischecked = $("#AddRabbits").prop('checked');
+            if (ischecked) {
+                marker1.setVisible(true);
+                marker2.setVisible(true);
+                var currentcenter = map.getCenter();
+                marker1.position = currentcenter;
+                marker2.position = currentcenter;
+            }
+            else {
+                marker1.setVisible(false);
+                marker2.setVisible(false);
+            }
+        }
+        function SearchUniqueID(texttosearch) {
+            if (texttosearch.length >= 4) {
+                for (i = 0; i < markers.length; i++) {
+                    if (markers[i].uniqueid.includes(texttosearch) && markers[i].getVisible() == true) {
+                        var latLng = markers[i].getPosition();
+                        map.setZoom(17);
+                        map.panTo(latLng);
+                    }
+                }
+            }
+        }
+        function FillItems() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetItemsProject", "ItemTypes")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                    'type' : "install"
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["item_Type"] + '</option>';
+                    }
+                    $("#TheItemType").html(s);
+                    document.getElementById("TheItemType").style.width = "100%";
+                }
+            });
+            for (i = 0; i < markers.length; i++) {
+                if (markers[i].project == ProjectId) {
+                    markers[i].setVisible(true);
+                }
+                else {
+                    markers[i].setVisible(false);
+                }
+            }
+            if (ProjectId == 40 || ProjectId == 48) {
+                kmlLayer = new google.maps.KmlLayer('https://drive.google.com/uc?export=download&id=1uR0xsPABccyNmXgCYbKsErFC4We4QXuI', {
+                    map: map
+                });
+                kmlLayer2 = null;
+            }
+            else if(ProjectId == 418) {
+                kmlLayer = null;
+                kmlLayer2 = new google.maps.KmlLayer('https://drive.google.com/uc?export=download&id=1xq7EDSY4v3QN63YM7JEc0cxKHXFczpEj', {
+                    map: map
+                });
+            }
+            else {
+                kmlLayer = null;
+                kmlLayer2 = null;
+            }
+        }
+        function setthecenter() {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                myposmarker = null;
+                isfound = false;
+                var Lat = position.coords.latitude;
+                var Lng = position.coords.longitude;
+                map.setCenter({ lat: Lat, lng: Lng });
+            },
+
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                        alert("error permission denied");
+                    }
+                }, { maximumAge: 0, timeout: 8000, enableHighAccuracy: true });
+        }
+
+        $(document).ready(function () {
+            document.getElementById('ProjectId').options[0].selected = 'selected';
+            DisplayGoogleMap();
+
+        });
+        window.addEventListener("load", function () {
+            FillItems();
+        });
+        function getKMPoint() {
+            var lat = $("#latinput").val();
+            var lng = $("#longinput").val();
+            $.ajax({
+                url: '@Url.Action("FindNearestKM", "TrackItems")',
+                data: {
+                    ProjectId: 40,
+                    lat: lat,
+                    lng: lng
+                },
+                type: "GET",
+                success: function (data) {
+                    $("#kpinput").val(data);
+                },
+                error: function (data) {
+
+                },
+            });
+        }
+        function updateposition(index) {
+            var lat = $("#latinputdragged").val();
+            var lng = $("#lnginputdragged").val();
+            var indexdragged = $("#indexdragged").val();
+            if (indexdragged == index) {
+                $.ajax({
+                    url: '@Url.Action("UpdateInstallPos", "TrackItems")',
+                    data: {
+                        id: index,
+                        lat: lat,
+                        lng: lng
+                    },
+                    type: "POST",
+                    success: function (data) {
+                        if (data == "success") {
+                            alert("Position Updated");
+                        }
+                        else {
+                            alert("Failure");
+                        }
+                    },
+                    error: function (data) {
+                        alert("Failure in code");
+                    },
+                });
+            }
+            else {
+                alert("You are not updating the latest dragged marker. Either reload browser and start over or drag the marker again that you want to move");
+            }
+        }
+        function UpdateList(index) {
+            var thedate = new Date();
+            var ProjectId = $("#ProjectId").val();
+            var ItemTypeId = index;
+            var showinstalled = document.getElementById("installedcheckbox").checked;
+            var showdeinstalled = document.getElementById("deinstalledcheckbox").checked;
+            for (i = 0; i < markers.length; i++) {
+                if (markers[i].project == ProjectId) {
+                    if (markers[i].itemtypeid == ItemTypeId || ItemTypeId == null || ItemTypeId == "") {
+                        if (new Date(markers[i].timestamp) <= thedate) {
+                            if (new Date(markers[i].deinstalltimestamp) > thedate) {
+                                if (showinstalled == true) {
+                                    markers[i].setVisible(true);
+                                }
+                                else {
+                                    markers[i].setVisible(false);
+                                }
+
+                            }
+                            else {
+                                if (showdeinstalled == true) {
+                                    markers[i].setVisible(true);
+                                }
+                                else {
+                                    markers[i].setVisible(false);
+                                }
+
+                            }
+                        }
+                        else {
+                            markers[i].setVisible(false);
+                        }
+                    }
+                    else {
+                        markers[i].setVisible(false);
+                    }
+                }
+                else {
+                    markers[i].setVisible(false);
+                }
+
+            }
+
+
+        }
+
+        function isPointOnSegment(gpsPoint1, gpsPoint2, gpsPoint) {
+
+            //Provided by Engineer
+            // http://stackoverflow.com/questions/10018003/which-segment-of-a-polyline-was-clicked
+            // 1st version, ignores perfectly horiz and vert. lines
+            var p1 = map.getProjection().fromLatLngToPoint(gpsPoint1);
+            var p2 = map.getProjection().fromLatLngToPoint(gpsPoint2);
+            var p = map.getProjection().fromLatLngToPoint(gpsPoint);
+
+            var t_x = (p.x - p1.x) / (p2.x - p1.x);
+            var t_y = (p.y - p1.y) / (p2.y - p1.y);
+            return (eq(t_x, t_y) && t_x >= 0 && t_x <= 1 && t_y >= 0 && t_y <= 1);
+        }
+    function startOperation(index) {
+        var starttime = $("#"+index).datepicker('getDate');
+            $.ajax({
+                url: '@Url.Action("StartOperation", "TrackItems")',
+                data: {
+                    id: index,
+                    dato: starttime.toUTCString()},
+                type: "GET",
+                success: function (data1) {
+                    alert("Operation Started");
+                },
+                error: function (output) {
+                    alert("Failure");
+                }
+            });
+        }
+        function stopOperation(index)
+        {
+        var endtime = $("#" + index).datepicker('getDate');
+            $.ajax({
+                url: '@Url.Action("StopOperation", "TrackItems")',
+                data: {
+                    id: index,
+                    dato: endtime.toUTCString()},
+                type: "GET",
+                success: function (data1) {
+                    alert("Operation Stopped");
+                },
+                error: function (output) {
+                    alert("Failure");
+                }
+            });
+        }
+        function chooseThis(index) {
+            $("#InstallationId").val(index);
+            $("#InstallationId2").val(index);
+            $("#editid").val(index);
+            $.ajax({
+                url: '@Url.Action("GetInstallPartialView", "TrackItems")',
+                data: { id: index },
+                type: "GET",
+                contentType: "application/json; charset=utf-8",
+                success: function (data1) {
+                    $("#InstallPartial").html(data1);
+                },
+                error: function (output) {
+
+                }
+            });
+        }
+        function DisplayGoogleMap() {
+            var projid = $("#ProjectId").val()
+            if (projid == 40 || projid == 48) {
+                kmlLayer = new google.maps.KmlLayer('https://drive.google.com/uc?export=download&id=1uR0xsPABccyNmXgCYbKsErFC4We4QXuI', {
+                    map: map
+                });
+                kmlLayer2 = null;
+            }
+            else if (projid == 418) {
+                kmlLayer2 = new google.maps.KmlLayer('https://drive.google.com/uc?export=download&id=1xq7EDSY4v3QN63YM7JEc0cxKHXFczpEj', {
+                    map: map
+                });
+                kmlLayer = null;
+            }
+            else {
+                kmlLayer = null;
+                kmlLayer2 = null;
+            }
+            @foreach(var item in Model.Where(x=>x.TypeCoord != "Coord Measure")){
+                if(item.Install.DeinstallDate == null)
+                {
+                    item.Install.DeinstallDate = DateTime.Now.AddDays(365);
+                }
+             <text>
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: { lat: @item.Latitude, lng: @item.Longitude },
+                    draggable: true,
+                    title: "@item.Install.ItemType.Item_Type.Replace("\""," inch",0)",
+                    uniqueid: "@item.Install.UniqueID",
+                    itemtypeid: "@item.Install.ItemTypeId",
+                    InstallId: "@item.Install.Id",
+                    project: "@item.Install.ProjectId",
+                    isinstalled: "@item.Install.isInstalled",
+                    timestamp: "@String.Concat(item.Install.TimeStamp.Year.ToString("0000"),"-",item.Install.TimeStamp.Month.ToString("00"),"-",item.Install.TimeStamp.Day.ToString("00"))",
+                    timestampreal: "@item.Install.TimeStamp.ToString()",
+                    deinstalltimestamp: "@String.Concat(Convert.ToDateTime(item.Install.DeinstallDate).Year.ToString("0000"),"-",Convert.ToDateTime(item.Install.DeinstallDate).Month.ToString("00"),"-",Convert.ToDateTime(item.Install.DeinstallDate).Day.ToString("00"))",
+                });
+                if (markers.length != 0) {
+                    var istrue = true;
+                    var i = 0;
+                    while (istrue) {
+                        var existingMarker = markers[i];
+                        var pos = existingMarker.getPosition();
+                        if (marker.position.equals(pos)) {
+                            var a = 360.0 / markers.length;
+                            var newLat = pos.lat() + -.00015 * Math.cos((+a * i) / 180 * Math.PI);  //x
+                            var newLng = pos.lng() + -.00015 * Math.sin((+a * i) / 180 * Math.PI);  //Y
+                            var latLng = new google.maps.LatLng(newLat, newLng);
+                            marker.position = latLng;
+                        }
+                        if (i == markers.length - 1) {
+                            istrue = false;
+                        }
+                        i++;
+                    }
+                }
+                @if (item.InstallId != null)
+                {
+                    if (item.Install.IsInOperation)
+                    {
+                        <text>
+                    marker['infowindow'] = new google.maps.InfoWindow({
+                        content: '<p>ID: @item.Install.Id</p> <p>Item: @item.Install.ItemType.Item_Type </p><p>Unique ID: @item.Install.UniqueID </p><p> @item.Install.Install_Text </p><p><button type="button" onclick="chooseThis(@item.Install.Id)">Choose this</button></p><p><button type="button" class="btn-hoelscher" onclick="updateposition(@item.Install.Id)">@SharedLocalizer.GetLocalizedHtmlString("Accept New Position")</button></p><p><button type="button" onclick="stopOperation(@item.Install.Id)">Stop Operation</button><input id="@item.Install.Id" type="text" class="date-picker" value="@DateTime.Now"></p>'
+            });
+                    </text>
+                    }
+                    else
+                    {
+                        <text>
+                    marker['infowindow'] = new google.maps.InfoWindow({
+                        content: '<p>ID: @item.Install.Id</p> <p>Item: @item.Install.ItemType.Item_Type </p><p>Unique ID: @item.Install.UniqueID </p> <p> @item.Install.Install_Text </p>  <p><button type="button" class="btn-hoelscher" onclick="chooseThis(@item.Install.Id)">Choose this</button></p><p><button type="button" class="btn-hoelscher" onclick="updateposition(@item.Install.Id)">@SharedLocalizer.GetLocalizedHtmlString("Accept New Position")</button></p> <p><button type="button" class="btn-hoelscher" onclick="startOperation(@item.Install.Id)">Start Operation</button><input id="@item.Install.Id"  type="text" class="date-picker" value="@DateTime.Now"></p>'
+            });
+                    </text>
+                    }
+
+                }
+                else
+                {
+                   <text>
+                        marker['infowindow'] = new google.maps.InfoWindow({
+                            content: '@item.Mobilize.ItemType.Item_Type'
+                        });
+                    </text>
+                }
+
+                google.maps.event.addListener(marker, 'click', function () {
+                    this['infowindow'].open(map, this);
+                });
+            google.maps.event.addListener(marker, 'click', function () {
+            for (i = 0; i @Html.Raw("<") pipes.length; i++) {
+                if (parseInt(pipes[i].polyInstallID) == parseInt(this.InstallId)) {
+                    if(parseInt(pipes[i].strokeWeight) == 2) {
+                        this.setIcon({
+                            url: 'https://maps.google.com/mapfiles/ms/icons/red.png',
+                            scaledSize: new google.maps.Size(100, 100)
+                        });
+                        pipes[i].setOptions({
+                            strokeColor: '#F31212',
+                            strokeWeight: 5,
+                            strokeOpacity: 0.9
+                        });
+                    }
+                    else {
+                        this.setIcon({
+                            url: 'https://maps.google.com/mapfiles/ms/icons/blue.png',
+                            scaledSize: new google.maps.Size(50, 50)
+                        });
+                        pipes[i].setOptions({
+                            strokeColor: '#0000FF',
+                            strokeWeight: 2,
+                            strokeOpacity: 0.7
+                        });
+                    }
+                            
+                        }
+                        }
+                    });
+                    
+
+
+
+
+                google.maps.event.addListener(marker, 'dragend', function (marker) {
+                    var latLng = marker.latLng;
+                    currentLatitude = latLng.lat();
+                    currentLongitude = latLng.lng();
+                    $("#latinputdragged").val(currentLatitude);
+                    $("#lnginputdragged").val(currentLongitude);
+                    $("#indexdragged").val(@item.Install.Id)
+                });
+                google.maps.event.addListener(marker['infowindow'], 'domready', function () {
+                    $('#@item.Install.Id.ToString()').datepicker({
+                        changeMonth: true,
+                        changeYear: true,
+                        yearRange: "-2:+0",
+                        dateFormat: "yy-MM-dd",
+                        controlType: 'select',
+                    });
+                });
+
+            @if (item.TypeCoord == "Installed")
+            {
+                if (item.Install.isInstalled.Equals(false))
+                {
+                    <text>
+                        marker.setIcon({
+                            url: 'https://maps.google.com/mapfiles/ms/icons/red.png',
+                            scaledSize: new google.maps.Size(50, 50)
+                        })
+                    </text>
+                }
+                else
+                {
+                    @if (item.Install.ItemType.Item_Type.ToLower().Contains("pump") || item.Install.ItemType.Item_Type.ToLower().Contains("well point system"))
+                {
+                    @if (item.Install.IsInOperation)
+                    {
+                    <text>
+                        marker.setIcon({
+                            url: 'https://drive.google.com/u/0/uc?id=19yF4cZ6iBNiHy_N5Pt321BSKTf5XmA38&export=download',
+                        scaledSize: new google.maps.Size(50, 50)
+                        })
+                    </text>
+                    }
+                    else
+                    {
+                    <text>
+                        marker.setIcon({
+                            url: 'https://drive.google.com/u/0/uc?id=1M3vu6d3d867bdZcsylFJhclW_gKH13bA&export=download',
+                        scaledSize: new google.maps.Size(50, 50)
+                        })
+                    </text>
+                    }
+
+                }
+                else if (item.Install.ItemType.Item_Type.ToLower().Contains("tank"))
+                {
+                    <text>
+                        marker.setIcon({
+                            url: 'https://maps.google.com/mapfiles/ms/icons/purple.png',
+                            scaledSize: new google.maps.Size(50, 50)
+                        })
+                    </text>
+                }
+                else if (item.Install.ItemType.Item_Type.ToLower().Contains("point"))
+                {
+                    <text>
+                        marker.setIcon({
+                            url: 'https://maps.google.com/mapfiles/ms/icons/orange.png',
+                            scaledSize: new google.maps.Size(50, 50)
+                        })
+                    </text>
+                }
+                else
+                {
+                    <text>
+                        marker.setIcon({
+                            url: 'https://maps.google.com/mapfiles/ms/icons/blue.png',
+                            scaledSize: new google.maps.Size(50, 50)
+                        })
+                    </text>
+                }
+                }
+
+
+            }
+            else if (item.TypeCoord == "DeInstalled")
+            {
+               <text>
+            marker.setIcon({
+                url: 'https://maps.google.com/mapfiles/ms/icons/red.png',
+                scaledSize: new google.maps.Size(50, 50)
+            })
+               </text>
+            }
+            else
+            {
+               <text>
+            marker.setIcon({
+                url: 'https://maps.google.com/mapfiles/ms/icons/purple.png',
+                scaledSize: new google.maps.Size(50, 50)
+            })
+               </text>
+            }
+            marker.setMap(map);
+            markers.push(marker);
+            </text>
+            }
+
+            @foreach(var pipe in Model.Where(x=>x.TypeCoord.Equals("Coord Measure")).GroupBy(x=>x.InstallId)){
+                <text>
+                var path = [];
+                @foreach(var item in Model.Where(x=>x.TypeCoord.Equals("Coord Measure") && x.InstallId.Equals(pipe.First().InstallId)).OrderBy(x=>x.TimeStamp))
+                {
+                    <text>
+                        path.push(new google.maps.LatLng(@item.Latitude, @item.Longitude));
+                    </text>
+                }
+            var PYLine = new google.maps.Polyline({
+                    path: path,
+                    strokeColor: '#0000FF',
+                    strokeOpacity: 0.7,
+                    strokeWeight: 2,
+                    polyItemTypeID: "@pipe.First().Install.ItemTypeId",
+                    polyInstallID: "@pipe.First().InstallId"
+                });
+            PYLine.setMap(map);
+            pipes.push(PYLine);
+            google.maps.event.addListener(
+                PYLine, 'click', function ()
+                {
+                if (parseInt(this.strokeWeight) == 5) {
+                    this.setOptions({
+                        strokeColor: '#0000FF',
+                        strokeOpacity: 0.7,
+                        strokeWeight: 2
+                    });
+                    for (i = 0; i @Html.Raw("<") markers.length; i++)
+                    {
+                        if (parseInt(markers[i].InstallId) == parseInt(this.polyInstallID)) {
+                            markers[i].setIcon({
+                                url: 'https://maps.google.com/mapfiles/ms/icons/blue.png',
+                                scaledSize: new google.maps.Size(50, 50)
+                            })
+
+                        }
+                    }
+                }
+                else {
+                    this.setOptions({
+                        strokeColor: '#F31212',
+                        strokeWeight: 5,
+                        strokeOpacity: 0.9
+                    });
+                    for (i = 0; i @Html.Raw("<") markers.length; i++) {
+                        if (parseInt(markers[i].InstallId) == parseInt(this.polyInstallID)) {
+                            markers[i].setIcon({
+                                url: 'https://maps.google.com/mapfiles/ms/icons/red.png',
+                                scaledSize: new google.maps.Size(100, 100)
+                            })
+
+                        }
+                    }
+                }
+                }
+            );
+
+                </text>
+            }
+            @foreach(var pipe in Model.Where(x=>x.Install.ItemTypeId.Equals(1824)).GroupBy(x=>x.TimeStamp.Date)){
+                <text>
+                var path = [];
+                @foreach(var item in Model.Where(x=>x.Install.ItemTypeId.Equals(1824) && x.TimeStamp.Date.Equals(pipe.First().TimeStamp.Date)).OrderBy(x=>x.TimeStamp))
+                {
+                    <text>
+                        path.push(new google.maps.LatLng(@item.Latitude, @item.Longitude));
+                    </text>
+                }
+                var polyline = new google.maps.Polyline({
+                    map: map,
+                    path: path,
+                    strokeColor: '#0000FF',
+                    strokeOpacity: 0.7,
+                    strokeWeight: 2
+                });
+                </text>
+            }
+            var path1 = [];
+            var path2 = [];
+            var path3 = [];
+            var markerspipe1 = [];
+            var markerspipe2 = [];
+            var markerspipe3 = [];
+                @for(int i = 0; i < ViewBag.Pipe1.Latitudes.Count; i++)
+                {
+                    <text>
+                        path1.push(new google.maps.LatLng(@ViewBag.Pipe1.Latitudes[i], @ViewBag.Pipe1.Longitudes[i]));
+                        var marker = new google.maps.Marker({
+                            map: map,
+                            position: { lat: @ViewBag.Pipe1.Latitudes[i], lng: @ViewBag.Pipe1.Longitudes[i] },
+                            draggable: false,
+                            title: "@ViewBag.Pipe1.KMPoints[i]",
+                        });
+                        marker['infowindow'] = new google.maps.InfoWindow({
+                            content: 'KM Point: @ViewBag.Pipe1.KMPoints[i] m'
+                        });
+                        google.maps.event.addListener(marker, 'click', function () {
+                            this['infowindow'].open(map, this);
+                        });
+                        marker.setVisible(false);
+                        markerspipe1.push(marker);
+                        marker.setMap(map);
+                       </text>
+
+                }
+                var polyline1 = new google.maps.Polyline({
+                    map: map,
+                    path: path1,
+                    strokeColor: '#0000FF',
+                    strokeOpacity: 0.7,
+                    strokeWeight: 3
+                });
+
+                @for(int i = 0; i < ViewBag.Pipe2.Latitudes.Count; i++)
+                {
+                    <text>
+                        path2.push(new google.maps.LatLng(@ViewBag.Pipe2.Latitudes[i], @ViewBag.Pipe2.Longitudes[i]));
+                        var marker = new google.maps.Marker({
+                            map: map,
+                            position: { lat: @ViewBag.Pipe2.Latitudes[i], lng: @ViewBag.Pipe2.Longitudes[i] },
+                            draggable: false,
+                            title: "@ViewBag.Pipe2.KMPoints[i]",
+                        });
+                        marker['infowindow'] = new google.maps.InfoWindow({
+                            content: 'KM Point: @ViewBag.Pipe2.KMPoints[i] m'
+                        });
+                        google.maps.event.addListener(marker, 'click', function () {
+                            this['infowindow'].open(map, this);
+                        });
+                        marker.setVisible(false);
+                        markerspipe2.push(marker);
+                        marker.setMap(map);
+                       </text>
+                }
+                var polyline2 = new google.maps.Polyline({
+                    map: map,
+                    path: path2,
+                    strokeColor: '#0000FF',
+                    strokeOpacity: 0.7,
+                    strokeWeight: 3
+                });
+
+            @for(int i = 0; i < ViewBag.Pipe3.Latitudes.Count; i++)
+                {
+                    <text>
+                        path3.push(new google.maps.LatLng(@ViewBag.Pipe3.Latitudes[i], @ViewBag.Pipe3.Longitudes[i]));
+                        var marker = new google.maps.Marker({
+                            map: map,
+                            position: { lat: @ViewBag.Pipe3.Latitudes[i], lng: @ViewBag.Pipe3.Longitudes[i] },
+                            draggable: false,
+                            title: "@ViewBag.Pipe3.KMPoints[i]",
+                        });
+                        marker['infowindow'] = new google.maps.InfoWindow({
+                            content: 'KM Point: @ViewBag.Pipe3.KMPoints[i] m'
+                        });
+                        google.maps.event.addListener(marker, 'click', function () {
+                            this['infowindow'].open(map, this);
+                        });
+                        marker.setVisible(false);
+                        markerspipe3.push(marker);
+                        marker.setMap(map);
+                       </text>
+                }
+                var polyline3 = new google.maps.Polyline({
+                    map: map,
+                    path: path3,
+                    strokeColor: '#0000FF',
+                    strokeOpacity: 0.7,
+                    strokeWeight: 3
+                });
+            google.maps.event.addListener(polyline1, 'click', function (h) {
+                var latlng = h.latLng;
+                var needle1 = {
+                    minDistance: 9999999999, //silly high
+                    index: -1,
+                    latlng: null
+                };
+                polyline1.getPath().forEach(function (routePoint, index) {
+                    var dist = google.maps.geometry.spherical.computeDistanceBetween(latlng, routePoint);
+                    if (dist < needle1.minDistance) {
+                        needle1.minDistance = dist;
+                        needle1.index = index;
+                        needle1.latlng = routePoint;
+                    }
+                });
+                markerspipe1[needle1.index].setVisible(true);
+
+            });
+            google.maps.event.addListener(polyline2, 'click', function (h) {
+                var latlng2 = h.latLng;
+                var needle2 = {
+                    minDistance: 9999999999, //silly high
+                    index: -1,
+                    latlng: null
+                };
+                polyline2.getPath().forEach(function (routePoint2, index) {
+                    var dist = google.maps.geometry.spherical.computeDistanceBetween(latlng2, routePoint2);
+                    if (dist < needle2.minDistance) {
+                        needle2.minDistance = dist;
+                        needle2.index = index;
+                        needle2.latlng = routePoint2;
+                    }
+                });
+                markerspipe2[needle2.index].setVisible(true);
+
+            });
+            google.maps.event.addListener(polyline3, 'click', function (h) {
+                var latlng3 = h.latLng;
+                var needle3 = {
+                    minDistance: 9999999999, //silly high
+                    index: -1,
+                    latlng: null
+                };
+                polyline3.getPath().forEach(function (routePoint3, index) {
+                    var dist = google.maps.geometry.spherical.computeDistanceBetween(latlng3, routePoint3);
+                    if (dist < needle3.minDistance) {
+                        needle3.minDistance = dist;
+                        needle3.index = index;
+                        needle3.latlng = routePoint3;
+                    }
+                });
+                markerspipe3[needle3.index].setVisible(true);
+
+            });
+        }
+        map.setCenter(myposmarker.getPosition())
+
+    </script>
+
+}

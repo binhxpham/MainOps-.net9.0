@@ -1,0 +1,81 @@
+﻿@model IEnumerable<MainOps.Models.NeedsOilChange>
+<h2>
+    @SharedLocalizer.GetLocalizedHtmlString("Upload GPS Information")
+</h2>
+@if (ViewBag.Message != null)
+{
+    <h1>
+        @ViewBag.Message
+    </h1>
+}
+<form asp-action="UploadGPS" asp-controller="ItemActivities" method="post" enctype="multipart/form-data">
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Project")</label></td>
+            <td> <select name="ProjectId" asp-items="ViewBag.ProjectId" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select Project")</option></select></td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("SubProject")</label></td>
+            <td> <select name="SubProjectId" asp-items="ViewBag.SubProjectId" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select SubProject")</option></select></td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Start Date")</label></td>
+            <td><input name="StartTime" value="@DateTime.Now" type="datetime-local" style="width:100%;" /></td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("End Date")</label></td>
+            <td><input name="StartTime" value="@DateTime.Now" type="datetime-local" style="width:100%;" /></td>
+        </tr>
+        <tr>
+            <td><label>@SharedLocalizer.GetLocalizedHtmlString("Data")</label></td>
+            <td><input type="file" accept=".csv" name="file" /></td>
+        </tr>
+        <tr>
+            <td colspan="2"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Submit")</button></td>
+        </tr>
+    </table>
+
+</form>
+
+<table style="width:100%;table-layout:fixed;">
+    <thead>
+        <tr>
+            <th>@SharedLocalizer.GetLocalizedHtmlString("Unique ID")</th>
+            <th>@SharedLocalizer.GetLocalizedHtmlString("Last Oil Change")</th>
+            <th>@SharedLocalizer.GetLocalizedHtmlString("Hours Operated Since")</th>
+        </tr>
+
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+
+            if (item.HoursOperated > 476)
+            {
+                <tr style="background-color:red;">
+                    <td>@Html.DisplayFor(modelItem => item.UniqueID)</td>
+                    <td>@Html.DisplayFor(modelItem => item.LastOilChange)</td>
+                    <td>@Html.DisplayFor(modelItem => item.HoursOperated)</td>
+                </tr>
+            }
+            else if (item.HoursOperated >= 450)
+            {
+                <tr style="background-color:orange;">
+                    <td>@Html.DisplayFor(modelItem => item.UniqueID)</td>
+                    <td>@Html.DisplayFor(modelItem => item.LastOilChange)</td>
+                    <td>@Html.DisplayFor(modelItem => item.HoursOperated)</td>
+                </tr>
+
+            }
+            else
+            {
+                <tr>
+                    <td>@Html.DisplayFor(modelItem => item.UniqueID)</td>
+                    <td>@Html.DisplayFor(modelItem => item.LastOilChange)</td>
+                    <td>@Html.DisplayFor(modelItem => item.HoursOperated)</td>
+                </tr>
+            }
+
+        }
+    </tbody>
+    </table>

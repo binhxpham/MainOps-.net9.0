@@ -1,0 +1,20 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+
+@inject IViewLocalizer Localizer
+@{
+    ViewData["Title"] = @Localizer["Delete Confirmed"];
+}
+
+<h2>@ViewData["Title"]</h2>
+<div>
+    <p>
+        @Localizer["Your account has been deleted."]
+    </p>
+</div>
+@using (Html.BeginForm("Index", "Home"))
+{
+    <button class="btn btn-default" type="submit">@Localizer["Back to main page"]</button>
+}
+
+
+

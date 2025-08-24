@@ -1,0 +1,101 @@
+﻿@model MainOps.Models.HourSchedule
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>HourSchedule</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="day01" class="control-label"></label>
+                <input asp-for="day01" class="form-control" />
+                <span asp-validation-for="day01" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="day02" class="control-label"></label>
+                <input asp-for="day02" class="form-control" />
+                <span asp-validation-for="day02" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="day03" class="control-label"></label>
+                <input asp-for="day03" class="form-control" />
+                <span asp-validation-for="day03" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="day04" class="control-label"></label>
+                <input asp-for="day04" class="form-control" />
+                <span asp-validation-for="day04" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="day05" class="control-label"></label>
+                <input asp-for="day05" class="form-control" />
+                <span asp-validation-for="day05" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="day06" class="control-label"></label>
+                <input asp-for="day06" class="form-control" />
+                <span asp-validation-for="day06" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="day07" class="control-label"></label>
+                <input asp-for="day07" class="form-control" />
+                <span asp-validation-for="day07" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="day08" class="control-label"></label>
+                <input asp-for="day08" class="form-control" />
+                <span asp-validation-for="day08" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="day09" class="control-label"></label>
+                <input asp-for="day09" class="form-control" />
+                <span asp-validation-for="day09" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="day10" class="control-label"></label>
+                <input asp-for="day10" class="form-control" />
+                <span asp-validation-for="day10" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="day11" class="control-label"></label>
+                <input asp-for="day11" class="form-control" />
+                <span asp-validation-for="day11" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="day12" class="control-label"></label>
+                <input asp-for="day12" class="form-control" />
+                <span asp-validation-for="day12" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="day13" class="control-label"></label>
+                <input asp-for="day13" class="form-control" />
+                <span asp-validation-for="day13" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="day14" class="control-label"></label>
+                <input asp-for="day14" class="form-control" />
+                <span asp-validation-for="day14" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+

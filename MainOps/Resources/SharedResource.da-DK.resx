@@ -1,0 +1,2595 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Name" xml:space="preserve">
+    <value>Navn</value>
+  </data>
+  <data name="search.." xml:space="preserve">
+    <value>søg..</value>
+  </data>
+  <data name="Authenticator code" xml:space="preserve">
+    <value>Authenticator kode</value>
+  </data>
+  <data name="Confirm password" xml:space="preserve">
+    <value>Bekræft password</value>
+  </data>
+  <data name="E-Mail Adress" xml:space="preserve">
+    <value>E-Mail-Adresse</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="Recovery Code" xml:space="preserve">
+    <value>Gendannelseskode</value>
+  </data>
+  <data name="Remember me" xml:space="preserve">
+    <value>Husk mig</value>
+  </data>
+  <data name="Remember me?" xml:space="preserve">
+    <value>Husk mig?</value>
+  </data>
+  <data name="Remember this machine" xml:space="preserve">
+    <value>Husk denne maskine</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Brugernavn</value>
+  </data>
+  <data name="Contact" xml:space="preserve">
+    <value>Kontakt</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Beskrivelse</value>
+  </data>
+  <data name="Employee" xml:space="preserve">
+    <value>Medarbejder</value>
+  </data>
+  <data name="Field must be at least 2 characters" xml:space="preserve">
+    <value>Feltet skal mindst være 2 karakterer</value>
+  </data>
+  <data name="First Name" xml:space="preserve">
+    <value>Fornavn</value>
+  </data>
+  <data name="Last Name" xml:space="preserve">
+    <value>Efternavn</value>
+  </data>
+  <data name="Phone Number" xml:space="preserve">
+    <value>Telefonnummer</value>
+  </data>
+  <data name="Confirm new password" xml:space="preserve">
+    <value>Bekræft nyt password</value>
+  </data>
+  <data name="Confirmed" xml:space="preserve">
+    <value>Bekræftet</value>
+  </data>
+  <data name="Current password" xml:space="preserve">
+    <value>Nuværende password</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>Dato</value>
+  </data>
+  <data name="E-Mail Adress confirmed" xml:space="preserve">
+    <value>E-Mail addresse bekræftet</value>
+  </data>
+  <data name="Must be positive" xml:space="preserve">
+    <value>Skal være positiv</value>
+  </data>
+  <data name="New password" xml:space="preserve">
+    <value>Nyt password</value>
+  </data>
+  <data name="The new password and confirmation password do not match." xml:space="preserve">
+    <value>Det nye password og det bekræftede password passer ikke</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>Bruger</value>
+  </data>
+  <data name="Verification Code" xml:space="preserve">
+    <value>Bekræftelseskode</value>
+  </data>
+  <data name="First Name(s)" xml:space="preserve">
+    <value>Fornavne</value>
+  </data>
+  <data name="Is employee" xml:space="preserve">
+    <value>Er medarbejder</value>
+  </data>
+  <data name="User ID" xml:space="preserve">
+    <value>Bruger ID</value>
+  </data>
+  <data name="User Roles" xml:space="preserve">
+    <value>Bruger roller</value>
+  </data>
+  <data name="-- Please Select --" xml:space="preserve">
+    <value>-- Vælg Venligst --</value>
+  </data>
+  <data name="All" xml:space="preserve">
+    <value>Alle</value>
+  </data>
+  <data name="Add flow:" xml:space="preserve">
+    <value>Tilføj Flowmeter</value>
+  </data>
+  <data name="Add Watermeter:" xml:space="preserve">
+    <value>Tilføj Vandur:</value>
+  </data>
+  <data name="Are you sure you want to delete this?" xml:space="preserve">
+    <value>Er du sikker på du vil slette dette?</value>
+  </data>
+  <data name="Back to List" xml:space="preserve">
+    <value>Tilbage til indeks</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Opret</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Slet</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>Detaljer</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Rediger</value>
+  </data>
+  <data name="Index" xml:space="preserve">
+    <value>Indeks</value>
+  </data>
+  <data name="Measurement Points" xml:space="preserve">
+    <value>Målepunkter</value>
+  </data>
+  <data name="Measurements" xml:space="preserve">
+    <value>Målinger</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Gem</value>
+  </data>
+  <data name="Search:" xml:space="preserve">
+    <value>Søg:</value>
+  </data>
+  <data name="Select CSV-Delimiter" xml:space="preserve">
+    <value>Vælg CSV-seperator</value>
+  </data>
+  <data name="Select Project (choose none if all)" xml:space="preserve">
+    <value>Vælg Projekt (Vælg ingen, hvis alle)</value>
+  </data>
+  <data name="Comment" xml:space="preserve">
+    <value>Kommentar</value>
+  </data>
+  <data name="Logger Change" xml:space="preserve">
+    <value>Logger ændring</value>
+  </data>
+  <data name="MeasType" xml:space="preserve">
+    <value>Måle Type</value>
+  </data>
+  <data name="Offset" xml:space="preserve">
+    <value>kote</value>
+  </data>
+  <data name="Project" xml:space="preserve">
+    <value>Projekt</value>
+  </data>
+  <data name="ProjectUser" xml:space="preserve">
+    <value>Projekterbruger</value>
+  </data>
+  <data name="You do not have access to this resource." xml:space="preserve">
+    <value>Du har ikke adgang til denne side</value>
+  </data>
+  <data name="Abbreviation" xml:space="preserve">
+    <value>Forkortelse</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Tilføj</value>
+  </data>
+  <data name="Add WaterMeter" xml:space="preserve">
+    <value>Tilføj Vandur</value>
+  </data>
+  <data name="Client" xml:space="preserve">
+    <value>Klient</value>
+  </data>
+  <data name="Coordinate System Id" xml:space="preserve">
+    <value>Koordinatsystem</value>
+  </data>
+  <data name="Delimiter" xml:space="preserve">
+    <value>seperator</value>
+  </data>
+  <data name="End Date" xml:space="preserve">
+    <value>Slut Dato</value>
+  </data>
+  <data name="Flow Rate" xml:space="preserve">
+    <value>Flow rate</value>
+  </data>
+  <data name="For Scada" xml:space="preserve">
+    <value>Til SCADA</value>
+  </data>
+  <data name="hi alexandra" xml:space="preserve">
+    <value>HALLO Alex Danish</value>
+  </data>
+  <data name="Logger" xml:space="preserve">
+    <value>Datalogger</value>
+  </data>
+  <data name="Logger Added" xml:space="preserve">
+    <value>Logger tilføjet</value>
+  </data>
+  <data name="Logger Changes" xml:space="preserve">
+    <value>Logger ændringer</value>
+  </data>
+  <data name="Measurement" xml:space="preserve">
+    <value>Måling</value>
+  </data>
+  <data name="Measurement Point" xml:space="preserve">
+    <value>Målepunkt</value>
+  </data>
+  <data name="Measurement Type" xml:space="preserve">
+    <value>Måletype</value>
+  </data>
+  <data name="New Comment" xml:space="preserve">
+    <value>Ny Kommentar</value>
+  </data>
+  <data name="Please Select Logger No" xml:space="preserve">
+    <value>Vælg venligst Logger nummer</value>
+  </data>
+  <data name="Project ID" xml:space="preserve">
+    <value>Projekt ID</value>
+  </data>
+  <data name="Project Number" xml:space="preserve">
+    <value>Projektnummer</value>
+  </data>
+  <data name="Projects" xml:space="preserve">
+    <value>Projekter</value>
+  </data>
+  <data name="Scada Adress" xml:space="preserve">
+    <value>SCADA addressee</value>
+  </data>
+  <data name="Select Project(choose none if all)" xml:space="preserve">
+    <value>Vælg Projekt (Vælg ingen, hvis alle)</value>
+  </data>
+  <data name="Start Date" xml:space="preserve">
+    <value>Start Dato</value>
+  </data>
+  <data name="System" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="Type" xml:space="preserve">
+    <value>Type</value>
+  </data>
+  <data name="User E-Mail-Adress" xml:space="preserve">
+    <value>Bruger Email addresse</value>
+  </data>
+  <data name="Water Level" xml:space="preserve">
+    <value>Vandniveau</value>
+  </data>
+  <data name="WaterMeter" xml:space="preserve">
+    <value>Vandur</value>
+  </data>
+  <data name="When" xml:space="preserve">
+    <value>Tidspunkt</value>
+  </data>
+  <data name="X-Coordinate" xml:space="preserve">
+    <value>X-Koordinat</value>
+  </data>
+  <data name="Y-Coordinate" xml:space="preserve">
+    <value>Y-Koodinat</value>
+  </data>
+  <data name="Logger Number" xml:space="preserve">
+    <value>Loggernummer</value>
+  </data>
+  <data name="Logger Removed" xml:space="preserve">
+    <value>Logger fjernet</value>
+  </data>
+  <data name="Serial Number" xml:space="preserve">
+    <value>Serienummer</value>
+  </data>
+  <data name="Sim Card Number" xml:space="preserve">
+    <value>SIM-kort nummer</value>
+  </data>
+  <data name="Add Raw Measurements" xml:space="preserve">
+    <value>Tilføj rå målinger</value>
+  </data>
+  <data name="Account Control" xml:space="preserve">
+    <value>Min Profil</value>
+  </data>
+  <data name="Add Flow" xml:space="preserve">
+    <value>Tilføj Flowmeter</value>
+  </data>
+  <data name="Add WM" xml:space="preserve">
+    <value>Tilføj Vandur</value>
+  </data>
+  <data name="Admin Page" xml:space="preserve">
+    <value>Administration</value>
+  </data>
+  <data name="Comment Types" xml:space="preserve">
+    <value>Kommentartyper</value>
+  </data>
+  <data name="Coord Systems" xml:space="preserve">
+    <value>Koordinatsystemer</value>
+  </data>
+  <data name="Create New Measurement" xml:space="preserve">
+    <value>Opret Ny Måling</value>
+  </data>
+  <data name="Create New Measurement Point" xml:space="preserve">
+    <value>Opret nyt Målepunkt</value>
+  </data>
+  <data name="Data Points" xml:space="preserve">
+    <value>Datapunkter</value>
+  </data>
+  <data name="Details PDF" xml:space="preserve">
+    <value>Brønd-tag PDF</value>
+  </data>
+  <data name="Details Tag" xml:space="preserve">
+    <value>Brønd-tag HTML</value>
+  </data>
+  <data name="Dip Tag" xml:space="preserve">
+    <value>Pejle-tag HTML</value>
+  </data>
+  <data name="Dip Tag PDF" xml:space="preserve">
+    <value>Pejle-tag PDF</value>
+  </data>
+  <data name="Dip Tags All PDF" xml:space="preserve">
+    <value>Pejle-tags PDF</value>
+  </data>
+  <data name="Dip Tags HTML All" xml:space="preserve">
+    <value>Pejle-tags HTML</value>
+  </data>
+  <data name="Dips" xml:space="preserve">
+    <value>Pejleplanlægning</value>
+  </data>
+  <data name="Divisions" xml:space="preserve">
+    <value>Divisioner</value>
+  </data>
+  <data name="Documents" xml:space="preserve">
+    <value>Dokumenter</value>
+  </data>
+  <data name="Export Configurations" xml:space="preserve">
+    <value>Eksporter konfigurationer</value>
+  </data>
+  <data name="Export Measurements" xml:space="preserve">
+    <value>Eksporter Målinger</value>
+  </data>
+  <data name="Export UploadTool/KRONOS" xml:space="preserve">
+    <value>Eksporter til UploadTool/KRONOS</value>
+  </data>
+  <data name="Hello" xml:space="preserve">
+    <value>Hej</value>
+  </data>
+  <data name="HJ Items" xml:space="preserve">
+    <value>Udstyrshåndtering</value>
+  </data>
+  <data name="Logger Active" xml:space="preserve">
+    <value>Logger Aktiv</value>
+  </data>
+  <data name="Loggers" xml:space="preserve">
+    <value>Dataloggere</value>
+  </data>
+  <data name="Measurement Types" xml:space="preserve">
+    <value>Måletyper</value>
+  </data>
+  <data name="Monitor Types" xml:space="preserve">
+    <value>Moniteringstyper</value>
+  </data>
+  <data name="Offsets" xml:space="preserve">
+    <value>Koter</value>
+  </data>
+  <data name="Project Users" xml:space="preserve">
+    <value>Projektbrugere</value>
+  </data>
+  <data name="Search End date" xml:space="preserve">
+    <value>Søg Slutdag:</value>
+  </data>
+  <data name="Search Point:" xml:space="preserve">
+    <value>Søg Punkt:</value>
+  </data>
+  <data name="Search Project:" xml:space="preserve">
+    <value>Søg Projekt:</value>
+  </data>
+  <data name="Search Start date" xml:space="preserve">
+    <value>Søg Startdag:</value>
+  </data>
+  <data name="Show data" xml:space="preserve">
+    <value>Vis Data</value>
+  </data>
+  <data name="Show Not Functional Loggers" xml:space="preserve">
+    <value>Vis ikke funktionelle Data loggere</value>
+  </data>
+  <data name="Toggle Activity" xml:space="preserve">
+    <value>Ændre Aktivitet</value>
+  </data>
+  <data name="Upload document" xml:space="preserve">
+    <value>Upload dokument</value>
+  </data>
+  <data name="Well Tags HTML" xml:space="preserve">
+    <value>Brønd-tags HTML</value>
+  </data>
+  <data name="Well Tags PDF" xml:space="preserve">
+    <value>Brønd-tags PDF</value>
+  </data>
+  <data name="Create New Measurement Point2" xml:space="preserve">
+    <value>Opret nyt målepunkt</value>
+  </data>
+  <data name="About Us" xml:space="preserve">
+    <value>Om os</value>
+  </data>
+  <data name="Add Measurement" xml:space="preserve">
+    <value>Tilføj måling</value>
+  </data>
+  <data name="Alert settings" xml:space="preserve">
+    <value>Alarm indstillinger</value>
+  </data>
+  <data name="Do your daily maintenance right here on the internet!" xml:space="preserve">
+    <value>Lav din daglige vedligeholdelse lige her på internettet!</value>
+  </data>
+  <data name="Documentation" xml:space="preserve">
+    <value>KS</value>
+  </data>
+  <data name="Forgot your password?" xml:space="preserve">
+    <value>Glemt dit password?</value>
+  </data>
+  <data name="Information" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="Informationen" xml:space="preserve">
+    <value>Information</value>
+  </data>
+  <data name="Location and Directions" xml:space="preserve">
+    <value>Lokation og vejviser</value>
+  </data>
+  <data name="Log in" xml:space="preserve">
+    <value>Log ind</value>
+  </data>
+  <data name="Log in with Email" xml:space="preserve">
+    <value>Log ind med Email</value>
+  </data>
+  <data name="Log out" xml:space="preserve">
+    <value>Log ud</value>
+  </data>
+  <data name="Machinery" xml:space="preserve">
+    <value>Maskineri</value>
+  </data>
+  <data name="Manage Point" xml:space="preserve">
+    <value>Administrer Målepunkt</value>
+  </data>
+  <data name="Pump Activities" xml:space="preserve">
+    <value>Pumpe aktivitet</value>
+  </data>
+  <data name="Register" xml:space="preserve">
+    <value>Registrer</value>
+  </data>
+  <data name="Register as a new user?" xml:space="preserve">
+    <value>Registrer en ny bruger?</value>
+  </data>
+  <data name="Show data WM" xml:space="preserve">
+    <value>Vis data Vandur</value>
+  </data>
+  <data name="Show Map" xml:space="preserve">
+    <value>Vis Kort</value>
+  </data>
+  <data name="Site Admin" xml:space="preserve">
+    <value>Administrator</value>
+  </data>
+  <data name="Upload Measurements" xml:space="preserve">
+    <value>Upload Målinger</value>
+  </data>
+  <data name="Use a local account to log in." xml:space="preserve">
+    <value>Brug en lokal konto til at logge ind</value>
+  </data>
+  <data name="Error.:" xml:space="preserve">
+    <value>Fejl.:</value>
+  </data>
+  <data name="Has Error" xml:space="preserve">
+    <value>Har Fejl</value>
+  </data>
+  <data name="Install Item" xml:space="preserve">
+    <value>Installer Materiale</value>
+  </data>
+  <data name="Is Installed" xml:space="preserve">
+    <value>Er Installeret</value>
+  </data>
+  <data name="Is Packed" xml:space="preserve">
+    <value>Er Pakket</value>
+  </data>
+  <data name="Is Received" xml:space="preserve">
+    <value>Er Modtaget</value>
+  </data>
+  <data name="Is Sent" xml:space="preserve">
+    <value>Er Sendt</value>
+  </data>
+  <data name="Item Information" xml:space="preserve">
+    <value>Materiale Information</value>
+  </data>
+  <data name="Item Installed.:" xml:space="preserve">
+    <value>Materiale Installeret.:</value>
+  </data>
+  <data name="Item Packed.:" xml:space="preserve">
+    <value>Materiale Pakket.:</value>
+  </data>
+  <data name="Item Received.:" xml:space="preserve">
+    <value>Materiale Modtaget.:</value>
+  </data>
+  <data name="Item Sent.:" xml:space="preserve">
+    <value>Materiale Sendt.:</value>
+  </data>
+  <data name="Log Book" xml:space="preserve">
+    <value>Log Bog</value>
+  </data>
+  <data name="Pack Item" xml:space="preserve">
+    <value>Pak Materiale</value>
+  </data>
+  <data name="Photos from Errors" xml:space="preserve">
+    <value>Billeder fra Fejl</value>
+  </data>
+  <data name="Photos from Installation" xml:space="preserve">
+    <value>Billeder fra Installation</value>
+  </data>
+  <data name="Photos from Packing" xml:space="preserve">
+    <value>Billeder fra Pakning</value>
+  </data>
+  <data name="Photos from Receival" xml:space="preserve">
+    <value>Billeder fra Modtagelse</value>
+  </data>
+  <data name="Photos from Sending" xml:space="preserve">
+    <value>Billeder fra Forsendelse</value>
+  </data>
+  <data name="Receive Item" xml:space="preserve">
+    <value>Modtag Materiale</value>
+  </data>
+  <data name="Report Error" xml:space="preserve">
+    <value>Anmeld Fejl</value>
+  </data>
+  <data name="Send Item" xml:space="preserve">
+    <value>Send Materiale</value>
+  </data>
+  <data name="Time Stamp" xml:space="preserve">
+    <value>Tidspunkt</value>
+  </data>
+  <data name="Track Items" xml:space="preserve">
+    <value>Materiale Tracking</value>
+  </data>
+  <data name="Error Resolved.:" xml:space="preserve">
+    <value>Fejl udbedret.:</value>
+  </data>
+  <data name="Number of Measurement Days" xml:space="preserve">
+    <value>Antal Pejlerunder</value>
+  </data>
+  <data name="Number of Measurements" xml:space="preserve">
+    <value>Antal Målinger</value>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Fejl</value>
+  </data>
+  <data name="Error Status" xml:space="preserve">
+    <value>Fejl Status</value>
+  </data>
+  <data name="Filter both ON and OFF" xml:space="preserve">
+    <value>Filter både ON og OFF</value>
+  </data>
+  <data name="Filter specifically ON or OFF" xml:space="preserve">
+    <value>Filter specifikt ON eller OFF</value>
+  </data>
+  <data name="HOFOR Description" xml:space="preserve">
+    <value>HOFOR beskrivelse</value>
+  </data>
+  <data name="Installed" xml:space="preserve">
+    <value>Installeret</value>
+  </data>
+  <data name="Item Installed" xml:space="preserve">
+    <value>Materiale Installeret</value>
+  </data>
+  <data name="Item Packed" xml:space="preserve">
+    <value>Materiale Pakket</value>
+  </data>
+  <data name="Item Received" xml:space="preserve">
+    <value>Materiale Modtaget</value>
+  </data>
+  <data name="Item Sent" xml:space="preserve">
+    <value>Materiale Sendt</value>
+  </data>
+  <data name="Packed" xml:space="preserve">
+    <value>Pakket</value>
+  </data>
+  <data name="Received" xml:space="preserve">
+    <value>Modtaget</value>
+  </data>
+  <data name="Sent" xml:space="preserve">
+    <value>Sendt</value>
+  </data>
+  <data name="Status choice" xml:space="preserve">
+    <value>Status valg</value>
+  </data>
+  <data name="Already on rental from Already on rental from Arrival" xml:space="preserve">
+    <value>Allerede på leje ved ankomst</value>
+  </data>
+  <data name="Amount" xml:space="preserve">
+    <value>Mængde</value>
+  </data>
+  <data name="Arrivals" xml:space="preserve">
+    <value>Ankomne Udstyr</value>
+  </data>
+  <data name="Bill of Quantity Items" xml:space="preserve">
+    <value>BoQ Positioner</value>
+  </data>
+  <data name="BoQ Number" xml:space="preserve">
+    <value>BoQ nummer</value>
+  </data>
+  <data name="Create New" xml:space="preserve">
+    <value>Opret ny BoQ type</value>
+  </data>
+  <data name="Current Accuracy" xml:space="preserve">
+    <value>GPS nøjagtighed</value>
+  </data>
+  <data name="Days" xml:space="preserve">
+    <value>Dage</value>
+  </data>
+  <data name="Division Control" xml:space="preserve">
+    <value>Divisionskontrol</value>
+  </data>
+  <data name="Download Documentation" xml:space="preserve">
+    <value>Download Dokumentation</value>
+  </data>
+  <data name="Download Invoice" xml:space="preserve">
+    <value>Download Akonto</value>
+  </data>
+  <data name="End:" xml:space="preserve">
+    <value>Slut Periode:</value>
+  </data>
+  <data name="From" xml:space="preserve">
+    <value>Fra</value>
+  </data>
+  <data name="Hour Rate" xml:space="preserve">
+    <value>Timerate</value>
+  </data>
+  <data name="Hours(excl. Break)" xml:space="preserve">
+    <value>Timer(eksl. pause)</value>
+  </data>
+  <data name="Install Price" xml:space="preserve">
+    <value>Installeringspris</value>
+  </data>
+  <data name="Installations" xml:space="preserve">
+    <value>Installationer</value>
+  </data>
+  <data name="Item Arrivals" xml:space="preserve">
+    <value>Ankommet Udstyr</value>
+  </data>
+  <data name="Item Name" xml:space="preserve">
+    <value>Position Navn</value>
+  </data>
+  <data name="Item Type" xml:space="preserve">
+    <value>Position</value>
+  </data>
+  <data name="ItemType" xml:space="preserve">
+    <value>Position</value>
+  </data>
+  <data name="LogText" xml:space="preserve">
+    <value>Beskrivelse</value>
+  </data>
+  <data name="Measurement Items" xml:space="preserve">
+    <value>Målinger</value>
+  </data>
+  <data name="Mobilizations" xml:space="preserve">
+    <value>Mobiliseringer</value>
+  </data>
+  <data name="Mobilize Item" xml:space="preserve">
+    <value>Mobilisér</value>
+  </data>
+  <data name="Personnel and Staff" xml:space="preserve">
+    <value>Personale og arbejdere</value>
+  </data>
+  <data name="Price" xml:space="preserve">
+    <value>Pris</value>
+  </data>
+  <data name="Price Unit" xml:space="preserve">
+    <value>Pris endhed</value>
+  </data>
+  <data name="Project Actions" xml:space="preserve">
+    <value>Projekthandlinger</value>
+  </data>
+  <data name="Project:" xml:space="preserve">
+    <value>Projekt:</value>
+  </data>
+  <data name="ProjectId" xml:space="preserve">
+    <value>Projekt</value>
+  </data>
+  <data name="Rental Price" xml:space="preserve">
+    <value>Leje pris</value>
+  </data>
+  <data name="Rental Price Unit" xml:space="preserve">
+    <value>Leje pris enhed</value>
+  </data>
+  <data name="Safety Problem" xml:space="preserve">
+    <value>Sikkerhedsproblem</value>
+  </data>
+  <data name="Start:" xml:space="preserve">
+    <value>Start Periode:</value>
+  </data>
+  <data name="Summary Table" xml:space="preserve">
+    <value>Sammendragstabel</value>
+  </data>
+  <data name="Super Admin Page" xml:space="preserve">
+    <value>Super-Admin Side</value>
+  </data>
+  <data name="TimeStamp" xml:space="preserve">
+    <value>Tidsstempel</value>
+  </data>
+  <data name="Total Arrived Items Cost" xml:space="preserve">
+    <value>Totale Omkostninger Ankommet Udstyr</value>
+  </data>
+  <data name="Total Cumulative Amount" xml:space="preserve">
+    <value>Total akkumuleret mængde</value>
+  </data>
+  <data name="Total Cumulative Cost" xml:space="preserve">
+    <value>Total akkumuleret omkostning</value>
+  </data>
+  <data name="Total Hours Cost" xml:space="preserve">
+    <value>Totale Omkostninger Timer</value>
+  </data>
+  <data name="Total Mobilization Cost" xml:space="preserve">
+    <value>Totale Omkostninger Mobiliseringer</value>
+  </data>
+  <data name="Total This Period" xml:space="preserve">
+    <value>Total denne periode</value>
+  </data>
+  <data name="Total This Period Cost" xml:space="preserve">
+    <value>Total denne periode omkostning</value>
+  </data>
+  <data name="Unit Price" xml:space="preserve">
+    <value>Pris Enhed</value>
+  </data>
+  <data name="Update" xml:space="preserve">
+    <value>Opdater</value>
+  </data>
+  <data name="Upload pictures" xml:space="preserve">
+    <value>Upload billeder</value>
+  </data>
+  <data name="Accuracy:" xml:space="preserve">
+    <value>Nøjagtighed</value>
+  </data>
+  <data name="Add Measurement to:" xml:space="preserve">
+    <value>Tilføj Måling til:</value>
+  </data>
+  <data name="Add Measurement!" xml:space="preserve">
+    <value>Tilføj Måling!</value>
+  </data>
+  <data name="Add Small Part" xml:space="preserve">
+    <value>Tilføj Ting</value>
+  </data>
+  <data name="BOQs" xml:space="preserve">
+    <value>BoQ'er</value>
+  </data>
+  <data name="Choose file" xml:space="preserve">
+    <value>Vælg fil</value>
+  </data>
+  <data name="Comment:" xml:space="preserve">
+    <value>Kommentar:</value>
+  </data>
+  <data name="Cut/Extend Pipe" xml:space="preserve">
+    <value>Afkort/Forlæng Rør</value>
+  </data>
+  <data name="Daily Report" xml:space="preserve">
+    <value>Dagsseddel</value>
+  </data>
+  <data name="DeInstall" xml:space="preserve">
+    <value>Afinstallér</value>
+  </data>
+  <data name="Edit Alert Limits" xml:space="preserve">
+    <value>Redigér Alarm Grænser</value>
+  </data>
+  <data name="Generate Invoice" xml:space="preserve">
+    <value>Generér AKONTO</value>
+  </data>
+  <data name="Install" xml:space="preserve">
+    <value>Installér</value>
+  </data>
+  <data name="Install Small Parts" xml:space="preserve">
+    <value>Installér små dele</value>
+  </data>
+  <data name="Item" xml:space="preserve">
+    <value>Position</value>
+  </data>
+  <data name="Measure Pipe" xml:space="preserve">
+    <value>Opmåling af Rør</value>
+  </data>
+  <data name="Measurement:" xml:space="preserve">
+    <value>Måling:</value>
+  </data>
+  <data name="Method" xml:space="preserve">
+    <value>Metode</value>
+  </data>
+  <data name="Mobilize" xml:space="preserve">
+    <value>Mobilisér</value>
+  </data>
+  <data name="Overview" xml:space="preserve">
+    <value>Overblik</value>
+  </data>
+  <data name="Project - DAILY REPORT" xml:space="preserve">
+    <value>Projekt DAGSSEDDEL</value>
+  </data>
+  <data name="Project KS Page!" xml:space="preserve">
+    <value>Projekt Kvalitetssikring!</value>
+  </data>
+  <data name="Reports" xml:space="preserve">
+    <value>Rapporter</value>
+  </data>
+  <data name="Safety" xml:space="preserve">
+    <value>Sikkerhed</value>
+  </data>
+  <data name="Send Results!!" xml:space="preserve">
+    <value>Send Resultat!!</value>
+  </data>
+  <data name="Three Step Test" xml:space="preserve">
+    <value>3-Step-Test</value>
+  </data>
+  <data name="Titles" xml:space="preserve">
+    <value>Titler</value>
+  </data>
+  <data name="Update Coordiantes!" xml:space="preserve">
+    <value>Opdatér koordinater</value>
+  </data>
+  <data name="Update Coords of:" xml:space="preserve">
+    <value>Opdatér koordinater på:</value>
+  </data>
+  <data name="Upload Pictures:" xml:space="preserve">
+    <value>Upload Billeder:</value>
+  </data>
+  <data name="Upload Water Sample" xml:space="preserve">
+    <value>Upload Vandprøve</value>
+  </data>
+  <data name="Value" xml:space="preserve">
+    <value>Værdi</value>
+  </data>
+  <data name="Water Sample Measures" xml:space="preserve">
+    <value>Vandprøveresultater</value>
+  </data>
+  <data name="Water Sample Place" xml:space="preserve">
+    <value>Vandprøve Målested</value>
+  </data>
+  <data name="Water Sample Places" xml:space="preserve">
+    <value>Vandprøve Målesteder</value>
+  </data>
+  <data name="Water Sample Type" xml:space="preserve">
+    <value>Prøve Navn</value>
+  </data>
+  <data name="Water Samples" xml:space="preserve">
+    <value>Vandprøver</value>
+  </data>
+  <data name="Daily Reports" xml:space="preserve">
+    <value>Dagssedler</value>
+  </data>
+  <data name="DeInstallations" xml:space="preserve">
+    <value>Afintallationer</value>
+  </data>
+  <data name="Mobilisations" xml:space="preserve">
+    <value>Mobiliseringer</value>
+  </data>
+  <data name="Hour Rate Payment(Extra Works)" xml:space="preserve">
+    <value>Timebaseret betaling(Ekstra arbejder)</value>
+  </data>
+  <data name="PLEASE SELECT" xml:space="preserve">
+    <value>VÆLG VENLIGST</value>
+  </data>
+  <data name="Unit Rate Payment(Installations etc.)" xml:space="preserve">
+    <value>Enhedsrate betaling(Fx Installationer)</value>
+  </data>
+  <data name="Date Measured" xml:space="preserve">
+    <value>Date og Tid</value>
+  </data>
+  <data name="Dip (m)" xml:space="preserve">
+    <value>Pejling (m)</value>
+  </data>
+  <data name="ExtMonitorPoint" xml:space="preserve">
+    <value>Externt Målepunkt</value>
+  </data>
+  <data name="Last WM reference" xml:space="preserve">
+    <value>Sidste vandur kalibrering</value>
+  </data>
+  <data name="Measurement Converted" xml:space="preserve">
+    <value>Måling konverteret</value>
+  </data>
+  <data name="MonitorPoint" xml:space="preserve">
+    <value>Målepunkt</value>
+  </data>
+  <data name="Raw Measurement" xml:space="preserve">
+    <value>Rå måling</value>
+  </data>
+  <data name="Reading Converted" xml:space="preserve">
+    <value>Aflæsning konverteret</value>
+  </data>
+  <data name="Reading Watermeter" xml:space="preserve">
+    <value>Aflæsning Vandur</value>
+  </data>
+  <data name="Reference level" xml:space="preserve">
+    <value>kote</value>
+  </data>
+  <data name="Reference value for Measurement" xml:space="preserve">
+    <value>Referencepunkt for måling</value>
+  </data>
+  <data name="Water Level in reference" xml:space="preserve">
+    <value>Vandspejl i kote</value>
+  </data>
+  <data name="Installation Text" xml:space="preserve">
+    <value>Installationskommentarer</value>
+  </data>
+  <data name="Work Performed" xml:space="preserve">
+    <value>Arbejde udført</value>
+  </data>
+  <data name="Accept signature" xml:space="preserve">
+    <value>Accepter Underskrift</value>
+  </data>
+  <data name="Add Ons" xml:space="preserve">
+    <value>Tillæg</value>
+  </data>
+  <data name="Alarm Hours" xml:space="preserve">
+    <value>Alarm timer</value>
+  </data>
+  <data name="Allowances" xml:space="preserve">
+    <value>Diæter</value>
+  </data>
+  <data name="Calculation week:" xml:space="preserve">
+    <value>Beregning uge:</value>
+  </data>
+  <data name="Clear signature" xml:space="preserve">
+    <value>Ryd Underskrift</value>
+  </data>
+  <data name="Fri" xml:space="preserve">
+    <value>Fre</value>
+  </data>
+  <data name="Full Name" xml:space="preserve">
+    <value>Fulde Navn</value>
+  </data>
+  <data name="Hours" xml:space="preserve">
+    <value>Timer</value>
+  </data>
+  <data name="License Plate Nr" xml:space="preserve">
+    <value>Nummerplade</value>
+  </data>
+  <data name="Mon" xml:space="preserve">
+    <value>Man</value>
+  </data>
+  <data name="Others" xml:space="preserve">
+    <value>Andet</value>
+  </data>
+  <data name="Overhours" xml:space="preserve">
+    <value>Ovetid</value>
+  </data>
+  <data name="Overhours 100% 1204" xml:space="preserve">
+    <value>Overtid 100% 1204</value>
+  </data>
+  <data name="Overhours 50% 1202" xml:space="preserve">
+    <value>Overtid 50% 1202</value>
+  </data>
+  <data name="Payment Nr" xml:space="preserve">
+    <value>Løn Nr</value>
+  </data>
+  <data name="Rate" xml:space="preserve">
+    <value>Sats</value>
+  </data>
+  <data name="Reg. hours 1201" xml:space="preserve">
+    <value>Norm. timer 1201</value>
+  </data>
+  <data name="Register Hours - Hourly Payed Workers" xml:space="preserve">
+    <value>Timeregistrering - Timelønnede</value>
+  </data>
+  <data name="Regular Hours" xml:space="preserve">
+    <value>Normale Timer</value>
+  </data>
+  <data name="Sat" xml:space="preserve">
+    <value>Lør</value>
+  </data>
+  <data name="Submit Time Sheet" xml:space="preserve">
+    <value>Send Time Registrering!</value>
+  </data>
+  <data name="Sun" xml:space="preserve">
+    <value>Søn</value>
+  </data>
+  <data name="Supervisor Name" xml:space="preserve">
+    <value>Formand/leder</value>
+  </data>
+  <data name="Thu" xml:space="preserve">
+    <value>Tor</value>
+  </data>
+  <data name="Tue" xml:space="preserve">
+    <value>Tir</value>
+  </data>
+  <data name="Wed" xml:space="preserve">
+    <value>Ons</value>
+  </data>
+  <data name="Week 1" xml:space="preserve">
+    <value>Uge 1</value>
+  </data>
+  <data name="Week 2" xml:space="preserve">
+    <value>Uge 2</value>
+  </data>
+  <data name="Week-type" xml:space="preserve">
+    <value>Uge-type</value>
+  </data>
+  <data name="(winter)Heating + insulation ok ?" xml:space="preserve">
+    <value>(Vinter) Varme + insulering i orden?</value>
+  </data>
+  <data name="Add Report" xml:space="preserve">
+    <value>Indsend Rapport</value>
+  </data>
+  <data name="Additional instruction neccesary" xml:space="preserve">
+    <value>Yderligere instruktion nedvendig</value>
+  </data>
+  <data name="All filters in operation?" xml:space="preserve">
+    <value>Alle filtre i funktion?</value>
+  </data>
+  <data name="All Item Tags" xml:space="preserve">
+    <value>Alle udstyr Tags</value>
+  </data>
+  <data name="All Item Tags PDF (2per page)" xml:space="preserve">
+    <value>Alle udstyr Tags PDF(2 per side)</value>
+  </data>
+  <data name="All Item Tags PDF(1per page)" xml:space="preserve">
+    <value>Alle udstyr Tags PDF(1 per side)</value>
+  </data>
+  <data name="All normal personal protective equipment (helmet, ear plugs, reflective clothing, safety boots, gloves and glasses)" xml:space="preserve">
+    <value>Alt normalt PPE (hjelm, høreværn, reflektionstøj, sikkerhedssko, handler og briller)</value>
+  </data>
+  <data name="All valves in correct position?" xml:space="preserve">
+    <value>Alle ventiler i korrekt position?</value>
+  </data>
+  <data name="Amount of People" xml:space="preserve">
+    <value>Antal mennesker</value>
+  </data>
+  <data name="Any leakages in hoses/manifold/pipes?" xml:space="preserve">
+    <value>Nogen lækager i slanger/manifold/rør?</value>
+  </data>
+  <data name="Are all main valves in correct position?" xml:space="preserve">
+    <value>Er alle hovedventiler i korrekt position?</value>
+  </data>
+  <data name="Are areas clear?" xml:space="preserve">
+    <value>Er område frigjorte?</value>
+  </data>
+  <data name="Area re-established?" xml:space="preserve">
+    <value>Område reetableret?</value>
+  </data>
+  <data name="Arrivals(Put on Rent!)" xml:space="preserve">
+    <value>Ankomster(Sæt på leje!)</value>
+  </data>
+  <data name="Bottom Dip" xml:space="preserve">
+    <value>Bundpejling</value>
+  </data>
+  <data name="Branch" xml:space="preserve">
+    <value>Branche</value>
+  </data>
+  <data name="Check All levels and flows in SCADA. Are they plausible?" xml:space="preserve">
+    <value>Tjekke alle niveauer og flows i SCADA, virker de plausible?</value>
+  </data>
+  <data name="Check Performed By" xml:space="preserve">
+    <value>Tjek udført af</value>
+  </data>
+  <data name="Check pressure of filters and infiltration line" xml:space="preserve">
+    <value>Tjek tryk i alle filtre og infiltrationslinie</value>
+  </data>
+  <data name="Check water level in tanks" xml:space="preserve">
+    <value>Tjek vandstand i tanke</value>
+  </data>
+  <data name="Check WTP for leakages (inside + outside)" xml:space="preserve">
+    <value>Tjek WTP for lækager (indenfor + udenfor)</value>
+  </data>
+  <data name="Choose User" xml:space="preserve">
+    <value>Vælg Bruger</value>
+  </data>
+  <data name="Clear water pump above slurry?" xml:space="preserve">
+    <value>Er klarvandspumpe over slammet?</value>
+  </data>
+  <data name="Comments" xml:space="preserve">
+    <value>Kommentarer</value>
+  </data>
+  <data name="Condition of construction machinery / small equpiment" xml:space="preserve">
+    <value>Tilstand af byggepldas maskineri / småt udstyr</value>
+  </data>
+  <data name="Condition of load handling devices (e.g. chains, synthetic fibre webbing, strings etc.) ok?" xml:space="preserve">
+    <value>Tilstand af bærende redskaber (kæder, syntetisk fiber net, tråde etc.) i orden?</value>
+  </data>
+  <data name="Conditions of ladders/steps/platforms ok?" xml:space="preserve">
+    <value>Status af stiger/trapper/platforme i orden?</value>
+  </data>
+  <data name="Conductivity SCADA Inlet" xml:space="preserve">
+    <value>Ledningsevne SCADA indløb</value>
+  </data>
+  <data name="Conductivity SCADA Inlet after" xml:space="preserve">
+    <value>Ledningsevne SCADA indløb efter</value>
+  </data>
+  <data name="Conductivity SCADA Outlet" xml:space="preserve">
+    <value>Ledningsevne SCADA udløb</value>
+  </data>
+  <data name="Conductivity SCADA Outlet after" xml:space="preserve">
+    <value>Ledningsevne SCADA udløb efter</value>
+  </data>
+  <data name="Conductivity sensor cleaned at inlet?" xml:space="preserve">
+    <value>Ledningsevne sensor renset ved indløb?</value>
+  </data>
+  <data name="Conductivity sensor cleaned at outlet?" xml:space="preserve">
+    <value>Ledningsevne sensor renset ved udløb?</value>
+  </data>
+  <data name="Construction Site Inspection" xml:space="preserve">
+    <value>Byggeplads Gennemgang</value>
+  </data>
+  <data name="Construction Site Inspections" xml:space="preserve">
+    <value>Byggeplads Inspektioner(Safety)</value>
+  </data>
+  <data name="Correct and safe storage of materials" xml:space="preserve">
+    <value>Korrekt og sikker opbevaring af materialer</value>
+  </data>
+  <data name="Daily Report texts" xml:space="preserve">
+    <value>Dagsseddel tekster</value>
+  </data>
+  <data name="Damages at wells" xml:space="preserve">
+    <value>Skader på brønde</value>
+  </data>
+  <data name="Decommission" xml:space="preserve">
+    <value>Sløjfning</value>
+  </data>
+  <data name="Decommission Reports" xml:space="preserve">
+    <value>Sløjfningsrapporter</value>
+  </data>
+  <data name="Did you close bypass valve at inlet?" xml:space="preserve">
+    <value>Har du lukket omløbsventil ved indløb?</value>
+  </data>
+  <data name="Did you close bypass valve at outlet?" xml:space="preserve">
+    <value>Har du lukket omløbsventil ved udløb?</value>
+  </data>
+  <data name="Dip before" xml:space="preserve">
+    <value>Pejling før</value>
+  </data>
+  <data name="Do flowmeters work? and fit with SCADA?" xml:space="preserve">
+    <value>Virker flowmålere? Og Passer de med SCADA?</value>
+  </data>
+  <data name="Do Maintenance" xml:space="preserve">
+    <value>Udfør vedligeholdelse</value>
+  </data>
+  <data name="Do we need a suction truck for slurry?" xml:space="preserve">
+    <value>Er der brug for en slamsuger?</value>
+  </data>
+  <data name="Edits" xml:space="preserve">
+    <value>Redigeringer</value>
+  </data>
+  <data name="Emergency measures / facillities (first aid kit fire extinguishers, etc.) ok?" xml:space="preserve">
+    <value>Nødforanstaltninger / faciliteter (førstehjælpskasse, brandslukkere etc.) i orden?</value>
+  </data>
+  <data name="End Time" xml:space="preserve">
+    <value>Sluttidspunkt</value>
+  </data>
+  <data name="endtime" xml:space="preserve">
+    <value>Slut tid</value>
+  </data>
+  <data name="Equipment" xml:space="preserve">
+    <value>Udstyr</value>
+  </data>
+  <data name="Evaluation" xml:space="preserve">
+    <value>Evaluering</value>
+  </data>
+  <data name="Export Samples" xml:space="preserve">
+    <value>Eksporter prøver</value>
+  </data>
+  <data name="Extra Works" xml:space="preserve">
+    <value>Ekstraarbejder</value>
+  </data>
+  <data name="Fall and construction pit protection" xml:space="preserve">
+    <value>Fald og byggegrube beskyttelse</value>
+  </data>
+  <data name="Floor openings?" xml:space="preserve">
+    <value>Åbninger i gulvet?</value>
+  </data>
+  <data name="General Comments" xml:space="preserve">
+    <value>Generelle kommentarer</value>
+  </data>
+  <data name="Generate Akonto File" xml:space="preserve">
+    <value>Generér AKONTO fil</value>
+  </data>
+  <data name="Generate Documentation File" xml:space="preserve">
+    <value>Generér DOKUMENTATION fil</value>
+  </data>
+  <data name="Generator Hours (after test)" xml:space="preserve">
+    <value>Generator timer (efter test)</value>
+  </data>
+  <data name="Generator started without problems?" xml:space="preserve">
+    <value>Generator startede uden problemer?</value>
+  </data>
+  <data name="Generator switched off without problems?" xml:space="preserve">
+    <value>Generator lukkede ned uden problemer?</value>
+  </data>
+  <data name="Generator Test" xml:space="preserve">
+    <value>Generator Test</value>
+  </data>
+  <data name="Generator Tests" xml:space="preserve">
+    <value>Generatortests</value>
+  </data>
+  <data name="Heating / Insulation in place?" xml:space="preserve">
+    <value>Varme/Insulation på plads?</value>
+  </data>
+  <data name="Hours for safety setup" xml:space="preserve">
+    <value>Timer til sikkerhedsopsætning</value>
+  </data>
+  <data name="Instructed" xml:space="preserve">
+    <value>Instrueret</value>
+  </data>
+  <data name="Involvement of Project manager neccesary?" xml:space="preserve">
+    <value>Skal projektlederen involveres?</value>
+  </data>
+  <data name="Is coolant ok?" xml:space="preserve">
+    <value>Er kølevæske i orden?</value>
+  </data>
+  <data name="Is Oil level ok?" xml:space="preserve">
+    <value>Er olieniveau i orden?</value>
+  </data>
+  <data name="Is the workplace tidy" xml:space="preserve">
+    <value>Er pladsen holdt rent?</value>
+  </data>
+  <data name="Is there particularly hazardous work to be performed?" xml:space="preserve">
+    <value>Er der specielt farligt arbejde der skal udføres?</value>
+  </data>
+  <data name="Is water clear after filtration?" xml:space="preserve">
+    <value>Er vandet klart efter filtrering?</value>
+  </data>
+  <data name="Key Words" xml:space="preserve">
+    <value>Nøgleord</value>
+  </data>
+  <data name="Kg bentonite used" xml:space="preserve">
+    <value>Kg bentonit brugt</value>
+  </data>
+  <data name="Kg casting material used" xml:space="preserve">
+    <value>Kg støbemateriale</value>
+  </data>
+  <data name="Kg sand used" xml:space="preserve">
+    <value>Kg sand brugt</value>
+  </data>
+  <data name="Known contaminations" xml:space="preserve">
+    <value>Kendte forureninger?</value>
+  </data>
+  <data name="L Water used" xml:space="preserve">
+    <value>Liter vand brugt</value>
+  </data>
+  <data name="Logs" xml:space="preserve">
+    <value>Log tekster</value>
+  </data>
+  <data name="Machinery List" xml:space="preserve">
+    <value>Maskinliste</value>
+  </data>
+  <data name="Main Data" xml:space="preserve">
+    <value>Stam Data</value>
+  </data>
+  <data name="Mapping of especially dangerous work" xml:space="preserve">
+    <value>Kortlægning af specielt farligt arbejde</value>
+  </data>
+  <data name="Marking of work devices ( equipment and load handling devices) ok?" xml:space="preserve">
+    <value>Markering af arbejdsredskaber (bærende udstyr) i orden?</value>
+  </data>
+  <data name="Material storage / tidiness in the workplace ok?" xml:space="preserve">
+    <value>Materiale lagring / arbejdsplads oprydning i orden?</value>
+  </data>
+  <data name="Measures to prevent environmental harm" xml:space="preserve">
+    <value>Tiltag for at undgå skade på miljøet</value>
+  </data>
+  <data name="Misc" xml:space="preserve">
+    <value>Diverse</value>
+  </data>
+  <data name="Number of own people" xml:space="preserve">
+    <value>Antal egne medarbejdere</value>
+  </data>
+  <data name="Organisation" xml:space="preserve">
+    <value>Organisation</value>
+  </data>
+  <data name="Other information / comments" xml:space="preserve">
+    <value>Anden information / kommentarer</value>
+  </data>
+  <data name="Paid work?" xml:space="preserve">
+    <value>Betalt arbejde?</value>
+  </data>
+  <data name="Payments" xml:space="preserve">
+    <value>Betalinger</value>
+  </data>
+  <data name="Performed By" xml:space="preserve">
+    <value>Udført af</value>
+  </data>
+  <data name="Personal protection" xml:space="preserve">
+    <value>Personlig beskyttelse</value>
+  </data>
+  <data name="Personal Protection equipped?" xml:space="preserve">
+    <value>PPE overholdt?</value>
+  </data>
+  <data name="pH SCADA Inlet" xml:space="preserve">
+    <value>pH SCADA indløb</value>
+  </data>
+  <data name="pH SCADA Inlet after" xml:space="preserve">
+    <value>pH SCADA indløb efter</value>
+  </data>
+  <data name="pH SCADA Outlet" xml:space="preserve">
+    <value>pH SCADA udløb</value>
+  </data>
+  <data name="pH SCADA Outlet after" xml:space="preserve">
+    <value>pH SCADA udløb efter</value>
+  </data>
+  <data name="pH sensor calibrated at inlet?" xml:space="preserve">
+    <value>pH sensor kalibreret ved indløb?</value>
+  </data>
+  <data name="pH sensor calibrated at outlet?" xml:space="preserve">
+    <value>pH sensor kalibreret ved udløb?</value>
+  </data>
+  <data name="pH sensor cleaned at inlet?" xml:space="preserve">
+    <value>pH sensor renset ved indløb?</value>
+  </data>
+  <data name="pH sensor cleaned at outlet?" xml:space="preserve">
+    <value>pH sensor renset ved udløb?</value>
+  </data>
+  <data name="Pipe cut X meter under terrain" xml:space="preserve">
+    <value>Rør afkortet X meter under terræn</value>
+  </data>
+  <data name="Please Select SubProject" xml:space="preserve">
+    <value>Venligst vælg underprojekt</value>
+  </data>
+  <data name="Problems from previous sections rectified by person + deadline date" xml:space="preserve">
+    <value>Problemer fra tidligere sektioner ordnes af person + deadline dato</value>
+  </data>
+  <data name="Project Documents" xml:space="preserve">
+    <value>Projektdokumenter</value>
+  </data>
+  <data name="Pump Tests" xml:space="preserve">
+    <value>Pumptests</value>
+  </data>
+  <data name="Pumps + WTP + Infiltration started during test?" xml:space="preserve">
+    <value>Pumper + WTP + infiltration startede under testen?</value>
+  </data>
+  <data name="Pumps + WTP + Infiltratoin started after test?" xml:space="preserve">
+    <value>Pumper + WTP + Infiltration startede efter testen?</value>
+  </data>
+  <data name="Report Date" xml:space="preserve">
+    <value>Rapport dato</value>
+  </data>
+  <data name="Request User Summary" xml:space="preserve">
+    <value>Anmod Bruger Sammendrag</value>
+  </data>
+  <data name="Safe access to construction site possible?" xml:space="preserve">
+    <value>Sikker adgang til byggepladsen mulig?</value>
+  </data>
+  <data name="Safety condition (Inspection plates on equipment) ok?" xml:space="preserve">
+    <value>Sikkerhedstilstand (inspektions-plader på udstyr) i orden?</value>
+  </data>
+  <data name="Safety condition machinery / equipment ok?" xml:space="preserve">
+    <value>Sikkerhedstilstand for maskineri / udstyr i orden?</value>
+  </data>
+  <data name="Safety connected to aforementioned tasks" xml:space="preserve">
+    <value>Sikkerhed forbundet med førnævnte opgaver</value>
+  </data>
+  <data name="SCADA: All pumps running that should run?" xml:space="preserve">
+    <value>SCADA: Alle pumper kører, der skal køre?</value>
+  </data>
+  <data name="Sensors Cehcks" xml:space="preserve">
+    <value>Sensortjeks</value>
+  </data>
+  <data name="Sensors Check" xml:space="preserve">
+    <value>Tjek af Sensorer</value>
+  </data>
+  <data name="Show Documentation File" xml:space="preserve">
+    <value>Vis dokumentation fil</value>
+  </data>
+  <data name="Show Items" xml:space="preserve">
+    <value>Vis udstyr</value>
+  </data>
+  <data name="Signature" xml:space="preserve">
+    <value>Underskrift</value>
+  </data>
+  <data name="Signature used" xml:space="preserve">
+    <value>Underskrift anvendt</value>
+  </data>
+  <data name="Site Check" xml:space="preserve">
+    <value>Tjek af Site</value>
+  </data>
+  <data name="Site Check Reports" xml:space="preserve">
+    <value>Byggeplads tjeks</value>
+  </data>
+  <data name="Sloaping areas" xml:space="preserve">
+    <value>Hædende områder</value>
+  </data>
+  <data name="Special PPE required for this site" xml:space="preserve">
+    <value>Specielt PPE for denne plads</value>
+  </data>
+  <data name="Split Invoice into subprojects" xml:space="preserve">
+    <value>Adskil AKONTO i underprojekter</value>
+  </data>
+  <data name="Standard limits" xml:space="preserve">
+    <value>Standard grænseværdier</value>
+  </data>
+  <data name="Standing Time" xml:space="preserve">
+    <value>Ventetid</value>
+  </data>
+  <data name="Start Time" xml:space="preserve">
+    <value>Startidspunkt</value>
+  </data>
+  <data name="starttime" xml:space="preserve">
+    <value>Start tid</value>
+  </data>
+  <data name="State of overall construction site ok?" xml:space="preserve">
+    <value>General status på byggepladsen i orden?</value>
+  </data>
+  <data name="Sub Project" xml:space="preserve">
+    <value>Underprojekt</value>
+  </data>
+  <data name="Sub-Contractors" xml:space="preserve">
+    <value>Underleverandører</value>
+  </data>
+  <data name="Subcontractors used?" xml:space="preserve">
+    <value>Underleverandører benyttet?</value>
+  </data>
+  <data name="Submit" xml:space="preserve">
+    <value>Indsend</value>
+  </data>
+  <data name="Sufficient lighting" xml:space="preserve">
+    <value>Tilstrækkelig belysning</value>
+  </data>
+  <data name="Sufficient number of first aiders on site?" xml:space="preserve">
+    <value>Nok førstehjælpere på pladsen?</value>
+  </data>
+  <data name="Temporary ground support systems in order?" xml:space="preserve">
+    <value>Midlertidig jord-bund støtte systemer i orden?</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Titel</value>
+  </data>
+  <data name="Tool box performed" xml:space="preserve">
+    <value>Toolbox udført?</value>
+  </data>
+  <data name="Tool Box Talks" xml:space="preserve">
+    <value>Tool Box Rapporter</value>
+  </data>
+  <data name="Turbidity SCADA Inlet" xml:space="preserve">
+    <value>Turbiditet SCADA indløb</value>
+  </data>
+  <data name="Turbidity SCADA Inlet after" xml:space="preserve">
+    <value>Turbiditet SCADA indløb efter</value>
+  </data>
+  <data name="Turbidity SCADA Outlet after" xml:space="preserve">
+    <value>Turbiditet SCADA udløb efter</value>
+  </data>
+  <data name="Turbidity sensor cleaned at inlet?" xml:space="preserve">
+    <value>Turbiditet sensor renset ved indløb?</value>
+  </data>
+  <data name="Turbidity sensor cleaned at outlet?" xml:space="preserve">
+    <value>Turbiditet sensor renset ved udløb?</value>
+  </data>
+  <data name="Unknown contaminations" xml:space="preserve">
+    <value>Ukendte forureninger</value>
+  </data>
+  <data name="Upload Drawing" xml:space="preserve">
+    <value>Upload tegning</value>
+  </data>
+  <data name="Upload Photo" xml:space="preserve">
+    <value>Upload foto</value>
+  </data>
+  <data name="User Action Summary" xml:space="preserve">
+    <value>Bruger Aktioner Sammendrag</value>
+  </data>
+  <data name="User Summaries" xml:space="preserve">
+    <value>Brugersammendrag</value>
+  </data>
+  <data name="Walkway and roads kept clear" xml:space="preserve">
+    <value>Gangveje og veje holdt frie</value>
+  </data>
+  <data name="Was Airlifted before?" xml:space="preserve">
+    <value>Er brønden airliftet før?</value>
+  </data>
+  <data name="Was bentonite used?" xml:space="preserve">
+    <value>Blev bentonit brugt?</value>
+  </data>
+  <data name="Was sand used?" xml:space="preserve">
+    <value>Blev sand brugt?</value>
+  </data>
+  <data name="Was the well casted?" xml:space="preserve">
+    <value>Blev brønden støbt?</value>
+  </data>
+  <data name="Waste disposal / environment" xml:space="preserve">
+    <value>Affaldsdeponering / Miljø</value>
+  </data>
+  <data name="Waste disposal neccesary" xml:space="preserve">
+    <value>Deponering af affald nødvendigt</value>
+  </data>
+  <data name="Waste seperation incl. verfication" xml:space="preserve">
+    <value>Seperation af affald inkl. verfikation</value>
+  </data>
+  <data name="Well (Choice)" xml:space="preserve">
+    <value>Brønd (Valg)</value>
+  </data>
+  <data name="Well (Type In)" xml:space="preserve">
+    <value>Brønd (Skriv)</value>
+  </data>
+  <data name="What is the diesel level?" xml:space="preserve">
+    <value>Hvad er dieselniveauet?</value>
+  </data>
+  <data name="Work tasks coming week" xml:space="preserve">
+    <value>Arbejdsopgaver kommende uge</value>
+  </data>
+  <data name="Workplace" xml:space="preserve">
+    <value>Arbejdsplads</value>
+  </data>
+  <data name="WPA (Work Place Assesment) Performed?" xml:space="preserve">
+    <value>WPA(Work Place Assessment) udført?</value>
+  </data>
+  <data name="WTP Check" xml:space="preserve">
+    <value>Tjek af WTP</value>
+  </data>
+  <data name="WTP Checks" xml:space="preserve">
+    <value>WTP tjeks</value>
+  </data>
+  <data name="Add flow :" xml:space="preserve">
+    <value>Tilføj Flowrate :</value>
+  </data>
+  <data name="Add WaterMeter :" xml:space="preserve">
+    <value>Tilføj Vandur :</value>
+  </data>
+  <data name="MonitorTypeId" xml:space="preserve">
+    <value>Moniteringstype</value>
+  </data>
+  <data name="Top of Pipe / Initial value" xml:space="preserve">
+    <value>Top af rør / startværdi</value>
+  </data>
+  <data name="Z-Coordinate" xml:space="preserve">
+    <value>Z-Koordinat</value>
+  </data>
+  <data name="Unique ID(if applicable)" xml:space="preserve">
+    <value>Unik ID (hvis muligt)</value>
+  </data>
+  <data name="Maintenance" xml:space="preserve">
+    <value>Vedligeholdelse</value>
+  </data>
+  <data name="Already Uploaded" xml:space="preserve">
+    <value>Allerede uploadet</value>
+  </data>
+  <data name="Delete Account" xml:space="preserve">
+    <value>Slet konto</value>
+  </data>
+  <data name="Done By" xml:space="preserve">
+    <value>Oprettet af</value>
+  </data>
+  <data name="Entry Date" xml:space="preserve">
+    <value>Tidspunkt</value>
+  </data>
+  <data name="New Entry" xml:space="preserve">
+    <value>Nyt Indlæg</value>
+  </data>
+  <data name="Path to photo" xml:space="preserve">
+    <value>Sti til foto</value>
+  </data>
+  <data name="Send verification email" xml:space="preserve">
+    <value>Send bekræftelses email</value>
+  </data>
+  <data name="Shared Information" xml:space="preserve">
+    <value>Delt Information</value>
+  </data>
+  <data name="Text" xml:space="preserve">
+    <value>Tekst</value>
+  </data>
+  <data name="Update Log" xml:space="preserve">
+    <value>Opdater Logbog</value>
+  </data>
+  <data name="User Log" xml:space="preserve">
+    <value>Bruger Logbog</value>
+  </data>
+  <data name="Account" xml:space="preserve">
+    <value>Konto</value>
+  </data>
+  <data name="Due to GDPR reasons, only the last 7 days entries are shown. Older entries are deleted. If you personally want to store information as a log, you can store it within your account in your log-book" xml:space="preserve">
+    <value>Grundet GDPR vises kun indlæg fra de sidste 7 dage. Ældre indlæg bliver slettet. Hvis du personligt vil logge information i en logbog, kan du gøre dette via KONTO, hvor du har en personlig log</value>
+  </data>
+  <data name="Accommodation Work" xml:space="preserve">
+    <value>Støttemure, Trapper, etc.</value>
+  </data>
+  <data name="Accommodation Works" xml:space="preserve">
+    <value>Støttemure, Trapper, etc. arbejder</value>
+  </data>
+  <data name="Building" xml:space="preserve">
+    <value>Bygning</value>
+  </data>
+  <data name="Buildings" xml:space="preserve">
+    <value>Bygninger</value>
+  </data>
+  <data name="Forms" xml:space="preserve">
+    <value>Formularer</value>
+  </data>
+  <data name="Junction" xml:space="preserve">
+    <value>Kryds</value>
+  </data>
+  <data name="Junctions" xml:space="preserve">
+    <value>Kryds</value>
+  </data>
+  <data name="Main Menu" xml:space="preserve">
+    <value>Hovedmenu</value>
+  </data>
+  <data name="Protocol" xml:space="preserve">
+    <value>Protokol</value>
+  </data>
+  <data name="Protocols" xml:space="preserve">
+    <value>Protokoller</value>
+  </data>
+  <data name="Reports and Tables" xml:space="preserve">
+    <value>Rapporter og Tabeller</value>
+  </data>
+  <data name="Road Section" xml:space="preserve">
+    <value>Vej Sektion</value>
+  </data>
+  <data name="Road Sections" xml:space="preserve">
+    <value>Vej Sektioner</value>
+  </data>
+  <data name="Structure" xml:space="preserve">
+    <value>Struktur</value>
+  </data>
+  <data name="Structures" xml:space="preserve">
+    <value>Strukturer</value>
+  </data>
+  <data name="Actions" xml:space="preserve">
+    <value>Handlinger</value>
+  </data>
+  <data name="Alarm Call" xml:space="preserve">
+    <value>Alarmudkald</value>
+  </data>
+  <data name="DAILY REPORT - Direct Link" xml:space="preserve">
+    <value>Dagsseddel - Direkte link</value>
+  </data>
+  <data name="Daily Report and Alarm Call" xml:space="preserve">
+    <value>Dagsseddel og Alarmudkald</value>
+  </data>
+  <data name="Invoices and Costs" xml:space="preserve">
+    <value>Regninger og Omkostninger</value>
+  </data>
+  <data name="Site Maintenance" xml:space="preserve">
+    <value>Vedligeholdelse på byggeplads</value>
+  </data>
+  <data name="Continues" xml:space="preserve">
+    <value>Fortsætter</value>
+  </data>
+  <data name="Site Clearances Between Contract Borders" xml:space="preserve">
+    <value>Rydninger mellem kontraktgrænser</value>
+  </data>
+  <data name="Site Clearances For Utility Relocations" xml:space="preserve">
+    <value>Rydninger for lednignsomlægninger</value>
+  </data>
+  <data name="Action Performed:" xml:space="preserve">
+    <value>Handling gjort:</value>
+  </data>
+  <data name="Describe the Maintenance" xml:space="preserve">
+    <value>Beskriv vedligeholdelsen</value>
+  </data>
+  <data name="Maintenance Point" xml:space="preserve">
+    <value>Vedligeholdelsespunkt</value>
+  </data>
+  <data name="MaintenancePoint" xml:space="preserve">
+    <value>Vedligeholdelsespunkt</value>
+  </data>
+  <data name="Choose Supervisor" xml:space="preserve">
+    <value>Vælgt Overordnede</value>
+  </data>
+  <data name="Shared Documents" xml:space="preserve">
+    <value>Delte Dokumenter</value>
+  </data>
+  <data name="Tasks" xml:space="preserve">
+    <value>Opgaver</value>
+  </data>
+  <data name="Create Truck Daily Report" xml:space="preserve">
+    <value>Opret dagsseddel for lastbil</value>
+  </data>
+  <data name="SubProject" xml:space="preserve">
+    <value>Underprojekt</value>
+  </data>
+  <data name="Truck Daily Report" xml:space="preserve">
+    <value>Lastbil dagsseddel</value>
+  </data>
+  <data name="Truck Daily Reports" xml:space="preserve">
+    <value>Lastbil dagsseddeler</value>
+  </data>
+  <data name="Fill Hour Sheet" xml:space="preserve">
+    <value>Udfyld Timeseddel</value>
+  </data>
+  <data name="#Use only submersible cable joint kits" xml:space="preserve">
+    <value>#Brug kun kabelforbindelse der kan sænkes ned i vand</value>
+  </data>
+  <data name="1.0 Visual Check" xml:space="preserve">
+    <value>1.0 Visuelt check</value>
+  </data>
+  <data name="2. Insulation testing" xml:space="preserve">
+    <value>2. Test af insulering</value>
+  </data>
+  <data name="3. Testing the pump" xml:space="preserve">
+    <value>3. Test af pumpen</value>
+  </data>
+  <data name="Cable extended by (x meters)" xml:space="preserve">
+    <value>Kabel forlænget med (x meter)</value>
+  </data>
+  <data name="Cable extended?" xml:space="preserve">
+    <value>Kabel forlænget?</value>
+  </data>
+  <data name="Can it be fixed?" xml:space="preserve">
+    <value>Kan det repareres?</value>
+  </data>
+  <data name="Choose" xml:space="preserve">
+    <value>Vælg</value>
+  </data>
+  <data name="Complete exchange?" xml:space="preserve">
+    <value>Komplet udskift?</value>
+  </data>
+  <data name="Flow(m3/h)" xml:space="preserve">
+    <value>Flowrate(m3/h)</value>
+  </data>
+  <data name="If no, exchange the cable" xml:space="preserve">
+    <value>Hvis nej, så udskift kablet</value>
+  </data>
+  <data name="Insulation tested?" xml:space="preserve">
+    <value>Insulering testet?</value>
+  </data>
+  <data name="Is all cable submerged?" xml:space="preserve">
+    <value>Er hele kablet under vand?</value>
+  </data>
+  <data name="Is cable damaged?" xml:space="preserve">
+    <value>Er kablet beskadiget?</value>
+  </data>
+  <data name="Is insulation ok?" xml:space="preserve">
+    <value>Er insulering ok?</value>
+  </data>
+  <data name="Length of the cable" xml:space="preserve">
+    <value>Kabellængde</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>nej</value>
+  </data>
+  <data name="Pick Blue or Black" xml:space="preserve">
+    <value>Vælg Blåt eller Sort</value>
+  </data>
+  <data name="Pressure(bar)" xml:space="preserve">
+    <value>Tryk(bar)</value>
+  </data>
+  <data name="Pump Functionality Test" xml:space="preserve">
+    <value>Pumpefunktionstest</value>
+  </data>
+  <data name="Pump Functionality Tests" xml:space="preserve">
+    <value>Pumpefunktionstester</value>
+  </data>
+  <data name="Pump Number" xml:space="preserve">
+    <value>Pumpenummer</value>
+  </data>
+  <data name="Pump size" xml:space="preserve">
+    <value>Pumpestørrelse</value>
+  </data>
+  <data name="Test Date" xml:space="preserve">
+    <value>Test dato</value>
+  </data>
+  <data name="Test duration(minutes)" xml:space="preserve">
+    <value>Testtid(minutter)</value>
+  </data>
+  <data name="The Pump" xml:space="preserve">
+    <value>Pumpen</value>
+  </data>
+  <data name="Which cable is damaged?" xml:space="preserve">
+    <value>Hvilket kabel er beskadiget?</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Ja</value>
+  </data>
+  <data name="Sub Tasks" xml:space="preserve">
+    <value>Underopgaver</value>
+  </data>
+  <data name="End" xml:space="preserve">
+    <value>Afslut</value>
+  </data>
+  <data name="Feedback Item" xml:space="preserve">
+    <value>Feedback Underopgave</value>
+  </data>
+  <data name="Feedback Task" xml:space="preserve">
+    <value>Feedback Opgave</value>
+  </data>
+  <data name="Finish" xml:space="preserve">
+    <value>Afslut</value>
+  </data>
+  <data name="Load previous" xml:space="preserve">
+    <value>Genoptag sidste</value>
+  </data>
+  <data name="Photos" xml:space="preserve">
+    <value>Billeder</value>
+  </data>
+  <data name="Save for later" xml:space="preserve">
+    <value>Gem til senere</value>
+  </data>
+  <data name="And" xml:space="preserve">
+    <value>Og</value>
+  </data>
+  <data name="And/Or" xml:space="preserve">
+    <value>Og/eller</value>
+  </data>
+  <data name="Create new task" xml:space="preserve">
+    <value>Opret ny opgave</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>Filtrer</value>
+  </data>
+  <data name="In Charge/Worker" xml:space="preserve">
+    <value>Ansvarlig/Arbejder</value>
+  </data>
+  <data name="Is Finished?" xml:space="preserve">
+    <value>Færdiggjort?</value>
+  </data>
+  <data name="Is Started?" xml:space="preserve">
+    <value>Påbegyndt?</value>
+  </data>
+  <data name="Or" xml:space="preserve">
+    <value>Eller</value>
+  </data>
+  <data name="Show ALl Tasks" xml:space="preserve">
+    <value>Vi alle opgaver</value>
+  </data>
+  <data name="Show Feedback" xml:space="preserve">
+    <value>Vis feedback</value>
+  </data>
+  <data name="Show Finished Tasks" xml:space="preserve">
+    <value>Vis færdige opgaver</value>
+  </data>
+  <data name="Show Started Tasks" xml:space="preserve">
+    <value>Vis påbegyndte opgaver</value>
+  </data>
+  <data name="Show subtasks" xml:space="preserve">
+    <value>Vis underopgaver</value>
+  </data>
+  <data name="Is VAT Refundable?" xml:space="preserve">
+    <value>Er MOMsen løftbar?</value>
+  </data>
+  <data name="VAT. is refundable" xml:space="preserve">
+    <value>MOMs refunderes</value>
+  </data>
+  <data name="VAT. is NOT refundable" xml:space="preserve">
+    <value>MOMs refunderes IKKE</value>
+  </data>
+  <data name="Action Reports" xml:space="preserve">
+    <value>Aktion Rapporter</value>
+  </data>
+  <data name="Alarm Reports" xml:space="preserve">
+    <value>Alarm Rapporter</value>
+  </data>
+  <data name="Clear Pump Tests" xml:space="preserve">
+    <value>Renpumpninger</value>
+  </data>
+  <data name="Daily Report Summaries" xml:space="preserve">
+    <value>Dagsseddel Sammendrag</value>
+  </data>
+  <data name="Daily Reports and Alarm Calls" xml:space="preserve">
+    <value>Dagssedler og Alarmudkald</value>
+  </data>
+  <data name="Get All Site Reports" xml:space="preserve">
+    <value>Få Alle Rapporter på Projektet</value>
+  </data>
+  <data name="Horizontal Drain Tests" xml:space="preserve">
+    <value>Horisontal Dræn Tests</value>
+  </data>
+  <data name="Hour Registrations" xml:space="preserve">
+    <value>Timesedler</value>
+  </data>
+  <data name="Maintenance Reports" xml:space="preserve">
+    <value>Vedligeholdeses Rapporter</value>
+  </data>
+  <data name="Pipe Cut/Extension Reports" xml:space="preserve">
+    <value>Rørafkortning/forlængelses Rapporter</value>
+  </data>
+  <data name="Sensors Checks" xml:space="preserve">
+    <value>Sensortjek Rapporter</value>
+  </data>
+  <data name="Site Maintenance Reports" xml:space="preserve">
+    <value>Byggeplads vedligeholdeses Rapporter</value>
+  </data>
+  <data name="Test Reports" xml:space="preserve">
+    <value>Test Rapporter</value>
+  </data>
+  <data name="Three Step Pump Tests" xml:space="preserve">
+    <value>3-Step Tests</value>
+  </data>
+  <data name="Users Reports" xml:space="preserve">
+    <value>Bruger Rapporter</value>
+  </data>
+  <data name="Refundable VAT / Non-Refundable VAT" xml:space="preserve">
+    <value>Refunderbar MOMS / IKKE-refunderbar MOMS</value>
+  </data>
+  <data name="Photo after plugging pipe" xml:space="preserve">
+    <value>Foto efter afpropning af rør</value>
+  </data>
+  <data name="Photo BEFORE" xml:space="preserve">
+    <value>Foto FØR</value>
+  </data>
+  <data name="Photo w. Grout finished" xml:space="preserve">
+    <value>Foto af færdig grouting</value>
+  </data>
+  <data name="After Sealing Photo" xml:space="preserve">
+    <value>Foto efter afpropning</value>
+  </data>
+  <data name="Before Photo" xml:space="preserve">
+    <value>Foto før</value>
+  </data>
+  <data name="Before Sealing Photo" xml:space="preserve">
+    <value>Foto før afpropning</value>
+  </data>
+  <data name="Time Series Flow-rate" xml:space="preserve">
+    <value>Tidsrække Flow-rate</value>
+  </data>
+  <data name="Water meter end" xml:space="preserve">
+    <value>Slut vandur</value>
+  </data>
+  <data name="Water meter start" xml:space="preserve">
+    <value>Start vandur</value>
+  </data>
+  <data name="Blind Pipe length" xml:space="preserve">
+    <value>Blindrør længde</value>
+  </data>
+  <data name="Drill Well Form" xml:space="preserve">
+    <value>Brønd Boring Formular</value>
+  </data>
+  <data name="Filter length" xml:space="preserve">
+    <value>Filterlængde</value>
+  </data>
+  <data name="Mikrolit B bags(25kg) used" xml:space="preserve">
+    <value>Mikrolit B sække(25kg) brugt</value>
+  </data>
+  <data name="Pipe Diameter" xml:space="preserve">
+    <value>Rørdimension</value>
+  </data>
+  <data name="Sand 5 bags(25kg) used" xml:space="preserve">
+    <value>Sand 5 sække(25kg) brugt</value>
+  </data>
+  <data name="Upload Photos" xml:space="preserve">
+    <value>Upload billeder</value>
+  </data>
+  <data name="Well Depth m.u.t." xml:space="preserve">
+    <value>Boredybde m.u.t.</value>
+  </data>
+  <data name="Well ID" xml:space="preserve">
+    <value>Brønd ID</value>
+  </data>
+  <data name="Photo Water Meter after" xml:space="preserve">
+    <value>Vandur Efter foto</value>
+  </data>
+  <data name="Photo Water Meter before" xml:space="preserve">
+    <value>Vandur Før foto</value>
+  </data>
+  <data name="Water Meter After Photo" xml:space="preserve">
+    <value>Vandur Efter foto</value>
+  </data>
+  <data name="Water Meter Before Photo" xml:space="preserve">
+    <value>Vandur Før foto</value>
+  </data>
+  <data name="Pipe Height(m.o.t)" xml:space="preserve">
+    <value>Rør højde over terræn</value>
+  </data>
+  <data name="Downtime" xml:space="preserve">
+    <value>Ventetid</value>
+  </data>
+  <data name="fdsafdsa" xml:space="preserve">
+    <value>Messelemente</value>
+  </data>
+  <data name="- Breakfast 15%" xml:space="preserve">
+    <value>- Morgenmad 15%</value>
+  </data>
+  <data name="- Dinner 30%" xml:space="preserve">
+    <value>- Aftensmad 30%</value>
+  </data>
+  <data name="- Lunch 30%" xml:space="preserve">
+    <value>- Frokost 30%</value>
+  </data>
+  <data name="Accomodation" xml:space="preserve">
+    <value>Logi</value>
+  </data>
+  <data name="Additional hours" xml:space="preserve">
+    <value>Tillægstimer</value>
+  </data>
+  <data name="Allowance is calculated with reference to the section about allowances in the pamflet 'Hourly paid in HJ'" xml:space="preserve">
+    <value>Diæter er beregnet mht. sektionen om diæter i pjecen 'Timebetalt i HJ'</value>
+  </data>
+  <data name="Allowances Total" xml:space="preserve">
+    <value>Diæter total</value>
+  </data>
+  <data name="Amount of days" xml:space="preserve">
+    <value>Antal dage</value>
+  </data>
+  <data name="Calculation of Allowance" xml:space="preserve">
+    <value>Beregning af diæter</value>
+  </data>
+  <data name="Calculation of diets and small necesseties" xml:space="preserve">
+    <value>Udregning af kost og små nødvendigheder</value>
+  </data>
+  <data name="days x" xml:space="preserve">
+    <value>dage x</value>
+  </data>
+  <data name="Deductions" xml:space="preserve">
+    <value>Fradrag</value>
+  </data>
+  <data name="Diets" xml:space="preserve">
+    <value>Kost</value>
+  </data>
+  <data name="Employee Number" xml:space="preserve">
+    <value>Medarbejder nummer</value>
+  </data>
+  <data name="End Date/Time" xml:space="preserve">
+    <value>Slut Dato/Tid</value>
+  </data>
+  <data name="hours x" xml:space="preserve">
+    <value>timer x</value>
+  </data>
+  <data name="I live in a trailer on site" xml:space="preserve">
+    <value>Jeg bor i en trailer på pladsen</value>
+  </data>
+  <data name="I,my self, account for all expenses" xml:space="preserve">
+    <value>Jeg afholder selv alle udgifter</value>
+  </data>
+  <data name="Pay Period" xml:space="preserve">
+    <value>Lønperiode</value>
+  </data>
+  <data name="Please Select Project" xml:space="preserve">
+    <value>Vælg Projekt</value>
+  </data>
+  <data name="Rate pr. day" xml:space="preserve">
+    <value>Rate pr. dag</value>
+  </data>
+  <data name="Site name" xml:space="preserve">
+    <value>Byggeplads navn</value>
+  </data>
+  <data name="Start Date/Time" xml:space="preserve">
+    <value>Start Dato/Tid</value>
+  </data>
+  <data name="Subtotal" xml:space="preserve">
+    <value>Subtotal</value>
+  </data>
+  <data name="Unit" xml:space="preserve">
+    <value>Enhed</value>
+  </data>
+  <data name="Allowances - Accommodation" xml:space="preserve">
+    <value>Diæter - Logi</value>
+  </data>
+  <data name="Diets / Allowances" xml:space="preserve">
+    <value>Kost / Diæter Formular</value>
+  </data>
+  <data name="Shed Money" xml:space="preserve">
+    <value>Skur penge</value>
+  </data>
+  <data name="Summary Table - Old items hidden." xml:space="preserve">
+    <value>Sammendragstabel - Gamle poster gemt.</value>
+  </data>
+  <data name="Date/Time of Signature Client" xml:space="preserve">
+    <value>Dato underskrift klient</value>
+  </data>
+  <data name="Date/Time of Signature HJ" xml:space="preserve">
+    <value>Dato underskrift HJ</value>
+  </data>
+  <data name="People" xml:space="preserve">
+    <value>Mennesker</value>
+  </data>
+  <data name="Signature Client" xml:space="preserve">
+    <value>Underskrift klient</value>
+  </data>
+  <data name="Signature HJ" xml:space="preserve">
+    <value>Underskrift HJ</value>
+  </data>
+  <data name="Age" xml:space="preserve">
+    <value>Alder</value>
+  </data>
+  <data name="Approved By" xml:space="preserve">
+    <value>Godkendt af</value>
+  </data>
+  <data name="Approvement Date" xml:space="preserve">
+    <value>Godkendt dato</value>
+  </data>
+  <data name="Assessed By" xml:space="preserve">
+    <value>Bedømt af</value>
+  </data>
+  <data name="Attachments" xml:space="preserve">
+    <value>Bilag</value>
+  </data>
+  <data name="bentonite" xml:space="preserve">
+    <value>bentonit</value>
+  </data>
+  <data name="Bore Profile" xml:space="preserve">
+    <value>Boreprofil</value>
+  </data>
+  <data name="Coordinate System" xml:space="preserve">
+    <value>Projektion</value>
+  </data>
+  <data name="Depth(m)" xml:space="preserve">
+    <value>Dybde(m)</value>
+  </data>
+  <data name="DGU Number" xml:space="preserve">
+    <value>DGU nummer</value>
+  </data>
+  <data name="Drill Well" xml:space="preserve">
+    <value>Bor en Brønd</value>
+  </data>
+  <data name="Drilled by" xml:space="preserve">
+    <value>Boret af</value>
+  </data>
+  <data name="dry" xml:space="preserve">
+    <value>tør</value>
+  </data>
+  <data name="Env." xml:space="preserve">
+    <value>Miljø</value>
+  </data>
+  <data name="Geological Description" xml:space="preserve">
+    <value>Geologisk beskrivelse</value>
+  </data>
+  <data name="Geology" xml:space="preserve">
+    <value>Geologi</value>
+  </data>
+  <data name="Level(mDVR)" xml:space="preserve">
+    <value>Niveau(mDVR)</value>
+  </data>
+  <data name="No." xml:space="preserve">
+    <value>Nu.</value>
+  </data>
+  <data name="odor" xml:space="preserve">
+    <value>lugt</value>
+  </data>
+  <data name="Sample" xml:space="preserve">
+    <value>Prøve</value>
+  </data>
+  <data name="sand" xml:space="preserve">
+    <value>sand</value>
+  </data>
+  <data name="Slots" xml:space="preserve">
+    <value>Slidser</value>
+  </data>
+  <data name="Soil Layer Control" xml:space="preserve">
+    <value>Jordlag oversigt</value>
+  </data>
+  <data name="Stand Pipe 1" xml:space="preserve">
+    <value>Rør 1</value>
+  </data>
+  <data name="Stand Pipe 2" xml:space="preserve">
+    <value>Rør 2</value>
+  </data>
+  <data name="Stand Pipe 3" xml:space="preserve">
+    <value>Rør 3</value>
+  </data>
+  <data name="Test Results" xml:space="preserve">
+    <value>Test Resultater</value>
+  </data>
+  <data name="Well Name" xml:space="preserve">
+    <value>Brønd navn</value>
+  </data>
+  <data name="Wells" xml:space="preserve">
+    <value>Brønde</value>
+  </data>
+  <data name="wet" xml:space="preserve">
+    <value>våd</value>
+  </data>
+  <data name="Machine Account Plan" xml:space="preserve">
+    <value>Maskin kontoplan</value>
+  </data>
+  <data name="Page:" xml:space="preserve">
+    <value>Side:</value>
+  </data>
+  <data name="Printed on:" xml:space="preserve">
+    <value>Printet d.:</value>
+  </data>
+  <data name="color" xml:space="preserve">
+    <value>farve</value>
+  </data>
+  <data name="Abstraction Well" xml:space="preserve">
+    <value>Pumpebrønd</value>
+  </data>
+  <data name="Approved by:" xml:space="preserve">
+    <value>Godkendt af:</value>
+  </data>
+  <data name="Approved date:" xml:space="preserve">
+    <value>Godkendt dato:</value>
+  </data>
+  <data name="Attachments:" xml:space="preserve">
+    <value>Bilag:</value>
+  </data>
+  <data name="Create Instruction" xml:space="preserve">
+    <value>Lav Boreinstruks</value>
+  </data>
+  <data name="Done by:" xml:space="preserve">
+    <value>Udført af:</value>
+  </data>
+  <data name="Drill Profile" xml:space="preserve">
+    <value>Boreprofil</value>
+  </data>
+  <data name="Drilling Instructions" xml:space="preserve">
+    <value>Boreinstrukser</value>
+  </data>
+  <data name="Generate PDF" xml:space="preserve">
+    <value>Generér PDF</value>
+  </data>
+  <data name="Stand Pipe" xml:space="preserve">
+    <value>Pejlerør</value>
+  </data>
+  <data name="T.O.P" xml:space="preserve">
+    <value>Top Rør</value>
+  </data>
+  <data name="Service Car" xml:space="preserve">
+    <value>Service Bil</value>
+  </data>
+  <data name="Excavator" xml:space="preserve">
+    <value>Gravemaskine</value>
+  </data>
+  <data name="Acid Trailer" xml:space="preserve">
+    <value>Syre Trailer</value>
+  </data>
+  <data name="Gravemaskine" xml:space="preserve">
+    <value>Excavator</value>
+  </data>
+  <data name="Pump" xml:space="preserve">
+    <value>Pumpe</value>
+  </data>
+  <data name="Pump Trailer" xml:space="preserve">
+    <value>Pumpe Trailer</value>
+  </data>
+  <data name="Pumpe" xml:space="preserve">
+    <value>Pump</value>
+  </data>
+  <data name="Pumpe Trailer" xml:space="preserve">
+    <value>Pump Trailer</value>
+  </data>
+  <data name="Pumpetrailer" xml:space="preserve">
+    <value>Pump Trailer</value>
+  </data>
+  <data name="Syre Trailer" xml:space="preserve">
+    <value>Acid Trailer</value>
+  </data>
+  <data name="Trailer" xml:space="preserve">
+    <value>Trailer</value>
+  </data>
+  <data name="Blue Collar Allowances - Accommodation Form" xml:space="preserve">
+    <value>Udstationering, Timelønnet</value>
+  </data>
+  <data name="White Collar Allowances - Accommodation Form" xml:space="preserve">
+    <value>Udstationering, Funktionær</value>
+  </data>
+  <data name="Pre Excavation" xml:space="preserve">
+    <value>Forgravning</value>
+  </data>
+  <data name="Pre Excavations" xml:space="preserve">
+    <value>Forgravninger</value>
+  </data>
+  <data name="Annulled" xml:space="preserve">
+    <value>Annulleret</value>
+  </data>
+  <data name="Blue: # of all projects that were/are tendered for in the following 5 phases: Won,Lost,Tender Phase, Budget Phase, Annulled" xml:space="preserve">
+    <value>Blå: # Projekter der blev/bliver givet tilbud på inden for de følgende 5 faser: Vundet, Tabt, Tilbudsfase, Budgetfase, Annuleret</value>
+  </data>
+  <data name="Blue: Average value of won projects for the given year" xml:space="preserve">
+    <value>Blå: Gennemsnitsværdi af vundne projekter det givne år</value>
+  </data>
+  <data name="Blue: Here we see the worth of all projects that were/are tendered for in the" xml:space="preserve">
+    <value>Blå: Her ser vi værdien af alle projekter der blev/bliver givet tilbud på i det</value>
+  </data>
+  <data name="Blue: Here we see the worth of all projects that were/are tendered for in the following 5 phases: Won,Lost,Tender Phase, Budget Phase, Annulled" xml:space="preserve">
+    <value>Blå: Her ser vi værdien af alle projekter der blev/bliver givet tilbud på inden for de følgende 5 phaser: Vundet, Tabt, Tilbudsfase, Budgetfase, Annuleret</value>
+  </data>
+  <data name="Budget Phase" xml:space="preserve">
+    <value>Budgetfase</value>
+  </data>
+  <data name="Category" xml:space="preserve">
+    <value>Kategori</value>
+  </data>
+  <data name="Choose Category" xml:space="preserve">
+    <value>Vælg Kategori</value>
+  </data>
+  <data name="Choose Client" xml:space="preserve">
+    <value>Vælgt Klient</value>
+  </data>
+  <data name="Choose Status" xml:space="preserve">
+    <value>Vælg Status</value>
+  </data>
+  <data name="Client Contact" xml:space="preserve">
+    <value>Klient kontakt</value>
+  </data>
+  <data name="Client Tender Date" xml:space="preserve">
+    <value>Klientens tilbudsdato</value>
+  </data>
+  <data name="Date Submitted" xml:space="preserve">
+    <value>Dato afleveret</value>
+  </data>
+  <data name="Deatering" xml:space="preserve">
+    <value>Afvanding</value>
+  </data>
+  <data name="Design" xml:space="preserve">
+    <value>Design</value>
+  </data>
+  <data name="Dewatering" xml:space="preserve">
+    <value>Afvanding</value>
+  </data>
+  <data name="Distribution of contract value of each category of work within HJ. This only shows for projects which have had ANY categories marked. Value is distributed evenly among chosen categories" xml:space="preserve">
+    <value>Fordelingen af kontraktens værdi til hver kategori af arbejde inden for HJ. Her vises kun for projekter, hvor kategori er explicit valgt. Værdien af kontrakten af fordelt ligeligt blandt de valgte kategorier.</value>
+  </data>
+  <data name="Duration" xml:space="preserve">
+    <value>Varighed</value>
+  </data>
+  <data name="Enter new Tender" xml:space="preserve">
+    <value>Opret nyt tilbud</value>
+  </data>
+  <data name="Expected Total Value pr. year" xml:space="preserve">
+    <value>Forventet Total Værdi pr. år</value>
+  </data>
+  <data name="Gantt diagram of projects not yet finalized" xml:space="preserve">
+    <value>Gantt diagram for ikke afsluttede projekter</value>
+  </data>
+  <data name="Green: Win-% of Blue" xml:space="preserve">
+    <value>Grøn: % vundne projekter af 'Blå'</value>
+  </data>
+  <data name="Grouting" xml:space="preserve">
+    <value>Grouting</value>
+  </data>
+  <data name="Hide/Show Graphs" xml:space="preserve">
+    <value>Gem/Vis grafer</value>
+  </data>
+  <data name="Installation Value" xml:space="preserve">
+    <value>Installationsværdi</value>
+  </data>
+  <data name="laller" xml:space="preserve">
+    <value>daller</value>
+  </data>
+  <data name="Lost" xml:space="preserve">
+    <value>Tabt</value>
+  </data>
+  <data name="Lost Projects Average Value" xml:space="preserve">
+    <value>Tabte Projekter Gennemsnitsværdi</value>
+  </data>
+  <data name="Maintenance/Operations" xml:space="preserve">
+    <value>Vedligehold og tjek</value>
+  </data>
+  <data name="Modelling" xml:space="preserve">
+    <value>Modellering</value>
+  </data>
+  <data name="Monitoring" xml:space="preserve">
+    <value>Monitering</value>
+  </data>
+  <data name="Offer Number" xml:space="preserve">
+    <value>Tilbudsnummer</value>
+  </data>
+  <data name="Only projecst marked specifically as WON or LOST are accounted for" xml:space="preserve">
+    <value>Kun projekter markeret som VUNDET eller TABT er vist her.</value>
+  </data>
+  <data name="Open Dewatering" xml:space="preserve">
+    <value>Åben Tørholdelse</value>
+  </data>
+  <data name="Options Value" xml:space="preserve">
+    <value>Optioner sum</value>
+  </data>
+  <data name="Orange: # of won projects with startdate in that year" xml:space="preserve">
+    <value>Orange: # Projekter vundet med startdato det givne år</value>
+  </data>
+  <data name="Green: The expected value of projects in that given year" xml:space="preserve">
+    <value>Grøn: Den forventede værdi af projekter i det givne år</value>
+  </data>
+  <data name="Percent Complete" xml:space="preserve">
+    <value>Procent færdig</value>
+  </data>
+  <data name="Percent done" xml:space="preserve">
+    <value>Procent færdig</value>
+  </data>
+  <data name="Permits/Applications" xml:space="preserve">
+    <value>Tilladselser/Ansøgninger</value>
+  </data>
+  <data name="Phase" xml:space="preserve">
+    <value>Fase</value>
+  </data>
+  <data name="Project Description" xml:space="preserve">
+    <value>Projektbeskrivelse</value>
+  </data>
+  <data name="Project Name" xml:space="preserve">
+    <value>Projektnavn</value>
+  </data>
+  <data name="Project Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Project Value" xml:space="preserve">
+    <value>Projektværdi</value>
+  </data>
+  <data name="Projects w/o cancels" xml:space="preserve">
+    <value>Projekter uden annullerede</value>
+  </data>
+  <data name="Pumping Tests" xml:space="preserve">
+    <value>Pumpetests</value>
+  </data>
+  <data name="Purle: Win-% of Red" xml:space="preserve">
+    <value>Lilla: % vundne projekter af 'Rød'</value>
+  </data>
+  <data name="Red: # of all projects that were/are tendered for in the following 4 phases: Won,Lost,Tender Phase, Budget Phase" xml:space="preserve">
+    <value>Rød: # Projekter der blev/bliver givet tilbud på inden for de følgende 4 faser Vundet, Tabt, Tilbudsfase, Budgetfase</value>
+  </data>
+  <data name="Red: Average value of lost projects for the given year" xml:space="preserve">
+    <value>Rød: Gennemsnitsværdi af tabte projekter det givne år</value>
+  </data>
+  <data name="Red: Here we see the worth of all projects that have been defined as 'won'" xml:space="preserve">
+    <value>Rød: Her ser vi værdien af alle projekter der er defineret som 'vundet'</value>
+  </data>
+  <data name="Reporting" xml:space="preserve">
+    <value>Rapportering</value>
+  </data>
+  <data name="Resource" xml:space="preserve">
+    <value>Tilbudsnummer</value>
+  </data>
+  <data name="Sampling" xml:space="preserve">
+    <value>Prøver</value>
+  </data>
+  <data name="Supply of Materials/Equipment" xml:space="preserve">
+    <value>Udlejning af Materiel/Materialer</value>
+  </data>
+  <data name="Tender Date" xml:space="preserve">
+    <value>Tilbudsdato</value>
+  </data>
+  <data name="Tender Manager" xml:space="preserve">
+    <value>Tilbudsansvarlig</value>
+  </data>
+  <data name="Tender Phase" xml:space="preserve">
+    <value>Tilbudsfase</value>
+  </data>
+  <data name="Tenders" xml:space="preserve">
+    <value>Tilbud</value>
+  </data>
+  <data name="Timeline including contract worths for projects not yet finalized" xml:space="preserve">
+    <value>Tidslinie med kontraktværdier for projekter, der endnu ikke er færdige</value>
+  </data>
+  <data name="Total Projects" xml:space="preserve">
+    <value>Totalt Antal Projekter</value>
+  </data>
+  <data name="Total Value All Projects pr. year" xml:space="preserve">
+    <value>Total Værdi alle Projekter pr. år</value>
+  </data>
+  <data name="Total Value incl. Options" xml:space="preserve">
+    <value>Kontraktsum inkl. optioner</value>
+  </data>
+  <data name="Total Value Won Projects pr. year" xml:space="preserve">
+    <value>Total Værdi vundne Projekter pr. år</value>
+  </data>
+  <data name="Total Won Projects" xml:space="preserve">
+    <value>Totalt Antal vundne Projekter</value>
+  </data>
+  <data name="Value by Category" xml:space="preserve">
+    <value>Værdi pr. kategori</value>
+  </data>
+  <data name="Value [DKK]" xml:space="preserve">
+    <value>Værdi [DKK]</value>
+  </data>
+  <data name="Values after spreading correctly from start-&gt;end" xml:space="preserve">
+    <value>Værdier, hvis summen spredes fra start-&gt;slut</value>
+  </data>
+  <data name="Values when startdate defines the year" xml:space="preserve">
+    <value>Værdier, hvis startdato definerer ÅRET</value>
+  </data>
+  <data name="Water treatment" xml:space="preserve">
+    <value>Vandbehandling</value>
+  </data>
+  <data name="Well Development" xml:space="preserve">
+    <value>Brøndudvikling</value>
+  </data>
+  <data name="Well Drilling" xml:space="preserve">
+    <value>Brøndboring</value>
+  </data>
+  <data name="Well Points" xml:space="preserve">
+    <value>Sugespidser</value>
+  </data>
+  <data name="Well Sealing/Decommissioning" xml:space="preserve">
+    <value>Sløjning af Brønde</value>
+  </data>
+  <data name="Win %" xml:space="preserve">
+    <value>Vundet %</value>
+  </data>
+  <data name="Win % #2" xml:space="preserve">
+    <value>Vundet % #2</value>
+  </data>
+  <data name="Won" xml:space="preserve">
+    <value>Vundet</value>
+  </data>
+  <data name="Won Projects" xml:space="preserve">
+    <value>Vundne Projekter</value>
+  </data>
+  <data name="Won Projects Average Value" xml:space="preserve">
+    <value>Vundne Projekter Gennemsnitsværdi</value>
+  </data>
+  <data name="Year" xml:space="preserve">
+    <value>år</value>
+  </data>
+  <data name="Orange: Here we see the worth of all projects that are in 'Tender Phase' or 'Budget Price' - so still open to win" xml:space="preserve">
+    <value>Orange: Her ser vi værdien af alle projekter, der er i 'Tender fase' eller 'Budget Pris' - so stadig åbne til at vinde</value>
+  </data>
+</root>

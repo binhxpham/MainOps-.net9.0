@@ -1,0 +1,48 @@
+﻿@model IEnumerable<MainOps.Models.MeasPoint>
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Items</title>
+</head>
+<body>
+    <font size="4">
+        <div class="col-md-12">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-6">
+                    <table border="1" style="margin-bottom:2cm;margin-right:1cm;margin-left:1cm;">
+                        <tbody>
+                            <tr>
+                                <td width="240" rowspan="2" align="left"><img src="~/images/Divisions/Photos/@item.Project.Division.Id/@item.Project.Division.LogoPath" height="80" /></td>
+                                <td rowspan="4" width="120" align="center"><img src='@Url.Action("GetQR3","HJItems",new { Id = item.Id })' alt="" height="120" /></td>
+                            </tr>
+                            <tr></tr>
+                            <tr>
+                                <td align="center" height="40" width="240" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.Project.Name)</td>
+                            </tr>
+                            @if (item.DGUnr != "" && item.DGUnr != null)
+                            {
+                                <tr>
+                                    <td align="center" height="40" width="240" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.Name) : @Html.DisplayFor(modelItem => item.DGUnr)</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td align="center" height="40" width="240" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.Name)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </font>
+</body>
+</html>

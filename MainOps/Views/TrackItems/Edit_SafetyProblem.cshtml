@@ -1,0 +1,87 @@
+﻿@model MainOps.Models.SafetyProblem
+
+@{
+    ViewData["Title"] = "Edit_SafetyProblem";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Edit Safety Problem")</h2>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit_SafetyProblem" enctype="multipart/form-data" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="LogText" class="control-label"></label>
+                <textarea asp-for="LogText" cols="40" rows="10" class="form-control"></textarea>
+                <span asp-validation-for="LogText" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="safetyproblemtype"></label>
+                <select asp-for="safetyproblemtype" style="width:100%;">
+                    <option value="Near Miss">@SharedLocalizer.GetLocalizedHtmlString("Near Miss")</option>
+                    <option value="Unsafe Work Area">@SharedLocalizer.GetLocalizedHtmlString("Unsafe Work Area")</option>
+                    <option value="Accident">@SharedLocalizer.GetLocalizedHtmlString("Accident")</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label asp-for="Latitude" class="control-label"></label>
+                <input asp-for="Latitude" class="form-control" />
+                <span asp-validation-for="Latitude" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Longitude" class="control-label"></label>
+                <input asp-for="Longitude" class="form-control" />
+                <span asp-validation-for="Longitude" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TimeStamp" class="control-label"></label>
+                <input asp-for="TimeStamp" class="form-control" />
+                <span asp-validation-for="TimeStamp" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DoneBy" class="control-label"></label>
+                <input asp-for="DoneBy" class="form-control" />
+                <span asp-validation-for="DoneBy" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select>
+                <span asp-validation-for="ProjectId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label>
+                <input type="file" name="files" multiple accept=".jpg,.jpeg,.png,.gif,.pdf" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn-hoelscher" style="width:100%;height:50px;" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select',
+                    firstDay: 1
+
+                });
+            });
+        });
+
+    </script>
+}

@@ -1,0 +1,77 @@
+﻿@model IEnumerable<MainOps.Models.WTPClasses.MainClasses.Effort>
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Index");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Efforts")</h2>
+<hr/>
+<p>
+    <a asp-action="Create">@SharedLocalizer.GetLocalizedHtmlString("Create New")</a>
+</p>
+<table class="table col-md-11">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WTP_block_name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Category)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.effort)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.WTPUnit)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Temp_section)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Division)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Wtp_luxurity.wtp_luxurity)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.WTP_block_name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category.category)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.effort)
+                </td>
+                <td>
+                    @Html.Raw(item.WTPUnit.the_unit)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Temp_section.section)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Division.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Wtp_luxurity.wtp_luxurity)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a><br />
+                    <a asp-action="Details" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Details")</a><br />
+                    <a asp-action="Delete" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Delete")</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

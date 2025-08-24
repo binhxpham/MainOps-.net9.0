@@ -1,0 +1,402 @@
+﻿@model IEnumerable<MainOps.Models.ViewModels.StrechList>
+@using Microsoft.AspNetCore.Localization
+@{
+
+    DateTime? start = ViewBag.Startdate;
+    DateTime? end = ViewBag.Enddate;
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var lang = requestCulture.RequestCulture.UICulture;
+    var legendwidth = 1500;
+    var chartheight = 800;
+    //var ganttheight = String.Concat(Model.Projects.Where(x => !x.StatusDescriptionId.Equals(9) && !x.StatusDescriptionId.Equals(12) && x.EndDate != x.StartDate && x.EndDate.Date >= DateTime.Now.Date).ToList().Count * 41, "px");
+
+}
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Installation Overview");
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" href="@Url.Content("~/css/loadercess.css")" />
+    <style>
+        #legend_div {
+            font-family: Arial;
+            font-size: 11px;
+            text-align: center;
+            width: @String.Concat(legendwidth.ToString(), "px");
+                    }
+        .legend-entry {
+            display: inline-block;
+            padding: 16px 4px 8px 4px;
+        }
+
+        .legend-entry-color {
+            display: inline-block;
+            height: 12px;
+            width: 12px;
+        }
+    </style>
+</head>
+<div id="theloader" class="loader" hidden="hidden" style="align-self:center;"></div>
+<div class="row">
+    <form asp-controller="ProjectStatus" asp-action="Index" method="get">
+        <div class="col-xs-12">
+            <table style="width:100%;table-layout:fixed;">
+                <tr>
+                    <td style="width:100%;"><label>@SharedLocalizer.GetLocalizedHtmlString("Start Date")</label></td>
+                    <td style="width:100%;"><label>@SharedLocalizer.GetLocalizedHtmlString("End Date")</label></td>
+                    <td style="width:100%;"><label>@SharedLocalizer.GetLocalizedHtmlString("Category")</label></td>
+                </tr>
+                <tr>
+                    <td><input type="datetime-local" value="@String.Format("{0:yyyy-MM-ddT00:00}",start)" name="Start" id="Start1" onchange="SetStart2();" style="width:100%;" /></td>
+                    <td><input type="datetime-local" value="@String.Format("{0:yyyy-MM-ddT00:00}",end)" name="End" id="End1" onchange="SetEnd2();" style="width:100%;" /></td>
+                    <td><select id="ItemTypeId" asp-items="ViewBag.ItemTypeId" multiple="multiple" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Category")</option></select></td>
+
+                </tr>
+                <tr>
+                    <td colspan="2"><button type="submit" class="btn-hoelscher"><span class="glyphicon glyphicon-search"></span></button></td>
+                </tr>
+            </table>
+        </div>
+    </form>
+
+</div>
+<div id="chart1" style="width: 95%; height: @String.Concat(chartheight,"px");">
+
+</div>
+<div id="legend_div"></div>
+
+
+@section scripts{
+    <script id="template-legend-entry" type="text/html">
+        <div class="legend-entry" data-columnIndex="{{index}}">
+            {{colors}}
+            <span>{{label}}</span>
+        </div>
+    </script>
+    <script id="template-legend-entry-color" type="text/html">
+        <div class="legend-entry-color" style="background-color:{{color}}">
+
+        </div>
+    </script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        /*google.charts.load("current", { packages: ['corechart', 'gantt'] }); // google.charts.load('current', {'packages':['gantt']});*/
+        //google.charts.load("current", { packages: ['corechart', 'scatter'] });
+        google.charts.load('current', { 'packages': ['corechart'] });
+                /*       google.charts.load('current', {  packages: ['timeline']   });*/
+                google.charts.setOnLoadCallback(drawCharts);
+        $(window).resize(drawCharts);
+                //var container = document.getElementById('timeline');
+                var dataTableGroup;
+                var dateRangeStart;
+                var dateRangeEnd;
+                var formatDate;
+                var rowHeight;
+                var options;
+                var datas = [];
+                function toggleLoad() {
+                    var x = document.getElementById("theloader");
+                    if (x.style.display === "none")
+                    {
+                        x.style.display = "block";
+                    }
+                    else {
+                        x.style.display = "none";
+                    }
+                }
+
+                function drawChart () {
+                    var itemtypes = {
+                        1725: 'Piston Pump',
+                        1702: 'Well Point System',
+                        1723: 'Grout',
+                        1703: 'Drain Pipe',
+                        1800: 'Drain Pump',
+                        1812: "Discharge Pump",
+                        1704: "Pumping Well",
+                        1787: "Centrifugal Pump"
+
+                    };
+                    var itemtypesused = [];
+            var data = new google.visualization.DataTable();
+            data.addColumn('number', 'KM Mark');
+            data.addColumn('date', 'Installed');
+            data.addColumn({ 'type': 'string', 'role': 'style' });
+            data.addColumn({ 'type': 'number', 'role': 'style' });
+            //data.addColumn('number', 'Idle Days');
+            datas = [];
+            @foreach(var stretch in Model)
+                {
+                foreach(var item in stretch.GantInstalls)
+                {
+                         <text>
+                        var newdate = new Date( @item.MovedToDestination.Year,@item.MovedToDestination.Month,@item.MovedToDestination.Day );
+                        </text>
+                    if (item.Install.ItemTypeId.Equals(1725))
+                    {
+                        <text>
+                        //alert("here");
+                        </text>
+                            @:datas.push([@item.KM, new Date(@item.MovedToDestination.Year,@item.MovedToDestination.Month,@item.MovedToDestination.Day), 'point {size: 14; fill-color: yellow;opacity: 0.6;}',@item.Install.ItemTypeId]);
+                        }
+                      else if (item.Install.ItemTypeId.Equals(1702))
+                        {
+                            @:datas.push([@item.KM, new Date(@item.MovedToDestination.Year,@item.MovedToDestination.Month,@item.MovedToDestination.Day), 'point {size: 14; fill-color: green; opacity: 0.7;}',@item.Install.ItemTypeId]);
+                        }
+                    else if (item.Install.ItemTypeId.Equals(1723))
+                        {
+                            @:datas.push([@item.KM, new Date(@item.MovedToDestination.Year,@item.MovedToDestination.Month,@item.MovedToDestination.Day), 'point {size: 14; fill-color: grey; opacity: 0.7;}',@item.Install.ItemTypeId]);
+                        }
+                     else if (item.Install.ItemTypeId.Equals(1703))
+                        {
+                            @:datas.push([@item.KM, new Date(@item.MovedToDestination.Year,@item.MovedToDestination.Month,@item.MovedToDestination.Day), 'point {size: 14; fill-color: pink; opacity: 0.4;}',@item.Install.ItemTypeId]);
+                        }
+                    else if (item.Install.ItemTypeId.Equals(1800))
+                        {
+                            @:datas.push([@item.KM, new Date(@item.MovedToDestination.Year,@item.MovedToDestination.Month,@item.MovedToDestination.Day), 'point {size: 14; fill-color: blue; opacity: 0.7;}',@item.Install.ItemTypeId]);
+                        }
+                    else if (item.Install.ItemTypeId.Equals(1812))
+                        {
+                            @:datas.push([@item.KM, new Date(@item.MovedToDestination.Year,@item.MovedToDestination.Month,@item.MovedToDestination.Day), 'point {size: 14; fill-color: red; opacity: 0.7;}',@item.Install.ItemTypeId]);
+                        }
+                    else if (item.Install.ItemTypeId.Equals(1704))
+                        {
+                            @:datas.push([@item.KM, new Date(@item.MovedToDestination.Year,@item.MovedToDestination.Month,@item.MovedToDestination.Day), 'point {size: 14; fill-color: lightblue; opacity: 0.7;}',@item.Install.ItemTypeId]);
+                        }
+                    else if (item.Install.ItemTypeId.Equals(1787))
+                        {
+                            @:datas.push([@item.KM, new Date(@item.MovedToDestination.Year,@item.MovedToDestination.Month,@item.MovedToDestination.Day), 'point {size: 14; fill-color: lightgreen; opacity: 0.7;}',@item.Install.ItemTypeId]);
+                        }
+                        else
+                        {
+                            @:datas.push([@item.KM, new Date(@item.MovedToDestination.Year,@item.MovedToDestination.Month,@item.MovedToDestination.Day), 'point {size: 14; fill-color: red;;opacity: 0.6;}',@item.Install.ItemTypeId]);
+                        }
+
+
+                }
+            }
+
+            data.addRows(datas);
+            //var view = new google.visualization.DataView(data);
+            //view.setColumns([{
+            //    calc: function (dt, row) {
+            //        return itemtypes[data.getValue(row, 3)];
+            //    },
+            //    label: 'Installed',
+            //    type: 'string'
+            //}, 1]);
+            var options = {
+                chart: {
+                    title: 'Installations',
+                    subtitle: 'By date and KM'
+                },
+                legend: {
+                    position: 'none'
+                },
+                width: @legendwidth,
+                height: @chartheight,
+                colors: ['red', 'blue','green','yellow','grey','pink','lightgreen','lightblue'],
+                pointSize: 12,
+                opacity: 0.6
+            };
+
+            var chart = new google.visualization.ScatterChart(document.getElementById('chart1'));
+
+////////////////////
+
+                    google.visualization.events.addListener(chart, 'ready', function () {
+                        // legend container
+                        var legend = document.getElementById('legend_div');
+                        legend.innerHTML = '';
+
+                        // build legend from chart data
+                        var colorPallette = [];
+                        /*for (var colIndex = 0; colIndex < data.getNumberOfColumns(); colIndex++) {*/
+                            var colIndex = 2;
+                            // determine if style column
+                            /*if (data.getColumnRole(colIndex) === 'style') {*/
+                                // save colors for entire series (all rows)
+                        var seriesColorsStruct = {};
+                                var seriesColor = '';
+                                for (var rowIndex = 0; rowIndex < data.getNumberOfRows(); rowIndex++) {
+                                    if (itemtypesused.indexOf(data.getValue(rowIndex, colIndex + 1)) == -1) {
+                                        seriesColor = renderTemplate('template-legend-entry-color', {
+                                            color: data.getValue(rowIndex, colIndex).split("fill-color: ")[1].split("opacity")[0].replace(";", "").trim()
+                                        });
+                                        seriesColorsStruct[data.getValue(rowIndex, colIndex + 1)] = seriesColor;
+                                        itemtypesused.push(data.getValue(rowIndex, colIndex + 1));
+                                    }
+
+                        }
+                        itemtypesused = [];
+                                for (var rowIndex = 0; rowIndex < data.getNumberOfRows(); rowIndex++) {
+                                    if (itemtypesused.indexOf(data.getValue(rowIndex, colIndex + 1)) == -1) {
+                                        legend.insertAdjacentHTML('beforeEnd', renderTemplate('template-legend-entry', {
+                                            colors: seriesColorsStruct[data.getValue(rowIndex,colIndex + 1)],
+                                            index: colIndex + 1,
+                                            label: itemtypes[data.getValue(rowIndex, colIndex + 1)]
+                                            //label: data.getColumnLabel(colIndex - 1)
+                                        }));
+                                        itemtypesused.push(data.getValue(rowIndex, colIndex + 1));
+
+                                    }
+                                    if (itemtypes[data.getValue(rowIndex, colIndex + 1)] == undefined) {
+                                        alert(data.getValue(rowIndex, colIndex + 1));
+                                    }
+
+                                }
+                                // add legend for series (all colors)
+
+                            /*}*/
+                        /*}*/
+
+                        // add click event to legend entries
+                        //var legendEntries = legend.getElementsByClassName('legend-entry');
+                        //Array.prototype.forEach.call(legendEntries, function (entry) {
+                        //    entry.addEventListener('click', function (e) {
+                        //        // find legend entry
+                        //        var entry = e.target || e.srcElement;
+                        //        if (entry.className.toLowerCase() !== 'legend-entry') {
+                        //            entry = entry.parentNode;
+                        //        }
+
+                        //        // get data table column index from legend entry
+                        //        var columnIndex = parseInt(entry.getAttribute('data-columnIndex'));
+
+                        //        // display legend entry that was clicked
+                        //        document.getElementById('message_div').innerHTML = 'legend entry clicked = ' + data.getColumnLabel(columnIndex);
+
+                        //        // select chart series
+                        //        chart.setSelection([{ row: null, column: columnIndex }]);
+                        //    }, false);
+                        //});
+                    });
+
+                    // render html template
+                    function renderTemplate(templateId, templateProps) {
+                        var content = document.getElementById(templateId).innerHTML;
+                        for (var handle in templateProps) {
+                            if (templateProps.hasOwnProperty(handle)) {
+                                content = content.replace('{{' + handle + '}}', templateProps[handle]);
+                            }
+                        }
+                        return content.trim();
+                    }
+
+////////////////////
+            chart.draw(data, options);
+        }
+        @*function drawGantt() {
+            var data = new google.visualization.DataTable();
+            var datas = new Array();
+            data.addColumn('string', 'Task ID');
+            data.addColumn('string', 'Task Name');
+            data.addColumn("string", '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Resource").Value)');
+            data.addColumn('date', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Start Date").Value)');
+            data.addColumn('date', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("End Date").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Duration").Value)');
+            data.addColumn('number', '@Html.Raw(SharedLocalizer.GetLocalizedHtmlString("Percent Complete").Value)');
+            data.addColumn('string', 'Dependencies');
+
+
+            @foreach (var stretch in Model)
+            {
+                foreach (var item in stretch.GantInstalls)
+                {
+
+                }
+            }
+                <text>
+            var submitexists = false;
+            var tenderexists*@ = false;
+            var clienttenderexists = false;
+            @*if ("@p.DateSubmitted" != "") {
+                var submitdate1 = new Date(@Convert.ToDateTime(p.DateSubmitted).Year,@Convert.ToDateTime(p.DateSubmitted).Month-1,@Convert.ToDateTime(p.DateSubmitted).Day);
+                var submitdate2 = new Date(@Convert.ToDateTime(p.DateSubmitted).Year,@Convert.ToDateTime(p.DateSubmitted).Month-1,@Convert.ToDateTime(p.DateSubmitted).Day + 1);
+                datas.push(["@p.QuoteNumber Submit", "@Html.Raw(p.ProjectName) -Submit","@p.QuoteNumber", submitdate1, submitdate2, daysToMilliseconds(1),iscompleted(submitdate1,submitdate2), null]);
+                submitexists = true;
+            }
+            if ("@p.TenderDate" != "") {
+                var tenderdate1 = new Date(@Convert.ToDateTime(p.TenderDate).Year,@Convert.ToDateTime(p.TenderDate).Month-1,@Convert.ToDateTime(p.TenderDate).Day);
+                var tenderdate2 = new Date(@Convert.ToDateTime(p.TenderDate).Year,@Convert.ToDateTime(p.TenderDate).Month-1,@Convert.ToDateTime(p.TenderDate).Day + 1);
+                if (submitexists == true) {
+                    datas.push(["@p.QuoteNumber Tender", "@Html.Raw(p.ProjectName) -Tender", "@p.QuoteNumber", tenderdate1, tenderdate2, daysToMilliseconds(1), iscompleted(tenderdate1, tenderdate2), "@p.QuoteNumber Submit"]);
+                }
+                else {
+                    datas.push(["@p.QuoteNumber Tender", "@Html.Raw(p.ProjectName) -Tender", "@p.QuoteNumber", tenderdate1, tenderdate2, daysToMilliseconds(1), iscompleted(tenderdate1, tenderdate2), null]);
+                }
+                tenderexists = true;
+
+            }
+            if ("@p.ClientTenderDate" != "") {
+                var clienttenderdate1 = new Date(@Convert.ToDateTime(p.ClientTenderDate).Year,@Convert.ToDateTime(p.ClientTenderDate).Month-1,@Convert.ToDateTime(p.ClientTenderDate).Day);
+                var clienttenderdate2 = new Date(@Convert.ToDateTime(p.ClientTenderDate).Year,@Convert.ToDateTime(p.ClientTenderDate).Month-1,@Convert.ToDateTime(p.ClientTenderDate).Day + 1);
+                if (tenderexists == true) {
+                    datas.push(["@p.QuoteNumber Client Tender", "@Html.Raw(p.ProjectName) -Client Tender", "@p.QuoteNumber", clienttenderdate1, clienttenderdate2, daysToMilliseconds(1), iscompleted(clienttenderdate1, clienttenderdate2), "@p.QuoteNumber Tender"]);
+                }
+                else if (submitexists == true) {
+                    datas.push(["@p.QuoteNumber Client Tender", "@Html.Raw(p.ProjectName) -Client Tender", "@p.QuoteNumber", clienttenderdate1, clienttenderdate2, daysToMilliseconds(1), iscompleted(clienttenderdate1, clienttenderdate2), "@p.QuoteNumber Submit"]);
+                }
+                else {
+                    datas.push(["@p.QuoteNumber Client Tender", "@Html.Raw(p.ProjectName) -Client Tender", "@p.QuoteNumber", clienttenderdate1, clienttenderdate2, daysToMilliseconds(1), iscompleted(clienttenderdate1, clienttenderdate2), null]);
+                }
+                clienttenderexists = true;
+
+            }*@
+                @*var startdate = new Date(@p.StartDate.Year,@p.StartDate.Month-1,@p.StartDate.Day);
+                var enddate = new Date(@p.EndDate.Year,@p.EndDate.Month-1,@p.EndDate.Day);
+                var datediffmilli = enddate - startdate;
+                if (clienttenderexists == true) {
+                     datas.push(["@p.QuoteNumber", "@Html.Raw(p.ProjectName)","@p.QuoteNumber", startdate, enddate, datediffmilli, iscompleted(startdate, enddate), "@p.QuoteNumber Client Tender"]);
+                }
+                else if (tenderexists == true) {
+                     datas.push(["@p.QuoteNumber", "@Html.Raw(p.ProjectName)","@p.QuoteNumber", startdate, enddate, datediffmilli, iscompleted(startdate, enddate), "@p.QuoteNumber Tender"]);
+                }
+                else if (submitexists == true) {
+                     datas.push(["@p.QuoteNumber", "@Html.Raw(p.ProjectName)","@p.QuoteNumber", startdate, enddate, datediffmilli, iscompleted(startdate, enddate), "@p.QuoteNumber Submit"]);
+                }
+                else {
+                     datas.push(["@p.QuoteNumber", "@Html.Raw(p.ProjectName)","@p.QuoteNumber", startdate, enddate, datediffmilli, iscompleted(startdate, enddate), null]);
+                }
+
+                </text>
+
+                //
+
+            }*@
+            <!--data.addRows(datas);
+            var options = {
+                gantt: {
+                    labelStyle: {
+                        fontSize: 11,
+                    },
+                    /*palette: getPalette(),*/
+                    criticalPathEnabled: false,
+                    innerGridHorizLine: {
+                        stroke: '#009EFF',
+                        strokeWidth: 2
+                    },
+
+                },
+                //hAxis: {
+                //    scaleType: 'log'
+                //},
+                width: '100%',
+                height: '100%',
+            };
+            var chart = new google.visualization.Gantt(document.getElementById('ganttdiv'));
+            chart.draw(data, options);
+        }-->
+
+    function drawCharts() {
+        drawChart();
+    }
+
+
+
+        $(document).ready(function () {
+            drawCharts();
+        });
+    </script>
+}
+

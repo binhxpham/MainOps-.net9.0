@@ -1,0 +1,406 @@
+﻿@model MainOps.Models.ReportClasses.WTP_Test
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Water Treatment Plant Inspection");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Water Treatment Plant Inspection")</h2>
+
+<div class="row">
+    <div class="col-xs-8">
+        <form asp-action="WTP_Test">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ProjectId" class="control-label"></label>
+                <select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId"></select>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Visual_Check" /> @Html.DisplayNameFor(model => model.Visual_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Visual_Comment" class="control-label"></label>
+                <input asp-for="Visual_Comment" class="form-control" />
+                <span asp-validation-for="Visual_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Organoleptic_Check" /> @Html.DisplayNameFor(model => model.Organoleptic_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Organoleptic_Comment" class="control-label"></label>
+                <input asp-for="Organoleptic_Comment" class="form-control" />
+                <span asp-validation-for="Organoleptic_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Filters_Check" /> @Html.DisplayNameFor(model => model.Filters_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Filters_Comment" class="control-label"></label>
+                <input asp-for="Filters_Comment" class="form-control" />
+                <span asp-validation-for="Filters_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Manifolds_Check" /> @Html.DisplayNameFor(model => model.Manifolds_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Manifolds_Comment" class="control-label"></label>
+                <input asp-for="Manifolds_Comment" class="form-control" />
+                <span asp-validation-for="Manifolds_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Valves_Check" /> @Html.DisplayNameFor(model => model.Valves_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Valves_Comment" class="control-label"></label>
+                <input asp-for="Valves_Comment" class="form-control" />
+                <span asp-validation-for="Valves_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Water_Levels_Check" /> @Html.DisplayNameFor(model => model.Water_Levels_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Water_Levels_Comment" class="control-label"></label>
+                <input asp-for="Water_Levels_Comment" class="form-control" />
+                <span asp-validation-for="Water_Levels_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Control_Cabinet_Check" /> @Html.DisplayNameFor(model => model.Control_Cabinet_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Control_Cabinet_Comment" class="control-label"></label>
+                <input asp-for="Control_Cabinet_Comment" class="form-control" />
+                <span asp-validation-for="Control_Cabinet_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Power_Check" /> @Html.DisplayNameFor(model => model.Power_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Power_Comment" class="control-label"></label>
+                <input asp-for="Power_Comment" class="form-control" />
+                <span asp-validation-for="Power_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Alarm_Check" /> @Html.DisplayNameFor(model => model.Alarm_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Alarm_Comment" class="control-label"></label>
+                <input asp-for="Alarm_Comment" class="form-control" />
+                <span asp-validation-for="Alarm_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                @Html.Raw(Html.DisplayNameFor(Model => Model.Coordination_Description))
+                <input asp-for="Coordination_Description" class="form-control" />
+                <span asp-validation-for="Coordination_Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Calibration_Check" /> @Html.DisplayNameFor(model => model.Calibration_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Calibration_Comment" class="control-label"></label>
+                <input asp-for="Calibration_Comment" class="form-control" />
+                <span asp-validation-for="Calibration_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Electrical_Check" /> @Html.DisplayNameFor(model => model.Electrical_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Electrical_Comment" class="control-label"></label>
+                <input asp-for="Electrical_Comment" class="form-control" />
+                <span asp-validation-for="Electrical_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Cleaing_Check" /> @Html.DisplayNameFor(model => model.Cleaing_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Cleaing_Comment" class="control-label"></label>
+                <input asp-for="Cleaing_Comment" class="form-control" />
+                <span asp-validation-for="Cleaing_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Sample_Check" /> @Html.DisplayNameFor(model => model.Sample_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Sample_Comment" class="control-label"></label>
+                <input asp-for="Sample_Comment" class="form-control" />
+                <span asp-validation-for="Sample_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Manganese_Inlet" class="control-label"></label>
+                <input asp-for="Manganese_Inlet" class="form-control" />
+                <span asp-validation-for="Manganese_Inlet" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Manganese_outlet" class="control-label"></label>
+                <input asp-for="Manganese_outlet" class="form-control" />
+                <span asp-validation-for="Manganese_outlet" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="pH_Inlet" class="control-label"></label>
+                <input asp-for="pH_Inlet" class="form-control" />
+                <span asp-validation-for="pH_Inlet" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="pH_outlet" class="control-label"></label>
+                <input asp-for="pH_outlet" class="form-control" />
+                <span asp-validation-for="pH_outlet" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="S1_Check" class="control-label"></label>
+                <input asp-for="S1_Check" class="form-control" />
+                <span asp-validation-for="S1_Check" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="S1_Check" /> @Html.DisplayNameFor(model => model.S1_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="S1_Comment" class="control-label"></label>
+                <input asp-for="S1_Comment" class="form-control" />
+                <span asp-validation-for="S1_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="S2_Check" class="control-label"></label>
+                <input asp-for="S2_Check" class="form-control" />
+                <span asp-validation-for="S2_Check" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="S2_Check" /> @Html.DisplayNameFor(model => model.S2_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="S2_Check" class="control-label"></label>
+                <input asp-for="S2_Check" class="form-control" />
+                <span asp-validation-for="S2_Check" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="S3_Check" /> @Html.DisplayNameFor(model => model.S3_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="S3_Comment" class="control-label"></label>
+                <input asp-for="S3_Comment" class="form-control" />
+                <span asp-validation-for="S3_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="F1_Check" /> @Html.DisplayNameFor(model => model.F1_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="F2_Check" /> @Html.DisplayNameFor(model => model.F2_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="F3_Check" /> @Html.DisplayNameFor(model => model.F3_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="F_Check" /> @Html.DisplayNameFor(model => model.F_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="F_Comment" class="control-label"></label>
+                <input asp-for="F_Comment" class="form-control" />
+                <span asp-validation-for="F_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="AG1_Check" /> @Html.DisplayNameFor(model => model.AG1_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="AG2_Check" /> @Html.DisplayNameFor(model => model.AG2_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="AG3_Check" /> @Html.DisplayNameFor(model => model.AG3_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="AG_Check" /> @Html.DisplayNameFor(model => model.AG_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="AG_Comment" class="control-label"></label>
+                <input asp-for="AG_Comment" class="form-control" />
+                <span asp-validation-for="AG_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Exchange_Check" /> @Html.DisplayNameFor(model => model.Exchange_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="Exchange_Comment" class="control-label"></label>
+                <input asp-for="Exchange_Comment" class="form-control" />
+                <span asp-validation-for="Exchange_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="SandFilter_Check" /> @Html.DisplayNameFor(model => model.SandFilter_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="SandFilter_Amount" class="control-label"></label>
+                <input asp-for="SandFilter_Amount" class="form-control" />
+                <span asp-validation-for="SandFilter_Amount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SandFilter_Comment" class="control-label"></label>
+                <input asp-for="SandFilter_Comment" class="form-control" />
+                <span asp-validation-for="SandFilter_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="GACFilter_Check" /> @Html.DisplayNameFor(model => model.GACFilter_Check)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label asp-for="GACFilter_Amount" class="control-label"></label>
+                <input asp-for="GACFilter_Amount" class="form-control" />
+                <span asp-validation-for="GACFilter_Amount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="GACFilter_Comment" class="control-label"></label>
+                <input asp-for="GACFilter_Comment" class="form-control" />
+                <span asp-validation-for="GACFilter_Comment" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Executed_Works" class="control-label"></label>
+                <input asp-for="Executed_Works" class="form-control" />
+                <span asp-validation-for="Executed_Works" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Unusual_Event" class="control-label"></label>
+                <input asp-for="Unusual_Event" class="form-control" />
+                <span asp-validation-for="Unusual_Event" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="datetime" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd")" asp-for="Date_Done" style="width:100%;height:36px;" />
+                <span asp-validation-for="Date_Done" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datetimepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+
+                });
+                $('.date-picker').datetimepicker("setDate", new Date());
+
+            });
+        });
+
+    </script>
+}

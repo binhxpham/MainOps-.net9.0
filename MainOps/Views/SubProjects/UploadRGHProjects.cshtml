@@ -1,0 +1,12 @@
+﻿
+
+@{
+    ViewData["Title"] = "Upload Region H subprojects";
+}
+
+<h2>Choose File (from Jan or Reg H)</h2>
+
+<form asp-action="UploadRGHProjects" method="post" enctype="multipart/form-data">
+    <input name="postedFile" type="file" accept=".csv" />
+    <button class="btn-hoelscher">Upload</button>
+</form>

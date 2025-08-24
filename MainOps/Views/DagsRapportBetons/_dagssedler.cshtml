@@ -1,0 +1,418 @@
+﻿@model IEnumerable<MainOps.Models.CGJClassesBeton.DagsRapportBeton>
+@{
+    Layout = null;
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("Dagsrapport")</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+
+@foreach(var item in Model) { 
+<div style="page-break-after:always !important">
+    <table style="page-break-inside:avoid;">
+        <tr style="background-color:orange;">
+            <td colspan="3">
+                <b>@SharedLocalizer.GetLocalizedHtmlString("Dagsrapport")</b>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;color:white;background-color:black;">
+                <b>
+                    Projekt
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Name)
+            </td>
+            <td rowspan="5" align="right"><img src="~/images/Divisions/Photos/@item.Project.Division.Id/@item.Project.Division.LogoPath" width="151" height="66" /></td>
+        </tr>
+        <tr>
+            <td style="text-align:left;color:white;background-color:black;">
+                <b>
+                    Projektnummer
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.ProjectNr)
+            </td>
+        </tr>
+        @if (item.SubProjectId != null)
+        {
+            <tr>
+                <td style="text-align:left;color:white;background-color:black;">
+                    <b>
+                        Underprojekt
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SubProject.Name) : @Html.DisplayFor(modelItem => item.SubProject.SubProjectNr)
+                </td>
+            </tr>
+        }
+        <tr>
+            <td style="text-align:left;color:white;background-color:black;">
+                <b>
+                    Klient
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Project.Client)
+            </td>
+
+        </tr>
+
+        <tr>
+            <td style="text-align:left;color:white;background-color:black;">
+                <b>
+                    Dato
+                </b>
+            </td>
+            <td>
+                @String.Format("{0:ddd yyyy-MM-dd}", item.Dato)
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;color:white;background-color:black;">
+                <b>
+                    @Html.DisplayNameFor(modelItem => item.UdarbjedetAf)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UdarbjedetAf)
+            </td>
+        </tr>
+        @if (item.Vejr.Equals(true))
+        {
+
+            <tr>
+                <td colspan="3">
+                    <table id="vejrtabel" style="table-layout:fixed;width:100%;text-align:left;color:white;background-color:black;">
+                        <tr>
+                            <td>
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.DisplayFor(modelItem => item.Sol) @Html.DisplayNameFor(modelItem => item.Sol)
+                                    </label>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.DisplayFor(modelItem => item.Skyet) @Html.DisplayNameFor(modelItem => item.Skyet)
+                                    </label>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.DisplayFor(modelItem => item.OverSkyet) @Html.DisplayNameFor(modelItem => item.OverSkyet)
+                                    </label>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.DisplayFor(modelItem => item.Regn_sne) @Html.DisplayNameFor(modelItem => item.Regn_sne)
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.DisplayFor(modelItem => item.Vindstille) @Html.DisplayNameFor(modelItem => item.Vindstille)
+                                    </label>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.DisplayFor(modelItem => item.Svag_Vind) @Html.DisplayNameFor(modelItem => item.Svag_Vind)
+                                    </label>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.DisplayFor(modelItem => item.Jaevn_Vind) @Html.DisplayNameFor(model => model.Jaevn_Vind)
+                                    </label>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="checkbox">
+                                    <label>
+                                        @Html.DisplayFor(modelItem => item.Haard_Vind) @Html.DisplayNameFor(modelItem => item.Haard_Vind)
+                                    </label>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><label>@Html.DisplayNameFor(modelItem => item.Temperatur_kl_otte)</label></td>
+                            <td style="text-align:center;background-color:white;color:black;">@Html.DisplayFor(modelItem => item.Temperatur_kl_otte)</td>
+                            <td> <label>@Html.DisplayNameFor(modelItem => item.Temperatur_kl_tolv)</label></td>
+                            <td style="text-align:center;background-color:white;color:black;"> @Html.DisplayFor(modelItem => item.Temperatur_kl_tolv)</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        }
+
+
+
+        <tr>
+            <td colspan="3" style="background-color:orange;text-align:left;">
+                <b>Tidsregistrering af mandskab</b>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <table style="width:100%;table-layout:fixed;">
+                    <tr style="text-align:left;color:white;background-color:black;">
+                        <td><b>Navn</b></td>
+                        <td><b>Timer</b></td>
+                        <td><b>Overtid 50/100%</b></td>
+                        <td colspan="3"><b>Noter</b></td>
+                        <td><b>Timer totalt</b></td>
+
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background-color:orange;text-align:left;"><b>Arbejdsløn, Timer fordeles på de enkelte aktiviteter</b></td>
+                    </tr>
+
+                    @foreach (var itemz in item.Timer)
+                    {
+                        <tr>
+                            <td>
+                                <b>
+                                    @Html.DisplayFor(modelItem => itemz.Navn)
+                                </b>
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => itemz.Timer)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => itemz.Overtid_50100)
+                            </td>
+                            <td colspan="3">
+                                @Html.DisplayFor(modelItem => itemz.Note)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => itemz.CGJ_Timer_Total)
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        @{
+                            var totaltimer = item.Timer.Sum(x => x.Timer);
+                            var totalovertid50100 = item.Timer.Sum(x => x.Overtid_50100);
+                            var totaltotal = item.Timer.Sum(x => x.CGJ_Timer_Total);
+                        }
+                        <td><b>I alt:</b></td>
+                        <td>@String.Format("{0:n2}", totaltimer)</td>
+                        <td>@String.Format("{0:n2}", totalovertid50100)</td>
+                        <td colspan="3"></td>
+                        <td>@String.Format("{0:n2}", totaltotal)</td>
+                    </tr>
+                    <tr>
+                        <td colspan="7" style="background-color:orange;text-align:left;"><b>Ekstraarbejder</b></td>
+                    </tr>
+                    @foreach (var itemz in item.TimerEkstraarbejder)
+                    {
+                        <tr>
+                            <td>
+                                <b>
+                                    @Html.DisplayFor(modelItem => itemz.Navn)
+                                </b>
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => itemz.Timer)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => itemz.Overtid_50100)
+                            </td>
+                            <td colspan="3">
+                                @Html.DisplayFor(modelItem => itemz.Note)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => itemz.CGJ_Timer_Total)
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        @{
+                            var totaltimere = item.TimerEkstraarbejder.Sum(x => x.Timer);
+                            var totalovertid50100e = item.TimerEkstraarbejder.Sum(x => x.Overtid_50100);
+                            var totaltotale = item.TimerEkstraarbejder.Sum(x => x.CGJ_Timer_Total);
+                        }
+                        <td><b>I alt:</b></td>
+                        <td>@String.Format("{0:n2}", totaltimere)</td>
+                        <td>@String.Format("{0:n2}", totalovertid50100e)</td>
+                        <td colspan="3"></td>
+                        <td>@String.Format("{0:n2}", totaltotale)</td>
+                    </tr>
+                </table>
+
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <table style="table-layout:fixed;width:100%;">
+                    <tr style="background-color:orange;">
+                        <td colspan="3" style="text-align:left;"><b>Materialer, Forbrugsgods, kørsel,underentreprenører m.m.</b></td>
+                    </tr>
+                    <tr style="text-align:left;color:white;background-color:black;">
+                        <td style="width:15%;"><b><label>@Html.DisplayNameFor(modelItem => item.Kontraktarbejder.First().EgetMateriel) </label></b></td>
+                        <td style="width:35%;"><b><label>@Html.DisplayNameFor(modelItem => item.Kontraktarbejder.First().UL_Firma) </label></b></td>
+                        <td style="width:50%;"><b><label>@Html.DisplayNameFor(modelItem => item.Kontraktarbejder.First().UL_Materiel) </label></b></td>
+                    </tr>
+                    @for (int i = 0; i < item.Kontraktarbejder.Count; i++)
+                    {
+                        <tr>
+                            <td style="width:15%;">@Html.DisplayFor(modelItem => item.Kontraktarbejder.ElementAt(i).EgetMateriel)</td>
+                            <td style="width:35%;">@Html.DisplayFor(modelItem => item.Kontraktarbejder.ElementAt(i).UL_Firma)</td>
+                            <td style="width:50%;">@Html.DisplayFor(modelItem => item.Kontraktarbejder.ElementAt(i).UL_Materiel)</td>
+                        </tr>
+                    }
+                </table>
+            </td>
+        </tr>
+    </table>
+    <table border="1" style="page-break-inside:avoid;width:100%;table-layout:fixed;">
+        <tr>
+            <td colspan="6" style="background-color:black;color:white;text-align:center;">
+                <b>Materiel</b>
+            </td>
+        </tr>
+        @{ var rows = 0;}
+        @if (item.Materiel.Where(x => x.Antal > 0).Count() % 3 == 0)
+        {
+            rows = item.Materiel.Where(x => x.Antal > 0).Count() / 3;
+        }
+        else
+        {
+            rows = Convert.ToInt32(item.Materiel.Where(x => x.Antal > 0).Count() / 3) + 1;
+        }
+        @{ var totalcells = item.Materiel.Where(x => x.Antal > 0).Count();}
+        @for (int i = 0; i < rows; i++)
+        {
+            @if (totalcells - 3 >= 0) //enough room to add whole row
+            {
+                <tr>
+                    <td style="width:25%;"><label>@item.Materiel.Where(x => x.Antal > 0).ElementAt((i + 1) * 3 - 3).Materiel.Materiellet</label></td>
+                    <td style="width:8%;">@Html.DisplayFor(modelItem => item.Materiel.Where(x => x.Antal > 0).ElementAt((i + 1) * 3 - 3).Antal)</td>
+                    <td style="width:25%;"><label>@item.Materiel.Where(x => x.Antal > 0).ElementAt((i + 1) * 3 - 3 + 1).Materiel.Materiellet</label></td>
+                    <td style="width: 8%;">@Html.DisplayFor(modelItem => item.Materiel.Where(x => x.Antal > 0).ElementAt((i + 1) * 3 - 3 + 1).Antal)</td>
+                    <td style="width:25%;"><label>@item.Materiel.Where(x => x.Antal > 0).ElementAt((i + 1) * 3 - 3 + 2).Materiel.Materiellet</label></td>
+                    <td style="width: 8%;">@Html.DisplayFor(modelItem => item.Materiel.Where(x => x.Antal > 0).ElementAt((i + 1) * 3 - 3 + 2).Antal)</td>
+                </tr>
+                totalcells -= 3;
+            }
+            else if (totalcells - 2 >= 0)
+            {
+                <tr>
+                    <td style="width:25%;"><label>@item.Materiel.Where(x => x.Antal > 0).ElementAt((i + 1) * 3 - 3).Materiel.Materiellet</label></td>
+                    <td style="width:8%;">@Html.DisplayFor(modelItem => item.Materiel.Where(x => x.Antal > 0).ElementAt((i + 1) * 3 - 3).Antal)</td>
+                    <td style="width:25%;"><label>@item.Materiel.Where(x => x.Antal > 0).ElementAt((i + 1) * 3 - 3 + 1).Materiel.Materiellet</label></td>
+                    <td style="width:8%;">@Html.DisplayFor(modelItem => item.Materiel.Where(x => x.Antal > 0).ElementAt((i + 1) * 3 - 3 + 1).Antal)</td>
+                    <td style="width:25%;"></td>
+                    <td style="width:8%;"></td>
+                </tr>
+                totalcells -= 2;
+            }
+            else //enough room to add 1 picture in row
+            {
+                <tr>
+                    <td style="width:25%;"><label>@item.Materiel.Where(x => x.Antal > 0).ElementAt((i + 1) * 3 - 3).Materiel.Materiellet</label></td>
+                    <td style="width:8%;">@Html.DisplayFor(modelItem => item.Materiel.Where(x => x.Antal > 0).ElementAt((i + 1) * 3 - 3).Antal)</td>
+                    <td style="width:25%;"></td>
+                    <td style="width:8%;"></td>
+                    <td style="width:25%;"></td>
+                    <td style="width:8%;"></td>
+                </tr>
+                totalcells -= 1;
+            }
+
+        }
+        <tr>
+            <td colspan="6" style="text-align:left;background-color:orange;"> <label> @Html.DisplayNameFor(modelItem => item.UddybendeNoter)</label></td>
+        </tr>
+        <tr>
+            <td coslpan="6">
+                @if (item.UddybendeNoter != null && item.UddybendeNoter != "")
+                {
+                    @Html.Raw(item.UddybendeNoter.Replace("\r\n", "<br />"))
+                }
+                else
+                {
+                    @Html.DisplayFor(modelItem => item.UddybendeNoter)
+                }
+            </td>
+        </tr>
+       
+    </table>
+    <div class="form-group">
+        <label>@Html.DisplayNameFor(modelItem => item.ForSaetter)</label> : @Html.DisplayFor(modelItem => item.ForSaetter)
+    </div>
+    <table name="phototable" style="width:100%;page-break-inside:avoid;table-layout:fixed;">
+        @{ rows = 0;}
+        @if (item.Fotos.Count() % 2 == 0)
+        {
+            rows = item.Fotos.Count() / 2;
+        }
+        else
+        {
+            rows = Convert.ToInt32(item.Fotos.Count() / 2) + 1;
+        }
+        @{ var totalpics = item.Fotos.Count();}
+        @for (int i = 0; i < rows; i++)
+        {
+
+            if (totalpics - 2 >= 0)
+            {
+                var photo1 = item.Fotos.ElementAt((i + 1) * 2 - 2);
+                var photo2 = item.Fotos.ElementAt((i + 1) * 2 - 2 + 1);
+                <tr>
+                    @if (photo1.Path.Contains(".png"))
+                    {
+                        <td style="width:50%"><img src="@String.Concat("/CGJensen/", @String.Concat(photo1.Path.Split(".")[0],".", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/CGJensen/")[1])" style="width:100%" /></td>
+                    }
+                    else
+                    {
+                        <td style="width: 50%"><img src="@String.Concat("/CGJensen/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/CGJensen/")[1])" style="width:100%" /></td>
+                    }
+                    @if (photo2.Path.Contains(".png"))
+                    {
+                        <td style="width: 50%"><img src="@String.Concat("/CGJensen/", @String.Concat(photo2.Path.Split(".")[0],".", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/CGJensen/")[1])" style="width:100%" /></td>
+                    }
+                    else
+                    {
+                        <td style="width: 50%"><img src="@String.Concat("/CGJensen/", @String.Concat(photo2.Path.Split(".")[0], "_edit.", photo2.Path.Split(".")[1]).Replace("\\", "/").Split("/CGJensen/")[1])" style="width:100%" /></td>
+                    }
+                    <td></td>
+                </tr>
+
+                totalpics -= 2;
+            }
+            else //enough room to add 1 picture in row
+            {
+                var photo1 = item.Fotos.ElementAt((i + 1) * 2 - 2);
+                <tr>
+                    @if (photo1.Path.Contains(".png"))
+                    {
+                        <td colspan="3" style="width: 50%"><img src="@String.Concat("/CGJensen/", @String.Concat(photo1.Path.Split(".")[0],".", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/CGJensen/")[1])" style="width:100%;" /></td>
+                    }
+                    else
+                    {
+                        <td colspan="3" style="width: 50%"><img src="@String.Concat("/CGJensen/", @String.Concat(photo1.Path.Split(".")[0], "_edit.", photo1.Path.Split(".")[1]).Replace("\\", "/").Split("/CGJensen/")[1])" style="width:100%;" /></td>
+                    }
+
+                </tr>
+                totalpics -= 1;
+            }
+
+        }
+    </table>
+</div>
+        }

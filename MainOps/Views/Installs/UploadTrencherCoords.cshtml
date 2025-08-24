@@ -1,0 +1,15 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Upload Trencher Coords");
+}
+
+<h2>
+    Upload trencher coordiantes
+</h2>
+
+<form asp-action="UploadTrencherCoords" asp-controller="Installs" method="post" enctype="multipart/form-data">
+    <input type="file" accept=".csv" name="postedFile" />
+    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload")</button>
+</form>

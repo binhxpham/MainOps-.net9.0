@@ -1,0 +1,51 @@
+﻿@model MainOps.Models.MonitorType
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>MonitorType</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <div class="form-group">
+                <label asp-for="MonitorTypeName" class="control-label"></label>
+                <input asp-for="MonitorTypeName" class="form-control" />
+                <span asp-validation-for="MonitorTypeName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <div class="form-group">
+                    <label asp-for="DivisionId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.DivisionId))</label>
+                    <select asp-for="DivisionId" class="form-control" asp-items="ViewBag.DivisionId"></select>
+                </div>
+                <span asp-validation-for="DivisionId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="frequency" class="control-label"></label>
+                <input asp-for="frequency" class="form-control" />
+                <span asp-validation-for="frequency" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="alertfrequency" class="control-label"></label>
+                <input asp-for="alertfrequency" class="form-control" />
+                <span asp-validation-for="alertfrequency" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

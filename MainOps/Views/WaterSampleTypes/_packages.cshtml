@@ -1,0 +1,45 @@
+﻿@model WaterSamplePackagePDFViewModel
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Invoice</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+@{
+    Layout = null;
+    ViewData["Title"] = "Packages PDF";
+    var widthparam = String.Concat((100.0 / Model.packages.Count()).ToString(), "%;");
+}
+<table style="width:auto;table-layout:fixed;border:3px solid blue">
+    <thead style="border:2px solid blue;">
+        <tr style="border:2px solid blue">
+            @foreach (var package in Model.packages)
+            {
+                <th class="@package.ProjectId celltd" style="border: 2px solid blue; text-align: center;width:@widthparam">@Html.DisplayFor(modelItem => package.Project.Name)</th>
+            }
+        </tr>
+        <tr style="border:2px solid blue">
+            @foreach (var package in Model.packages)
+            {
+                <th class="@package.ProjectId celltd" style="border: 2px solid blue; text-align:center;width:@widthparam">@Html.DisplayFor(modelItem => package.Annotation)</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var sample in Model.result)
+        {
+            <tr class="@sample">
+                @foreach (var package in Model.packages)
+                {
+                    <td class="@package.ProjectId celltd" style="border: 2px solid blue; text-align: center; height:32px;width:@widthparam">
+                        @if (package.ListOfComponents.Contains(sample))
+                        {
+                            <text>
+                                @sample
+                            </text>
+                        }
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>

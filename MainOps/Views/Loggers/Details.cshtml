@@ -1,0 +1,33 @@
+﻿@model MainOps.Models.Logger
+
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Details")</h2>
+
+<div>
+    <h4>@SharedLocalizer.GetLocalizedHtmlString("Logger")</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.LoggerNo)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.LoggerNo)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SerialNo)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SerialNo)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SimCardNo)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SimCardNo)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> |
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>

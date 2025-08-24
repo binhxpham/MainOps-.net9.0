@@ -1,0 +1,415 @@
+﻿
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("User Events");
+}
+<style>
+    .ui-datepicker td a:after {
+        content: "";
+        display: block;
+        text-align: center;
+        color: yellow;
+        font-size: small;
+        font-weight: bold;
+    }
+
+    .hasDailyReport a {
+        background-color: Blue !important;
+        background-image: none !important;
+        color: White !important;
+        font-weight: bold !important;
+        font-size: 12pt;
+    }
+
+    .hasMaintenanceReport a {
+        background-color: Green !important;
+        background-image: none !important;
+        color: White !important;
+        font-weight: bold !important;
+        font-size: 12pt;
+    }
+
+    .hasAlarmReport a {
+        background-color: Red !important;
+        background-image: none !important;
+        color: White !important;
+        font-weight: bold !important;
+        font-size: 12pt;
+    }
+</style>
+<h2>@SharedLocalizer.GetLocalizedHtmlString("User Report Calendar")</h2>
+
+<div class="form-group" style="width:80%;">
+    <label style="width:20%;height:50px;font-size:20px;">@SharedLocalizer.GetLocalizedHtmlString("User:")</label>
+    <select id="UserId" asp-items="ViewBag.UserId" onchange="ClearDatepickers(); AddDailyReports(); AddMaintenanceReports(); AddAlarmReports();" style="width:80%;height:50px;font-size:20px;">
+        <option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose User")</option>
+    </select>
+</div>
+<h3>@SharedLocalizer.GetLocalizedHtmlString("Daily Reports Overview")</h3>
+<div id="calendardiv">
+</div>
+<br />
+<br />
+<h3>@SharedLocalizer.GetLocalizedHtmlString("Maintenance Reports Overview")</h3>
+<div id="calendardivMain">
+</div>
+<br />
+<br />
+<h3>@SharedLocalizer.GetLocalizedHtmlString("Alarm Reports Overview")</h3>
+<div id="calendardivAlarm">
+</div>
+
+<div id="myModalDailyReports" class="TwoModal">
+    <div class="TwoModal-content" style="width:800px;">
+        <div class="TwoModal-header">
+            <span class="close" onclick="closeandcontinue()">&times;</span>
+            <h2 style="color: white;">@SharedLocalizer.GetLocalizedHtmlString("Reports")</h2>
+        </div>
+        <div class="TwoModal-body">
+            <div id="dailyreportpopup"></div>
+        </div>
+        <div class="TwoModal-footer" style="text-align: right;">
+            <button type="button" class="btn-hoelscher" onclick="closeandcontinue()">@SharedLocalizer.GetLocalizedHtmlString("Close and Continue")</button>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        var modal = document.getElementById('myModalDailyReports');
+        var urlpathStart = '@Url.Action("GetDailyReportDays","UserActions")';
+        var urlpathStartMain = '@Url.Action("GetMaintenanceReportDays","UserActions")';
+        var urlpathStartAlarm = '@Url.Action("GetAlarmReportDays","UserActions")';
+        var eventsStart = [];
+        var eventsStartMain = [];
+        var eventsStartAlarm = [];
+        var dynamicCSSRules = [];
+        function ClearDatepickers() {           
+            $("#calendardiv").datepicker("destroy");
+            $("#calendardivMain").datepicker("destroy");
+            $("#calendardivAlarm").datepicker("destroy");
+            eventsStart = [];
+            eventsStartMain = [];
+            eventsStartAlarm = [];
+        }
+        function AddAlarmReports() {
+            var userId = $("#UserId").val();
+            $.ajax({
+                        type: "GET",
+                url: urlpathStartAlarm,
+                        dataType: "json",
+                        data: {"id": userId},
+                success: function (result) {
+                            for (var i = 0; i < result.length; i++) {
+                                eventsStartAlarm[i] = { Title: result[i].id, Date: new Date(result[i].report_Date) }
+                            }
+                            if (eventsStartAlarm.length >= 1) {
+                                $("#calendardivAlarm").datepicker({
+                                    dateFormat: 'dd-mm-yy',
+                                    defaultDate: new Date(),
+                                    showOtherMonths: true,
+                                    numberOfMonths: 4,
+                                    minDate: "-90D",
+                                    maxDate: "+0D",
+                                    showButtonPanel: false,
+                                    changeMonth: false,
+                                    changeYear: false,
+                                    beforeShowDay: function (date) {
+                                        var result = [true, '', null];
+                                        var matchingStart = $.grep(eventsStartAlarm,
+                                            function (event) {
+                                                return event.Date.valueOf() === date.valueOf();
+                                            });
+
+                                        if (matchingStart.length) {
+                                            result = [true, 'hasAlarmReport' + ' ' + matchingStart.length, null];
+                                        }
+                                        else {
+                                            result = [true, '', ''];
+                                        }
+                                        return result;
+                                    },
+                                    onSelect: function (dateText) {
+                                        var date,
+                                            selectedDate = new Date(dateText.substring(3, 5) +
+                                                "-" +
+                                                dateText.substring(0, 2) +
+                                                "-" +
+                                                dateText.substring(6, 10)),
+                                            i = 0,
+                                            event = null;
+                                        while (i < eventsStartAlarm.length && !event) {
+                                            date = eventsStartAlarm[i].Date;
+                                            if (selectedDate.valueOf() === date.valueOf()) {
+                                                event = eventsStartAlarm[i];
+                                            }
+                                            i++;
+                                        }
+
+                                        if (event) {
+                                            var url = '@Url.Action("GetAlarmReports", "UserActions")';
+                                            var _data = {
+                                                'Daton': event.Date.toUTCString(),
+                                                'userId': userId,
+                                            };
+                                            $.ajax({
+                                                url: url,
+                                                datatype: "json",
+                                                data: _data,
+                                                type: "post",
+                                                async: true,
+                                                success: function (output) {
+                                                    $('#dailyreportpopup').html(output);
+                                                    modal.style.display = "block";
+                                                    AddAlarmReports();
+                                                },
+                                                error: function (output) {
+                                                    ShowError("Could not get daily report");
+                                                    AddAlarmReports();
+                                                }
+                                            });
+                                        }
+
+
+                                    }
+                                });
+                            }
+                            $('.hasAlarmReport').each(function (idx, elem) {
+                                var childnodes = elem.children;
+                                var values = elem.className.split(" ");
+                                if (values.length > 1) {
+                                    var value = values[2];
+                                    if (isNumeric(value) == false) {
+                                        value = values[3];
+                                    }
+                                    var className = 'datepicker-content-' + value;
+                                    addCSSRule('.ui-datepicker td a.' + className + ':after {content: "' + value + '";}');
+                                    $(childnodes[0]).addClass(className);
+                                }
+                            });
+                    },
+                    error: function (req, status, error) {
+                    }
+                    //this is the end of calendar
+                    });
+        }
+        function AddMaintenanceReports() {
+            var userId = $("#UserId").val();
+            $.ajax({
+                        type: "GET",
+                        url: urlpathStartMain,
+                        dataType: "json",
+                        data: {"id": userId},
+                        success: function (resultMain) {
+                            for (var i = 0; i < resultMain.length; i++) {
+                                eventsStartMain[i] = { Title: resultMain[i].id, Date: new Date(resultMain[i].report_Date) }
+                            }
+                            if (eventsStartMain.length >= 1) {
+                                $("#calendardivMain").datepicker({
+                                    dateFormat: 'dd-mm-yy',
+                                    defaultDate: new Date(),
+                                    showOtherMonths: true,
+                                    numberOfMonths: 4,
+                                    minDate: "-90D",
+                                    maxDate: "+0D",
+                                    showButtonPanel: false,
+                                    changeMonth: false,
+                                    changeYear: false,
+                                    beforeShowDay: function (dateMain) {
+                                        var resultMain = [true, '', null];
+                                        var matchingStartMain = $.grep(eventsStartMain,
+                                            function (eventMain) {
+                                                return eventMain.Date.valueOf() === dateMain.valueOf();
+                                            });
+
+                                        if (matchingStartMain.length) {
+                                            resultMain = [true, 'hasMaintenanceReport' + ' ' + matchingStartMain.length, null];
+                                        }
+                                        else {
+                                            resultMain = [true, '', ''];
+                                        }
+                                        return resultMain;
+                                    },
+                                    onSelect: function (dateTextMain) {
+                                        var dateMain,
+                                            selectedDateMain = new Date(dateTextMain.substring(3, 5) +
+                                                "-" +
+                                                dateTextMain.substring(0, 2) +
+                                                "-" +
+                                                dateTextMain.substring(6, 10)),
+                                            i = 0,
+                                            eventMain = null;
+                                        while (i < eventsStartMain.length && !eventMain) {
+                                            dateMain = eventsStartMain[i].Date;
+                                            if (selectedDateMain.valueOf() === dateMain.valueOf()) {
+                                                eventMain = eventsStartMain[i];
+                                            }
+                                            i++;
+                                        }
+
+                                        if (eventMain) {
+                                            var urlMain = '@Url.Action("GetMaintenanceReports", "UserActions")';
+                                            var _data = {
+                                                'Daton': eventMain.Date.toUTCString(),
+                                                'userId': userId,
+                                            };
+                                            $.ajax({
+                                                url: urlMain,
+                                                datatype: "json",
+                                                data: _data,
+                                                type: "post",
+                                                async: true,
+                                                success: function (outputMain) {
+                                                    $('#dailyreportpopup').html(outputMain);
+                                                    modal.style.display = "block";
+                                                    AddMaintenanceReports();
+                                                },
+                                                error: function (output) {
+                                                    ShowError("Could not get daily report");
+                                                    AddMaintenanceReports();
+                                                }
+                                            });
+                                        }
+
+
+                                    }
+                                });
+                            }
+                            $('.hasMaintenanceReport').each(function (idx, elem) {
+                                var childnodes = elem.children;
+                                var values = elem.className.split(" ");
+                                if (values.length > 1) {
+                                    var value = values[2];
+                                    if (isNumeric(value) == false) {
+                                        value = values[3];
+                                    }
+                                    var className = 'datepicker-content-' + value;
+                                    addCSSRule('.ui-datepicker td a.' + className + ':after {content: "' + value + '";}');
+                                    $(childnodes[0]).addClass(className);
+                                }
+                            });
+                    },
+                    error: function (req, status, error) {
+
+                    }
+                    //this is the end of calendar
+                    });
+        }
+        function AddDailyReports() {
+            var userId = $("#UserId").val();
+            eventsStart = [];
+            $.ajax({
+                type: "GET",
+                url: urlpathStart,
+                dataType: "json",
+                data: {"id": userId},
+                success: function (result) {
+
+                    for (var i = 0; i < result.length; i++) {
+                        eventsStart[i] = { Title: result[i].id, Date: new Date(result[i].report_Date) }
+                    }
+
+                    if (eventsStart.length >= 1) {
+                        $("#calendardiv").datepicker({
+                            dateFormat: 'dd-mm-yy',
+                            defaultDate: new Date(),
+                            showOtherMonths: true,
+                            numberOfMonths: 4,
+                            minDate: "-90D",
+                            maxDate: "+0D",
+                            showButtonPanel: false,
+                            changeMonth: false,
+                            changeYear: false,
+                            beforeShowDay: function (date) {
+                                var result = [true, '', null];
+                                var matchingStart = $.grep(eventsStart,
+                                    function (event) {
+                                        return event.Date.valueOf() === date.valueOf();
+                                    });
+
+                                if (matchingStart.length) {
+                                    result = [true, 'hasDailyReport' + ' ' + matchingStart.length, null];
+                                }
+                                else {
+                                    result = [true, '', ''];
+                                }
+                                return result;
+                            },
+                            onSelect: function (dateText) {
+                                var date,
+                                    selectedDate = new Date(dateText.substring(3, 5) +
+                                        "-" +
+                                        dateText.substring(0, 2) +
+                                        "-" +
+                                        dateText.substring(6, 10)),
+                                    i = 0,
+                                    event = null;
+                                while (i < eventsStart.length && !event) {
+                                    date = eventsStart[i].Date;
+                                    if (selectedDate.valueOf() === date.valueOf()) {
+                                        event = eventsStart[i];
+                                    }
+                                    i++;
+                                }
+
+                                if (event) {
+                                    var url = '@Url.Action("GetDailyReports", "UserActions")';
+                                    var _data = {
+                                        'Daton': event.Date.toUTCString(),
+                                        'userId': userId,
+                                    };
+                                    $.ajax({
+                                        url: url,
+                                        datatype: "json",
+                                        data: _data,
+                                        type: "post",
+                                        async: true,
+                                        success: function (output) {
+                                            $('#dailyreportpopup').html(output);
+                                            modal.style.display = "block";
+                                            AddDailyReports();
+                                        },
+                                        error: function (output) {
+                                            ShowError("Could not get daily report");
+                                            AddDailyReports();
+                                        }
+                                    });
+                                }
+
+
+                            }
+                        });
+                    }
+                    $('.hasDailyReport').each(function (idx, elem) {
+                        var childnodes = elem.children;
+                        var values = elem.className.split(" ");
+                        if (values.length > 1) {
+                            var value = values[2];
+                            if (isNumeric(value) == false) {
+                                value = values[3];
+                            }
+                            var className = 'datepicker-content-' + value;
+                            addCSSRule('.ui-datepicker td a.' + className + ':after {content: "' + value + '";}');
+                            $(childnodes[0]).addClass(className);
+                        }
+                    });
+
+            },
+            error: function (req, status, error) {
+            }
+            //this is the end of calendar
+            });
+        }
+        function addCSSRule(rule) {
+            if ($.inArray(rule, dynamicCSSRules) == -1) {
+                $('head').append('<style>' + rule + '</style>');
+                dynamicCSSRules.push(rule);
+            }
+        }
+
+        function isNumeric(value) {
+            return /^-?\d+$/.test(value);
+        }
+        function closeandcontinue() {
+            modal.style.display = "none";
+        }
+    </script>
+}

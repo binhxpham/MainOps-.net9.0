@@ -1,0 +1,138 @@
+﻿@model IEnumerable<MainOps.Models.WTPClasses.MainClasses.WTP_block>
+
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Index");
+}
+
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("WTP Parts")</h2>
+<hr class="col-md-11" />
+<br />
+<table>
+    <tr>
+        <td>
+            <form asp-controller="WtpBlock" asp-action="Create" method="get">
+                <button type="submit" class="btn btn-hoelscher">
+                    @SharedLocalizer.GetLocalizedHtmlString("Create New")
+                </button>
+            </form>
+        </td>
+        <td>
+            <form asp-controller="WtpBlock" asp-action="UploadPicture" method="get">
+                <button type="submit" class="btn btn-hoelscher">
+                    @SharedLocalizer.GetLocalizedHtmlString("Upload Picture")
+                </button>
+            </form>
+        </td>
+        
+        @using (Html.BeginForm("Combsearch", "WtpBlock", FormMethod.Post))
+        {
+        <td>
+            <div class="form-group">
+                <div class="ui-widget">
+                    <form asp-controller="WtpBlock" asp-action="Combsearch">
+                        <input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoComplete","WtpBlock")" />
+                        <button type="submit" class="btn btn-hoelscher">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </td>
+        }
+    </tr>
+</table>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("English Name")
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.size)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.weight)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.length)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.width)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.height)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.size)
+                &nbsp;
+                @Html.Raw(SharedLocalizer.GetLocalizedHtmlString(item.unit_size.the_unit))
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.weight)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.length)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.width)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.height)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> |
+                <a asp-action="Details" asp-route-id="@item.id">@SharedLocalizer.GetLocalizedHtmlString("Details")</a> |
+                <a asp-action="Delete" asp-route-id="@item.id">@SharedLocalizer.GetLocalizedHtmlString("Delete")</a> |
+                <a asp-action="GetEfforts" asp-route-id="@item.id">@SharedLocalizer.GetLocalizedHtmlString("Show Efforts")</a> |
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+@section scripts{
+    <script>
+        $(function () {
+            $('#search').autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: $('#search').data("url"),
+                        type: "GET",
+                        dataType: "json",
+                        contentType: 'application/json, charset=utf-8',
+                        data: {
+                            search: $("#search").val()
+                        },
+                        success: function (data) {
+
+                            response($.map(data, function (item) {
+                                return {
+                                    value: item.value,
+                                    label: item.label
+                                };
+                            }));
+                        },
+                        error: function (xhr, status, error) {
+                            ShowError(error);
+                        }
+                    });
+                },
+                minLength: 1
+            });
+        });
+
+    </script>
+}
+
+

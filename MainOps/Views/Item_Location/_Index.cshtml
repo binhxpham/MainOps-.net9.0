@@ -1,0 +1,93 @@
+﻿@model MainOps.Models.Item_Locations_VM
+@using System.Globalization;
+<head>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+@{
+    Layout = null;
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Internal Rent");
+    var nfi = new NumberFormatInfo();
+    nfi.NumberDecimalSeparator = Model.Locations.FirstOrDefault().Project.Division.CurrencyDecimalSeperator;
+    nfi.NumberGroupSeparator = Model.Locations.FirstOrDefault().Project.Division.CurrencyGroupSeperator;
+    string Currency = Model.Locations.FirstOrDefault().Project.Division.Currency;
+
+}
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Internal Rent from: ") @String.Format("{0:yyyy-MM-dd}", Model.StartDate) @SharedLocalizer.GetLocalizedHtmlString("To: ") @String.Format("{0:yyyy-MM-dd}", Model.EndDate) </h2>
+
+@foreach (Project p in Model.Locations.Select(x => x.Project).Distinct())
+{
+    double projecttotal = 0.0;
+
+    <h2>@p.ProjectNr : @p.Name</h2>
+
+    <table class="table" style="break-after:always;width:100%;table-layout:fixed;">
+        <thead>
+            <tr>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString("Project")
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString("Sub Project")
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString("Item")
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString("Start Day")
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString("End Day")
+                </th>
+                @if (Model.StartDate != null & Model.EndDate != null)
+                {
+                    <th>
+                        @SharedLocalizer.GetLocalizedHtmlString("Rent Calculated")
+                    </th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Locations.Where(x => x.Project.Name.Equals(p.Name)))
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Name)
+                    </td>
+                    <td>
+                        @if (item.SubProjectId != null)
+                        {
+                            @Html.DisplayFor(modelItem => item.SubProject.Name)
+                        }
+                        else
+                        {
+                        }
+
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.HJItem.HJId) : @Html.DisplayFor(modelItem => item.HJItem.HJItemClass.ClassName)
+                    </td>
+                    <td>
+                        @String.Format("{0:yyyy-MM-dd}", item.StartTime)
+                    </td>
+                    <td>
+                        @String.Format("{0:yyyy-MM-dd}", item.EndTime)
+                    </td>
+
+                    @if (Model.StartDate != null & Model.EndDate != null)
+                    {
+                        <td>
+                            @item.CalculatedRent(Convert.ToDateTime(Model.StartDate), Convert.ToDateTime(Model.EndDate)) @Currency
+                            @{projecttotal += item.CalculatedRent(Convert.ToDateTime(Model.StartDate), Convert.ToDateTime(Model.EndDate));}
+                        </td>
+                    }
+                </tr>
+            }
+            <tr style="border-top: 3px solid black;border-bottom:double dashed black;">
+                <td colspan="5" style="text-align:left;">@SharedLocalizer.GetLocalizedHtmlString("Sum:")</td>
+                <td>@String.Format("{0:N2}", projecttotal) @Currency</td>
+            </tr>
+        </tbody>
+    </table>
+}

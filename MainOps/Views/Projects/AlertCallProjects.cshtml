@@ -1,0 +1,107 @@
+﻿@model IEnumerable<MainOps.Models.Project>
+
+@{
+    ViewData["Title"] = "AlertCallProjects";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Projects with Alert Calls")</h2>
+<div id="documentinfo">
+
+</div>
+<table class="table" style="width:100%;table-layout:fixed;">
+
+
+    @foreach (var item in Model)
+    {
+    <tr>
+        <td style="width:100%;text-align:center;">
+            <table style="border:2px solid blue;width:100%;table-layout:fixed;overflow-wrap:break-word;" border="1">
+                <thead >
+                    <tr>
+                        <th style="text-align:center;">
+                            @Html.DisplayNameFor(modelItem => item.Name)
+                        </th>
+                        <th style="text-align:center;">
+                            @Html.DisplayNameFor(modelItem => item.Client)
+                        </th>
+                        <th style="text-align:center;">
+                            @Html.DisplayNameFor(modelItem => item.ClientContactAlert)
+                        </th>
+                        <th style="text-align:center;">
+                            @Html.DisplayNameFor(modelItem => item.ClientAlertPhone)
+                        </th >
+                        <th style="text-align:center;">
+                            @Html.DisplayNameFor(modelItem => item.Address)
+                        </th>
+                        </tr>
+                    </thead>
+                <tbody>
+
+
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name) (@Html.DisplayFor(modelItem => item.ProjectNr))
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Client)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ClientContactAlert)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ClientAlertPhone)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Address)
+                        </td>
+
+
+                    </tr>
+                    <tr>
+                        <th colspan="4" style="border-right:none;">
+                            @Html.DisplayNameFor(modelItem => item.Description)
+                        </th>
+                        <th style="border-left:none;"></th>
+                    </tr>
+                    <tr>
+                        <td colspan="4" rowspan="5" style="width: 100%; height: 100%; text-wrap: normal; overflow-wrap: break-word;">
+                            @Html.DisplayFor(modelItem => item.Description)
+                        </td>
+                        <td style="width:100%;">
+                            <button class="btn-hoelscher" onclick="DisplayProjectDocuments(@item.Id);" style="width:95%;height:100%;text-wrap:normal;font-size:12px;">@SharedLocalizer.GetLocalizedHtmlString("Alarm Documents")</button>
+                            @if (User.IsInRole("Manager"))
+                            {
+                                <a asp-action="Edit" asp-controller="Projects" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>  
+    }
+</table>
+
+
+@section Scripts {
+    <script type="text/javascript">
+
+
+        function DisplayProjectDocuments(index) {
+            $.ajax({
+                type: 'post',
+                url: '@Url.Action("GetAlertDocuments","Projects")',
+                data: {
+                    'id': index
+                },
+                success: function (output) {
+                    $('#documentinfo').html(output);
+                },
+                error: function () {
+                    alert("error");
+                }
+            });
+        }
+       
+    </script>
+}

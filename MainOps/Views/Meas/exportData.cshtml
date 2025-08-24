@@ -1,0 +1,75 @@
+﻿@model MainOps.Models.ExportDataViewModel
+<link href="~/css/jquery-ui-timepicker-addon.min.css" rel="stylesheet" />
+
+
+<h2>@ViewData["Title"]</h2>
+
+<h4>@SharedLocalizer.GetLocalizedHtmlString("Measurements")</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="exportData">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="projectNumber" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.projectNumber))</label>
+                @Html.DropDownListFor(m => m.projectNumber, ViewData["ProjectId"] as IEnumerable<SelectListItem>
+    , @SharedLocalizer.GetLocalizedHtmlString("Select Project (choose none if all)"), new { style = "width:250px;height:40px;" })
+                <span asp-validation-for="projectNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Delimiter" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.Delimiter))</label>
+                @Html.DropDownListFor(m => m.Delimiter, ViewData["delimiters"] as IEnumerable<SelectListItem>
+    , @SharedLocalizer.GetLocalizedHtmlString("Select CSV-Delimiter"), new { style = "width:250px;height:40px;" })
+                <span asp-validation-for="Delimiter" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="startDate" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.startDate))</label>
+                <input type="datetime" class="date-picker" name="startDate" id="startDate" />
+                <span asp-validation-for="startDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="endDate" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.endDate))</label>
+                <input type="datetime" class="date-picker" name="endDate" id="endDate" />
+                <span asp-validation-for="endDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ForScada" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.ForScada))</label>
+                <input asp-for="ForScada" class="form-control" />
+                <span asp-validation-for="ForScada" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AddRaw" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.AddRaw))</label>
+                <input asp-for="AddRaw" class="form-control" />
+                <span asp-validation-for="AddRaw" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString("Create")" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-100:+0",
+                    dateFormat: 'dd-M-yy',
+                    controlType: 'select',
+                    firstDay: 1
+                });
+
+            });
+        });
+
+    </script>
+}

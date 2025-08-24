@@ -1,0 +1,478 @@
+﻿@model IEnumerable<MainOps.Models.MeasPoint>
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Measurement Points")</h2>
+<div id="ModalInput" class="TwoModal">
+    <div class="TwoModal-content">
+        <div class="TwoModal-header">
+            <span class="closer" onclick="closethepopup();">&times;</span>
+            <h3>@SharedLocalizer.GetLocalizedHtmlString("Edit Alert Limits")</h3>
+        </div>
+        <div class="TwoModal-body">
+            <div id="theMPContent"></div>
+        </div>
+    </div>
+</div>
+<table style="width:100%;table-layout:fixed;word-break:break-all;">
+    <tr>
+        @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DivisionAdmin") || User.IsInRole("StorageManager"))
+        {
+            <td style="width:100%;">
+                <form asp-controller="MeasPoints" asp-action="ExternalWellTag" method="get">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Create External WellTag")</button>
+                </form>
+            </td>
+        }
+        <td style="width:100%;">
+            <form asp-controller="MeasPoints" asp-action="AllAlertSettings" method="get">
+                <button class="btn-hoelscher" type="submit" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Alert settings")</button>
+            </form>
+        </td>
+        <td style="width:100%;">
+            <form asp-controller="MeasPoints" asp-action="exportLabor" method="get">
+                <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Export Configurations")</button>
+            </form>
+        </td>
+        <td style="width:100%;">
+            <form asp-controller="MeasPoints" asp-action="ExportMonitorPoints" method="get">
+                <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Export UploadTool/KRONOS")</button>
+            </form>
+        </td>
+        <td style="width:100%;">
+            <form asp-controller="MeasPoints" asp-action="UploadLaborIDs" method="get">
+                <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Upload from LaborID file")</button>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td style="width:100%;border:1px solid blue;">
+            <form asp-controller="MeasPoints" asp-action="DipTagsAll" target="_blank">
+                <table style="width:100%;">
+                    <tr>
+                        <td>
+                            @Html.DropDownList("filterchoice", ViewData["filterchoices"] as SelectList, @SharedLocalizer.GetLocalizedHtmlString("All"), new { @style = "width:100%;" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoComplete", "MeasPoints")" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button type="submit" class="btn-hoelscher">
+                                @SharedLocalizer.GetLocalizedHtmlString("Dip Tags HTML All")
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+
+            </form>
+        </td>
+        <td style="width:100%;border:1px solid blue;">
+            <form asp-controller="MeasPoints" asp-action="DipTagsAllPdf" target="_blank">
+                <table style="width:100%;">
+                    <tr>
+                        <td>
+                            @Html.DropDownList("filterchoice", ViewData["filterchoices"] as SelectList, @SharedLocalizer.GetLocalizedHtmlString("All"), new { @style = "width:100%;" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoComplete", "MeasPoints")" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button type="submit" class="btn-hoelscher">
+                                @SharedLocalizer.GetLocalizedHtmlString("Dip Tags All PDF")
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+
+            </form>
+        </td>
+        <td style="width:100%;border:1px solid blue;">
+            <form asp-controller="MeasPoints" asp-action="DetailsAll" target="_blank">
+                <table style="width:100%;">
+                    <tr><td>@Html.DropDownList("filterchoice", ViewData["filterchoices"] as SelectList, @SharedLocalizer.GetLocalizedHtmlString("All"), new { @style = "width:100%;" })</td></tr>
+                    <tr>
+                        <td>
+                            <input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoComplete", "MeasPoints")" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button type="submit" class="btn-hoelscher">
+                                @SharedLocalizer.GetLocalizedHtmlString("Well Tags HTML")
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </td>
+        <td style="width:100%;border:1px solid blue;">
+            <form asp-controller="MeasPoints" asp-action="DetailsAllPdf" target="_blank">
+                <table style="width:100%;">
+                    <tr><td>@Html.DropDownList("filterchoice", ViewData["filterchoices"] as SelectList, @SharedLocalizer.GetLocalizedHtmlString("All"), new { @style = "width:100%;" })</td></tr>
+                    <tr><td><input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoComplete", "MeasPoints")" /></td></tr>
+                    <tr><td>All Types: <input name="AllTypes" type="checkbox" value="false" onchange="this.checked == checked ? this.value = true : this.value = false" /></td></tr>
+                    <tr>
+                        <td>
+                            <button type="submit" class="btn-hoelscher">
+                                @SharedLocalizer.GetLocalizedHtmlString("Well Tags PDF")
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td style="width:100%;">
+            <form asp-controller="MeasPoints" asp-action="Create" method="get">
+                <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Create New Measurement Point")</button>
+            </form>
+        </td>
+        <td>
+            <form asp-controller="Meas" asp-action="exportData" method="get">
+                <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Export Measurements")</button>
+            </form>
+        </td>
+        <td style="margin-left: 5px; border-left: 1px solid blue; border-top: 1px solid blue; border-bottom: 1px solid blue;">
+            @SharedLocalizer.GetLocalizedHtmlString("Search:")
+        </td>
+        <td style="border-right: 1px solid blue; border-top: 1px solid blue; border-bottom: 1px solid blue; ">
+            <form asp-controller="MeasPoints" asp-action="Combsearch">
+                @Html.DropDownList("filterchoice", ViewData["filterchoices"] as SelectList, @SharedLocalizer.GetLocalizedHtmlString("All"), new { @style = "width:100%;" })
+                <input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoComplete", "MeasPoints")" />
+                <button type="submit" class="btn-hoelscher">
+                    <span class="glyphicon glyphicon-search"></span>
+                </button>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form asp-controller="MeasPoints" asp-action="ShowNonFunctional">
+                <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Show Not Functional Loggers")</button>
+            </form>
+        </td>
+        <td>
+            <form asp-controller="MeasPoints" asp-action="ShowHidden" method="get">
+                <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Show Hidden MPs")</button>
+            </form>
+        </td>
+        <td colspan="3" style="border:1px solid blue;">
+            <form asp-controller="MeasPoints" asp-action="ShowMap" method="get">
+
+
+
+                <table>
+                    <tr>
+                        <td> <button class="btn-hoelscher" type="submit" style="width:200px;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Show Map")</button></td>
+                        <td> @Html.DropDownList("filterchoice", ViewData["filterchoices"] as SelectList, @SharedLocalizer.GetLocalizedHtmlString("All"), new { @style = "width:100%;" })</td>
+                    </tr>
+
+                </table>
+            </form>
+        </td>
+    </tr>
+</table>
+<table style="width:100%;">
+        <thead>
+            <tr>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Project))
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.SubProject))
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Name))
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Id))
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Coordx))
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Coordy))
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Coordz))
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.MeasType))
+                </th>
+                <th>
+                    @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.DGUnr))
+                </th>
+                <th></th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubProject.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Id)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Coordx)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Coordy)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Coordz)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MeasType.Type)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DGUnr)
+                    </td>
+                    @if (!User.IsInRole("Guest") && !User.IsInRole("MemberGuest"))
+                    {
+                        <td>
+                            <button type="button" class="btn-hoelscher" onclick="toggleManage(@item.Id)">@SharedLocalizer.GetLocalizedHtmlString("Manage Point")</button>
+                        </td>
+                        <td id="td_@item.Id" style="display:none">
+                            <table style="overflow-wrap:break-word;border: 1px dashed blue;width:100%;table-layout:fixed;">
+                                <tr>
+                                    <td colspan="2">
+                                        <form asp-action="DetailsTotal" asp-route-id="@item.Id">
+                                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Details")</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2">
+                                        <form asp-action="CreateMeas" asp-controller="Meas" asp-route-id="@item.Id" method="get" target="_blank">
+                                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement")</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin"))
+                                {
+
+                                    <tr>
+                                        <td>
+                                            <form asp-action="Edit" asp-route-id="@item.Id" method="get" target="_blank">
+                                                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <form asp-action="Delete" asp-route-id="@item.Id" method="get" target="_blank">
+                                                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <form asp-action="DetailsTag" asp-route-id="@item.Id" method="get" target="_blank">
+                                                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Details Tag")</button>
+                                            </form>
+
+                                        </td>
+                                        <td>
+                                            <form asp-action="DetailsPdf" asp-route-id="@item.Id" method="get" target="_blank">
+                                                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Details PDF")</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <form asp-action="DipTag" asp-route-id="@item.Id" method="get" target="_blank">
+                                                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Dip Tag")</button>
+                                            </form>
+
+                                        </td>
+                                        <td>
+                                            <form asp-action="DipTagPdf" asp-route-id="@item.Id" method="get" target="_blank">
+                                                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Dip Tag PDF")</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <form asp-action="addWM" asp-route-id="@item.Id" method="get" target="_blank">
+                                                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Add WM")</button>
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <form asp-action="addFlow" asp-route-id="@item.Id" method="get" target="_blank">
+                                                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Add Flow")</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <button type="button" class="btn-hoelscher" onclick="editAlerts(@item.Id)">@SharedLocalizer.GetLocalizedHtmlString("Edit Alert Limits")</button>
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn-hoelscher" onclick="activatedeactivate(@item.Id)">@SharedLocalizer.GetLocalizedHtmlString("Change Activity")</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <button type="button" class="btn-hoelscher" onclick="togglehidden(@item.Id)">@SharedLocalizer.GetLocalizedHtmlString("Toggle Hidden")</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <form asp-action="CreateMeas" asp-controller="Documents" asp-route-id="@item.Id" method="get" target="_blank">
+                                                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload document")</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+
+                                }
+
+                                @if (User.IsInRole("Member") && !User.IsInRole("Admin") && !User.IsInRole("DivisionAdmin"))
+                                {
+                                    <tr>
+                                        <td>
+                                            <form asp-action="CreateMeas" asp-controller="Documents" asp-route-id="@item.Id" method="get" target="_blank">
+                                                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload document")</button>
+                                            </form>
+                                        </td>
+                                        <td>
+                                            <form asp-action="CreateMeas" asp-controller="Meas" asp-route-id="@item.Id" method="get" target="_blank">
+                                                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Add Measurement")</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <button type="button" class="btn-hoelscher" onclick="activatedeactivate(@item.Id)">@SharedLocalizer.GetLocalizedHtmlString("Change Activity")</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </table>
+                        </td>
+                        <td id="td2_@item.Id" style="display:none;">
+                            <table style="overflow-wrap:break-word;border: 1px dashed blue;width:100%;table-layout:fixed;">
+                                <tr>
+                                    <td>
+                                        <form asp-action="ShowData" asp-controller="MeasPoints">
+                                            <input type="hidden" id="theNameidx" name="theName" value="@item.Name" />
+                                            <input type="hidden" id="theididx" name="theid" value="@item.Id" />
+                                            <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Show data")</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                @if (item.MeasType.Type.ToLower().Equals("water meter"))
+                                {
+                                    <tr>
+                                        <td>
+                                            <form asp-action="ShowData_2" asp-controller="MeasPoints">
+                                                <input type="hidden" id="theNameidx" name="theName" value="@item.Name" />
+                                                <input type="hidden" id="theididx" name="theid" value="@item.Id" />
+                                                <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Show data WM")</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                }
+                                </table>
+                        </td>
+                    }
+
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @section scripts{
+        <script>
+            var AlertModal = document.getElementById('ModalInput');
+            var span4 = document.getElementByClassName("closer")[2];
+            $(function () {
+                span4.onclick = function () {
+                    AlertModal.style.display = "none";
+                }
+                window.onclick = function (event) {
+                    if (event.target == AlertModal) {
+                        AlertModal.style.display = "none";
+                    }
+                }
+            });
+            function toggleManage(theindex) {
+                var x = document.getElementById("td_" + theindex)
+                var x2 = document.getElementById("td2_" + theindex)
+                if (x.style.display === "none") {
+                    x.style.display = "block";
+                } else {
+                    x.style.display = "none";
+                }
+                if (x2.style.display === "none") {
+                    x2.style.display = "block";
+                } else {
+                    x2.style.display = "none";
+                }
+            }
+            function activatedeactivate(theindex) {
+                $.ajax({
+                    type: 'post',
+                    url: '/MeasPoints/ToggleActivity',
+                    data: {
+                        'theid': theindex,
+                        'thetime': new Date().toISOString()
+                    },
+                    success: function (response) {
+                        alert("set to " + response);
+                    },
+                    error: function () {
+                        alert("error");
+                    }
+                });
+            }
+            function togglehidden(theindex) {
+                $.ajax({
+                    type: 'post',
+                    url: '/MeasPoints/ToggleHidden',
+                    data: {
+                        'theid': theindex,
+                    },
+                    success: function (response) {
+                        alert("set to " + response);
+                    },
+                    error: function () {
+                        alert("error");
+                    }
+                });
+            }
+            function editAlerts(theindex) {
+                $.ajax({
+                    type: 'post',
+                    url: '/MeasPoints/GetAlerts',
+                    data: {
+                        'Id': theindex
+                    },
+                    success: function (response) {
+                        $('#theMPContent').html(response);
+                        AlertModal.style.display = "block";
+                    },
+                    error: function () {
+                        alert("error");
+                    }
+                });
+            }
+            function closethepopup() {
+                AlertModal.style.display = "none";
+            }
+        </script>
+    }

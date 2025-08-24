@@ -1,0 +1,189 @@
+﻿@model MainOps.Models.ReportClasses.AllDocumentation
+@{ 
+    Layout = null;
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("All Documenation")</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+<div class="row">
+    <div class="col-xs-12">
+        @foreach (var item in Model.Daily_Reports)
+        {
+        <table style="page-break-inside:avoid;">
+            <tr>
+                <td colspan="3">
+                    <b>@SharedLocalizer.GetLocalizedHtmlString("Daily Report")</b>
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Project.Name)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Name)
+                </td>
+                <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@item.Project.Division.Id/@item.Project.Division.LogoPath" width="151" height="66" /></td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Project.ProjectNr)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.ProjectNr)
+                </td>
+            </tr>
+            @if (item.SubProjectId != null)
+            {
+                <tr>
+                    <td style="text-align:left;">
+                        <b>
+                            @Html.DisplayNameFor(modelItem => item.SubProject.Name)
+                        </b>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubProject.Name) : @Html.DisplayFor(modelItem => item.SubProject.SubProjectNr)
+                    </td>
+                </tr>
+            }
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Project.Client)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Client)
+                </td>
+
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.short_Description)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.short_Description)
+                </td>
+            </tr>
+
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Report_Date)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Report_Date)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.Amount)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Amount)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.StartHour)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StartHour)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.EndHour)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EndHour)
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:left;">
+                    <b>
+                        @Html.DisplayNameFor(modelItem => item.DoneBy)
+                    </b>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DoneBy)
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3"><b>@Html.DisplayNameFor(modelItem => item.Work_Performed)</b></td>
+            </tr>
+            <tr rowspan="20">
+                <td colspan="3" style="text-align:left;">
+                    @if (item.Work_Performed != null && item.Work_Performed != "")
+                    {
+                        @Html.Raw(item.Work_Performed.Replace("\r\n", "<br />"))
+                    }
+                    else
+                    {
+                        @Html.DisplayFor(modelItem => item.Work_Performed)
+                    }
+                </td>
+            </tr>
+        </table>
+        <table name="phototable" style="page-break-inside:avoid;width:100%;table-layout:fixed;">
+            @{ var rows = 0;}
+            @if (item.pictures.Count % 3 == 0)
+            {
+                rows = item.pictures.Count() / 3;
+            }
+            else
+            {
+                rows = Convert.ToInt32(item.pictures.Count() / 3) + 1;
+            }
+            @{ var totalpics = item.pictures.Count();}
+            @for (int i = 0; i < rows; i++)
+            {
+                @if (totalpics - 3 >= 0) //enough room to add whole row
+                {
+                    <tr>
+                        <td style="width:100%;"><img src="~/AHAK/DailyReports/@item.Id.ToString()/@item.pictures[(i+1)*3 - 3]" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="~/AHAK/DailyReports/@item.Id.ToString()/@item.pictures[(i+1)*3 - 3 +1]" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="~/AHAK/DailyReports/@item.Id.ToString()/@item.pictures[(i+1)*3 - 3 +2]" style="width:100%;" /></td>
+                    </tr>
+                    totalpics -= 3;
+                }
+                else if (totalpics - 2 >= 0)
+                {
+                    <tr>
+                        <td style="width:100%;"><img src="~/AHAK/DailyReports/@item.Id.ToString()/@item.pictures[(i+1)*3 - 3]" style="width:100%;" /></td>
+                        <td style="width:100%;"><img src="~/AHAK/DailyReports/@item.Id.ToString()/@item.pictures[(i+1)*3 - 3 +1]" style="width:100%;" /></td>
+                        <td style="width:100%;"></td>
+                    </tr>
+                    totalpics -= 2;
+                }
+                else //enough room to add 1 picture in row
+                {
+                    <tr>
+                        <td style="width:100%;"><img src="~/AHAK/DailyReports/@item.Id.ToString()/@item.pictures[(i+1)*3 - 3]" style="width:100%;" /></td>
+                        <td style="width:100%;"></td>
+                        <td style="width:100%;"></td>
+                    </tr>
+                    totalpics -= 1;
+                }
+
+            }
+        </table>
+            }
+            
+        }
+    </div>
+</div>

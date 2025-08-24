@@ -1,0 +1,47 @@
+﻿@model MainOps.Models.ExportLaborViewModel
+<link href="~/css/jquery-ui-timepicker-addon.min.css" rel="stylesheet" />
+
+
+<h2>@ViewData["Title"]</h2>
+
+<h4>@SharedLocalizer.GetLocalizedHtmlString("Measurement Points")</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="exportLabor">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="projectNumber" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.projectNumber))</label>
+                @Html.DropDownListFor(m => m.projectNumber, ViewData["ProjectId"] as IEnumerable<SelectListItem>
+    ,
+    @SharedLocalizer.GetLocalizedHtmlString("Select Project (choose none if all)"), new { style = "width:250px;height:40px;" })
+                <span asp-validation-for="projectNumber" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Delimiter" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.Delimiter))</label>
+                @Html.DropDownListFor(m => m.Delimiter, ViewData["delimiters"] as IEnumerable<SelectListItem>
+    , @SharedLocalizer.GetLocalizedHtmlString("Select CSV-Delimiter"), new { style = "width:250px;height:40px;" })
+                <span asp-validation-for="Delimiter" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AQ9"></label>
+                <input asp-for="AQ9" type="checkbox" value="false" onchange="this.checked ? this.value = true : this.value = false;" />
+            </div>
+            <div class="form-group">
+                <label asp-for="AQ10"></label>
+                <input asp-for="AQ10" type="checkbox" value="true" checked="checked" onchange="this.checked ? this.value = true : this.value = false;" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="@SharedLocalizer.GetLocalizedHtmlString("Create")" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

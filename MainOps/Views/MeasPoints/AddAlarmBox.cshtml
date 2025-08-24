@@ -1,0 +1,67 @@
+﻿@model MainOps.Models.ViewModels.AddAlarmBoxVM
+
+@{
+    ViewData["Title"] = "Install Alarm Box";
+}
+<div class="row">
+    <div class="col-xs-12">
+
+        <form asp-controller="MeasPoints" asp-action="AddAlarmBox" method="post">
+            <table>
+                <tr>
+                    <td>
+                        @Html.LabelFor(x=>x.ProjectId)
+                    </td>
+                    <td>
+                        @Html.DropDownListFor(Model => Model.ProjectId, ViewData["ProjectId"] as SelectList, @SharedLocalizer.GetLocalizedHtmlString("Please Select Project"))
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        @Html.LabelFor(x => x.Name)
+                    </td>
+                    <td>
+                        @Html.EditorFor(x=>x.Name)
+                    </td>
+                </tr>
+                
+                <tr>
+                    <td>
+                        @Html.LabelFor(x => x.Description)
+                    </td>
+                    <td>
+                        <textarea rows="4" cols="24" name="Description" id="Description"></textarea>
+                    </td>
+                </tr>
+            </table>
+            <input type="number" id="latinput" value="0" name="Latitude" hidden="hidden" />
+            <input type="number" id="longinput" value="0" name="Longitude" hidden="hidden" />
+            <button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Add box!")</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        var myLat = 0, myLng = 0;
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                myLat = position.coords.latitude;
+                myLng = position.coords.longitude;
+                getPos(myLat, myLng);
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                                                //alert("error");
+                    }
+
+                }, { maximumAge: 200000, timeout: 8000, enableHighAccuracy: true });
+        }
+        function getPos(lat, lng) {
+            $("#latinput").val(lat);
+            $("#longinput").val(lng);
+        }
+    </script>
+}
+

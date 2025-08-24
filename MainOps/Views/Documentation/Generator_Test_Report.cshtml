@@ -1,0 +1,237 @@
+﻿@model MainOps.Models.ReportClasses.Generator_Test
+
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@Html.DisplayFor(model => model.Test_name)</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+
+@{
+    ViewData["Title"] = "Generator_Test_Report";
+}
+
+<h2>Generator_Test_Report</h2>
+
+<div>
+    <table>
+        <tr>
+            <td width="33%" height="40px;"></td>
+            <td width="33%" height="40px;"><b>@Html.DisplayFor(model => model.Test_name)</b></td>
+            <td width="33%" height="40px;"><b>@SharedLocalizer.GetLocalizedHtmlString("Version") @Html.DisplayFor(model => model.VersionNr)</b></td>
+        </tr>
+        <tr>
+            <td width="33%" height="20px;"><b>Doc. ID no. @Html.DisplayFor(model => model.DocId)</b></td>
+            <td width="33%" height="20px;"></td>
+            <td width="33%" height="20px;"><b>@SharedLocalizer.GetLocalizedHtmlString("2019.06.01")</b></td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td style="width:25%;height:20px;"><b>@Html.DisplayNameFor(model => model.Site_Manager_Name)</b></td>
+            <td style="width:25%;height:20px;">@Html.DisplayFor(model => model.Site_Manager_Name)</td>
+            <td style="width:15%;height:20px;"><b>@Html.DisplayNameFor(model => model.EquipmentName)</b></td>
+            <td style="width:15%;height:20px;">@Html.DisplayFor(model => model.EquipmentName)</td>
+            <td style="width:10%;height:20px;"></td>
+            <td style="width:10%;height:20px;"></td>
+        </tr>
+        <tr>
+            <td style="width:25%;height:20px;"><b>@Html.DisplayNameFor(model => model.Project)</b></td>
+            <td style="width:25%;height:20px;">@Html.DisplayFor(model => model.Project.Name)</td>
+            <td style="width:15%;height:20px;"><b>@Html.DisplayNameFor(model => model.Type)</b></td>
+            <td style="width:15%;height:20px;">@Html.DisplayFor(model => model.Type) kWA</td>
+            <td style="width:10%"></td>
+            <td style="width:10%;height:20px;"></td>
+        </tr>
+        <tr>
+            <td style="width:25%;height:20px;"><b>@Html.DisplayNameFor(model => model.Location)</b></td>
+            <td style="width:25%;height:20px;">@Html.DisplayFor(model => model.Location)</td>
+            <td style="width:15%;height:20px;"><b>@Html.DisplayNameFor(model => model.Manufacturer)</b></td>
+            <td style="width:15%;height:20px;">@Html.DisplayFor(model => model.Manufacturer)</td>
+            <td style="width:10%;height:20px;"><b>@Html.DisplayNameFor(model => model.HD_Equipment_Id)</b></td>
+            <td style="width:10%;height:20px;">@Html.DisplayFor(model => model.HD_Equipment_Id)</td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td style="width:25%"><b>@Html.DisplayNameFor(model => model.Oil_level_check)</b></td>
+            <td style="width:25%"></td>
+            @if (Model.Oil_level_check == true)
+            {
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else
+            {
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+            }
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(model => model.Fuel_level_check)</b></td>
+            <td>@Html.DisplayFor(model => model.Fuel_level)%</td>
+            @if (Model.Fuel_level_check)
+            {
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else
+            {
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+            }
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(model => model.Battery_status)</b></td>
+            <td>@Html.DisplayFor(model => model.Battery_level)%</td>
+            @if (Model.Battery_status)
+            {
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else
+            {
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+            }
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(model => model.Heating_check)</b></td>
+            <td></td>
+            @if (Model.Heating_check)
+            {
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else
+            {
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+            }
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(model => model.Cooling_check)</b></td>
+            <td></td>
+            @if (Model.Cooling_check)
+            {
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else
+            {
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+            }
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(model => model.Cut_power_supply_during_test)</b></td>
+            <td></td>
+            @if (Model.Cut_power_supply_during_test)
+            {
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else
+            {
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+            }
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(model => model.Generator_Run_1_Hour)</b></td>
+            <td></td>
+            @if (Model.Generator_Run_1_Hour)
+            {
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else
+            {
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+            }
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(model => model.Load_current_fully_overtaken)</b></td>
+            <td></td>
+            @if (Model.Load_current_fully_overtaken)
+            {
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else
+            {
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+            }
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(model => model.Time_delayed_starting_of_pumps)</b></td>
+            <td></td>
+            @if (Model.Time_delayed_starting_of_pumps)
+            {
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else
+            {
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+            }
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(model => model.Switching_off_generator_ok)</b></td>
+            <td></td>
+            @if (Model.Switching_off_generator_ok)
+            {
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else
+            {
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+            }
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(model => model.received_alarm)</b></td>
+            <td></td>
+            @if (Model.received_alarm)
+            {
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td>@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else
+            {
+                <td>@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+            }
+        </tr>
+        <tr>
+            <td><b>@Html.DisplayNameFor(model => model.Hours_of_Operation)</b></td>
+            <td>@Html.DisplayFor(model => model.Hours_of_Operation) kWh</td>
+            <td></td>
+            <td></td>
+        </tr>
+        </table>
+    <table>
+        <tr>
+            <td><b>@Html.DisplayNameFor(model => model.Special_events)</b></td>
+        </tr>
+        <tr>
+            <td>@Html.DisplayFor(model => model.Special_events)</td>
+        </tr>
+        <tr></tr>
+    </table>
+    <table>
+        <tr>
+            <td><b>@Html.DisplayNameFor(model => model.Date_Done)</b></td>
+            <td>@Html.DisplayFor(model => model.Date_Done)</td>
+            <td><b>@Html.DisplayNameFor(model => model.Name)</b></td>
+            <td>@Html.DisplayFor(model => model.Name)</td>
+        </tr>
+    </table>   
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

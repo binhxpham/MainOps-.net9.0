@@ -1,0 +1,78 @@
+﻿@model MainOps.Models.Invoice
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Invoice</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.InvoiceID)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.InvoiceID)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Amount)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Amount)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.InvoiceDate)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.InvoiceDate)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TimeStampStart)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TimeStampStart)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TimeStampEnd)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TimeStampEnd)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Project)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Project.Abbreviation)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SubProject)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SubProject.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Taxes)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Taxes)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Surchage)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Surchage)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TaxesPercent)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TaxesPercent)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

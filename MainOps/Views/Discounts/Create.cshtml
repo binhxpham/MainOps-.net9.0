@@ -1,0 +1,47 @@
+﻿@model MainOps.Models.Discount
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Create Discount")</h2>
+
+<h4>
+    @SharedLocalizer.GetLocalizedHtmlString("Discount")</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ItemTypeId" class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Item")</label>
+                <input asp-for="ItemTypeId" value="@Model.ItemTypeId" readonly="readonly" />
+                <label>@ViewData["ItemTypeName"]</label>
+                <label>@ViewData["Project"]</label>
+            </div>
+            <div class="form-group">
+                <label asp-for="Rate" class="control-label"></label>
+                <input asp-for="Rate" class="form-control" type="number" min="0.00" max="1.00" step="0.01" />
+                <span asp-validation-for="Rate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="StartDate" class="control-label"></label>
+                <input asp-for="StartDate" type="datetime-local" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" class="form-control" />
+                <span asp-validation-for="StartDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EndDate" class="control-label"></label>
+                <input asp-for="EndDate" type="datetime-local" class="form-control" />
+                <span asp-validation-for="EndDate" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index" asp-controller="ItemTypes">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+

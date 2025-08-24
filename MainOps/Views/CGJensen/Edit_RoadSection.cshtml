@@ -1,0 +1,46 @@
+﻿@model MainOps.Models.CGJClasses.RoadSection
+
+@{
+    ViewData["Title"] = "Rediger_VejSektion";
+}
+
+<h2>Rediger Vej Sektion</h2>
+
+<h4>Vej Sektion</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit_RoadSection" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input asp-for="path" hidden="hidden" />
+            <div class="form-group">
+                <label asp-for="ProtocolId" class="control-label"></label>
+                <select asp-for="ProtocolId" class="form-control" asp-items="ViewBag.ProtocolId"></select>
+                <span asp-validation-for="ProtocolId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Location" class="control-label"></label>
+                <input asp-for="Location" class="form-control" />
+                <span asp-validation-for="Location" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="path" class="control-label"></label>
+                <input type="file" name="file" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Gem" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="CGJensenMainMenu">Tilbage</a>
+</div>
+

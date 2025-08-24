@@ -1,0 +1,170 @@
+﻿@model IEnumerable<MainOps.Models.ExtraWork>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Extra Works")</h2>
+
+<p>
+    <a asp-action="Create" asp-controller="ExtraWorks">@SharedLocalizer.GetLocalizedHtmlString("Create New")</a>
+</p>
+<form asp-controller="ExtraWorks" asp-action="Combsearch">
+    @Html.DropDownList("filterchoice", ViewData["filterchoices"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("All"), new { @id = "ProjectId", @onchange = "FillHeadLines();" })
+    @Html.DropDownList("ExtraWorkType", ViewData["ExtraWorkTypeId"] as SelectList, SharedLocalizer.GetLocalizedHtmlString("All Headlines"), new { @id = "ExtraWorkTypeId" })
+    <input id="search" type="text" name="searchstring" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" data-url="@Url.Action("AutoComplete", "ItemTypes")" />
+    <div class="form-group">
+        <label style="width:180px;">@SharedLocalizer.GetLocalizedHtmlString("Search Start date")</label>
+        <input type="datetime" class="date-picker" name="startDate" id="startDate" />
+    </div>
+    <div class="form-group">
+        <label style="width:180px;">@SharedLocalizer.GetLocalizedHtmlString("Search End date")</label>
+        <input type="datetime" class="date-picker" name="endDate" id="endDate" />
+    </div>
+    <button type="submit" class="btn-hoelscher">
+        <span class="glyphicon glyphicon-search"></span>
+    </button>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubProject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EndStamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Price)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BoQHeadLine.BoQnum)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Abbreviation)
+                </td>
+                @if (item.SubProjectId != null)
+                {
+                    <td>@Html.DisplayFor(modelItem => item.SubProject.Name)</td>
+                }
+                else
+                {
+                    <td></td>
+                }
+                <td>
+                    @Html.DisplayFor(modelItem => item.TimeStamp)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EndStamp)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Price)
+                </td>
+                <td>
+                    @if(item.BoQHeadLineId != null) 
+                    {
+                        <text>
+                    @Html.DisplayFor(modelItem => item.BoQHeadLine.HeadLine)
+                    </text>
+                    }
+                </td>
+                @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DivisionAdmin"))
+                {
+                    <td>
+                        <form asp-action="Details" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                        </form>
+                        <form asp-action="Edit" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                        </form>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DivisionAdmin"))
+                        {
+                            <a asp-action="Delete" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Delete")</a>
+                        }
+                    </td>
+                    <td>
+                        <form asp-action="UploadPhotoOrPdf" asp-controller="ExtraWorks" asp-route-id="@item.Id" enctype="multipart/form-data" method="post">
+                            <input type="file" name="files" multiple accept=".jpg,.jpeg,.png,.pdf" style="width:100%;" />
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload")</button>
+                        </form>
+                        <form asp-action="DeleteFiles" asp-controller="ExtraWorks" asp-route-id="@item.Id" method="get">
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Delete All Files")</button>
+                        </form>
+                    </td>
+                }
+                else
+                {
+                    <td>
+                        <form asp-action="UploadPhotoOrPdf" asp-controller="ExtraWorks" enctype="multipart/form-data" method="post">
+                            <input hidden="hidden" name="id" value="@item.Id" />
+                            <input type="file" name="files" multiple accept=".jpg,.jpeg,.png,.pdf" style="width:100%;" />
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload")</button>
+                        </form>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                $(".date-picker").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    yearRange: "-2:+0",
+                    dateFormat: "dd-MM-yy",
+                    controlType: 'select'
+                });
+                $('.date-picker').datepicker("setDate", new Date());
+                FillHeadLines();
+            });
+        });
+        function FillHeadLines() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetProjectHeadLines", "BoQHeadLines")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">All Headlines</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["headLine"] + '</option>';
+                        }
+                        $("#ExtraWorkTypeId").html(s);
+                        document.getElementById("BoQHeadLineId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Select Headline</option>';
+                        $("#ExtraWorkTypeId").html(s);
+                    }
+                }
+            });
+        }
+
+    </script>
+}

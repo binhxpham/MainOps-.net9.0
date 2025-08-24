@@ -1,0 +1,317 @@
+﻿@model MainOps.Models.HorizontalDrainTest
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>Edit</h2>
+
+<h4>HorizontalDrainTest</h4>
+<hr />
+
+<div id="myModal3" class="ThreeModal">
+    <div class="ThreeModal-content">
+        <div class="ThreeModal-header">
+            <span class="ThreeModalclose">&times;</span>
+            <h2>@SharedLocalizer.GetLocalizedHtmlString("Choose Horizontal Drain")</h2>
+        </div>
+        <div class="ThreeModal-body">
+            <div id="myDivMap" style="width:100%;height:600px;"></div>
+        </div>
+    </div>
+</div>
+<form asp-action="Edit" method="post" enctype="multipart/form-data" id="theform" onsubmit="retrieveData(event);">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input asp-for="Signature" hidden="hidden" />
+    <input asp-for="EnteredIntoDataBase" hidden="hidden" />
+    <input asp-for="LastEditedInDataBase" hidden="hidden" />
+    <input asp-for="DoneBy" hidden="hidden" />
+    <table style="width:100%;table-layout:fixed;">
+        <tr>
+            <td>
+                <label asp-for="ProjectId" class="control-label" style="width:100%;"></label>
+            </td>
+            <td><select asp-for="ProjectId" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();" style="width:100%;"></select></td>
+        </tr>
+        <tr>
+            <td>
+                <label asp-for="SubProjectId" class="control-label" style="width:100%;"></label>
+
+            </td>
+            <td><select asp-for="SubProjectId" class="form-control" asp-items="ViewBag.SubProjectId" style="width:100%;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("No SubProjet")</option>            
+                </select></td>
+        </tr>
+        <tr>
+            <td>
+                <label asp-for="TimeStamp" class="control-label" style="width:100%;"></label>
+            </td>
+            <td>
+                <input type="datetime-local" asp-for="TimeStamp" class="form-control" style="width:100%;" />
+                <span asp-validation-for="TimeStamp" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label asp-for="InstallId" class="control-label" style="width:100%;"></label>
+            </td>
+            <td>
+                <button type="button" id="modalbutton">@SharedLocalizer.GetLocalizedHtmlString("Pick Horizontal Drain on Map")</button>
+                <select asp-for="@Model.InstallId" asp-items="ViewBag.InstallId" id="InstallId" style="height:36px;width:100%;">
+                    <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please choose Horizontal Drain")</option>
+                </select>
+                <span asp-validation-for="InstallId" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label asp-for="Location" class="control-label" style="width:100%;"></label>
+
+            </td>
+            <td>
+                <input asp-for="Location" class="form-control" style="width:100%;" />
+                <span asp-validation-for="Location" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label asp-for="Distance" class="control-label" style="width:100%;"></label>
+
+            </td>
+            <td>
+                <input type="number" step="0.01" min="0" max="1000" asp-for="Distance" class="form-control" style="width:100%;" />
+                <span asp-validation-for="Distance" class="text-danger"></span>
+            </td>
+        </tr>
+
+        <tr>
+            <td>
+                <label asp-for="Duration" class="control-label" style="width:100%;"></label>
+
+            </td>
+            <td>
+                <input asp-for="Duration" type="number" step="0.25" min="0" max="99" class="form-control" style="width:100%;" />
+                <span asp-validation-for="Duration" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label asp-for="LogText" class="control-label" style="width:100%;"></label>
+
+            </td>
+            <td>
+                <textarea asp-for="LogText" cols="50" rows="8" class="form-control" style="width:100%;"></textarea>
+                <span asp-validation-for="LogText" class="text-danger"></span>
+            </td>
+        </tr>
+        <tr>
+            <td><label class="control-label">@SharedLocalizer.GetLocalizedHtmlString("Upload pictures")</label></td>
+            <td><input type="file" name="files" multiple accept=".jpg,.jpeg,.pdf" style="width:100%;" /></td>
+        </tr>
+        
+    </table>
+
+    <div class="form-group">
+        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Update")</button>
+    </div>
+</form>
+
+
+<div>
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.js"></script>
+    <script src="http://ajax.aspnetcdn.com/ajax/mvc/3.0/jquery.validate.unobtrusive.min.js"></script>
+    <script type="text/javascript">
+        var markers = [];
+        var myLatLng = { lat: 55.312440, lng: 11.491625 };
+        var myLat = null;
+        var myLng = null;
+        var isfound = false;
+        var myposmarker = null;
+        var mapOptions = {
+            center: myLatLng,
+            zoom: 20,
+            minZoom: 4,
+            mapTypeId: google.maps.MapTypeId.ROADMAP
+        };
+        var modal = document.getElementById("myModal3");
+        var btn = document.getElementById("modalbutton");
+        var span = document.getElementsByClassName("ThreeModalclose")[0];
+        var map = new google.maps.Map(document.getElementById("myDivMap"), mapOptions);
+        if (navigator.geolocation) {
+            id = navigator.geolocation.watchPosition(function (position) {
+                myLat = position.coords.latitude;
+                myLng = position.coords.longitude;
+                getPos(myLat, myLng);
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                        alert("error permission GPS denied");
+                    }
+
+                }, { maximumAge: 0, timeout: 8000, enableHighAccuracy: true });
+        }
+
+        function setPos(lat, lng) {
+            var initialLocation = new google.maps.LatLng(lat, lng);
+            if (myposmarker == null) {
+                myposmarker = new google.maps.Marker({
+                    map: map,
+                    position: { lat: lat, lng: lng },
+                    title: "You",
+
+                });
+                myposmarker.setIcon({
+                    url: 'https://maps.google.com/mapfiles/ms/icons/yellow-dot.png',
+                    scaledSize: new google.maps.Size(70, 70)
+                })
+                myposmarker['infowindow'] = new google.maps.InfoWindow({
+                    content: 'Your Position!'
+                });
+                myposmarker.setMap(map);
+                map.setCenter(new google.maps.LatLng(lat, lng));
+            }
+            google.maps.event.addListener(myposmarker, 'click', function () {
+                this['infowindow'].open(map, this);
+            });
+            map.setCenter(initialLocation);
+        }
+        function getPos(lat, lng, acc) {
+            $("#latinput").val(lat);
+            $("#longinput").val(lng);
+            if (!isfound) {
+                setPos(lat, lng);
+                isfound = true;
+            }
+        }
+        btn.onclick = function () {
+            modal.style.display = "block";
+        }
+        span.onclick = function () {
+            modal.style.display = "none";
+        }
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+        $(document).ready(function () {
+            $(function () {
+                FillSubProjects();
+                FillItems();
+                populateMap();
+            })
+        });
+        function retrieveData(e) {
+            var posting = true;
+            
+            if ($("#theform").valid() == false) {
+                posting = false;
+            }
+            if (posting == true) {
+                StartSpinner();
+            }
+        }
+
+        function FillItems() {
+            var ProjectId = $('#ProjectId').val();
+            var InstallId = $("#InstallId").val();
+            var url = '@Url.Action("GetHorizontalInstallsProject", "TrackItems")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'theId': ProjectId,
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select Maintained Item</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["value"] + '">' + data[prop]["text"] + '</option>';
+                    }
+                    $("#InstallId").html(s);
+                    $("#InstallId").val(InstallId);
+                    document.getElementById("InstallId").style.width = "100%";
+                }
+            });
+        }
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var SubProjectId = $("#SubProjectId").val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                    $("#SubProjectId").val(SubProjectId);
+                }
+            });
+        }
+        function chooseThis(idx) {
+            $("#InstallId").val(idx);
+        }
+        function populateMap() {
+            @foreach(var item in Model.Installations)
+            {
+               <text>
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: { lat: @item.Latitude, lng: @item.Longitude },
+                });
+                if (markers.length != 0) {
+                    var istrue = true;
+                    var i = 0;
+                    while (istrue) {
+                        var existingMarker = markers[i];
+                        var pos = existingMarker.getPosition();
+                        if (marker.position.equals(pos)) {
+                            var a = 360.0 / markers.length;
+                            var newLat = pos.lat() + -.00015 * Math.cos((+a * i) / 180 * Math.PI);  //x
+                            var newLng = pos.lng() + -.00015 * Math.sin((+a * i) / 180 * Math.PI);  //Y
+                            var latLng = new google.maps.LatLng(newLat, newLng);
+                            marker.position = latLng;
+                        }
+                        if (i == markers.length - 1) {
+                            istrue = false;
+                        }
+                        i++;
+                    }
+                }
+                google.maps.event.addListener(marker, 'click', function () {
+                    this['infowindow'].open(map, this);
+                });
+                 marker['infowindow'] = new google.maps.InfoWindow({
+                            content: '<p>ID: @item.Id</p> <p>Item: @item.ItemType.Item_Type </p><p> @item..Install_Text </p><p><button type="button" onclick="chooseThis(@item.Id)">Choose this</button></p>'
+                });
+                marker.setIcon({
+                    url: 'https://maps.google.com/mapfiles/ms/icons/orange.png',
+                    scaledSize: new google.maps.Size(50, 50)
+                });
+                marker.setMap(map);
+                markers.push(marker);
+            </text>
+            }
+            map.setCenter(myposmarker.getPosition())
+        }
+
+
+    </script>
+}

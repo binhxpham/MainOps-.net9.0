@@ -1,0 +1,84 @@
+﻿@model MainOps.Models.WorkTask
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>WorkTask</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Project)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Project.Abbreviation)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.SubProject)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.SubProject.Id)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.IsStarted)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsStarted)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.IsFinished)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IsFinished)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TimeFinished)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TimeFinished)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.TimeStarted)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.TimeStarted)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DateToDo)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DateToDo)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Comments_Office)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Comments_Office)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Comments_Workers)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Comments_Workers)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.InChargeId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.InChargeId)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WorkerId)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WorkerId)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

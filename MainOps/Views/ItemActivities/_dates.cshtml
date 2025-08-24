@@ -1,0 +1,12 @@
+﻿@model IEnumerable<DateTime>
+
+@{Layout = null;}
+<table style="width:100%;table-layout:fixed;">
+    @foreach (var date in Model)
+    {
+        <tr>
+            <td>@String.Format("{0:yyyy-MM-dd}",date)</td>
+        </tr>
+    }
+</table>
+ 

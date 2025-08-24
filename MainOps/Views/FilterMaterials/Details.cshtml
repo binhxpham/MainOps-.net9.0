@@ -1,0 +1,42 @@
+﻿@model MainOps.Models.WTPClasses.MainClasses.FilterMaterial
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Details");
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Details")</h2>
+
+<div>
+    <h4>@SharedLocalizer.GetLocalizedHtmlString("Filter Material")</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.contaminations)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.contaminations)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.device)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.device)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.water_type.water_type)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.water_type.water_type)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> |
+    <a asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>
+</div>

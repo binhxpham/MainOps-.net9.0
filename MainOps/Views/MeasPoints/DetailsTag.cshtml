@@ -1,0 +1,38 @@
+﻿@model MainOps.Models.MeasPoint
+
+    
+    <body>
+        <font size="4">
+            <table>
+                <tbody>
+                    <tr>
+                        <td rowspan="3" width="20%" align="left"><img src="~/images/Divisions/Photos/@Model.Project.Division.Id/@Model.Project.Division.LogoPath" height="210" /></td>
+                        <td align="center" width="20%" height="70">@Html.DisplayNameFor(model => model.Project.Name)</td>
+                        <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(model => model.Project.Name)</td>
+                    </tr>
+                    <tr>
+                        <td align="center" width="20%" height="70">@Html.DisplayNameFor(model => model.Name)</td>
+                        <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(model => model.getBaseName)</td>
+                    </tr>
+
+                    <tr>
+                        <td align="center" width="20%" height="70">@Html.DisplayNameFor(model => model.Coordx)</td>
+                        <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(model => model.Coordx)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3" width="20%" align="left"><img src='@Url.Action("GetQR2","HJItems",new { Id = Model.Id })' alt="" height="210" /></td>
+                        <td align="center" width="20%" height="70">@Html.DisplayNameFor(model => model.Coordy)</td>
+                        <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(model => model.Coordy)</td>
+                    </tr>
+                    <tr>
+                        <td align="center" width="20%" height="70">@Html.DisplayNameFor(model => model.Coordz)</td>
+                        <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(model => model.Coordz)</td>
+                    </tr>
+                    <tr>
+                        <td align="center" width="20%" height="70">@SharedLocalizer.GetLocalizedHtmlString("Owner")</td>
+                        <td align="center" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(model => model.Project.Division.Name)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </font>
+    </body>

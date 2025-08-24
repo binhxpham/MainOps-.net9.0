@@ -1,0 +1,1085 @@
+﻿<!DOCTYPE html>
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject UserManager<ApplicationUser> UserManager
+@inject SignInManager<ApplicationUser> SignInManager
+@using Microsoft.AspNetCore.Localization
+@{
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var theculture = requestCulture.RequestCulture.UICulture.Name;
+}
+<html>
+<head>
+    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - @SharedLocalizer.GetLocalizedHtmlString("Hölscher Jensen A/S - Maintenance & Operations")</title>
+    @if (theculture == "nl-NL")
+    {
+        <link rel="icon" href="~/images/logo_tjaden.png" type="image/x-icon">
+    }
+    else
+    {
+        <link rel="icon" href="~/images/Logos/hjonly.png" type="image/x-icon">
+    }
+
+
+<environment include="Development">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/two-modal.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Blinking.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/three-modal1.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/LoadSpinner2.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Footer.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dropdown4.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/stepProgressBar.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Different.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Sidebarmenu.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/PicturesHeader.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/jquery-ui-timepicker-addon.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/jquery-ui-timepicker-addon.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/RandomCss.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/RandomCss.min.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/right-modal.css" asp-append-version="true" />
+</environment>
+<environment exclude="Development">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/two-modal.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Blinking.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/three-modal1.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/LoadSpinner2.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Footer.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/stepProgressBar.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Different.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Sidebarmenu.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/PicturesHeader.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dropdown4.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/jquery-ui-timepicker-addon.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/jquery-ui-timepicker-addon.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/RandomCss.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/RandomCss.min.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/right-modal.css" asp-append-version="true" />'
+</environment>
+    <style>
+        @@media(max-width:992px) {
+            /* On mobile set datepicker to viewport center*/
+            #ui-datepicker-div {
+                position: fixed !important;
+                left: 50% !important;
+                top: 50% !important;
+                transform: translate(-50%, -50%);
+                -webkit-transform: translate(-50%, -50%);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!--The id topnavbar is needed, that the navbar fixed top isn't overlapping the content of the page-->
+
+    <nav class="navbar navbar-default navbar-fixed-top" id="topnavbar" style="margin-bottom:0px;">
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <span id="topbarshowbutton" hidden="hidden" onclick="showthetop();" style="cursor:pointer;">X</span>
+            <table id="TheTopTable" style="table-layout:fixed;">
+                @*<tr id="topbarshowbutton" hidden="hidden" style="cursor:pointer;">
+                        <td></td>
+                    </tr>*@
+                <tr>
+                    <td><span onclick="hidethetop();" style="cursor:pointer;">X</span></td>
+                    <td>@await Html.PartialAsync("_SelectLanguagePartial")</td>
+                    <td>
+                        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
+                            <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Log out")</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form asp-area="" asp-controller="Manage" asp-action="Index" method="get" title="Manage">
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Account")</button>
+                        </form>
+                    </td>
+                    @if (User.IsInRole("AlarmTeam") || User.IsInRole("Admin"))
+                    {
+                        <td>
+                            <form asp-area="" asp-controller="TrackItems" asp-action="SystemCheck" method="post">
+                                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("System Checked!")</button>
+                            </form>
+                        </td>
+                    }
+                    <td id="TasksContainer" hidden="hidden"><button class="blinking btn-hoelscher" onclick="GetUserTasks();">@SharedLocalizer.GetLocalizedHtmlString("Tasks") (<span id="NumberOfTasks" style="color:red;font:bold;">0</span>)!</button></td>
+                    <td id="DownloadsContainer" hidden="hidden"><button class="blinking btn-hoelscher" onclick="GetUserDownloads();">@SharedLocalizer.GetLocalizedHtmlString("Downloads") (<span id="NumberOfDownloads" style="color:red;font:bold;">0</span>)!</button></td>
+                </tr>
+            </table>
+        }
+        else
+        {
+            <div class="navbar-header" id="topheader" style="width:100%;background-color:white;border:none;">
+                <table style="width:100%;">
+                    <tr>
+                        <td style="width:10%;">
+                            @await Html.PartialAsync("_LoginPartial")
+                        </td>
+                        <td style="width:70%;">
+                            @await Html.PartialAsync("_SelectLanguagePartial")
+                        </td>
+                        <td id="logopart" style="width:80%;text-align:right;">
+                            @if (theculture == "nl-NL")
+                            {
+                                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand"><img src="~/images/Logo Tjaden RGB new.png" alt="Hölscher Jensen A/S" id="logo" width="333" height="146" /></a>
+                            }
+                            else
+                            {
+                                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand"><img src="~/images/Logo-holscher-jensen_fritlagt_i_lille.png" alt="Hölscher Jensen A/S" id="logo" /></a>
+                            }
+
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        }
+
+        <div class="navbar-header" style="width:100%;height:50px;overflow:visible !important;border:none;">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <div id="thedropdownmenu" class="navbar-collapse collapse" style="background-color:black;">
+                <ul id="extratop" class="nav navbar-nav" style="width:100%;">
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        var user = await UserManager.GetUserAsync(User);
+                        if (user.Active.Equals(true))
+                        {
+                            if (user.DivisionId == 4 && User.IsInRole("ProjectMember") && user.Active.Equals(true))
+                            {
+                                <li class="dropdowndropdown">
+                                    <button class="dropdowndropbtn">
+                                        @SharedLocalizer.GetLocalizedHtmlString("Tjaden Projects")
+                                        <span class="dropdowndropdown-content">
+                                            <a asp-area="" asp-controller="Projects" asp-action="ProjectOverView">@SharedLocalizer.GetLocalizedHtmlString("Project Overview")</a>
+                                        </span>
+                                    </button>
+                                </li>
+                            }
+                            if (user.DivisionId == 6 || User.IsInRole("Admin"))
+                            {
+                                <li class="dropdowndropdown">
+                                    <button class="dropdowndropbtn">
+                                        @SharedLocalizer.GetLocalizedHtmlString("Letbanen")
+                                        <span class="dropdowndropdown-content">
+                                            <a asp-area="" asp-controller="CGJensen" asp-action="CGJensenMainMenu">@SharedLocalizer.GetLocalizedHtmlString("Main Menu")</a>
+                                            <a asp-area="" asp-controller="CGJensen" asp-action="Create_Dagsrapport">@SharedLocalizer.GetLocalizedHtmlString("Dagsseddel")</a>
+                                        </span>
+                                    </button>
+                                </li>
+                            }
+                            if (user.DivisionId != 6 && user.DivisionId != 10)
+                            {
+
+                                @if (User.IsInRole("Admin") || User.IsInRole("Guest") || User.IsInRole("MemberGuest") || User.IsInRole("DivisionAdmin") || User.IsInRole("Member"))
+                                {
+                                    <li class="dropdowndropdown">
+                                        <button class="dropdowndropbtn">
+                                            @SharedLocalizer.GetLocalizedHtmlString("Measurement Items")
+                                            <span class="dropdowndropdown-content">
+                                                <a asp-area="" asp-controller="Meas" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Measurements")</a>
+                                                <a asp-area="" asp-controller="MeasPoints" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Measurement Points")</a>
+                                                <a asp-area="" asp-controller="MeasPoints" asp-action="ExportDipList">@SharedLocalizer.GetLocalizedHtmlString("Dips")</a>
+                                                <a asp-area="" asp-controller="Offsets" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Offsets")</a>
+                                                @if (User.IsInRole("Admin") || user.DivisionId.Equals(9))
+                                                {
+                                                    <a asp-area="" asp-controller="MeasPoints" asp-action="ReUploadToFTP">@SharedLocalizer.GetLocalizedHtmlString("ReUpload to FTP")</a>
+                                                }
+                                                @if (!User.IsInRole("Guest"))
+                                                {
+                                                    <a asp-area="" asp-controller="Documentation" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Documentation")</a>
+                                                }
+                                            </span>
+                                        </button>
+                                    </li>
+                                }
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    if (user.DivisionId != 10)
+                                    {
+                                        <li class="dropdowndropdown">
+                                            <button class="dropdowndropbtn">
+                                                @SharedLocalizer.GetLocalizedHtmlString("Super Admin Page")
+                                                <span class="dropdowndropdown-content">
+                                                    <a asp-area="" asp-controller="Installs" asp-action="InstallsMenu">@SharedLocalizer.GetLocalizedHtmlString("Admin-Side-kick-Menu")</a>
+                                                    <a asp-area="" asp-controller="Units" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Units for BoQ")</a>
+                                                    <a asp-area="" asp-controller="MeasTypes" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Measurement Types")</a>
+                                                    <a asp-area="" asp-controller="MonitorTypes" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Monitor Types")</a>
+                                                    <a asp-area="" asp-controller="Comments" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Comment Types")</a>
+                                                    <a asp-area="" asp-controller="CoordSystems" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Coord Systems")</a>
+                                                    <a asp-area="" asp-controller="DataPoints" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Data Points")</a>
+                                                    <a asp-area="" asp-controller="Machinery" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Machinery")</a>
+                                                    <a asp-area="" asp-controller="TrackItems" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Track Items")</a>
+                                                    <a asp-area="" asp-controller="MeasPoints" asp-action="AlarmBoxes">@SharedLocalizer.GetLocalizedHtmlString("Alarm Boxes")</a>
+                                                    <a asp-area="" asp-controller="Titles" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Titles")</a>
+                                                    <a asp-area="" asp-controller="HourSchedules" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Hour Schedules")</a>
+                                                    <a asp-area="" asp-controller="ItemActivities" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Item Activities")</a>
+                                                    <a asp-area="" asp-controller="PhotoDocumenations" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Photo Docs")</a>
+                                                </span>
+                                            </button>
+                                        </li>
+                                    }
+                                }
+                                @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager") || User.IsInRole("Board"))
+                                {
+
+                                    <li class="dropdowndropdown">
+                                        <button class="dropdowndropbtn">
+                                            @SharedLocalizer.GetLocalizedHtmlString("Division Control")
+                                            <span class="dropdowndropdown-content">
+                                                @if (User.IsInRole("Board") && !User.IsInRole("DivisionAdmin") && !User.IsInRole("Manager") && !User.IsInRole("Admin"))
+                                                {
+                                                    <a asp-area="" asp-controller="ProjectStatus" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Tender List")</a>
+                                                }
+                                                else
+                                                {
+                                                    <a asp-area="" asp-controller="Projects" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Projects")</a>
+                                                    <a asp-area="" asp-controller="SubProjects" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("SubProjects")</a>
+
+                                                    @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin"))
+                                                    {
+                                                        if (user.DivisionId != 10)
+                                                        {
+                                                            <a asp-area="" asp-controller="ProjectUsers" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Project Users")</a>
+                                                            <a asp-area="" asp-controller="AlarmReportReceivers" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Alarm Report Receivers")</a>
+                                                            <a asp-area="" asp-controller="Divisions" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Divisions")</a>
+                                                            <a asp-area="" asp-controller="Manage" asp-action="UsersWithRoles">@SharedLocalizer.GetLocalizedHtmlString("Admin Page")</a>
+                                                            <a asp-area="" asp-controller="Departments" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Departments")</a>
+                                                        }
+                                                        else if (User.IsInRole("Admin") || user.DivisionId.Equals(10))
+                                                        {
+                                                            <a asp-area="" asp-controller="Manage" asp-action="UsersWithRoles">@SharedLocalizer.GetLocalizedHtmlString("Admin Page")</a>
+                                                        }
+
+                                                    }
+                                                    if (user.DivisionId != 10)
+                                                    {
+                                                        <a asp-area="" asp-controller="ProjectStatus" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Tender List")</a>
+                                                    }
+                                                }
+                                            </span>
+                                        </button>
+                                    </li>
+                                }
+                                else
+                                {
+
+                                }
+                                @if (User.IsInRole("Admin") || (User.IsInRole("StorageManager") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager")))
+                                {
+                                    if (user.DivisionId != 10)
+                                    {
+                                        <li class="dropdowndropdown">
+                                            <button class="dropdowndropbtn">
+                                                @SharedLocalizer.GetLocalizedHtmlString("Machinery Overview")
+                                                <span class="dropdowndropdown-content">
+                                                    <a asp-area="" asp-controller="StockRentalItems" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Rental Administration")</a>
+                                                    <a asp-area="" asp-controller="Item_Location" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Internal Rent")</a>
+                                                    <a asp-area="" asp-controller="HJItems" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("All Machinery")</a>
+                                                    <a asp-area="" asp-controller="HJItems" asp-action="Classes">@SharedLocalizer.GetLocalizedHtmlString("Classes Overview")</a>
+                                                    <a asp-area="" asp-controller="HJItemMasterClasses" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Machinery Master Classes")</a>
+                                                    <a asp-area="" asp-controller="HJItemClasses" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Machinery Sub Classes")</a>
+                                                </span>
+                                            </button>
+                                        </li>
+                                    }
+                                }
+                                @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("ProjectMember") || User.IsInRole("Manager") || User.IsInRole("Guest") || User.IsInRole("ExternalDriller") || User.IsInRole("AlarmTeam"))
+                                {
+                                    if (user.DivisionId != 10)
+                                    {
+                                        <li class="dropdowndropdown">
+                                            <button class="dropdowndropbtn">
+                                                @SharedLocalizer.GetLocalizedHtmlString("Project Actions")
+                                                <span class="dropdowndropdown-content">
+                                                    @if (User.IsInRole("ExternalDriller"))
+                                                    {
+                                                        <a asp-controller="TrackItems" asp-action="Daily_Report">@SharedLocalizer.GetLocalizedHtmlString("DAILY REPORT - Direct Link")</a>
+                                                        <a asp-area="" asp-controller="TrackItems" asp-action="DailyReports">@SharedLocalizer.GetLocalizedHtmlString("Daily Reports")</a>
+                                                    }
+
+                                                    @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager") || User.IsInRole("AlarmTeam"))
+                                                    {
+                                                        <a asp-area="" asp-controller="Projects" asp-action="AlertCallProjects">@SharedLocalizer.GetLocalizedHtmlString("Alert Call Projects")</a>
+                                                    }
+                                                    @if (User.IsInRole("Admin") || (User.IsInRole("Manager") && User.IsInRole("ProjectMember")))
+                                                    {
+                                                        <a asp-area="" asp-controller="ItemTypes" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("BOQs")</a>
+                                                        <a asp-area="" asp-controller="WorkTasks" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Work Tasks")</a>
+                                                    }
+                                                    @if (User.IsInRole("Admin") || User.IsInRole("ProjectMember") || User.IsInRole("Admin") || (User.IsInRole("ProjectMember") && User.IsInRole("Manager")))
+                                                    {
+                                                        <a asp-controller="TrackItems" asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Main Menu")</a>
+                                                        <a asp-controller="InformationEntries" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Shared Information")</a>
+                                                        <a asp-controller="TrackItems" asp-action="Daily_Report">@SharedLocalizer.GetLocalizedHtmlString("DAILY REPORT - Direct Link")</a>
+                                                        <a asp-controller="TrackItems" asp-action="Reports">@SharedLocalizer.GetLocalizedHtmlString("Reports")</a>
+                                                        <a asp-controller="TrackItems" asp-action="Safety">@SharedLocalizer.GetLocalizedHtmlString("Safety")</a>
+                                                        @if (User.IsInRole("AlarmTeam") || User.IsInRole("Admin"))
+                                                        {
+                                                            <a asp-area="" asp-controller="MeasPoints" asp-action="AlarmBoxes">@SharedLocalizer.GetLocalizedHtmlString("Alarm Boxes")</a>
+                                                        }
+                                                    }
+                                                    @if (User.IsInRole("Guest"))
+                                                    {
+                                                        <a asp-area="" asp-controller="TrackItems" asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Project Activities!")</a>
+                                                        <a asp-area="" asp-controller="TrackItems" asp-action="DailyReports">@SharedLocalizer.GetLocalizedHtmlString("Daily Reports")</a>
+                                                    }
+                                                    @if (User.IsInRole("International"))
+                                                    {
+                                                        <a asp-area="" asp-controller="TrackItems" asp-action="MainMenu_HIH">@SharedLocalizer.GetLocalizedHtmlString("International Page!")</a>
+                                                    }
+                                                </span>
+                                            </button>
+                                        </li>
+                                    }
+                                }
+                                @if ((User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("ProjectMember") || User.IsInRole("Manager") || User.IsInRole("ExternalDriller")) && !user.DivisionId.Equals(4))
+                                {
+                                    <li class="dropdowndropdown">
+                                        <button class="dropdowndropbtn">
+                                            @SharedLocalizer.GetLocalizedHtmlString("Drilling")
+                                            <span class="dropdowndropdown-content">
+                                                <a asp-controller="PreExcavations" asp-action="Create">@SharedLocalizer.GetLocalizedHtmlString("Pre Excavation")</a>
+                                                <a asp-controller="WellDrilling" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Wells")</a>
+                                                <a asp-controller="WellDrilling" asp-action="DrillWell">@SharedLocalizer.GetLocalizedHtmlString("Drill Well")</a>
+                                                <a asp-controller="DrilLWater" asp-action="Create">@SharedLocalizer.GetLocalizedHtmlString("Handle Drill Water")</a>
+                                                @if (!User.IsInRole("ExternalDriller"))
+                                                {
+                                                    <a asp-controller="Layers" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Soil Layer Control")</a>
+                                                    <a asp-controller="WellDrilling" asp-action="Instructions">@SharedLocalizer.GetLocalizedHtmlString("Drilling Instructions")</a>
+                                                    @if (User.IsInRole("Manager") || User.IsInRole("Admin") || User.IsInRole("DivisionAdmin"))
+                                                    {
+                                                        <a asp-controller="WellDrilling" asp-action="Create_Instruction">@SharedLocalizer.GetLocalizedHtmlString("Create Instruction")</a>
+                                                        <a asp-controller="WellTypes" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Well Types")</a>
+                                                    }
+                                                }
+
+
+                                            </span>
+                                        </button>
+                                    </li>
+                                }
+
+                            }
+                            if (user.DivisionId.Equals(10) || User.IsInRole("Admin"))
+                            {
+                                <li class="dropdowndropdown">
+                                    <button class="dropdowndropbtn">
+                                        @SharedLocalizer.GetLocalizedHtmlString("BetonRenovering")
+                                        <span class="dropdowndropdown-content">
+                                            <a asp-controller="DagsRapportBetons" asp-action="Create">@SharedLocalizer.GetLocalizedHtmlString("Udfyld Dagsseddel")</a>
+
+                                            @if (User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+                                            {
+                                                <a asp-controller="Materiels" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Materiel")</a>
+                                                <a asp-controller="DagsRapportBetons" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Dagsrapporter")</a>
+
+                                            }
+                                            @if (User.IsInRole("DivisionAdmin"))
+                                            {
+                                                <a asp-area="" asp-controller="Projects" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Projects")</a>
+                                                <a asp-area="" asp-controller="SubProjects" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("SubProjects")</a>
+                                                <a asp-area="" asp-controller="Manage" asp-action="UsersWithRoles">@SharedLocalizer.GetLocalizedHtmlString("Admin Page")</a>
+                                            }
+                                        </span>
+                                    </button>
+                                </li>
+                            }
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="navigationsbild" style="position:center;border:none;background: linear-gradient(to right, rgba(0,113,160,0.9) 0%, rgba(0,134,188, 0.9) 25%,rgba(0,91,138,0.9) 100%);">
+        <div class="video_wrapper">
+            <div class="video">
+                <img alt="" src="~/images/panorama3.jpg">
+            </div>
+            <div class="video_links"> <img id="nr_1" alt="" src="~/images/panorama1.jpg"> <img id="nr_2" alt="" src="~/images/panorama2.jpg"> </div>
+            <div class="video_rechts"> <img id="nr_1" alt="" src="~/images/panorama4.jpg"> <img id="nr_2" alt="" src="~/images/panorama5.jpg"> </div>
+        </div>
+    </div>
+    
+    <!--myModal2 is used to do the overlay with the Loginpart.-->
+    <div id="myModal2" class="TwoModal">
+        <div class="TwoModal-content">
+            <div class="TwoModal-header">
+                <span class="closer">&times;</span>
+                <h2>@SharedLocalizer.GetLocalizedHtmlString("Login")</h2>
+            </div>
+
+            <div class="TwoModal-body">
+                <div id="thecontent2"></div>
+            </div>
+        </div>
+    </div>
+    <!--errorModal is the popup used for all error messages. The homecontroller will localize the strings.-->
+    <div id="errorModal" class="TwoModal">
+        <div class="TwoModal-content">
+            <div class="TwoModal-header">
+                <span class="closer">&times;</span>
+                <h2>@SharedLocalizer.GetLocalizedHtmlString("Error")</h2>
+            </div>
+            <div class="TwoModal-body">
+                <div id="theErrorContent"></div>
+            </div>
+        </div>
+    </div>
+    <!--errorModal is the popup used for all error messages. The homecontroller will localize the strings.-->
+    <div id="noteModal" class="TwoModal">
+        <div class="TwoModal-content">
+            <div class="TwoModal-header">
+                <span class="closer">&times;</span>
+                <h2>@SharedLocalizer.GetLocalizedHtmlString("Note")</h2>
+            </div>
+            <div class="TwoModal-body">
+                <div id="theNoteContent"></div>
+            </div>
+        </div>
+    </div>
+    <div id="TaskModal" class="TwoModal" style="width:100%;z-index:1000;">
+        <div class="TwoModal-content" style="width:95%;">
+            <div class="TwoModal-header">
+                <span class="closer" onclick="CloseTaskModal();">&times;</span>
+                <h2>@SharedLocalizer.GetLocalizedHtmlString("Tasks")</h2>
+            </div>
+            <div class="TwoModal-body">
+                <div id="taskContent"></div>
+            </div>
+        </div>
+    </div>
+    <div id="DownloadsModal" class="TwoModal" style="width:100%;z-index:1000;">
+        <div class="TwoModal-content" style="width:95%;">
+            <div class="TwoModal-header">
+                <span class="closer" onclick="CloseDownloadsModal();">&times;</span>
+                <h2>@SharedLocalizer.GetLocalizedHtmlString("Downloads")</h2>
+            </div>
+            <div class="TwoModal-body">
+                <div id="downloadsContent"></div>
+            </div>
+        </div>
+    </div>
+    <div id="BillableModal" class="TwoModal" style="width:100%;z-index:1000;">
+        <div class="TwoModal-content" style="width:95%;">
+            <div class="TwoModal-header">
+                <span class="closer" onclick="CloseBillableModal();">&times;</span>
+                <h2>@SharedLocalizer.GetLocalizedHtmlString("Billables")</h2>
+            </div>
+            <div class="TwoModal-body">
+                <div id="billableContent"></div>
+            </div>
+        </div>
+    </div>
+    <div id="FeedbackModal" class="TwoModal" style="width:100%;z-index:2000;">
+        <div class="TwoModal-content" style="width:90%;">
+            <div class="TwoModal-header">
+                <span class="closer" onclick="CloseFeedbackModal();">&times;</span>
+                <h2>@SharedLocalizer.GetLocalizedHtmlString("Feedback")</h2>
+            </div>
+            <div class="TwoModal-body">
+                <div id="feedbackContent"></div>
+            </div>
+        </div>
+    </div>
+    <div id="EndTaskOrItemModal" class="TwoModal" style="width:100%;z-index:2000;">
+        <div class="TwoModal-content" style="width:90%;">
+            <div class="TwoModal-header">
+                <span class="closer" onclick="CloseEndTaskOrItemModal();">&times;</span>
+                <h2>@SharedLocalizer.GetLocalizedHtmlString("End Task/Work Item")</h2>
+            </div>
+            <div class="TwoModal-body">
+                <div id="endingContent">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="ItemTypesModal" class="TwoModal" style="width:100%;z-index:2000;">
+        <div class="TwoModal-content" style="width:90%;">
+            <div class="TwoModal-header">
+                <span class="closer" onclick="CloseItemTypesModal();">&times;</span>
+                <h2>@SharedLocalizer.GetLocalizedHtmlString("Existing Items")</h2>
+            </div>
+            <div class="TwoModal-body">
+                <div id="itemtypesContent">
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="bottom" style="border:none;font:20px;">
+        <div style="width:100%;">
+            <div class="container-fluid" style="height:100%;background: linear-gradient(to right, rgba(0,113,160,0.9) 0%, rgba(0,134,188, 0.9) 25%,rgba(0,91,138,0.9) 100%);">
+                <div style="width:100%;">
+                    <table style="border:none;width:100%;">
+                        <tr>
+                            <td style="width:10%;"></td>
+                            @if (SignInManager.IsSignedIn(User))
+                            {
+                                if ((await UserManager.GetUserAsync(User)).DivisionId == 10)
+                                {
+                                    <td style="width:80%;text-align:center;font-size:x-large;color:white;">@SharedLocalizer.GetLocalizedHtmlString("CG Jensen A/S - Betonrenovering")</td>
+                                }
+                                else
+                                {
+                                    <td style="width:80%;text-align:center;font-size:x-large;color:white;">@SharedLocalizer.GetLocalizedHtmlString("Hölscher Jensen A/S")</td>
+                                }
+
+                            }
+                            else
+                            {
+                                <td style="width:80%;text-align:center;font-size:x-large;color:white;">@SharedLocalizer.GetLocalizedHtmlString("Hölscher Jensen A/S")</td>
+                            }
+
+                            <td style="width:10%;"></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="main-content" style="border:none;background: linear-gradient(to right, rgba(0,113,160,0.9) 0%, rgba(0,134,188, 0.9) 25%,rgba(0,91,138,0.9) 100%);">
+        @if(User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager") || User.IsInRole("Supervisor")) {
+            <button class="ButtonRightModal" onclick="GetUserExtraWorks();"></button>
+        }
+        <div id="therightModal" class="RightModal">
+            <div class="RightModal-content">
+                <div class="RightModal-header">
+                    <span class="closer" onclick="CloseRightModal();">&times;</span>
+                    <h2>@SharedLocalizer.GetLocalizedHtmlString("Extra Works")</h2>
+                </div>
+                <div class="RightModal-body">
+                    <div id="theRightContent"></div>
+                </div>
+            </div>
+        </div>
+        <div class="container container-fluid" style="width:90%;">
+            <div class="col-xs-12" style="background-color:white;">
+                <div id="loading">
+
+                    <div id="loadingcontent">
+                        <p id="loadingspinner" onclick="StopSpinner();">
+                            @SharedLocalizer.GetLocalizedHtmlString("Loading...")
+                        </p>
+                    </div>
+                </div>
+                @RenderBody()
+            </div>
+        </div>
+    </div>
+
+    <footer id="myFooter">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3">
+                    <h5>@SharedLocalizer.GetLocalizedHtmlString("Contact")</h5>
+                    <ul>
+                        <li>@SharedLocalizer.GetLocalizedHtmlString("Hölscher Jensen A/S")</li>
+                        <li>@SharedLocalizer.GetLocalizedHtmlString("Fabriksparken 37")</li>
+                        <li>@SharedLocalizer.GetLocalizedHtmlString("2600 Glostrup")</li>
+                        @if (theculture == "nl-NL")
+                        {
+                            <li><a href="https://www.tjaden.nl" target="_blank">www.tjaden.nl</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="https://www.hj-as.dk" target="_blank">www.hj-as.dk</a></li>
+                            <li><a asp-area="" asp-controller="Home" asp-action="Contact">@SharedLocalizer.GetLocalizedHtmlString("Contact")</a></li>
+                        }
+
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>@SharedLocalizer.GetLocalizedHtmlString("Site Admin")</h5>
+                    <ul>
+                        <li>Telefon: +45 27256537</li>
+                        <li><a href="mailto:ofw@hj-as.dk"><span class="glyphicon-envelope"> @SharedLocalizer.GetLocalizedHtmlString("ofw@hj-as.dk")</span></a></li>
+
+                    </ul>
+                </div>
+                <div class="col-md-2">
+                    <h5>@SharedLocalizer.GetLocalizedHtmlString("Information")</h5>
+                    <ul>
+                        <li><a asp-area="" asp-controller="Home" asp-action="MoreInformation">@SharedLocalizer.GetLocalizedHtmlString("About Us")</a></li>
+                        <li><a asp-area="" asp-controller="Home" asp-action="Directions">@SharedLocalizer.GetLocalizedHtmlString("Location and Directions")</a></li>
+                        @if (theculture != "nl-NL")
+                        {
+                            <li><a href="http://www.hoelscher-wasserbau.de" target="_blank">www.Hoelscher-Wasserbau.de</a></li>
+                            <li><a href="http://www.CGJensen.dk" target="_blank">www.CG-Jensen.dk</a></li>
+                        }
+                        else
+                        {
+                            <li><a href="http://tjaden.nl" target="_blank">www.tjaden.nl</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="footer-copyright">
+            @if (theculture == "nl")
+            {
+                <p>© Tjaden B.V. 2025</p>
+            }
+            else
+            {
+                <p>© Hoelscher Jensen A/S 2025 </p>
+            }
+
+        </div>
+    </footer>
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.2.0.min.js"
+                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                crossorigin="anonymous"
+                integrity="sha384-K+ctZQ+LL8q6tP7I94W+qzQsfRV2a+AfHIi9k8z8l9ggpc8X+Ytst4yBo/hH+8Fk">
+        </script>
+        <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
+                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
+                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+                crossorigin="anonymous"
+                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
+        </script>
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+    </environment>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/themes/smoothness/jquery-ui.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.0/jquery-ui.min.js"></script>
+    <script src="~/js/Scripts/spin.min.js"></script>
+    <script>
+        window.onclick = function (event) {
+            var taskmodal = document.getElementById("TaskModal");
+            var feedbackmodal = document.getElementById("FeedbackModal");
+            var EndTaskOrItemModal = document.getElementById("EndTaskOrItemModal");
+            var downloadsmodal = document.getElementById("DownloadsModal");
+            var billablemodal = document.getElementById("BillableModal");
+            var itemtypesmodal = document.getElementById("ItemTypesModal");
+            var rightmodal = document.getElementById("therightModal");
+            if (event.target == downloadsmodal) {
+                downloadsmodal.style.display = "none";
+            }
+            if (event.target == taskmodal) {
+                rightmodal.style.display = "none";
+            }
+            if (event.target == rightmodal) {
+                taskmodal.style.display = "none";
+            }
+            if (event.target == feedbackmodal) {
+                feedbackmodal.style.display = "none";
+            }
+            if (event.target == EndTaskOrItemModal) {
+                EndTaskOrItemModal.display = "none";
+            }
+            if (event.target == billablemodal) {
+                billablemodal.style.display = "none";
+            }
+            if (event.target == itemtypesmodal) {
+                itemtypesmodal.style.display = "none";
+            }
+        }
+        $('#logo').click(function () {
+            $('#myForm').submit();
+        });
+        $(window).resize(function () {
+            var w = $(window).width();
+            var h = $(window).height();
+            if (w < 980) {
+                document.getElementById("logopart").style.display = 'none';
+
+            }
+            else {
+                document.getElementById("logopart").style.display = 'block';
+            }
+
+        });
+        function confirmMessage(evt) {
+            if (confirm('Are You Sure?')) {
+
+            }
+            else {
+                evt.preventDefault();
+            }
+        }
+        function hidethetop() {
+            $("#TheTopTable").hide();
+            $("#topbarshowbutton").show();
+            setpadding();
+        }
+        function showthetop() {
+            $("#TheTopTable").show();
+            $("#topbarshowbutton").hide();
+            setpadding();
+
+        }
+        function setpadding() {
+
+           //alert($('#topnavbar').height() + $("#extratop").height());
+           $(document.body).css('padding-top', $('#topnavbar').height());
+            // + $("#extratop").height()
+        }
+        $(document).ready(function () {
+            //$(window).keydown(function (event) {
+            //    if (event.keyCode == 13) {
+            //        event.preventDefault();
+            //        return false;
+            //    }
+            //});
+            setpadding();
+            @if(User.IsInRole("ProjectMember") || User.IsInRole("Member"))
+            {
+                <text>
+                var url = '@Url.Action("GetAmountWorkTasks", "WorkTasks")';
+                $.ajax({
+                    type: 'GET',
+                url: url,
+                    success: function (data) {
+                        if (data > 0) {
+                            $("#NumberOfTasks").html('<span class="blinking">' + data +'</span>');
+                            $("#TasksContainer").toggle()
+                        }
+                        else {
+
+                        }
+                    }
+                });
+                var url2 = '@Url.Action("GetAmountDownloads", "Home")';
+                $.ajax({
+                    type: 'GET',
+                url: url2,
+                    success: function (data) {
+                        if (data > 0) {
+                            $("#NumberOfDownloads").html('<span class="blinking">' + data +'</span>');
+                            $("#DownloadsContainer").toggle()
+                        }
+                        else {
+
+                        }
+                    }
+                });
+                </text>
+            }
+
+            document.addEventListener('click', function (event) {
+                    var dropdownmenu = document.getElementById("thedropdownmenu")
+                if (!dropdownmenu.contains(event.target)) {
+                    if (!dropdownmenu.classList.contains('collapsing')) {
+                            if (dropdownmenu.style.height == "0.993217px") {
+                                dropdownmenu.style.height = "auto";
+                            }
+                            else {
+                                var elements = document.getElementsByClassName("dropdowndropdown-content");
+                                for (var i = 0; i < elements.length; i++) {
+                                    if (elements[i].style.display == "block") {
+                                        elements[i].style.display = "none";
+                                    }
+                                }
+                                dropdownmenu.style.height = "0.993217px";
+                                dropdownmenu.classList.remove('in');
+                                dropdownmenu.classList.add('collapse');
+                            }
+                        }
+
+                    }
+            });
+            var elements = document.getElementsByClassName("dropdowndropdown");
+            var myFunction = function () {
+                var element = this.getElementsByClassName("dropdowndropdown-content")[0];
+                if (element.style.display == "block") {
+                    element.style.display = "none";
+                }
+                else {
+                    element.style.display = "block";
+                }
+
+
+            };
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].addEventListener('click', myFunction, false);
+            }
+
+
+        });
+        function OpenItemTypesModal() {
+            var itemtypesmodal2 = document.getElementById("ItemTypesModal");
+            itemtypesmodal2.style.display = "block";
+        }
+        function GetBoQExtraWorkItems(theId) {
+            
+            var url = '@Url.Action("GetBoQExtraWorkItems", "Home")';
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    data: {"theId": theId},
+                    contentType: 'application/html;charset=utf-8',
+                    dataType: 'html',
+                    success: function (data) {
+                        var thepartial = $("#itemtypesContent").html(data);
+                        OpenItemTypesModal();
+                    }
+                });
+        }
+        function GetUserExtraWorks() {
+            var url = '@Url.Action("GetUserExtraWorks", "Home")';
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    contentType: 'application/html;charset=utf-8',
+                    dataType: 'html',
+                    success: function (data) {
+                        var thepartial = $("#theRightContent").html(data);
+                        OpenRightModal();
+                    }
+                });
+        }
+        function OpenRightModal() {
+            var rightmodal = document.getElementById("therightModal");
+            rightmodal.style.display = "block";
+        }
+        function CloseRightModal() {
+            var rightmodal = document.getElementById("therightModal");
+            rightmodal.style.display = "none";
+        }
+        function CloseItemTypesModal() {
+            var itemtypesmodal2 = document.getElementById("ItemTypesModal");
+            itemtypesmodal2.style.display = "none";
+        }
+        function OpenTaskModal() {
+            var itemtypesmodal2 = document.getElementById("ItemTypesModal");
+            itemtypesmodal2.style.display = "block";
+        }
+        function CloseTaskModal() {
+            var taskmodal2 = document.getElementById("TaskModal");
+            taskmodal2.style.display = "none";
+        }
+        function CloseDownloadsModal() {
+            var downloadsmodal2 = document.getElementById("DownloadsModal");
+            downloadsmodal2.style.display = "none";
+        }
+        function OpenDownloadsModal() {
+            var downloadsmodal2 = document.getElementById("DownloadsModal");
+            downloadsmodal2.style.display = "block";
+        }
+        function OpenTaskModal() {
+            var taskmodal2 = document.getElementById("TaskModal");
+            taskmodal2.style.display = "block";
+        }
+        function CloseFeedbackModal() {
+            var feedbackmodal2 = document.getElementById("FeedbackModal");
+            feedbackmodal2.style.display = "none";
+        }
+        function OpenFeedbackModal() {
+            var feedbackmodal2 = document.getElementById("FeedbackModal");
+            feedbackmodal2.style.display = "block";
+        }
+        function CloseEndTaskOrItemModal() {
+            var endtaskoritemmodal = document.getElementById("EndTaskOrItemModal");
+            endtaskoritemmodal.style.display = "none";
+        }
+        function OpenEndTaskOrItemModal() {
+            var endtaskoritemmodal = document.getElementById("EndTaskOrItemModal");
+            endtaskoritemmodal.style.display = "block";
+        }
+        function CloseBillableModal() {
+            var billablemodal2 = document.getElementById("BillableModal");
+            billablemodal2.style.display = "none";
+        }
+        function OpenBillableModal() {
+            var billablemodal2 = document.getElementById("BillableModal");
+            billablemodal2.style.display = "block";
+        }
+        function GetUserTasks() {
+            var url = '@Url.Action("GetUserTasks", "WorkTasks")';
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    contentType: 'application/html;charset=utf-8',
+                    dataType: 'html',
+                    success: function (data) {
+                        var thepartial = $("#taskContent").html(data);
+                        OpenTaskModal();
+                    }
+                });
+        }
+
+        function GetUserDownloads() {
+            var url = '@Url.Action("GetUserDownloads", "Home")';
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    contentType: 'application/html;charset=utf-8',
+                    dataType: 'html',
+                    success: function (data) {
+                        var thepartial = $("#downloadsContent").html(data);
+                        OpenDownloadsModal();
+                    }
+                });
+        }
+        function StopSpinner()
+        {
+            $("#loading").fadeOut();
+        }
+        function StartSpinner() {
+            $("#loading").fadeIn();
+            var opts = {
+                lines: 12, // The number of lines to draw
+                length: 7, // The length of each line
+                width: 4, // The line thickness
+                radius: 10, // The radius of the inner circle
+                color: '#000', // #rgb or #rrggbb
+                speed: 1, // Rounds per second
+                trail: 60, // Afterglow percentage
+                shadow: false, // Whether to render a shadow
+                hwaccel: false // Whether to use hardware acceleration
+            };
+            var target = document.getElementById('loading');
+            var spinner = new Spinner(opts).spin(target);
+        }
+        function FeedbackTask(idx) {
+            var url = '@Url.Action("Feedback", "WorkTasks")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                contentType: 'application/html;charset=utf-8',
+                dataType: 'html',
+                data: {
+                    'WorkTaskId': idx,
+                    'WorkItemId': null
+                },
+                success: function (data) {
+                    var thepartial = $("#feedbackContent").html(data);
+                    OpenFeedbackModal();
+                },
+                error: function (lol) {
+                }
+            });
+        }
+        function FeedbackItem(idx1,idx2) {
+            var url = '@Url.Action("Feedback", "WorkTasks")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                contentType: 'application/html;charset=utf-8',
+                dataType: 'html',
+                data: {
+                    'WorkTaskId': idx1,
+                    'WorkItemId': idx2
+                },
+                success: function (data) {
+                    var thepartial = $("#feedbackContent").html(data);
+                    OpenFeedbackModal();
+                },
+                error: function (lol) {
+                }
+            });
+        }
+        function StartTask(idx) {
+            var url = '@Url.Action("StartTask", "WorkTasks")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: { 'id': idx },
+                success: function (data) {
+                    if (data == "") {
+
+                    }
+                    else {
+                        var objekt = document.getElementById("dot_" + idx);
+                        objekt.style.backgroundColor = data;
+                    }
+
+                },
+                error: function (lol) {
+                }
+            });
+        }
+        function EndTask(idx) {
+            var url = '@Url.Action("EndTask2", "WorkTasks")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: { 'id': idx },
+                success: function (data) {
+                    var thepartial = $("#endingContent").html(data);
+                    OpenEndTaskOrItemModal();
+                },
+                error: function (lol) {
+                    alert("Error");
+                }
+            });
+        }
+        function FinishWorkItem(idx) {
+            var url = '@Url.Action("EndWorkItem2", "WorkTasks")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: { 'id': idx },
+                success: function (data) {
+                    var thepartial = $("#endingContent").html(data);
+                    OpenEndTaskOrItemModal();
+                },
+                error: function (lol) {
+                    alert("Error");
+                }
+            });
+        }
+        @*function FinishWorkItem(idx,id) {
+            var url = '@Url.Action("EndWorkItem", "WorkTasks")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: { 'id': idx },
+                success: function (data) {
+                    if (data == "") {
+
+                    }
+                    else {
+                        var objekt = document.getElementById("dot_" + id + "_" + idx);
+                        objekt.style.backgroundColor = data;
+                    }
+                },
+                error: function (lol) {
+                    alert("Error");
+                }
+            });
+        }*@
+
+        function ShowWorkItems(idx) {
+            $(".workitem_" + idx).each(function () {
+                $(this).toggle();
+            });
+
+        }
+        function ShowFeedbacks(idx) {
+            $(".feedback_" + idx).each(function () {
+                $(this).toggle();
+            });
+
+        }
+        function ShowFeedbackTask(idx) {
+            $(".feedback_task_" + idx).each(function () {
+                $(this).toggle();
+            });
+
+        }
+    </script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

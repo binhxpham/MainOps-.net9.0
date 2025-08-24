@@ -1,0 +1,10 @@
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+
+@{
+    ViewData["Title"] = @SharedLocalizer.GetLocalizedHtmlString("Access denied");
+}
+
+<header>
+    <h2 class="text-danger">@ViewData["Title"]</h2>
+    <p class="text-danger">@SharedLocalizer.GetLocalizedHtmlString("You do not have access to this resource.")</p>
+</header>

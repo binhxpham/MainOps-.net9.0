@@ -1,0 +1,303 @@
+﻿@model IEnumerable<MainOps.Models.StockRentalItem>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<form asp-controller="StockRentalItems" asp-action="SearchItems">
+    <div class="form-group">
+        <select name="HJItemMasterClassId" id="HJItemMasterClassId" asp-items="ViewBag.FilterChoices1" onchange="UpdateClasses();" class="form-group"><option value="" >@SharedLocalizer.GetLocalizedHtmlString("All Main Categories")</option></select>
+        <select name="HJItemClassId" id="HJItemClassId" asp-items="ViewBag.FilterChoices2" class="form-group"><option value="" >@SharedLocalizer.GetLocalizedHtmlString("All Sub Categories")</option></select>
+
+        <input id="search" type="text" name="searchtext" placeholder="@SharedLocalizer.GetLocalizedHtmlString("search..")" class="form-group" />
+        <button type="submit" class="btn-hoelscher">
+            <span class="glyphicon glyphicon-search"></span>
+        </button>
+    </div>
+</form>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.HJItem)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Company)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ContactPerson)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PhoneNr)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.StartTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EndTime)
+            </th>
+            <th>@Html.DisplayNameFor(model => model.IsReturned)</th>
+            <th>@Html.DisplayNameFor(model => model.LastInvoiced)</th>
+            <th>Action</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            if (item.EndTime != null)
+            {
+                if (item.EndTime < DateTime.Now)
+                {
+                    if (item.IsReturned == false)
+                    {
+                        <tr style="background-color:lightcoral;">
+                            <td>
+                                @if (item.HJItem != null)
+                                {
+                                    <text>@Html.DisplayFor(modelItem => item.HJItem.HJId)</text>
+                                }
+                                else
+                                {
+                                    @Html.DisplayFor(modelItem => item.ItemNumber)
+                                }
+
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Company)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ContactPerson)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Email)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.PhoneNr)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.StartTime)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.EndTime)
+                            </td>
+                            <td>@Html.DisplayFor(modelItem => item.IsReturned)</td>
+                            <td>@Html.DisplayFor(modelItem => item.LastInvoiced)</td>
+                            <td>@SharedLocalizer.GetLocalizedHtmlString("Return Item")</td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> |
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        if (item.LastInvoiced.Value < item.EndTime)
+                        {
+                            <tr style="background-color:orange;">
+                                <td>
+                                    @if (item.HJItem != null)
+                                    {
+                                        <text>@Html.DisplayFor(modelItem => item.HJItem.HJId)</text>
+                                    }
+                                    else
+                                    {
+                                        @Html.DisplayFor(modelItem => item.ItemNumber)
+                                    }
+
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Company)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ContactPerson)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Email)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.PhoneNr)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.StartTime)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.EndTime)
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => item.IsReturned)</td>
+                                <td>@Html.DisplayFor(modelItem => item.LastInvoiced)</td>
+                                <td>@SharedLocalizer.GetLocalizedHtmlString("Invoice Remaining Period")</td>
+                                <td>
+                                    <a asp-action="Edit" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> |
+                                </td>
+                            </tr>
+                        }
+                        else
+                        {
+                            <tr style="background-color:lightgreen;">
+                                <td>
+                                    @if (item.HJItem != null)
+                                    {
+                                        <text>@Html.DisplayFor(modelItem => item.HJItem.HJId)</text>
+                                    }
+                                    else
+                                    {
+                                        @Html.DisplayFor(modelItem => item.ItemNumber)
+                                    }
+
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Company)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ContactPerson)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Email)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.PhoneNr)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.StartTime)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.EndTime)
+                                </td>
+                                <td>@Html.DisplayFor(modelItem => item.IsReturned)</td>
+                                <td>@Html.DisplayFor(modelItem => item.LastInvoiced)</td>
+                                <td>@SharedLocalizer.GetLocalizedHtmlString("Invoice Remaining Period")</td>
+                                <td>
+                                    <a asp-action="Edit" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> |
+                                </td>
+                            </tr>
+                        }
+
+                    }
+                }
+                else
+                {
+                    <tr style="background-color:lightyellow;">
+                        <td>
+                            @if (item.HJItem != null)
+                            {
+                                <text>@Html.DisplayFor(modelItem => item.HJItem.HJId)</text>
+                            }
+                            else
+                            {
+                                @Html.DisplayFor(modelItem => item.ItemNumber)
+                            }
+
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Company)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ContactPerson)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Email)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.PhoneNr)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.StartTime)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.EndTime)
+                        </td>
+                        <td>@Html.DisplayFor(modelItem => item.IsReturned)</td>
+                        <td>@Html.DisplayFor(modelItem => item.LastInvoiced)</td>
+                        <td>@SharedLocalizer.GetLocalizedHtmlString("Ongoing")</td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> |
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr style="background-color:yellow;">
+                    <td>
+                        @if (item.HJItem != null)
+                        {
+                            <text>@Html.DisplayFor(modelItem => item.HJItem.HJId)</text>
+                        }
+                        else
+                        {
+                            @Html.DisplayFor(modelItem => item.ItemNumber)
+                        }
+
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Company)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ContactPerson)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Email)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PhoneNr)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.StartTime)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EndTime)
+                    </td>
+                    <td>@Html.DisplayFor(modelItem => item.IsReturned)</td>
+                    <td>@Html.DisplayFor(modelItem => item.LastInvoiced)</td>
+                    <td>@SharedLocalizer.GetLocalizedHtmlString("Ongoing - Invoice?")</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> |
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        function UpdateClasses() {
+            var MasterClassId = $('#HJItemMasterClassId').val();
+            var ClassId = $('#HJItemClassId').val();
+            var url = '@Url.Action("GetHJItemClassesJson", "StockRentalItems")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {
+                    'MasterClass': MasterClassId
+                },
+                success: function (data) {
+                    var s = '<option value="">Please Select</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["classNumber"] + ' : ' + data[prop]["className"] + '</option>';
+                    }
+                    $("#HJItemClassId").html(s);
+                    var x = document.getElementById("HJItemClassId");
+                    var i;
+                    for (i = 0; i < x.length; i++) {
+                        if (x.options[i].value == ClassId) {
+                            x.options[i].selected = true;
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+}

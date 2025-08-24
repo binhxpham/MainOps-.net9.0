@@ -1,0 +1,12 @@
+﻿@model MainOps.Controllers.ImageModel
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<div style="width:100%;height:500px;">
+    <img src="@Model.path.Split("wwwroot")[1].Replace("\\","/")" style="width:100%;height:100%;" />
+</div>
+
+

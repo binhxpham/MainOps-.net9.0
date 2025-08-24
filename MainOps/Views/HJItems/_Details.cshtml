@@ -1,0 +1,46 @@
+﻿@model MainOps.Models.HJItem
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<style>
+    .rotated {
+        transform: rotate(15deg);
+    }
+</style>
+    <html>
+    <head>
+        <meta name="viewport" content="width=device-width" />
+        <title>@Model.HJId</title>
+        <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+    </head>
+    
+    <body>
+        <font size="5">
+            <div>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td rowspan="2" width="40%" align="left"><img src="~/images/Divisions/Photos/@Model.DivisionId/@Model.Division.LogoPath" height="210" style="width:96%;" /></td>
+                            <td colspan="2" align="center" width ="80%" height="70" style="border-width:thin;border-style:solid;">@Html.DisplayFor(model => model.Name)</td>
+                        </tr>
+                        <tr>
+                            <td align="center" width="20%" height="105">@Html.DisplayNameFor(model => model.HJId)</td>
+                            <td align="center" height="105" style="border-width:thin;border-style:solid;">@Html.DisplayFor(model => model.HJId)</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="2" width="20%" align="left"><img src='@Url.Action("GetQR","HJItems",new { Id = Model.Id })' alt="" height="210" /></td>
+                            <td align="center" width="20%" height="105">@Html.DisplayNameFor(model => model.weight)</td>
+                            <td align="center" height="105" style="border-width:thin;border-style:solid;">@Html.DisplayFor(model => model.weight)</td>
+                        </tr>
+                        <tr>
+                            <td align="center" width="20%" height="105">@Html.DisplayNameFor(model => model.Measures)</td>
+                            <td align="center" height="105" style="border-width:thin;border-style:solid;">@Html.DisplayFor(model => model.Measures)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </font>
+    </body>
+</html>

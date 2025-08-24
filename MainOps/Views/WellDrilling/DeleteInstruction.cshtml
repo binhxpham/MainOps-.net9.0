@@ -1,0 +1,279 @@
+﻿@model MainOps.Models.WellDrillingInstruction
+
+@{
+    ViewData["Title"] = "DeleteInstruction";
+}
+
+<h2>DeleteInstruction</h2>
+
+<h3>Are you sure you want to delete this?</h3>
+<div>
+    <h4>WellDrillingInstruction</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Project)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Project.Abbreviation)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Date)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Date)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Address)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Address)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DrillPlace)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DrillPlace)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.WellID)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.WellID)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Borerig)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Borerig)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Boringstype)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Boringstype)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Boremetode)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Boremetode)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Belaegning)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Belaegning)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Boretilladelse)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Boretilladelse)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Boretilladelse_Path)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Boretilladelse_Path)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Afledningstilladelse)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Afledningstilladelse)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Aflednignstilladelse_Path)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Aflednignstilladelse_Path)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.RaadenOverVej)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.RaadenOverVej)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.RaadenOverVej_Path)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.RaadenOverVej_Path)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Gravetilladelse)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Gravetilladelse)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Gravetilladelse_Path)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Gravetilladelse_Path)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Ledningsoplysninger)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Ledningsoplysninger)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Ledningsoplysninger_Path)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Ledningsoplysninger_Path)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Forgravning)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Forgravning)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Reetablering)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Reetablering)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ToFiltre)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ToFiltre)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Filter1_Dim)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Filter1_Dim)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Filter2_Dim)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Filter2_Dim)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Blindroer1)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Blindroer1)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Blindroer2)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Blindroer2)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Filterroer1)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Filterroer1)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Filterroer2)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Filterroer2)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Filterslidser)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Filterslidser)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Grustype)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Grustype)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Taetningsringe)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Taetningsringe)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Filterstyr)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Filterstyr)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Forsegling)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Forsegling)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Registrering)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Registrering)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ProeveFrekvens)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.ProeveFrekvens)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BoreDybde)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BoreDybde)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BlindPipe1)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BlindPipe1)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BlindPipe2)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BlindPipe2)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BlindPipe1m)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BlindPipe1m)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BlindPipe2m)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BlindPipe2m)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Filter1_Laengde)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Filter1_Laengde)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Filter2_Laengde)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Filter2_Laengde)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DoneBy)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DoneBy)
+        </dd>
+    </dl>
+    
+    <form asp-action="DeleteInstruction">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-action="Index">Back to List</a>
+    </form>
+</div>

@@ -1,0 +1,237 @@
+﻿@model IEnumerable<MainOps.Models.WaterSampleType>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Water Samples Main Page")</h2>
+
+<table border="1" style="width:100%;table-layout:fixed;">
+    <tr>
+        <td>
+            <form asp-action="UploadSamples" method="get">
+                <button class="btn-hoelscher" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Upload Water Sample")</button>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form asp-action="ShowMeasures" method="get">
+                <button class="btn-hoelscher" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Water Sample Measures")</button>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form asp-action="WaterSamplePlaces" method="get">
+                <button class="btn-hoelscher" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Water Sample Places")</button>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form asp-action="ExportSamples" method="get">
+                <button class="btn-hoelscher" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Export Samples")</button>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form asp-action="Index" asp-controller="WaterSampleStandardLimits">
+                <button class="btn-hoelscher" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Standard limits")</button>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <form asp-action="CreatePackage" method="get">
+                <button class="btn-hoelscher" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Create a Water Sample Package")</button>
+            </form>
+        </td>
+        <td>
+            <form asp-action="Packages" method="get">
+                <button class="btn-hoelscher" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("See Current Packages")</button>
+            </form>
+        </td>
+        <td>
+            <form asp-action="SamplingLog" method="get">
+                <table>
+                    <tr>
+                        <td><label>@SharedLocalizer.GetLocalizedHtmlString("Project:")</label></td>
+                        <td><select name="ProjectId" asp-items="@ViewBag.ProjectId" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Chooose Project")</option></select></td>
+                    </tr>
+                    <tr>
+                        <td><label>@SharedLocalizer.GetLocalizedHtmlString("Start Date:")</label></td>
+                        <td><input type="datetime-local" name="start" /></td>
+                    </tr>
+                    <tr>
+                        <td><label>@SharedLocalizer.GetLocalizedHtmlString("End Date:")</label></td>
+                        <td><input type="datetime-local" name="end" /></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><button class="btn-hoelscher" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("See Sampling log")</button></td>
+                    </tr>
+                </table>
+            </form>
+        </td>
+
+    </tr>
+    <tr>
+        <td colspan="3" style="width:50%;">
+            <form asp-action="WaterSampleReport" asp-controller="WaterSampleTypes" method="get">
+                <table style="width:100%;table-layout:fixed;">
+                    <tr>
+                        <td><label>@SharedLocalizer.GetLocalizedHtmlString("Load Report from Project")</label></td>
+                        <td><select id="ProjectId1" name="id" asp-items="@ViewBag.ProjectId" style="width:100%;"><option value="" >@SharedLocalizer.GetLocalizedHtmlString("Choose Project")</option></select></td>
+                        <td>search place: <input name="search" placeholder="search place..." /></td>
+                        <td><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Download")</button>
+                    </tr>
+
+                </table>
+            </form>
+        </td>
+        <td colspan="3" style="width:50%;">
+            <form asp-action="WaterSampleReportPDF" asp-controller="WaterSampleTypes" method="get">
+                <table style="width:100%;table-layout:fixed;">
+                    <tr>
+                        <td><label>@SharedLocalizer.GetLocalizedHtmlString("Load Report from Project")</label></td>
+                        <td><select id="ProjectId" name="id" asp-items="@ViewBag.ProjectId" onchange="FillWaterSamplePoints();" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Project")</option></select></td>
+                        <td><label>@SharedLocalizer.GetLocalizedHtmlString("Set today as REPORTING DATE")</label></td>
+                        <td><input type="checkbox" name="updatereportdate" value="false" onchange="this.checked ? this.value = true : this.value = false;" /></td>
+                        <td><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Download PDF")</button>
+                    </tr>
+                   
+                    @*<tr>
+                        <td>freqweeks: <input name="FreqWeeks" /></td>
+                        <td>freqsamples: <input name="FreqSamples" /></td>
+                    </tr>*@
+
+                </table>
+            </form>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3" style="width:50%;">
+            <form asp-action="WaterSampleReportSamplePlacePDF" asp-controller="WaterSampleTypes" method="get">
+                <table style="width:100%;table-layout:fixed;">
+                    <tr>
+                        <td><label>@SharedLocalizer.GetLocalizedHtmlString("Load Report from Sample Place")</label></td>
+                        <td><select id="WaterSamplePlaceId" name="id" asp-items="@ViewBag.SamplePlaceId" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Sample Place")</option></select></td>
+                        <td><label>@SharedLocalizer.GetLocalizedHtmlString("Set today as REPORTING DATE")</label></td>
+                        <td><input type="checkbox" name="updatereportdate" value="false" onchange="this.checked ? this.value = true : this.value = false;" /></td>
+                        <td><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Download PDF")</button>
+                    </tr>
+
+                </table>
+            </form>
+        </td>
+        <td colspan="3" style="width:50%;">
+            <form asp-action="WaterSampleReportGraphs" asp-controller="WaterSampleTypes" method="get">
+                <table style="width:100%;table-layout:fixed;">
+                    <tr>
+                        <td><label>@SharedLocalizer.GetLocalizedHtmlString("Load Report from Project")</label></td>
+                        <td><select id="ProjectId" name="id" asp-items="@ViewBag.ProjectId" onchange="FillWaterSamplePoints();" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Project")</option></select></td>
+                        <td><input name="searchplace" type="text" placeholder="search sample place..." /></td>
+                        <td><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Get Graphs")</button>
+                    </tr>
+
+
+                </table>
+            </form>
+        </td>
+
+    </tr>
+    <tr>
+        <td colspan="3" style="width:50%;">
+            <form asp-action="WaterSampleReportZip" asp-controller="WaterSampleTypes" method="get">
+                <table style="width:100%;table-layout:fixed;">
+                    <tr>
+                        <td><label>@SharedLocalizer.GetLocalizedHtmlString("Zip Them all")</label></td>
+                        <td><select id="ProjectId" name="id" asp-items="@ViewBag.ProjectId" onchange="FillWaterSamplePoints();" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Project")</option></select></td>
+                        <td><label>@SharedLocalizer.GetLocalizedHtmlString("Set today as REPORTING DATE")</label></td>
+                        <td><input type="checkbox" name="updatereportdate" value="false" onchange="this.checked ? this.value = true : this.value = false;" /></td>
+                        <td><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Create Zip")</button>
+                    </tr>
+                </table>
+            </form>
+        </td>
+        <td colspan="3" style="width:50%;">
+            <form asp-action="GetWaterSampleZipFile" asp-controller="WaterSampleTypes" method="get">
+                <table style="width:100%;table-layout:fixed;">
+                    <tr>
+                        <td><label>@SharedLocalizer.GetLocalizedHtmlString("Zip Them all")</label></td>
+                        <td><select id="ProjectId" name="ProjectId" asp-items="@ViewBag.ProjectId" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Choose Project")</option></select></td>
+                        <td><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Download Zip")</button>
+                    </tr>
+                </table>
+            </form>
+        </td>
+    </tr>
+</table>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Komponent)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Enhed)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DL)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Komponent)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Enhed)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DL)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Delete")</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            FillWaterSamplePoints();
+        })
+        function FillWaterSamplePoints() {
+            var ProjectId = $('#ProjectId1').val();
+            var url = '@Url.Action("GetWaterSamplePlacesProject", "WaterSampleTypes")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: {'theId' : ProjectId},
+                success: function (data) {
+                    var s = '<option value="">Select WaterSample Place</option>';
+                    for (var prop in data) {
+                        s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                    }
+                    $("#WaterSamplePlaceId").html(s);
+                    document.getElementById("WaterSamplePlaceId").style.width = "100%";
+                }
+            });
+        }
+    </script>
+}
+
+
