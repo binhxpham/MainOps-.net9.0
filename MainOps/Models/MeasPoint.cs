@@ -75,7 +75,7 @@ namespace MainOps.Models
         [Display(Name = "DGU nr")]
         public string? DGUnr { get; set; }
         public ICollection<Meas>? Measures { get; set; }
-        public ICollection<Offset> Offsets { get; set; }
+        public ICollection<Offset>? Offsets { get; set; }
 
         public bool Coordinates_Are_AsBuilt { get; set; }
         public double? ExternalCoordx { get; set; }

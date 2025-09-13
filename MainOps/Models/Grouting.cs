@@ -15,10 +15,10 @@ namespace MainOps.Models
         [Required]
         [Display(Name = "Project")]
         public int ProjectId { get; set; }
-        public virtual Project Project { get; set; }
+        public virtual Project? Project { get; set; }
         [Display(Name = "SubProject")]
         public int? SubProjectId { get; set; }
-        public virtual SubProject SubProject { get; set; }
+        public virtual SubProject? SubProject { get; set; }
         [Required]
         [Display(Name = "Start Time")]
         public DateTime StartTime { get; set; }
@@ -27,19 +27,19 @@ namespace MainOps.Models
         public DateTime EndTime { get; set; }
         [Display(Name = "Exclude from Invoice?")]
         public bool Exclude_From_Invoice { get; set; }
-        public ICollection<GroutTestDataDevice> Data { get; set; }
+        public ICollection<GroutTestDataDevice>? Data { get; set; }
         [NotMapped]
-        public JsonResult Data_Json { get; set; }
+        public JsonResult? Data_Json { get; set; }
         [Display(Name = "Photo BEFORE")]
-        public ICollection<GroutBeforePhoto> Before_Photos { get; set; }
+        public ICollection<GroutBeforePhoto>? Before_Photos { get; set; }
         [Display(Name = "Photo w. Grout finished")]
-        public ICollection<GroutGroutPhoto> Grout_Photos { get; set; }
+        public ICollection<GroutGroutPhoto>? Grout_Photos { get; set; }
         [Display(Name = "Photo after plugging pipe")]
-        public ICollection<GroutAfterPhoto> After_Photos { get; set; }
+        public ICollection<GroutAfterPhoto>? After_Photos { get; set; }
         [Display(Name = "Photo Water Meter before")]
-        public ICollection<GroutWMBeforePhoto> WM_Before_Photos { get; set; }
+        public ICollection<GroutWMBeforePhoto>? WM_Before_Photos { get; set; }
         [Display(Name = "Photo Water Meter after")]
-        public ICollection<GroutWMAfterPhoto> WM_After_Photos { get; set; }
+        public ICollection<GroutWMAfterPhoto>? WM_After_Photos { get; set; }
 
         public double? Meter_Drain {
             get 
@@ -70,14 +70,14 @@ namespace MainOps.Models
         [Display(Name = "Longitude")]
         public double Longitude { get; set; }
         [Display(Name = "Location")]
-        public string Location { get; set; }
+        public string? Location { get; set; }
         [Display(Name = "Total m3 Grout")]
         public double? Totalm3_override { get; set; }
         [Display(Name = "Comments")]
-        public string Comments { get; set; }
-        public string imagepath { get; set; }
+        public string? Comments { get; set; }
+        public string? imagepath { get; set; }
         [Display(Name = "Done By")]
-        public string DoneBy { get; set; }
+        public string? DoneBy { get; set; }
         [Display(Name = "Water meter start")]
         public double? WaterMeterStart { get; set; }
         [Display(Name = "Water meter end")]
@@ -114,7 +114,7 @@ namespace MainOps.Models
         public int Id { get; set; }
         [ForeignKey("Grouting")]
         public int? GroutingId { get; set; }
-        public virtual Grouting Grouting { get; set; }
+        public virtual Grouting? Grouting { get; set; }
         public DateTime TimeStamp { get; set; }
         public double? FlowData { get; set; }
     }

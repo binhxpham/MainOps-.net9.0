@@ -11,7 +11,7 @@ namespace MainOps.Models
     {
         [ForeignKey("Offsets")]
         public int OffsetId { get; set; }
-        public virtual Offset Offset {get; set;}
+        public virtual Offset? Offset {get; set;}
         public double meters_cut { get; set; }
         public DateTime start_time { get; set; }
         public PipeCutViewModel()
@@ -38,6 +38,9 @@ namespace MainOps.Models
         public double meters_cut { get; set; }
         [Display(Name = "Time of Cutting/Extending")]
         public DateTime start_time { get; set; }
+
+        [Display(Name = "Comment")]
+        public string? comment { get; set; }
         public PipeCutViewModel2()
         {
             start_time = DateTime.Now;

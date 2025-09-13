@@ -4,9 +4,19 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Grout Graph</title>
-    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+    @* <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js"></script>
+    <script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js"></script> *@
+
+    <!-- jQuery (use Google CDN since it's already allowed in CSP) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- Google Charts loader -->
+    @* <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> *@
+    <script type="text/javascript" src="https://www.gstatic.com/charts/"></script>
+
+    <!-- Moment.js (use cdnjs instead of rawgit, which is deprecated) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 </head>
 <body>
     <table style="width:100%;">
@@ -19,7 +29,7 @@
             <td>@Html.DisplayFor(Model => Model.Project.Name)</td>
             <td colspan="2" rowspan="11">
                 <div class="continer">
-                    <img src="@String.Concat("https://maps.googleapis.com/maps/api/staticmap?center=",@Model.Latitude,",",@Model.Longitude,"&zoom=15&size=600x400&maptype=roadmap&scale=2&markers=size:mid%7Ccolor:red%7Clabel:P%7C",@Model.Latitude,",",@Model.Longitude,"&key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM")" style="width:600px;height:400px;" />
+                    <img src="@String.Concat("https://maps.googleapis.com/maps/api/staticmap?center=", @Model.Latitude, ",", @Model.Longitude, "&zoom=15&size=600x400&maptype=roadmap&scale=2&markers=size:mid%7Ccolor:red%7Clabel:P%7C", @Model.Latitude, ",", @Model.Longitude, "&key=AIzaSyBZBU48i_mLH-TfVWO-UfsKM_Qu7fyPdWs")" style="width:600px;height:400px;" />
                 </div>
             </td>
         </tr>
@@ -103,7 +113,7 @@
     <div class="container">
         <div id="chart1" style="width:90%;"></div>
     </div>
-    <table style="width:100%;table-layout:fixed;">
+     <table style="width:100%;table-layout:fixed;">
         <tr>
             <td style="font-size:14px;"><b>@SharedLocalizer.GetLocalizedHtmlString("Before Photo")</b></td>
             <td style="font-size:14px;"><b>@SharedLocalizer.GetLocalizedHtmlString("Before Sealing Photo")</b></td>
@@ -150,7 +160,6 @@
         {
 
         }
-
     </table>
     <div>
         <form asp-action="Grouting_PDF" asp-controller="TrackItems" asp-route-id="@Model.Id" method="post" target="_blank" onsubmit="saveimage();">
@@ -158,7 +167,7 @@
             <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Get PDF")</button>
         </form>
     </div>
-    <script>
+    @* <script>
         var chart;
             google.charts.load('current', { 'packages': ['corechart'] });
             google.load('visualization', '1.0', { 'packages': ['corechart'], 'callback': drawchart });
@@ -211,7 +220,71 @@
                 saveImage();
             }
 
+    </script> *@
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        var chart;
+        google.charts.load('current', { packages: ['corechart'] });
+        google.charts.setOnLoadCallback(drawchart);
+
+        function saveImage() {
+            $('#imageid').val(chart.getImageURI());
+        }
+
+        function drawchart() {
+            console.log('Start drawing.....');
+            chart = new google.visualization.LineChart(document.getElementById('chart1'));
+            var data = new google.visualization.DataTable();
+            data.addColumn('datetime', 'time');
+            data.addColumn('number', 'Flow Rate');
+            console.log('data: ' + data);
+
+            var options = {
+                title: "Time Series Grout Graph",
+                width: 1000,
+                height: 750,
+                interpolateNulls: true,
+                legend: { position: 'top' },
+                vAxes: {
+                    0: { title: "m3 / h" }
+                },
+                chartArea: {
+                    height: '80%',
+                    width: '85%',
+                    left: 100,
+                    backgroundColor: { stroke: "gray", strokeWidth: 1 },
+                },
+                series: {
+                    0: {
+                        type: "line",
+                        targetAxisIndex: 0
+                    }
+                },
+                explorer: {
+                    actions: ['dragToZoom', 'rightClickToReset'],
+                    axis: 'both',
+                    keepInBounds: true,
+                    maxZoomIn: 20.0
+                },
+                pointSize: 8
+            };
+
+            @foreach (var item in Model.Data.OrderBy(x => x.TimeStamp))
+            {
+                    <text>
+                        console.log('Item: @item.FlowData');
+                        var val = @item.FlowData;
+                        var date = new Date('@item.TimeStamp.ToString("yyyy-MM-ddTHH:mm:ss")');
+                        data.addRow([date, val]);
+                    </text>
+            }
+
+            chart.draw(data, options);
+            saveImage();
+        }
     </script>
+
 </body>
 </html>
 

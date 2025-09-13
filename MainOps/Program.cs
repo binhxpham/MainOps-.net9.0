@@ -1,43 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.Reflection;
+using System.Text.Json.Serialization;
+using System.Threading.RateLimiting;
+using Azure.Identity;
+using MainOps.Configuration;
+//using Pomelo.EntityFrameworkCore.MySql.Data.MySqlClient;
+using MainOps.Data;
+using MainOps.ExtensionMethods;
+using MainOps.Models;
+using MainOps.Resources;
+using MainOps.Services;
 using Microsoft.AspNetCore.Builder;
+//using Pomelo.EntityFrameworkCore.MySql.Storage.Internal;
+using Microsoft.AspNetCore.CookiePolicy;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.AzureKeyVault;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
-//using Pomelo.EntityFrameworkCore.MySql.Data.MySqlClient;
-using MainOps.Data;
-using MainOps.Models;
-using MainOps.Services;
-using MainOps.Resources;
-using MainOps.ExtensionMethods;
-using Rotativa.AspNetCore;
-using Microsoft.AspNetCore.Http.Features;
-//using Pomelo.EntityFrameworkCore.MySql.Storage.Internal;
-using Microsoft.AspNetCore.CookiePolicy;
-using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.HttpLogging;
-using Microsoft.AspNetCore.ResponseCompression;
-using System.Threading.RateLimiting;
-using Azure.Identity;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.AzureKeyVault;
+using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 //using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 //using Pomelo.EntityFrameworkCore.MySql;
 using MySqlConnector;
 using Newtonsoft.Json;
-using System.Configuration;
-using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
+using Rotativa.AspNetCore;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Bind the "GoogleMaps" section from config to GoogleMapsSettings
+builder.Services.Configure<GoogleMapsSettings>(
+    builder.Configuration.GetSection("GoogleMaps"));
 
 // Load Key Vaults from configuration
 var vaultSecretUri = builder.Configuration["KeyVault:SecretUri"];
@@ -312,22 +317,16 @@ app.Use(async (context, next) =>
     context.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
     context.Response.Headers["Permissions-Policy"] =
         "accelerometer=(), camera=(), geolocation=(self), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()";
-    //context.Response.Headers["Content-Security-Policy"] =
-    //    "default-src 'self'; " + 
-    //    "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "+
-    //    "style-src 'self' 'unsafe-inline';";
     
-
     context.Response.Headers["Content-Security-Policy"] =
-    "default-src 'self'; " +
-    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://maps.gstatic.com https://ajax.googleapis.com; " +
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://ajax.googleapis.com; " +
-    "font-src 'self' https://fonts.gstatic.com; " +
-    "connect-src 'self' https://maps.googleapis.com https://maps.gstatic.com; " +
-    "img-src 'self' data: https://maps.googleapis.com https://maps.gstatic.com;";
-
-
-
+        "default-src 'self'; " +
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://maps.gstatic.com https://ajax.googleapis.com https://cdnjs.cloudflare.com https://www.gstatic.com/charts/; " +
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://ajax.googleapis.com https://www.gstatic.com/charts/; " +
+        "img-src 'self' data: https://maps.gstatic.com https://maps.googleapis.com; " +
+        "font-src 'self' https://fonts.gstatic.com; " +
+        "connect-src 'self' https://maps.googleapis.com https://maps.gstatic.com; " +
+        "frame-src 'self' https://www.google.com; " +
+        "img-src 'self' data: https://maps.googleapis.com https://maps.gstatic.com;";
 
     await next();
 });

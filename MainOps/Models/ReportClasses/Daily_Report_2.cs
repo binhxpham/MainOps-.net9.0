@@ -15,12 +15,12 @@ namespace MainOps.Models.ReportClasses
         [ForeignKey("Title")]
         [Display(Name = "Title")]
         public int TitleId { get; set; }
-        public Title Title { get; set; }
+        public Title? Title { get; set; }
         [ForeignKey("Project")]
         [Display(Name = "Project")]
         [Required]
         public int ProjectId { get; set; }
-        public virtual Project Project { get; set; }
+        public virtual Project? Project { get; set; }
         [Display(Name = "Key Words")]
         public string? short_Description { get; set; }
         [Display(Name = "Paid worK?")]
@@ -54,7 +54,7 @@ namespace MainOps.Models.ReportClasses
         public string? Extra_Works { get; set; }
         public string? DoneBy { get; set; }
         [NotMapped]
-        public IList<string> pictures { get; set; }
+        public IList<string>? pictures { get; set; }
         public string? Signature { get; set; }
         [Display(Name = "Amount of People")]
         [DefaultValue(1)]
@@ -76,7 +76,7 @@ namespace MainOps.Models.ReportClasses
         public string? Checked_By { get; set; }
         [Display(Name = "Sub Project")]
         public int? SubProjectId { get; set; }
-        public virtual SubProject SubProject { get; set; }
+        public virtual SubProject? SubProject { get; set; }
         [Display(Name = "Other people in Daily Report")]
         public string? OtherPeople { get; set; }
         [Display(Name = "Other people IDs in Daily Report")]
@@ -91,8 +91,10 @@ namespace MainOps.Models.ReportClasses
         [Display(Name = "Variation Order")]
         public int? VariationOrderId { get; set; }
         [Display(Name = "Variation Order")]
-        public virtual BoQHeadLine VariationOrder { get; set; }
+        public virtual BoQHeadLine? VariationOrder { get; set; }
         public DateTime? InvoiceDate { get; set; }
+
+        public Daily_Report_2() { }
 
     }
     public class Daily_Report_2_temp
@@ -129,12 +131,12 @@ namespace MainOps.Models.ReportClasses
         [ForeignKey("Title")]
         [Display(Name = "Title")]
         public int TitleId { get; set; }
-        public Title Title { get; set; }
+        public Title? Title { get; set; }
         [ForeignKey("Project")]
         [Display(Name = "Project")]
         [Required]
         public int ProjectId { get; set; }
-        public virtual Project Project { get; set; }
+        public virtual Project? Project { get; set; }
         [Display(Name = "Key Words")]
         public string? short_Description { get; set; }
         [Display(Name = "Paid worK?")]
@@ -168,7 +170,7 @@ namespace MainOps.Models.ReportClasses
         public string? Extra_Works { get; set; }
         public string? DoneBy { get; set; }
         [NotMapped]
-        public IList<string> pictures { get; set; }
+        public IList<string>? pictures { get; set; }
         public string? Signature { get; set; }
         [Display(Name = "Amount of People")]
         [DefaultValue(1)]
@@ -190,7 +192,7 @@ namespace MainOps.Models.ReportClasses
         public string? Checked_By { get; set; }
         [Display(Name = "Sub Project")]
         public int? SubProjectId { get; set; }
-        public virtual SubProject SubProject { get; set; }
+        public virtual SubProject? SubProject { get; set; }
         [Display(Name = "Other people in Daily Report")]
         public string? OtherPeople { get; set; }
         [Display(Name = "Other people IDs in Daily Report")]
@@ -205,7 +207,7 @@ namespace MainOps.Models.ReportClasses
         [Display(Name = "Variation Order")]
         public int? VariationOrderId { get; set; }
         [Display(Name = "Variation Order")]
-        public virtual BoQHeadLine VariationOrder { get; set; }
+        public virtual BoQHeadLine? VariationOrder { get; set; }
         public DateTime? InvoiceDate { get; set; }
         public Daily_Report_2Backup()
         {

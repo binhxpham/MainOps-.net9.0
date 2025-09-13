@@ -90,6 +90,8 @@ namespace MainOps.Models
         [Display(Name = "Done By")]
         public string? DoneBy { get; set; }
         public ICollection<PhotoFileMeas>? MeasPhotos { get; set; }
+
+        public Meas() { }
     }
     public class PipeLineMeas
     {

@@ -13,28 +13,28 @@ namespace MainOps.Models
         [Display(Name = "Project")]
         public int ProjectId { get; set; }
         [Display(Name = "Project")]
-        public virtual Project Project { get; set; }
+        public virtual Project? Project { get; set; }
         [Display(Name = "Sub Project")]
         public int? SubProjectId { get; set; }
         [Display(Name = "Sub Project")]
-        public virtual SubProject SubProject { get; set; }
+        public virtual SubProject? SubProject { get; set; }
         [Display(Name = "Time Stamp")]
         public DateTime TimeStamp { get; set; }
         [Display(Name = "Report Done By")]
-        public string DoneBy { get; set; }
+        public string? DoneBy { get; set; }
         [Display(Name = "Signature")]
-        public string Signature { get; set; }
+        public string? Signature { get; set; }
         [Display(Name = "Entered into Database")]
         public DateTime? EnteredIntoDataBase { get; set; }
         [Display(Name = "General Comments")]
-        public string GeneralComments { get; set; }
+        public string? GeneralComments { get; set; }
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
         [Display(Name = "Well (Type In)")]
-        public string Wellname { get; set; }
+        public string? Wellname { get; set; }
         [Display(Name = "Well (Choice)")]
         public int? MeasPointId { get; set; }
-        public virtual MeasPoint MeasPoint { get; set; }
+        public virtual MeasPoint? MeasPoint { get; set; }
         [Display(Name = "Photos befor taken?")]
         public bool PhotosBefore { get; set; }
         [Display(Name = "Photos after taken?")]
@@ -63,9 +63,9 @@ namespace MainOps.Models
         public double? Pipe_Cut_X_meter_under { get; set; }
         [Display(Name = "Area re-established?")]
         public bool Area_Reestablished { get; set; }
-        public ICollection<PhotoFileDecommission> Photos { get; set; }
+        public ICollection<PhotoFileDecommission>? Photos { get; set; }
         public int? ItemTypeId { get; set; }
-        public virtual ItemType ItemType { get; set; }
+        public virtual ItemType? ItemType { get; set; }
         [Display(Name = "Casting Density")]
         public double Density
         {
@@ -101,6 +101,8 @@ namespace MainOps.Models
                 }
             }
         }
+
+        public Decommission() { }
 
     }
 }

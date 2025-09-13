@@ -8,4 +8,6 @@
 @using Microsoft.AspNetCore.Hosting;
 @inject IViewLocalizer Localizer
 @inject LocService SharedLocalizer
+@using MainOps.Configuration
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject Microsoft.Extensions.Options.IOptions<GoogleMapsSettings> GoogleMaps

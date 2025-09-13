@@ -49,20 +49,46 @@ namespace MainOps.Controllers
                                   join pu in _context.ProjectUsers on o.measpoint.ProjectId
                                                     equals pu.projectId
                                   where pu.userId == theuser.Id && o.measpoint.Project.Active.Equals(true)
-                                  select o).OrderBy(x => x.measpoint.ProjectId).ThenBy(x => x.measpoint.Name).ThenBy(x => x.starttime).Take(100).ToListAsync();
-                
+                                  select o)
+                                  .OrderBy(x => x.measpoint.ProjectId)
+                                  .ThenBy(x => x.measpoint.Name)
+                                  .ThenBy(x => x.starttime)
+                                  .Take(100).ToListAsync();
+
+                Console.WriteLine("Guest and member guest role");
+
                 return View(data);
 
             }
             if (User.IsInRole("Admin"))
             {
-                var dataContextAdmin = _context.Offsets.Include(o => o.measpoint).ThenInclude(x => x.Project)
+                //var dataContextAdmin = _context.Offsets.Include(o => o.measpoint).ThenInclude(x => x.Project)
+                //    .Where(x => x.measpoint.Project.Active.Equals(true))
+                //.OrderBy(x => x.measpoint.ProjectId).ThenBy(x => x.measpoint.Name).ThenBy(x => x.starttime).Take(100);
+
+                var dataContextAdmin = _context.Offsets
+                    .Include(o => o.measpoint)
+                    .ThenInclude(x => x.Project)
                     .Where(x => x.measpoint.Project.Active.Equals(true))
-                .OrderBy(x => x.measpoint.ProjectId).ThenBy(x => x.measpoint.Name).ThenBy(x => x.starttime).Take(100);
+                    .OrderByDescending(x => x.starttime) // Sorting by starttime in descending order
+                    .ThenBy(x => x.measpoint.ProjectId)
+                    .ThenBy(x => x.measpoint.Name)
+                    .Take(100);
+
+                Console.WriteLine("Admin role");
                 return View(await dataContextAdmin.ToListAsync());
             }
-            var dataContext = _context.Offsets.Include(o => o.measpoint).ThenInclude(x=>x.Project)
-                .Where(x=>x.measpoint.Project.DivisionId.Equals(theuser.DivisionId) && x.measpoint.Project.Active.Equals(true)).OrderBy(x=>x.measpoint.ProjectId).ThenBy(x=>x.measpoint.Name).ThenBy(x=>x.starttime).Take(100);
+            //var dataContext = _context.Offsets.Include(o => o.measpoint).ThenInclude(x=>x.Project)
+            //    .Where(x=>x.measpoint.Project.DivisionId.Equals(theuser.DivisionId) && x.measpoint.Project.Active.Equals(true)).OrderBy(x=>x.measpoint.ProjectId).ThenBy(x=>x.measpoint.Name).ThenBy(x=>x.starttime).Take(100);
+            var dataContext = _context.Offsets
+                .Include(o => o.measpoint)
+                .ThenInclude(x => x.Project)
+                .Where(x => x.measpoint.Project.DivisionId.Equals(theuser.DivisionId) && x.measpoint.Project.Active.Equals(true))
+                .OrderBy(x => x.measpoint.ProjectId)
+                .ThenBy(x => x.measpoint.Name)
+                .ThenByDescending(x => x.starttime) // Sorting by starttime in descending order
+                .Take(100);
+
             return View(await dataContext.ToListAsync());
         }
         [HttpGet]
@@ -148,15 +174,31 @@ namespace MainOps.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetUserAsync(User);
-                var offset = await _context.Offsets.Where(x => x.MeasPointId.Equals(model.MeasPointId)).OrderByDescending(x=>x.starttime).FirstAsync();
+                //var offset = await _context.Offsets.Where(x => x.MeasPointId.Equals(model.MeasPointId)).OrderByDescending(x=>x.starttime).FirstAsync();
+                bool exists = await _context.Offsets
+                    .AnyAsync(x => x.MeasPointId == model.MeasPointId);
+
+                if (!exists)
+                {
+                    throw new InvalidOperationException("No offset found for this MeasPointId.");
+                }
+
+                var offset = await _context.Offsets
+                    .Where(x => x.MeasPointId == model.MeasPointId)
+                    .OrderByDescending(x => x.starttime)
+                    .FirstAsync();
+
+
                 Offset new_offset = new Offset();
                 new_offset.starttime = model.start_time;
                 new_offset.MeasPointId = model.MeasPointId;
                 new_offset.offset = offset.offset - model.meters_cut;
+                new_offset.DoneBy = user.full_name();
+                new_offset.Comment = model.comment;
                 _context.Offsets.Add(new_offset);
                 await _context.SaveChangesAsync();
                 var mp = await _context.MeasPoints.Include(x => x.Offsets).SingleOrDefaultAsync(x => x.Id.Equals(offset.MeasPointId));
-                if (mp.Offsets.Count() > 1)
+                if (mp.Offsets.Count > 1)
                 {
                     var newerOffsets = mp.Offsets.Where(x => x.starttime > new_offset.starttime).ToList();
                     if (newerOffsets.Count() > 0)
@@ -177,11 +219,15 @@ namespace MainOps.Controllers
                     await _context.SaveChangesAsync();
                 }
                 //add report
-                PipeCut PipeCut = new PipeCut();
-                PipeCut.DoneBy = user.full_name();
-                PipeCut.MeasPointId = new_offset.MeasPointId;
-                PipeCut.Meters_Cut = model.meters_cut;
-                PipeCut.TimeStamp = model.start_time;
+                var offsetAdded = await _context.Offsets.LastAsync();
+                PipeCut pipeCut = new PipeCut();
+                pipeCut.DoneBy = user.full_name();
+                pipeCut.MeasPointId = new_offset.MeasPointId;
+                pipeCut.Meters_Cut = model.meters_cut;
+                pipeCut.Comment = model.comment;
+                pipeCut.TimeStamp = model.start_time;
+                pipeCut.OffsetId = offsetAdded.Id;//new field
+
                 var itemtype = await _context.ItemTypes.FirstOrDefaultAsync(x => x.ProjectId.Equals(mp.ProjectId) && x.ReportTypeId.Equals(17));
                 if(itemtype != null)
                 {
@@ -191,7 +237,7 @@ namespace MainOps.Controllers
                     inst.SubProjectId = mp.SubProjectId;
                     inst.RentalStartDate = model.start_time;
                     inst.InvoiceDate = DateTime.Now;
-                    inst.Install_Text = "Automatic Installation Report of Pipe Cut/Extension of" + model.meters_cut.ToString("F") + " meters";
+                    inst.Install_Text = "Automatic Installation Report of Pipe Cut/Extension of " + model.meters_cut.ToString("F") + " meters";
                     inst.isInstalled = false;
                     inst.DeinstallDate = model.start_time;
                     inst.EnteredIntoDataBase = DateTime.Now;
@@ -206,15 +252,9 @@ namespace MainOps.Controllers
                     inst.ToBePaid = true;
                     _context.Add(inst);
                 }
-                if (model.meters_cut > 0)
-                {
-                    PipeCut.Cut_Or_Extended = "Cut";
-                }
-                else
-                {
-                    PipeCut.Cut_Or_Extended = "Extended";
-                }
-                _context.PipeCuts.Add(PipeCut);
+                
+                pipeCut.Cut_Or_Extended = (model.meters_cut > 0) ? "Cut" : "Extended";
+                _context.PipeCuts.Add(pipeCut);
                 await _context.SaveChangesAsync();
                 if (files != null)
                 {
@@ -441,14 +481,26 @@ namespace MainOps.Controllers
             }
             if (User.IsInRole("Admin"))
             {
-                var filternames2 = await _context.Projects.Include(x => x.Division).OrderBy(b => b.Name).ToListAsync();
+                //var filternames2 = await _context.Projects.Include(x => x.Division).OrderBy(b => b.Name).ToListAsync();
 
-                IEnumerable<SelectListItem> selList = from s in filternames2
-                                                      select new SelectListItem
-                                                      {
-                                                          Value = s.Id.ToString(),
-                                                          Text = s.Name
-                                                      };
+                //IEnumerable<SelectListItem> selList = from s in filternames2
+                //                                      select new SelectListItem
+                //                                      {
+                //                                          Value = s.Id.ToString(),
+                //                                          Text = s.Name
+                //                                      };
+
+                var filternames2 = await _context.Projects
+                    .Include(x => x.Division)
+                    .OrderByDescending(b => b.StartDate) // Replace with the actual DateTime field
+                    .ThenBy(b => b.Name) // Keep Name as a secondary sort (optional)
+                    .ToListAsync();
+
+                IEnumerable<SelectListItem> selList = filternames2.Select(s => new SelectListItem
+                {
+                    Value = s.Id.ToString(),
+                    Text = s.Name
+                });
                 return selList;
             }
             else
@@ -467,7 +519,7 @@ namespace MainOps.Controllers
         }
         [HttpPost]
         [Authorize(Roles = ("Admin,DivisionAdmin,Member,Manager,Guest,MemberGuest"))]
-        public async Task<IActionResult> Combsearch(string searchstring, string filterchoice)
+        public async Task<IActionResult> Combsearch(string? searchstring, string filterchoice)
         {
             int f_c_converted;
             f_c_converted = Convert.ToInt32(filterchoice);
@@ -529,13 +581,13 @@ namespace MainOps.Controllers
                         var dataC = await _context.Offsets
                         .Include(m => m.measpoint).ThenInclude(x => x.Project).ThenInclude(x => x.Division)
                         .Where(x => x.measpoint.Project.Active.Equals(true))
-                        .OrderBy(x => x.starttime).ThenBy(x => x.measpoint.Name).ToListAsync();
+                        .OrderByDescending(x => x.starttime).ThenBy(x => x.measpoint.Name).ToListAsync();
                         return View(nameof(Index), dataC);
                     }
                     var data = await _context.Offsets
                         .Include(m => m.measpoint).ThenInclude(x => x.Project).ThenInclude(x => x.Division)
                         .Where(x => x.measpoint.Project.Division.Id.Equals(theuser.DivisionId) && x.measpoint.Project.Active.Equals(true))
-                        .OrderBy(x => x.starttime).ThenBy(x => x.measpoint.Name).Take(100).ToListAsync();
+                        .OrderByDescending(x => x.starttime).ThenBy(x => x.measpoint.Name).Take(100).ToListAsync();
                     return View(nameof(Index), data);
                 }
                 else if (string.IsNullOrEmpty(searchstring) && (!string.IsNullOrEmpty(filterchoice) || !filterchoice.Equals("All")))
@@ -545,7 +597,7 @@ namespace MainOps.Controllers
                         var data = await _context.Offsets
                         .Include(x => x.measpoint).ThenInclude(x => x.Project).ThenInclude(x => x.Division)
                         .Where(b => b.measpoint.ProjectId.Equals(f_c_converted))
-                        .OrderBy(x => x.starttime).ThenBy(x => x.measpoint.Name).ToListAsync();
+                        .OrderByDescending(x => x.starttime).ThenBy(x => x.measpoint.Name).ToListAsync();
                         return View(nameof(Index), data);
                     }
                     else
@@ -553,7 +605,7 @@ namespace MainOps.Controllers
                         var data = await _context.Offsets
                         .Include(x => x.measpoint).ThenInclude(x => x.Project).ThenInclude(x => x.Division)
                         .Where(b => b.measpoint.ProjectId.Equals(f_c_converted) && b.measpoint.Project.Division.Id.Equals(theuser.DivisionId))
-                        .OrderBy(x => x.starttime).ThenBy(x => x.measpoint.Name).ToListAsync();
+                        .OrderByDescending(x => x.starttime).ThenBy(x => x.measpoint.Name).ToListAsync();
                         return View(nameof(Index), data);
                     }
                     
@@ -565,7 +617,7 @@ namespace MainOps.Controllers
                         var wtp_blocks = await _context.Offsets
                         .Include(x => x.measpoint).ThenInclude(x => x.Project).ThenInclude(x => x.Division)
                         .Where(b => b.measpoint.Name.ToLower().Contains(searchstring.ToLower()))
-                        .OrderBy(x => x.starttime).ThenBy(x => x.measpoint.Name).ToListAsync();
+                        .OrderByDescending(x => x.starttime).ThenBy(x => x.measpoint.Name).ToListAsync();
                         return View(nameof(Index), wtp_blocks);
                     }
                     else
@@ -573,7 +625,7 @@ namespace MainOps.Controllers
                         var wtp_blocks = await _context.Offsets
                         .Include(x => x.measpoint).ThenInclude(x => x.Project).ThenInclude(x => x.Division)
                         .Where(b => b.measpoint.Name.ToLower().Contains(searchstring.ToLower()) && b.measpoint.Project.Division.Id.Equals(theuser.DivisionId))
-                        .OrderBy(x => x.starttime).ThenBy(x => x.measpoint.Name).ToListAsync();
+                        .OrderByDescending(x => x.starttime).ThenBy(x => x.measpoint.Name).ToListAsync();
                         return View(nameof(Index), wtp_blocks);
                     }
                     
@@ -585,7 +637,7 @@ namespace MainOps.Controllers
                         var wtp_blocks = await _context.Offsets
                         .Include(x => x.measpoint).ThenInclude(x => x.Project).ThenInclude(x => x.Division)
                         .Where(b => b.measpoint.ProjectId.Equals(f_c_converted) && b.measpoint.Name.ToLower().Contains(searchstring.ToLower()))
-                        .OrderBy(x => x.starttime).ThenBy(x => x.measpoint.Name).ToListAsync();
+                        .OrderByDescending(x => x.starttime).ThenBy(x => x.measpoint.Name).ToListAsync();
                         return View(nameof(Index), wtp_blocks);
                     }
                     else
@@ -593,7 +645,7 @@ namespace MainOps.Controllers
                         var wtp_blocks = await _context.Offsets
                         .Include(x => x.measpoint).ThenInclude(x => x.Project).ThenInclude(x => x.Division)
                         .Where(b => b.measpoint.ProjectId.Equals(f_c_converted) && b.measpoint.Project.Division.Id.Equals(theuser.DivisionId) && b.measpoint.Name.ToLower().Contains(searchstring.ToLower()))
-                        .OrderBy(x => x.starttime).ThenBy(x => x.measpoint.Name).ToListAsync();
+                        .OrderByDescending(x => x.starttime).ThenBy(x => x.measpoint.Name).ToListAsync();
                         return View(nameof(Index), wtp_blocks);
                     }
                     

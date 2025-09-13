@@ -24,6 +24,10 @@
                     <td><input asp-for="meters_cut" type="number" step="0.01" min="-10000" max="999999" class="form-control" /></td>
                 </tr>
                 <tr>
+                    <td><label asp-for="comment" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.comment))</label></td>
+                    <td><input asp-for="comment" type="text" class="form-control" /></td>
+                </tr>
+                <tr>
                     <td><label asp-for="start_time" class="control-label">@SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(Model => Model.start_time))</label></td>
                     <td><input type="datetime" class="date-picker" value="@DateTime.Now.ToString("yyyy-MM-dd HH:mm")" asp-for="start_time" style="width:250px;height:40px;" /></td>
                 </tr>

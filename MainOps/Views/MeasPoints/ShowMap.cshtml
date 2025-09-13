@@ -1,6 +1,11 @@
 ﻿@model IEnumerable<MainOps.Models.MeasPoint>
-<head>
+@* <head>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM&sensor=false&libraries=places"></script>
+</head> *@
+<head>
+    @* <script src="https://maps.googleapis.com/maps/api/js?key=@Environment.GetEnvironmentVariable("GOOGLE_MAPS_API_KEY")&sensor=false&libraries=places"></script> *@
+    <script src="https://maps.googleapis.com/maps/api/js?key=@GoogleMaps.Value.ApiKey&sensor=false&libraries=places"></script>
+
 </head>
 <table style="width:100%;table-layout:fixed;">
     <thead>
@@ -41,7 +46,6 @@
         <td>
             <input type="checkbox" checked="checked" onchange="this.checked ? this.value = true : this.value = false;" style="width:100%;" />
         </td>
-
     </tr>
     <tr>
         <td>@SharedLocalizer.GetLocalizedHtmlString("Choose Project")</td>

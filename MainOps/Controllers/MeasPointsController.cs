@@ -329,6 +329,8 @@ namespace MainOps.Controllers
         public async Task<JsonResult> JsonData(int id)
         {
             var thedata = await _context.Measures.Include(x => x.MeasPoint).ThenInclude(x => x.MeasType).Where(x => x.MeasPointId.Equals(id) && x.TheMeasurement != null).OrderBy(x => x.When).ToListAsync();
+           
+
             List<double> therealmeases = await findRealMeases(thedata.First().When, thedata.Last().When, thedata.First().MeasPoint.Id);
             List<PlotData> plotdatas = new List<PlotData>();
             int counter = 0;

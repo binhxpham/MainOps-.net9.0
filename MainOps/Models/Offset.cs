@@ -23,6 +23,13 @@ namespace MainOps.Models
         [Required]
         [Display(Name = "Start Date")]
         public DateTime starttime { get; set; }
+
+
+        [Display(Name = "DoneBy")]
+        public string? DoneBy { get; set; }
+        [Display(Name = "Comment")]
+        public string? Comment { get; set; }
+        public Offset() { }
     }
 
 }

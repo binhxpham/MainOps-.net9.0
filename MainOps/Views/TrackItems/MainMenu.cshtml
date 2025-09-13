@@ -1,400 +1,420 @@
-﻿
-@{
-    ViewData["Title"] = "Main Menu";
+﻿@{
+	ViewData["Title"] = "Main Menu";
+	var uploadMessage = TempData["UploadSuccess"] as string;
 }
 @inject UserManager<ApplicationUser> _userManager;
 <h2>@SharedLocalizer.GetLocalizedHtmlString("Main Menu")</h2>
-
+@if (!string.IsNullOrEmpty(uploadMessage))
+{
+	<script>
+		window.onload = function () {
+			alert('@uploadMessage');
+		};
+	</script>
+}
 <div class="row">
-    <div class="col-xs-12">
-        @if((await _userManager.GetUserAsync(User)).DivisionId.Equals(4))
-        {
-            <table style="width:100%;table-layout:fixed;font-size:18px;">
-                <tr>
-                    <td colspan="2">
-                        <form asp-action="ProjectOverView" asp-controller="Projects" method="get">
-                            <button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Projects Overview")</button>
-                        </form>
-                    </td>
-                </tr>
-            </table>
-            }
-    <table style="width:100%;table-layout:fixed;font-size:18px;">
-        @if (User.IsInRole("Admin") || (User.IsInRole("Manager") || User.IsInRole("ProjectMember")))
-        {
-            <tr>
-                <td colspan="2" style="width:100%;"><b>@SharedLocalizer.GetLocalizedHtmlString("Daily Report and Alarm Call")</b></td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="Daily_Report" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Daily Report")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="AlarmCall" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Alarm Call")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="Create" asp-controller="PhotoDocumenations" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Photo Documenation")</button>
-                    </form>
-                </td>
-                <td style="text-align:center;vertical-align:middle;">
-                    <a href="#MaintenanceSection" class="button btn-hoelscher" style="width:100%;height:100px;display:flex;text-decoration:none;align-items:center;justify-content:space-around;">@SharedLocalizer.GetLocalizedHtmlString("Scroll To Maintenance")</a>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="Create" asp-controller="TruckDailyReports" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Truck Daily Report")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="HourRegistration" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Fill Hour Sheet")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="Create" asp-controller="Diets" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Diets / Allowances")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="Meas" asp-controller="Installs" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Water Meter Reading Pipeline!")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2" style="width:100%;"><b>@SharedLocalizer.GetLocalizedHtmlString("Actions")</b></td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="Mobilize" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Mobilize")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="Install" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Install")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="DeInstall" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("DeInstall")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="Arrival" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Arrivals(Put on Rent!)")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="Create" asp-controller="ExtraWorks" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Extra Works")</button>
-                    </form>
-                </td>
+	<div class="col-xs-12">
+		@if ((await _userManager.GetUserAsync(User)).DivisionId.Equals(4))
+		{
+			<table style="width:100%;table-layout:fixed;font-size:18px;">
+				<tr>
+					<td colspan="2">
+						<form asp-action="ProjectOverView" asp-controller="Projects" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Projects Overview")</button>
+						</form>
+					</td>
+				</tr>
+			</table>
+		}
+		<table style="width:100%;table-layout:fixed;font-size:18px;">
+			@if (User.IsInRole("Admin") || (User.IsInRole("Manager") || User.IsInRole("ProjectMember")))
+			{
+				<tr>
+					<td colspan="2" style="width:100%;"><b>@SharedLocalizer.GetLocalizedHtmlString("Daily Report and Alarm Call")</b></td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="Daily_Report" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Daily Report")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="AlarmCall" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Alarm Call")</button>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="Create" asp-controller="PhotoDocumenations" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Photo Documenation")</button>
+						</form>
+					</td>
+					<td style="text-align:center;vertical-align:middle;">
+						<a href="#MaintenanceSection" class="button btn-hoelscher" style="width:100%;height:100px;display:flex;text-decoration:none;align-items:center;justify-content:space-around;">@SharedLocalizer.GetLocalizedHtmlString("Scroll To Maintenance")</a>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="Create" asp-controller="TruckDailyReports" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Truck Daily Report")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="HourRegistration" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Fill Hour Sheet")</button>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="Create" asp-controller="Diets" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Diets / Allowances")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="Meas" asp-controller="Installs" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Water Meter Reading Pipeline!")</button>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2" style="width:100%;"><b>@SharedLocalizer.GetLocalizedHtmlString("Actions")</b></td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="Mobilize" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Mobilize")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="Install" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Install")</button>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="DeInstall" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("DeInstall")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="Arrival" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Arrivals(Put on Rent!)")</button>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="Create" asp-controller="ExtraWorks" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Extra Works")</button>
+						</form>
+					</td>
 
-            </tr>
+					<td>
+						<form asp-action="SensorCalibration" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Sensor Calibration")</button>
+						</form>
+					</td>
+				</tr>
 
-            <tr>
-                <td>
-                    <form asp-action="Create" asp-controller="PumpInstallations" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Install Pump")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="DataLoggerInstall" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Install Data Logger")</button>
-                    </form>
-                </td>
+				<tr>
+					<td>
+						<form asp-action="Create" asp-controller="PumpInstallations" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Install Pump")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="DataLoggerInstall" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Install Data Logger")</button>
+						</form>
+					</td>
 
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="Create" asp-controller="ReinfiltrationInstallations" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Install Reinfiltration")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="Create" asp-controller="ObservationInstallations" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Install Observation")</button>
-                    </form>
-                </td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="Create" asp-controller="ReinfiltrationInstallations" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Install Reinfiltration")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="Create" asp-controller="ObservationInstallations" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Install Observation")</button>
+						</form>
+					</td>
 
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="MeasurePipe" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Measure Pipe")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="InstallSmallParts" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Install Small Parts")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="Grouting" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Grouting")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="Drill" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Drill Well Form")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="Create" asp-controller="WellChecks" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Check Well")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2" style="width:100%;"><b>@SharedLocalizer.GetLocalizedHtmlString("Projects")</b></td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="OverView" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Overview")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="ProjectOverView" asp-controller="Projects" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Projects Overview")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="Index" asp-controller="Documents" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Project Documents")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="Toolbox" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Toolbox")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="Index" asp-controller="Discounts" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Discounts")</button>
-                    </form>
-                </td>
-            </tr>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="MeasurePipe" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Measure Pipe")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="InstallSmallParts" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Install Small Parts")</button>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="Grouting" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Grouting")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="Drill" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Drill Well Form")</button>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="Create" asp-controller="WellChecks" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Check Well")</button>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2" style="width:100%;"><b>@SharedLocalizer.GetLocalizedHtmlString("Projects")</b></td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="OverView" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Overview")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="ProjectOverView" asp-controller="Projects" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Projects Overview")</button>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="Index" asp-controller="Documents" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Project Documents")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="Toolbox" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Toolbox")</button>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="Index" asp-controller="Discounts" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Discounts")</button>
+						</form>
+					</td>
+				</tr>
 
-            <tr>
-                <td colspan="2" style="width:100%;"><b>@SharedLocalizer.GetLocalizedHtmlString("Pump Tests")</b></td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="ThreeStepTest" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Pumping Test")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="ClearPumpTest" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Clear Pumping")</button>
-                    </form>
-                </td>
+				<tr>
+					<td colspan="2" style="width:100%;"><b>@SharedLocalizer.GetLocalizedHtmlString("Pump Tests")</b></td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="ThreeStepTest" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Pumping Test")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="ClearPumpTest" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Clear Pumping")</button>
+						</form>
+					</td>
 
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="Create" asp-controller="AcidTreatments" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Acid Treatment")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="Create" asp-controller="Airlifts" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Airlift")</button>
-                    </form>
-                </td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="Create" asp-controller="AcidTreatments" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Acid Treatment")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="Create" asp-controller="Airlifts" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Airlift")</button>
+						</form>
+					</td>
 
-            </tr>
-            <tr id="MaintenanceSection">
-                <td>
-                    <form asp-action="Create" asp-controller="HorizontalDrainTests" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Horizontal Drain Tests")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2" style="width:100%;"><b>@SharedLocalizer.GetLocalizedHtmlString("Site Maintenance")</b></td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="GeneratorCheck" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Generator Test")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="SiteCheck" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Site Check")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="WTPCheck" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("WTP Check")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="SensorsCheck" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Sensors Check")</button>
-                    </form>
-                </td>
+				</tr>
+				<tr id="MaintenanceSection">
+					<td>
+						<form asp-action="Create" asp-controller="HorizontalDrainTests" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Horizontal Drain Tests")</button>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2" style="width:100%;"><b>@SharedLocalizer.GetLocalizedHtmlString("Site Maintenance")</b></td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="GeneratorCheck" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Generator Test")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="SiteCheck" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Site Check")</button>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="WTPCheck" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("WTP Check")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="WaterCareCheck" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("WTP HMR Check")</button>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="Create" asp-controller="SedimentationSiteReports" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Sedimentation Site Check")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="SensorsCheck" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Sensors Check")</button>
+						</form>
+					</td>
+					
+				</tr>
+				<tr>
+					<td>
+						<form asp-controller="WaterSampleTypes" asp-action="Index">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Water Samples")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="ConstructionSiteInspection" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Site Inspection")</button>
+						</form>
+					</td>
+					
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="Create" asp-controller="Pumptestings" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Pump Functionality Test")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="Decommission" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Decommission")</button>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="Maintenance" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Do Maintenance")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="PipeCut2" asp-controller="Offsets" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Cut/Extend Pipe")</button>
+						</form>
+					</td>
+				</tr>
+			}
 
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="Create" asp-controller="SedimentationSiteReports" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Sedimentation Site Check")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="ConstructionSiteInspection" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Site Inspection")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-controller="WaterSampleTypes" asp-action="Index">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Water Samples")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="Decommission" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Decommission")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="Create" asp-controller="Pumptestings" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Pump Functionality Test")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="Maintenance" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Do Maintenance")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="PipeCut2" asp-controller="Offsets" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Cut/Extend Pipe")</button>
-                    </form>
-                </td>
-            </tr>
-        }
+			@if (User.IsInRole("Admin") || (User.IsInRole("DivisionAdmin") || User.IsInRole("Manager")) || (await _userManager.GetUserAsync(User)).full_name().Contains("Jannick Bendtsen") || (await _userManager.GetUserAsync(User)).full_name().Contains("Ralf Gruender"))
+			{
+				<tr>
+					<td colspan="2" style="width:100%;"><b>@SharedLocalizer.GetLocalizedHtmlString("Invoices and Costs")</b></td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="GenerateInvoice" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Generate Invoice")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="Index" asp-controller="Payments" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Payments")</button>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="Index" asp-controller="Discounts" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Discounts (Rental)")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="Index" asp-controller="Discounts_Installation" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Discounts (Installation)")</button>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="Index" asp-controller="Invoices" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Invoices")</button>
+						</form>
+					</td>
+				</tr>
+			}
+			@if (User.IsInRole("Guest"))
+			{
+				<tr>
+					<td>
+						<form asp-action="GenerateInvoice" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Generate Invoice")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="OverView" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("OverView")</button>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="Installations" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Installations")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="Arrivals" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Rentals")</button>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="Deinstallations" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("DeInstallations")</button>
+						</form>
+					</td>
+					<td>
+						<form asp-action="DailyReports" asp-controller="TrackItems" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Daily Reports")</button>
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<form asp-action="InstallInOperation" asp-controller="Installs" method="get">
+							<button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Operating Days")</button>
+						</form>
+					</td>
 
-        @if (User.IsInRole("Admin") || (User.IsInRole("DivisionAdmin") || User.IsInRole("Manager")) || (await _userManager.GetUserAsync(User)).full_name().Contains("Jannick Bendtsen") || (await _userManager.GetUserAsync(User)).full_name().Contains("Ralf Gruender"))
-        {
-            <tr>
-                <td colspan="2" style="width:100%;"><b>@SharedLocalizer.GetLocalizedHtmlString("Invoices and Costs")</b></td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="GenerateInvoice" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Generate Invoice")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="Index" asp-controller="Payments" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Payments")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="Index" asp-controller="Discounts" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Discounts (Rental)")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="Index" asp-controller="Discounts_Installation" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Discounts (Installation)")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="Index" asp-controller="Invoices" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Invoices")</button>
-                    </form>
-                </td>
-            </tr>
-        }
-        @if (User.IsInRole("Guest"))
-        {
-            <tr>
-                <td>
-                    <form asp-action="GenerateInvoice" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Generate Invoice")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="OverView" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("OverView")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="Installations" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Installations")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="Arrivals" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Rentals")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="Deinstallations" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("DeInstallations")</button>
-                    </form>
-                </td>
-                <td>
-                    <form asp-action="DailyReports" asp-controller="TrackItems" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Daily Reports")</button>
-                    </form>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <form asp-action="InstallInOperation" asp-controller="Installs" method="get">
-                        <button class="btn-hoelscher" style="width:100%;height:100px;">@SharedLocalizer.GetLocalizedHtmlString("Operating Days")</button>
-                    </form>
-                </td>
+				</tr>
 
-            </tr>
-
-        }
-    </table>
-    </div>
+			}
+		</table>
+	</div>
 </div>
+
+
 
 

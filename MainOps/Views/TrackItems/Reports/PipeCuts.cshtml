@@ -1,59 +1,148 @@
 ﻿@model IEnumerable<MainOps.Models.PipeCut>
 
 @{
-    ViewData["Title"] = "PipeCuts";
+	ViewData["Title"] = "Pipe Cuts/Ext.";
 }
+@inject UserManager<ApplicationUser> _userManager;
 
 <h2>PipeCuts/Extensions</h2>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.MeasPoint)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Cut_Or_Extended)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Meters_Cut)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TimeStamp)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DoneBy)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.MeasPoint.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Cut_Or_Extended)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Meters_Cut)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TimeStamp)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DoneBy)
-            </td>
-            <td>
-                <form asp-action="Edit_PipeCut" asp-route-id="@item.Id" method="get">
-                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
-                </form>
-                <form asp-action="PipeCut_Details" asp-route-id="@item.Id" method="get" target="_blank">
-                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
-                </form>
-            </td>
-        </tr>
-}
-    </tbody>
+<div class="row" style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;">
+	<div class="col-md-6">
+		<select class="form-control" id="pipeCutSelect" onchange="filterTable(this.value)">
+			<option value="all">@SharedLocalizer.GetLocalizedHtmlString("- Choose a project -")</option>
+			@* @foreach (var item in Model)
+			{
+				<option value="@item.MeasPoint.Name">
+					@item.MeasPoint.Name - @item.Cut_Or_Extended (@item.Meters_Cut m) - @item.TimeStamp.ToString()
+				</option>
+			} *@
+
+			@foreach (var item in Model.Select(x => x.MeasPoint.Project.Name).Distinct())
+			{
+				<option value="@item">@item</option>
+			}
+		</select>
+	</div>
+	<div class="col-md-4">
+		<input type="text" id="searchInput" class="form-control" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Search by Measurement Point...")" />
+	</div>
+</div>
+
+<table class="table" id="pipeCutsTable">
+	<thead>
+		<tr>
+			<th>@Html.DisplayNameFor(model => model.MeasPoint.Project)</th>
+			<th>@Html.DisplayNameFor(model => model.MeasPoint)</th>
+			<th>@Html.DisplayNameFor(model => model.Cut_Or_Extended)</th>
+			<th>@Html.DisplayNameFor(model => model.Meters_Cut)</th>
+			<th>@Html.DisplayNameFor(model => model.Comment)</th>
+			<th>@Html.DisplayNameFor(model => model.TimeStamp)</th>
+			<th>@Html.DisplayNameFor(model => model.DoneBy)</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			var currentUser = await _userManager.GetUserAsync(User);
+			<tr>
+				<td>@Html.DisplayFor(modelItem => item.MeasPoint.Project.Name)</td>
+				<td>@Html.DisplayFor(modelItem => item.MeasPoint.Name)</td>
+				<td>@Html.DisplayFor(modelItem => item.Cut_Or_Extended)</td>
+				<td>@Html.DisplayFor(modelItem => item.Meters_Cut)</td>
+				<td>@Html.DisplayFor(modelItem => item.Comment)</td>
+				<td>@Html.DisplayFor(modelItem => item.TimeStamp)</td>
+				<td>@Html.DisplayFor(modelItem => item.DoneBy)</td>
+				<td>
+					<form asp-action="Edit_PipeCut" asp-route-id="@item.Id" method="get">
+						<button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+					</form>
+					<form asp-action="PipeCut_Details" asp-route-id="@item.Id" method="get" target="_blank">
+						<button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+					</form>
+					@if (User.IsInRole("Admin") || currentUser.Email.Equals("ase@hj-as.dk")) //Asta
+					{
+						<form asp-action="Delete_PipeCuts" asp-route-id="@item.Id" method="post">
+							<button class="btn-hoelscher" onclick="return confirm('Do you really want to delete this item?')">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button>
+						</form>
+					}
+				</td>
+			</tr>
+		}
+	</tbody>
 </table>
+
+@section Scripts {
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			//document.getElementById('pipeCutsTable').style.display = 'none';
+			document.getElementById('searchInput').addEventListener('input', searchByMeasPoint);
+		});
+
+		function showSelectedRow(measPointName) {
+			const table = document.getElementById('pipeCutsTable');
+			const rows = table.getElementsByTagName('tr');
+			let hasVisibleRow = false;
+
+			for (let i = 1; i < rows.length; i++) {
+				const row = rows[i];
+				const cellValue = row.cells[0].textContent.trim();
+
+				if (cellValue === measPointName) {
+					row.style.display = "";
+					hasVisibleRow = true;
+				} else {
+					row.style.display = "none";
+				}
+			}
+
+			table.style.display = hasVisibleRow ? "" : "none";
+		}
+
+		function searchByMeasPoint() {
+			const searchInput = document.getElementById('searchInput').value.trim().toLowerCase();
+			const table = document.getElementById('pipeCutsTable');
+			const rows = document.querySelectorAll('#pipeCutsTable tbody tr');
+			let hasVisibleRow = false;
+
+			rows.forEach(row => {
+				const wellNameCell = row.cells[1];
+				if (wellNameCell) {
+					const wellName = wellNameCell.textContent.trim().toLowerCase();
+					if (wellName.includes(searchInput)) {
+						row.style.display = '';
+						hasVisibleRow = true;
+					} else {
+						row.style.display = 'none';
+					}
+				}
+			});
+
+			table.style.display = hasVisibleRow ? '' : 'none';
+		}
+
+		 function filterTable(projectName) {
+			   const table = document.getElementById('pipeCutsTable');
+			   const rows =  document.querySelectorAll('#pipeCutsTable tbody tr');
+			   console.log('Selected: ' + projectName);
+			   let hasVisibleRow = false; // To track if at least one row matches
+
+			   rows.forEach(row => {
+				   const projectCell = row.cells[0].textContent.trim(); // Adjust index based on Project column
+
+				   console.log('Project: ' + projectCell);
+				   if (projectCell === projectName || projectName === 'all') {
+					   row.style.display = "";
+					   hasVisibleRow = true;
+				   } else {
+					   row.style.display = "none";
+				   }
+			   });
+
+			   // Show table only if there are visible rows and project is not "Choose project"
+			   table.style.display = (hasVisibleRow) // && (projectName !== '- Choose a project -')) ? '' : 'none';
+		   }
+
+	</script>
+}

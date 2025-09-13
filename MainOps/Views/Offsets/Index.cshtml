@@ -1,6 +1,6 @@
 ﻿@model IEnumerable<MainOps.Models.Offset>
 
-<h2>@ViewData["Title"]</h2>
+<h2>Offsets</h2>
 @if (User.IsInRole("Admin") || User.IsInRole("Member") || User.IsInRole("DivisionAdmin"))
 {
     <div>
@@ -39,6 +39,13 @@
             <th>
                 @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.starttime))
             </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.Comment))
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString(@Html.DisplayNameFor(model => model.DoneBy))
+            </th>
+
             <th></th>
             <th></th>
         </tr>
@@ -58,6 +65,12 @@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.starttime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Comment)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DoneBy)
                 </td>
                 <td>
                     @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Member"))

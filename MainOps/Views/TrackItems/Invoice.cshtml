@@ -41,6 +41,10 @@
     <span style="color:red;"><b><big><big><big><big>@SharedLocalizer.GetLocalizedHtmlString("PREVIOUS INVOICE(S) MISSING! Please") <a asp-action="Index" asp-controller="Invoices" asp-route-id="@Model.ProjectId">@SharedLocalizer.GetLocalizedHtmlString("CHECK!")</a></big></big></big></big></b></span>
 }
 <form asp-action="GetDocumentation" method="get" target="_blank">
+    <div>
+        <p>Processing Time: @ViewBag.ProcessingTime ms</p>
+    </div>
+
     <input type="text" value="@String.Format("{0:yyyy-MM-dd}", Model.starttime)" name="starttime" hidden="hidden" />
     <input type="text" value="@String.Format("{0:yyyy-MM-dd}", Model.endtime)" name="endtime" hidden="hidden" />
     <input type="text" value="@String.Format("{0:yyyy-MM-dd_HHmmss}", Model.GenerationTime)" name="generationtime" hidden="hidden" />
@@ -385,7 +389,8 @@
 
                 @try
                 {
-                    @foreach (var item in Model.items.Where(x => x.ArrivalId != null && x.Arrival.VariationOrderId == null && (x.BoQNr_Rental >= boqheadline.BoQnum && x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0)) && (x.rental_price > (decimal)0.0 || x.rental_price < (decimal)0.0)).OrderBy(x => x.BoQNr).ThenBy(x => x.location.Split(":")[1]).ThenBy(x => x.Install_date).ThenBy(x => x.Arrival.UniqueID))
+
+                    @foreach (var item in Model.items.Where(x => x.ArrivalId != null && x.Arrival.VariationOrderId == null && (x.BoQNr_Rental >= boqheadline.BoQnum && x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0)) && (x.rental_price > (decimal)0.0 || x.rental_price < (decimal)0.0)).OrderBy(x => x.BoQNr).ThenBy(x => (x?.location != null && x.location.Contains(":"))? x.location.Split(":")[1] : "").ThenBy(x => x.Install_date).ThenBy(x => x.Arrival.UniqueID))
                     {
                         var subtotal = Convert.ToDecimal(item.rental_price);//Convert.ToDecimal(item.ItemType.rental_price * (decimal)item.Days * (decimal)item.Amount);
                         var period = SharedLocalizer.GetLocalizedHtmlString("Days");
@@ -422,7 +427,7 @@
                             {
                                 if (item.Arrival.UniqueID != null && item.Arrival.UniqueID != "N/A")
                                 {
-                                    <td style="text-align:left">
+                                    <td style="text-align:left">debug1
                                         <form asp-action="Details_Arrival" asp-controller="TrackItems" asp-route-id="@item.ArrivalId" method="get" target="_blank">
                                             <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) @Html.DisplayFor(modelItem => item.Arrival.UniqueID) : @Html.DisplayFor(modelItem => item.location)</button>
                                         </form>
@@ -430,7 +435,7 @@
                                 }
                                 else
                                 {
-                                    <td style="text-align:left">
+                                    <td style="text-align:left">debug2
                                         <form asp-action="Details_Arrival" asp-controller="TrackItems" asp-route-id="@item.ArrivalId" method="get" target="_blank">
                                             <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) : @Html.DisplayFor(modelItem => item.location)</button>
                                         </form>
@@ -549,7 +554,7 @@
                             {
                                 if (item.Arrival.UniqueID != null && item.Arrival.UniqueID != "N/A")
                                 {
-                                    <td style="text-align:left">
+                                    <td style="text-align:left">debug3
                                         <form asp-action="Details_Arrival" asp-controller="TrackItems" asp-route-id="@item.ArrivalId" method="get" target="_blank">
                                             <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) @Html.DisplayFor(modelItem => item.Arrival.UniqueID) : @Html.DisplayFor(modelItem => item.location)</button>
                                         </form>
@@ -557,7 +562,7 @@
                                 }
                                 else
                                 {
-                                    <td style="text-align:left">
+                                    <td style="text-align:left">debug4
                                         <form asp-action="Details_Arrival" asp-controller="TrackItems" asp-route-id="@item.ArrivalId" method="get" target="_blank">
                                             <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) : @Html.DisplayFor(modelItem => item.location)</button>
                                         </form>
@@ -913,7 +918,7 @@
                             }
                             else
                             {
-                                <td style="text-align:left">
+                                <td style="text-align:left">debug5
                                     @if (item.Arrival.UniqueID != null && item.Arrival.UniqueID != "N/A")
                                     {
                                         <form asp-action="Details_Arrival" asp-controller="TrackItems" asp-route-id="@item.ArrivalId" method="get" target="_blank">

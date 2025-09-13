@@ -35,6 +35,7 @@ using System.Text;
 using ImageMagick;
 using Newtonsoft.Json;
 using System.IO.Compression;
+using System.Diagnostics;
 
 namespace MainOps.Controllers
 {
@@ -8541,13 +8542,14 @@ namespace MainOps.Controllers
             return View(model);
         }
 
+        //current works in version 2.0!
         [HttpPost]
         [Authorize(Roles = "Admin,DivisionAdmin,Guest,Manager,International")]
         public async Task<IActionResult> GenerateInvoice(GenerateInvoiceVM modelin)
         {
-
             if (ModelState.IsValid)
             {
+                var stopwatch = Stopwatch.StartNew();
 
                 InvoiceModel model = new InvoiceModel();
                 model.GenerationTime = DateTime.Now;
@@ -8591,16 +8593,10 @@ namespace MainOps.Controllers
                 List<ItemType> MachineryItems = new List<ItemType>();
                 List<ItemActivity> ItemActivities = await _context.ItemActivities.Where(x => x.ProjectId.Equals(modelin.ProjectId) && x.TheDate >= starttime && x.TheDate <= endtime).ToListAsync();
                 List<ItemActivity> ItemActivities2 = await _context.ItemActivities.Where(x => x.ProjectId.Equals(modelin.ProjectId) && x.TheDate <= endtime).ToListAsync();
-                //List<ItemType> IdleItems = await _context.ItemTypes.Include(x => x.Discounts).Include(x => x.Discounts_Installation).Where(x => x.ProjectId.Equals(modelin.ProjectId) && x.Item_Type.ToLower().Contains("idle")).ToListAsync();
-                List<ItemType> IdleItems = await _context.ItemTypes
-                    .Include(x => x.Discounts)
-                    .Include(x => x.Discounts_Installation)
-                    .Where(x => x.ProjectId.Equals(modelin.ProjectId) &&
-                                (x.Item_Type ?? "").ToLower().Contains("idle")) // Handle NULL values
-                    .ToListAsync();
+                List<ItemType> IdleItems = await _context.ItemTypes.Include(x => x.Discounts).Include(x => x.Discounts_Installation).Where(x => x.ProjectId.Equals(modelin.ProjectId) && x.Item_Type.ToLower().Contains("idle")).ToListAsync();
                 List<AlarmCall> alarms2 = await _context.AlarmCalls.Where(x => x.ProjectId.Equals(modelin.ProjectId) && x.TimeStamp.Date <= endtime).ToListAsync();
                 List<AlarmCall> alarms = alarms2.Where(x => x.ProjectId.Equals(modelin.ProjectId) && x.TimeStamp.Date >= starttime && x.TimeStamp.Date <= endtime).ToList();
-                
+
                 if (modelin.SubProjectId == -1 || modelin.SubProjectId == null)
                 {
                     if (modelin.Tax)
@@ -8608,18 +8604,15 @@ namespace MainOps.Controllers
                         if (!modelin.PayDownTime)
                         {
                             //dailyreports2 = await _context.Daily_Report_2s
-                            //.Include(x => x.Title)
-                            //.ThenInclude(x => x.ItemType)
-                            //.ThenInclude(x => x.Discounts)
+                            //.Include(x => x.Title).ThenInclude(x => x.ItemType).ThenInclude(x => x.Discounts)
                             //.Where(x => x.InvoiceDate != null && Convert.ToDateTime(x.InvoiceDate).Date <= endtime && x.tobepaid.Equals(1) && x.ProjectId.Equals(modelin.ProjectId) && x.Report_Checked.Equals(true))
                             //.OrderBy(x => x.Report_Date)
                             //.ToListAsync();
 
                             dailyreports2 = await _context.Daily_Report_2s
-                                .Include(x => x.Title)
-                                .ThenInclude(x => x.ItemType)
-                                .ThenInclude(x => x.Discounts)
-                                .Where(x => x.InvoiceDate.HasValue && x.InvoiceDate.Value.Date <= endtime
+                                .Include(x => x.Title).ThenInclude(x => x.ItemType).ThenInclude(x => x.Discounts)
+                                .Where(x => x.InvoiceDate != null
+                                            && x.InvoiceDate.Value.Date <= endtime.Date
                                             && x.tobepaid == 1
                                             && x.ProjectId == modelin.ProjectId
                                             && x.Report_Checked)
@@ -8656,7 +8649,7 @@ namespace MainOps.Controllers
                                 .Include(x => x.ItemType).ThenInclude(x => x.Install_Unit)
                                 .Include(x => x.ItemType).ThenInclude(x => x.Discounts)
                                 .Include(x => x.ItemType).ThenInclude(x => x.Discounts_Installation)
-                                .Where(x => x.TimeStamp.Date <= endtime.Date && x.ProjectId.HasValue && x.ProjectId == modelin.ProjectId)
+                                .Where(x => x.TimeStamp.Date <= endtime.Date && x.ProjectId.Equals(modelin.ProjectId))
                                 .OrderBy(x => x.TimeStamp)
                                 .ToListAsync();
                         }
@@ -8668,13 +8661,15 @@ namespace MainOps.Controllers
                         //    .Include(x => x.SubProject)
                         //    .Where(x => (x.InvoiceDate != null && Convert.ToDateTime(x.InvoiceDate).Date <= endtime) && x.ProjectId.Equals(modelin.ProjectId))
                         //    .ToListAsync();
+
                         extraworks2 = await _context.ExtraWorks
-                                        .Include(x => x.Project)
-                                        .Include(x => x.SubProject)
-                                        .Where(x => x.InvoiceDate.HasValue
-                                                 && x.InvoiceDate.Value.Date <= endtime.Date
-                                                 && x.ProjectId == modelin.ProjectId)
-                                        .ToListAsync();
+                            .Include(x => x.Project)
+                            .Include(x => x.SubProject)
+                            .Where(x => x.InvoiceDate != null
+                                        && x.InvoiceDate.Value.Date <= endtime.Date
+                                        && x.ProjectId == modelin.ProjectId)
+                            .ToListAsync();
+
                         arrivals = arrivals2.Where(x => (x.EndStamp == null || x.EndStamp >= starttime) || (x.InvoiceDate >= starttime && x.InvoiceDate <= endtime)).OrderBy(x => x.TimeStamp).ToList();
 
                         mobilizations = mobilizations2.Where(x => x.InvoiceDate.Date >= starttime).OrderBy(x => x.TimeStamp).ToList();
@@ -8925,20 +8920,40 @@ namespace MainOps.Controllers
                     }
                     if (arr.UniqueID.Contains("#"))
                     {
-                        List<Install> installs;
+                        List<Install> installs = new List<Install>();
                         if (arr.EndStamp != null)
                         {
-                            installs = installations.Where(x => x.UniqueID.Equals(arr.UniqueID) && x.ItemTypeId.Equals(arr.ItemTypeId) && x.RentalStartDate >= arr.TimeStamp && x.RentalStartDate <= arr.EndStamp).OrderBy(x => x.TimeStamp).ToList();
+                            //installs = installations.Where(x => x.UniqueID.Equals(arr.UniqueID) && x.ItemTypeId.Equals(arr.ItemTypeId) && x.RentalStartDate >= arr.TimeStamp && x.RentalStartDate <= arr.EndStamp).OrderBy(x => x.TimeStamp).ToList();
+                            installs = installations?
+                                .Where(x => x != null
+                                    && x.UniqueID != null && arr?.UniqueID != null && x.UniqueID == arr.UniqueID
+                                    && x.ItemTypeId != null && arr?.ItemTypeId != null && x.ItemTypeId == arr.ItemTypeId
+                                    && x.RentalStartDate != null && arr != null
+                                    && x.RentalStartDate >= arr.TimeStamp
+                                    && x.RentalStartDate <= arr.EndStamp)
+                                .OrderBy(x => x.TimeStamp)
+                                .ToList();
+
                         }
                         else
                         {
                             try
                             {
-                                installs = installations.Where(x => x.UniqueID.Equals(arr.UniqueID) && x.ItemTypeId.Equals(arr.ItemTypeId) && x.RentalStartDate >= arr.TimeStamp).OrderBy(x => x.TimeStamp).ToList();
+                                //installs = installations.Where(x => x.UniqueID.Equals(arr.UniqueID) && x.ItemTypeId.Equals(arr.ItemTypeId) && x.RentalStartDate >= arr.TimeStamp).OrderBy(x => x.TimeStamp).ToList();
+                                installs = installations?
+                                    .Where(x => x != null
+                                        && string.Equals(x.UniqueID, arr?.UniqueID)
+                                        && string.Equals(x.ItemTypeId, arr?.ItemTypeId)
+                                        && x.RentalStartDate != null
+                                        && arr != null
+                                        && x.RentalStartDate >= arr.TimeStamp)
+                                    .OrderBy(x => x.TimeStamp)
+                                    .ToList();
+
                             }
                             catch
                             {
-                                installs = installations.Where(x => x.UniqueID.Equals(arr.UniqueID) && x.ItemTypeId.Equals(arr.ItemTypeId) && x.RentalStartDate >= arr.TimeStamp).OrderBy(x => x.TimeStamp).ToList();
+                                //installs = installations.Where(x => x.UniqueID.Equals(arr.UniqueID) && x.ItemTypeId.Equals(arr.ItemTypeId) && x.RentalStartDate >= arr.TimeStamp).OrderBy(x => x.TimeStamp).ToList();
                             }
                         }
                         int i = 1;
@@ -8977,14 +8992,14 @@ namespace MainOps.Controllers
                             arr_new.TimeStamp = item.RentalStartDate;
                             if (item.DeinstallDate < arr_new.TimeStamp)
                             {
-                                
+
                                 //arr_new.EndStamp = null;
                             }
                             else
                             {
                                 arr_new.EndStamp = item.DeinstallDate;
                             }
-                            
+
                             if (arr_new.Amount != null)
                             {
                                 II.Amount = Convert.ToDouble(arr_new.Amount);
@@ -8994,7 +9009,7 @@ namespace MainOps.Controllers
                                 II.Amount = 1;
                             }
                             //check invoice date and overwrite!
-                            
+
                             if (arr_new.TimeStamp.Date <= starttime)
                             {
                                 if (arr_new.EndStamp == null)
@@ -9132,9 +9147,9 @@ namespace MainOps.Controllers
                                                         arr_new.EndStamp = arr_new.EndStamp.Value.AddDays(moredays);
                                                     }
                                                 }
-                                               
+
                                             }
-                                           
+
                                         }
                                         II2.ItemTypeId = idleitem.Id;
                                         II2.ItemType = idleitem;
@@ -9148,13 +9163,13 @@ namespace MainOps.Controllers
                                 else if (arr_new.ItemType.Rental_UnitId.Equals(13) || arr_new.ItemType.Rental_UnitId.Equals(14))
                                 {
                                     double tempdays = II.Days;
-                                   
+
                                     II.Days = GetInstalledDaysArrival(installations, arr_new, starttime, endtime);
-                                   
+
                                     II.rental_price = arr_new.ItemType.rental_price * (decimal)II.Days * (decimal)arr_new.Amount;
                                     if (arr_new.PayedAmount != null && arr_new.InvoiceDate.Date >= starttime && arr_new.InvoiceDate.Date <= endtime)
                                     {
-                                        
+
                                         II.rental_price -= Convert.ToDecimal(arr_new.PayedAmount);
                                     }
                                     if (idleitem != null)
@@ -9227,7 +9242,7 @@ namespace MainOps.Controllers
                                     II.rental_price = arr_new.ItemType.rental_price * (decimal)II.Days * (decimal)arr_new.Amount;
                                     if (arr_new.PayedAmount != null && arr_new.InvoiceDate.Date >= starttime && arr_new.InvoiceDate.Date <= endtime)
                                     {
-                                        
+
                                         II.rental_price -= Convert.ToDecimal(arr_new.PayedAmount);
                                     }
                                 }
@@ -9237,10 +9252,10 @@ namespace MainOps.Controllers
                                 II.rental_price = (decimal)0.00;
                                 if (arr_new.PayedAmount != null && arr.InvoiceDate.Date >= starttime && arr.InvoiceDate.Date <= endtime)
                                 {
-                                    
+
                                     II.rental_price -= Convert.ToDecimal(arr_new.PayedAmount);
                                 }
-                                
+
                             }
                             if (II.Discounts.Count > 0)
                             {
@@ -9453,30 +9468,42 @@ namespace MainOps.Controllers
                             {
                                 II.price = (decimal)0.00;
                                 II.Days = (endtime - starttime).Days + 1;
-                                if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. week"))
+                                //if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. week"))
+                                //{
+                                //    var previousdays = Math.Max(Math.Ceiling((starttime.AddDays(-1) - arr.TimeStamp.Date).TotalDays / 7), 0);
+                                //    var alldays = Math.Ceiling((endtime - arr.TimeStamp.Date).TotalDays / 7);
+                                //    II.Days = Convert.ToDouble(alldays - previousdays);
+                                //}
+                                if (arr?.ItemType?.Rental_Unit?.TheUnit?.ToLower() == "pr. week")
                                 {
                                     var previousdays = Math.Max(Math.Ceiling((starttime.AddDays(-1) - arr.TimeStamp.Date).TotalDays / 7), 0);
                                     var alldays = Math.Ceiling((endtime - arr.TimeStamp.Date).TotalDays / 7);
                                     II.Days = Convert.ToDouble(alldays - previousdays);
                                 }
-                                else if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. month"))
+
+                                //else if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. month"))
+                                //{
+                                //    II.Days = CalculateRentalMonths(arr, starttime.Date, endtime.Date);
+                                //    //II.Days = modelin.endtime.Month - modelin.starttime.Month + (modelin.endtime.Year - modelin.starttime.Year) * 12;
+                                //    //if (arr.TimeStamp.Date.Day == 1)
+                                //    //{
+                                //    //    II.Days += 1;
+                                //    //}
+                                //    //else if (arr.TimeStamp.Date >= starttime.Date)
+                                //    //{
+                                //    //    II.Days += 1;
+                                //    //}
+
+                                //    //if (modelin.starttime.Date.Day == 1)
+                                //    //{
+                                //    //    II.Days += 1;
+                                //    //}
+                                //}
+                                else if (arr?.ItemType?.Rental_Unit?.TheUnit?.ToLower() == "pr. month")
                                 {
                                     II.Days = CalculateRentalMonths(arr, starttime.Date, endtime.Date);
-                                    //II.Days = modelin.endtime.Month - modelin.starttime.Month + (modelin.endtime.Year - modelin.starttime.Year) * 12;
-                                    //if (arr.TimeStamp.Date.Day == 1)
-                                    //{
-                                    //    II.Days += 1;
-                                    //}
-                                    //else if (arr.TimeStamp.Date >= starttime.Date)
-                                    //{
-                                    //    II.Days += 1;
-                                    //}
-
-                                    //if (modelin.starttime.Date.Day == 1)
-                                    //{
-                                    //    II.Days += 1;
-                                    //}
                                 }
+
 
                             }
                             else
@@ -9554,45 +9581,53 @@ namespace MainOps.Controllers
                             {
                                 II.price = (decimal)0.00;
                                 II.Days = (endtime - arr.TimeStamp.Date).Days + 1;
-                                if(arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. week"))
+
+                                //if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. week"))
+                                if (arr.ItemType?.Rental_Unit?.TheUnit != null)
                                 {
-                                    var previousdays = Math.Max(Math.Ceiling((starttime.AddDays(-1) - arr.TimeStamp.Date).TotalDays / 7), 0);
-                                    var alldays = Math.Ceiling((endtime - arr.TimeStamp.Date).TotalDays / 7);
-                                    II.Days = Convert.ToDouble(alldays - previousdays);
-                                    //II.Days = Convert.ToDouble(Convert.ToInt32(II.Days / 7));
-                                }
-                                else if(arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. month"))
-                                {
-                                    II.Days = CalculateRentalMonths(arr, starttime.Date, endtime.Date);
-                                    //if(arr.TimeStamp.Date  <= modelin.starttime.Date) {
-                                    //    II.Days = modelin.endtime.Month - modelin.starttime.Month + (modelin.endtime.Year - modelin.starttime.Year) * 12;
-                                    //    if (modelin.starttime.Date.Day == 1)
-                                    //    {
-                                    //        II.Days += 1;
-                                    //    }
-                                    //    else if(arr.InvoiceDate >= modelin.starttime && arr.InvoiceDate <= modelin.endtime)
-                                    //    {
-                                    //        II.Days += 1;
-                                    //    }
-                                    //}
-                                    //else
-                                    //{
-                                    //    II.Days = modelin.endtime.Month - arr.TimeStamp.Month + (modelin.endtime.Year - arr.TimeStamp.Year) * 12;
-                                    //    if (arr.TimeStamp.Date.Day == 1)
-                                    //    {
-                                    //        II.Days += 1;
-                                    //    }
-                                    //    //new
-                                    //    if(arr.InvoiceDate.Date >= modelin.starttime.Date) { 
-                                    //        if(modelin.endtime.Month != arr.TimeStamp.Month)
-                                    //        {
-                                    //            II.Days += 1;
-                                    //        }
-                                    //    }
-                                    //}
+                                    var unit = arr.ItemType.Rental_Unit.TheUnit.ToLower();
+
+                                    if (unit.Equals("pr. week"))
+                                    {
+                                        var previousdays = Math.Max(Math.Ceiling((starttime.AddDays(-1) - arr.TimeStamp.Date).TotalDays / 7), 0);
+                                        var alldays = Math.Ceiling((endtime - arr.TimeStamp.Date).TotalDays / 7);
+                                        II.Days = Convert.ToDouble(alldays - previousdays);
+                                        //II.Days = Convert.ToDouble(Convert.ToInt32(II.Days / 7));
+                                    }
+                                    else if (unit.Equals("pr. month")) //(arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. month"))
+                                    {
+                                        II.Days = CalculateRentalMonths(arr, starttime.Date, endtime.Date);
+                                        //if(arr.TimeStamp.Date  <= modelin.starttime.Date) {
+                                        //    II.Days = modelin.endtime.Month - modelin.starttime.Month + (modelin.endtime.Year - modelin.starttime.Year) * 12;
+                                        //    if (modelin.starttime.Date.Day == 1)
+                                        //    {
+                                        //        II.Days += 1;
+                                        //    }
+                                        //    else if(arr.InvoiceDate >= modelin.starttime && arr.InvoiceDate <= modelin.endtime)
+                                        //    {
+                                        //        II.Days += 1;
+                                        //    }
+                                        //}
+                                        //else
+                                        //{
+                                        //    II.Days = modelin.endtime.Month - arr.TimeStamp.Month + (modelin.endtime.Year - arr.TimeStamp.Year) * 12;
+                                        //    if (arr.TimeStamp.Date.Day == 1)
+                                        //    {
+                                        //        II.Days += 1;
+                                        //    }
+                                        //    //new
+                                        //    if(arr.InvoiceDate.Date >= modelin.starttime.Date) { 
+                                        //        if(modelin.endtime.Month != arr.TimeStamp.Month)
+                                        //        {
+                                        //            II.Days += 1;
+                                        //        }
+                                        //    }
+                                        //}
 
 
+                                    }
                                 }
+
                             }
                             else
                             {
@@ -9670,15 +9705,15 @@ namespace MainOps.Controllers
                             if (arr.EndStamp == null)
                             {
                                 II.Days = (endtime.Date - arr.TimeStamp.Date).Days + 1;
-                                if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. week"))
+                                if (arr?.ItemType?.Rental_Unit?.TheUnit?.ToLower().Equals("pr. week") == true)
                                 {
                                     var previousdays = Math.Max(Math.Ceiling((starttime.AddDays(-1) - arr.TimeStamp.Date).TotalDays / 7), 0);
                                     var alldays = Math.Ceiling((endtime - arr.TimeStamp.Date).TotalDays / 7);
                                     II.Days = Convert.ToDouble(alldays - previousdays);
                                     //II.Days = Convert.ToDouble(Convert.ToInt32(II.Days / 7));
-                                   
+
                                 }
-                                else if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. month"))
+                                else if (arr?.ItemType?.Rental_Unit?.TheUnit?.ToLower().Equals("pr. month") == true)
                                 {
                                     II.Days = CalculateRentalMonths(arr, starttime.Date, endtime.Date);
                                     //II.Days = modelin.endtime.Month - arr.TimeStamp.Month + (modelin.endtime.Year - arr.TimeStamp.Year) * 12;
@@ -9747,103 +9782,124 @@ namespace MainOps.Controllers
                             II.price = (decimal)0.00;
                         }
                         II.Install_date = arr.TimeStamp.Date;
-                        // has rental price
-                        string idleitemname = String.Concat(arr.ItemType.Item_Type, " - Idle");
-                        var idleitem = IdleItems.Where(x => x.Item_Type.Equals(idleitemname)).SingleOrDefault();
-                        if (arr.ItemType.rental_price != null || idleitem != null)
+                        if (arr.ItemType != null)
                         {
-                            // calender day (no amount)
-                            if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. calender day"))
+                            // has rental price
+                            string idleitemname = String.Concat(arr.ItemType.Item_Type, " - Idle");
+                            var idleitem = IdleItems.Where(x => x.Item_Type.Equals(idleitemname)).SingleOrDefault();
+
+                            if (arr.ItemType.rental_price != null || idleitem != null)
                             {
-                                II.rental_price = arr.ItemType.rental_price * (decimal)II.Days * (decimal)arr.Amount;
-                            }
-                            //else if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. week"))
-                            //{
-                            //    II.Days = Convert.ToDouble(Convert.ToInt32(II.Days / 7));
-                            //}
-                            //else if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. month"))
-                            //{
-                            //    II.Days = modelin.endtime.Month - arr.TimeStamp.Month + (modelin.endtime.Year - arr.TimeStamp.Year) * 12;
-                            //    II.Days += 1;
-                            //}
-                            else if (arr.ItemType.Rental_UnitId.Equals(11) || arr.ItemType.Rental_UnitId.Equals(12))
-                            {
-                                double tempdays = II.Days;
-                                II.Days = GetOperationalDaysArrival(ItemActivities, arr, starttime, endtime);
-                                II.rental_price = arr.ItemType.rental_price * (decimal)II.Days * (decimal)arr.Amount;
-                                //if (arr.PayedAmount != null && arr.InvoiceDate.Date >= starttime && arr.InvoiceDate.Date <= endtime)
-                                //{
-                                //    II.rental_price -= Convert.ToDecimal(arr.PayedAmount);
-                                //}
-                                if (idleitem != null)
+                                // calender day (no amount)
+                                /*if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. calender day"))
                                 {
-                                    II2.Item_Name = idleitem.Item_Type;
-                                    II2.Arrival = II.Arrival;
-                                    II2.ArrivalId = II.ArrivalId;
-                                    II2.Install_date = II.Install_date;
-                                    II2.Invoice_date = II.Invoice_date;
-                                    II2.BoQNr = idleitem.BoQnr;
-                                    II2.BoQNr_Rental = idleitem.BoQnr_Rental;
-                                    II2.Days = tempdays - II.Days;
-                                    II2.ItemTypeId = idleitem.Id;
-                                    II2.ItemType = idleitem;
-                                    II2.location = II.location;
-                                    II2.Amount = II.Amount;
-                                    II2.rental_price = idleitem.rental_price * (decimal)II2.Days * (decimal)II2.Amount;
-                                    II2.Discounts = idleitem.Discounts.Where(x => x.StartDate.Date <= model.endtime).ToList();
+                                    // II.rental_price = arr.ItemType.rental_price * (decimal)II.Days * (decimal)arr.Amount;
+
+                                    //else if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. week"))
+                                    //{
+                                    //    II.Days = Convert.ToDouble(Convert.ToInt32(II.Days / 7));
+                                    //}
+                                    //else if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. month"))
+                                    //{
+                                    //    II.Days = modelin.endtime.Month - arr.TimeStamp.Month + (modelin.endtime.Year - arr.TimeStamp.Year) * 12;
+                                    //    II.Days += 1;
+                                    //}
+                                }*/
+
+
+                                if (arr.ItemType.Rental_Unit != null &&
+                                    !string.IsNullOrEmpty(arr.ItemType.Rental_Unit.TheUnit) &&
+                                    arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. calender day"))
+                                {
+                                    II.rental_price = arr.ItemType.rental_price * (decimal)II.Days * (decimal)arr.Amount;
+                                }
+                                else if (arr.ItemType.Rental_UnitId.Equals(11) || arr.ItemType.Rental_UnitId.Equals(12))
+                                {
+                                    double tempdays = II.Days;
+                                    II.Days = GetOperationalDaysArrival(ItemActivities, arr, starttime, endtime);
+                                    II.rental_price = arr.ItemType.rental_price * (decimal)II.Days * (decimal)arr.Amount;
+                                    //if (arr.PayedAmount != null && arr.InvoiceDate.Date >= starttime && arr.InvoiceDate.Date <= endtime)
+                                    //{
+                                    //    II.rental_price -= Convert.ToDecimal(arr.PayedAmount);
+                                    //}
+                                    if (idleitem != null)
+                                    {
+                                        II2.Item_Name = idleitem.Item_Type;
+                                        II2.Arrival = II.Arrival;
+                                        II2.ArrivalId = II.ArrivalId;
+                                        II2.Install_date = II.Install_date;
+                                        II2.Invoice_date = II.Invoice_date;
+                                        II2.BoQNr = idleitem.BoQnr;
+                                        II2.BoQNr_Rental = idleitem.BoQnr_Rental;
+                                        II2.Days = tempdays - II.Days;
+                                        II2.ItemTypeId = idleitem.Id;
+                                        II2.ItemType = idleitem;
+                                        II2.location = II.location;
+                                        II2.Amount = II.Amount;
+                                        II2.rental_price = idleitem.rental_price * (decimal)II2.Days * (decimal)II2.Amount;
+                                        II2.Discounts = idleitem.Discounts.Where(x => x.StartDate.Date <= model.endtime).ToList();
+                                    }
+
+                                }
+                                else if (arr.ItemType.Rental_UnitId.Equals(13) || arr.ItemType.Rental_UnitId.Equals(14))
+                                {
+                                    double tempdays = II.Days;
+                                    //II.Days = GetOperationalDaysArrival(ItemActivities, arr, starttime, endtime);
+                                    //ArrivalReturn arrreturn = GetInstalledDaysArrival(installations, arr, starttime, endtime);
+                                    //II.Days = arrreturn.days;
+                                    II.Days = GetInstalledDaysArrival(installations, arr, starttime, endtime);
+                                    //II.Arrival.EndStamp = arrreturn.arr.EndStamp;
+                                    II.rental_price = arr.ItemType.rental_price * (decimal)II.Days * (decimal)arr.Amount;
+                                    //var idleitem = IdleItems.Where(x => x.Item_Type.ToLower().Contains(arr.ItemType.Item_Type.ToLower())).SingleOrDefault();
+                                    //string idleitemname = String.Concat(arr.ItemType.Item_Type, " - Idle");
+                                    //var idleitem = IdleItems.Where(x => x.Item_Type.Equals(idleitemname)).SingleOrDefault();
+                                    if (idleitem != null)
+                                    {
+                                        II2.Item_Name = idleitem.Item_Type;
+                                        II2.Arrival = II.Arrival;
+                                        II2.ArrivalId = II.ArrivalId;
+                                        II2.Install_date = II.Install_date;
+                                        II2.BoQNr = idleitem.BoQnr;
+                                        II2.BoQNr_Rental = idleitem.BoQnr_Rental;
+                                        II2.Days = tempdays - II.Days;
+                                        II2.ItemTypeId = idleitem.Id;
+                                        II2.ItemType = idleitem;
+                                        II2.location = II.location;
+                                        II2.Amount = II.Amount;
+                                        II2.rental_price = idleitem.rental_price * (decimal)II2.Days * (decimal)II2.Amount;
+                                        II2.Discounts = idleitem.Discounts.Where(x => x.StartDate.Date <= model.endtime).ToList();
+                                    }
+                                }
+                                else //if (arr.ItemType.Rental_UnitId.Equals(16)) //binh 11.04.2025
+                                {
+                                    try
+                                    {
+                                        //II.Days = CalculateRentalMonths(arr, starttime.Date, endtime.Date);//binh 11.04.2025
+                                        II.rental_price = arr.ItemType.rental_price * (decimal)II.Days * (decimal)arr.Amount;
+                                        //    II.Days += 1;
+                                    }
+                                    catch
+                                    {
+                                        //II.rental_price = arr.ItemType.rental_price * (decimal)II.Days * (decimal)arr.Amount;
+                                    }
                                 }
 
-                            }
-                            else if (arr.ItemType.Rental_UnitId.Equals(13) || arr.ItemType.Rental_UnitId.Equals(14))
-                            {
-                                double tempdays = II.Days;
-                                //II.Days = GetOperationalDaysArrival(ItemActivities, arr, starttime, endtime);
-                                //ArrivalReturn arrreturn = GetInstalledDaysArrival(installations, arr, starttime, endtime);
-                                //II.Days = arrreturn.days;
-                                II.Days = GetInstalledDaysArrival(installations, arr, starttime, endtime);
-                                //II.Arrival.EndStamp = arrreturn.arr.EndStamp;
-                                II.rental_price = arr.ItemType.rental_price * (decimal)II.Days * (decimal)arr.Amount;
-                                //var idleitem = IdleItems.Where(x => x.Item_Type.ToLower().Contains(arr.ItemType.Item_Type.ToLower())).SingleOrDefault();
-                                //string idleitemname = String.Concat(arr.ItemType.Item_Type, " - Idle");
-                                //var idleitem = IdleItems.Where(x => x.Item_Type.Equals(idleitemname)).SingleOrDefault();
-                                if (idleitem != null)
-                                {
-                                    II2.Item_Name = idleitem.Item_Type;
-                                    II2.Arrival = II.Arrival;
-                                    II2.ArrivalId = II.ArrivalId;
-                                    II2.Install_date = II.Install_date;
-                                    II2.BoQNr = idleitem.BoQnr;
-                                    II2.BoQNr_Rental = idleitem.BoQnr_Rental;
-                                    II2.Days = tempdays - II.Days;
-                                    II2.ItemTypeId = idleitem.Id;
-                                    II2.ItemType = idleitem;
-                                    II2.location = II.location;
-                                    II2.Amount = II.Amount;
-                                    II2.rental_price = idleitem.rental_price * (decimal)II2.Days * (decimal)II2.Amount;
-                                    II2.Discounts = idleitem.Discounts.Where(x => x.StartDate.Date <= model.endtime).ToList();
-                                }
                             }
                             else
                             {
-                                try
-                                {
-                                    II.rental_price = arr.ItemType.rental_price * (decimal)II.Days * (decimal)arr.Amount;
-                                }
-                                catch
-                                {
-                                    II.rental_price = arr.ItemType.rental_price * (decimal)II.Days * (decimal)arr.Amount;
-                                }
-
+                                II.rental_price = (decimal)0.00;
                             }
-                           
+
                         }
                         else
                         {
-                            II.rental_price = (decimal)0.00;
+
                         }
+
+
                         if (arr.PayedAmount != null && arr.InvoiceDate.Date >= starttime && arr.InvoiceDate.Date <= endtime)
                         {
-                            
+
                             II.rental_price -= Convert.ToDecimal(arr.PayedAmount);
 
                         }
@@ -9939,6 +9995,7 @@ namespace MainOps.Controllers
                             II.Total_Discount = 0;
                         }
                         items.Add(II);
+
                         if (modelin.CheckInconsistensies == true)
                         {
                             inconsistentItems.Add(II);
@@ -10029,6 +10086,7 @@ namespace MainOps.Controllers
                         }
                     }
                 }
+
                 foreach (ExtraWork ew in extraworks)
                 {
                     InvoiceItem II = new InvoiceItem();
@@ -10125,7 +10183,7 @@ namespace MainOps.Controllers
 
                         }
                         II.rental_price = ew.Rental_Price * (decimal)II.Days;
-                        if(ew.PaidAmountRental != null)
+                        if (ew.PaidAmountRental != null)
                         {
                             II.rental_price -= Convert.ToDecimal(ew.PaidAmountRental);
                         }
@@ -10144,10 +10202,10 @@ namespace MainOps.Controllers
 
                 foreach (Install inst in installations)
                 {
-                   
-                    if(inst.InvoiceDate.Date >= model.starttime.Date && inst.InvoiceDate.Date <= model.endtime.Date && inst.ToBePaid == true)
+
+                    if (inst.InvoiceDate.Date >= model.starttime.Date && inst.InvoiceDate.Date <= model.endtime.Date && inst.ToBePaid == true)
                     {
-                       
+
                         InvoiceItem II = new InvoiceItem();
                         II.SubProjectId = inst.SubProjectId;
                         II.Install = inst;
@@ -10169,7 +10227,7 @@ namespace MainOps.Controllers
                             II.Amount = 1.000;
                         }
                         II.price = (decimal)II.Amount * II.ItemType.price;
-                        if(inst.PayedAmount != null)
+                        if (inst.PayedAmount != null)
                         {
                             II.price -= Convert.ToDecimal(inst.PayedAmount);
                         }
@@ -10199,7 +10257,7 @@ namespace MainOps.Controllers
                             DiscountItem.Install_date = II.Install_date;
                             DiscountItem.Total_Discount_Installation = (decimal)0.00;
                             DiscountItem.Invoice_date = II.Invoice_date;
-                            foreach(var item in II.Discounts_Installation)
+                            foreach (var item in II.Discounts_Installation)
                             {
                                 DiscountItem.Total_Discount_Installation += II.price * item.Rate;
                             }
@@ -10212,7 +10270,7 @@ namespace MainOps.Controllers
                     }
 
 
-                    
+
                     InvoiceItem II2 = new InvoiceItem();
                     InvoiceItem II3 = new InvoiceItem();
                     //II.SubProjectId = inst.SubProjectId;
@@ -10542,6 +10600,7 @@ namespace MainOps.Controllers
                 DateTime FirstJanuary2023 = new DateTime(2023, 01, 01, 00, 00, 01);
                 var nighttime = await _context.ItemTypes.Where(x => x.Item_Type.ToLower().Contains("night") && x.Rental_UnitId.Equals(19) && x.ProjectId.Equals(model.ProjectId)).FirstOrDefaultAsync();
                 var weekendtime = await _context.ItemTypes.Where(x => x.Item_Type.ToLower().Contains("weekend") && x.Rental_UnitId.Equals(19) && x.ProjectId.Equals(model.ProjectId)).FirstOrDefaultAsync();
+
                 foreach (Daily_Report_2 DR in dailyreports)
                 {
                     if (DR.tobepaid.Equals(1) || (DR.tobepaid != 1 && DR.StandingTime.Value.TotalMinutes > 0 && modelin.PayDownTime.Equals(true)))
@@ -10568,7 +10627,7 @@ namespace MainOps.Controllers
                         decimal nighthours = (decimal)0.0;
                         decimal weekendhours = (decimal)0.0;
                         var itemtype = DR.Title.ItemType;
-                        if(weekendtime != null)
+                        if (weekendtime != null)
                         {
                             weekendhours = CalculateWeekendHours(DR);
                         }
@@ -10576,7 +10635,7 @@ namespace MainOps.Controllers
                         {
                             nighthours = CalculateNightTime(DR, DR.StartHour, DR.EndHour, nighttime, itemtype);
                         }
-                        
+
                         II.BoQNr = itemtype.BoQnr;
                         II.ItemTypeId = itemtype.Id;
                         II.ItemType = itemtype;
@@ -10604,7 +10663,7 @@ namespace MainOps.Controllers
                         {
                             II.rental_price = itemtype.rental_price * (decimal)II.Days;
                         }
-                        else if(weekendhours > (decimal)0.00)
+                        else if (weekendhours > (decimal)0.00)
                         {
                             II2.Amount = DR.Amount;
                             II2.ItemType = weekendtime;
@@ -10620,7 +10679,7 @@ namespace MainOps.Controllers
                             II2.Daily_Report_2 = DR;
                             II2.Days = Convert.ToDouble(weekendhours * Convert.ToDecimal(DR.Amount));
                             II2.Invoice_date = II.Invoice_date;
-                            if(Convert.ToInt32(II2.rental_price) == 1584)
+                            if (Convert.ToInt32(II2.rental_price) == 1584)
                             {
                                 double miauw = 2.54;
                             }
@@ -10632,7 +10691,7 @@ namespace MainOps.Controllers
                             II2.ItemTypeId = nighttime.Id;
                             II2.Item_Name = II.Item_Name + " (Surcharge Night)";
                             II2.Install_date = II.Install_date;
-                            II2.rental_price = nighthours * II.ItemType.rental_price *  nighttime.rental_price * DR.Amount;
+                            II2.rental_price = nighthours * II.ItemType.rental_price * nighttime.rental_price * DR.Amount;
                             II2.price = (decimal)0.00;
                             II2.SubProjectId = II.SubProjectId;
                             II2.BoQNr = II.BoQNr;
@@ -10641,7 +10700,7 @@ namespace MainOps.Controllers
                             II2.Daily_Report_2 = DR;
                             II2.Days = Convert.ToDouble(nighthours * Convert.ToDecimal(DR.Amount));
                             II2.Invoice_date = II.Invoice_date;
-                            
+
                         }
 
 
@@ -10721,8 +10780,7 @@ namespace MainOps.Controllers
                     }
 
                 }
-                //
-                //
+
                 var invoiceitemsmob = (from m in mobilizations2
                                        select new InvoiceItem
                                        {
@@ -10742,7 +10800,7 @@ namespace MainOps.Controllers
                 foreach (var II in invoiceitemsmob)
                 {
                     allItems.Add(II);
-                    
+
                     if (modelin.CheckInconsistensies == true)
                     {
                         allInconsistentItems.Add(II);
@@ -10772,24 +10830,30 @@ namespace MainOps.Controllers
 
                 }
 
-
-
                 foreach (Arrival arr in arrivals2)
                 {
-                    if(arr.UniqueID == null)
+                    if (arr.UniqueID == null)
                     {
                         arr.UniqueID = "";
                     }
                     if (arr.UniqueID.Contains("#"))
                     {
-                        List<Install> installs;
+                        List<Install> installs = new List<Install>();
                         if (arr.EndStamp != null)
                         {
                             installs = installations2.Where(x => x.UniqueID.Equals(arr.UniqueID) && x.ItemTypeId.Equals(arr.ItemTypeId) && x.RentalStartDate >= arr.TimeStamp && x.RentalStartDate <= arr.EndStamp).OrderBy(x => x.TimeStamp).ToList();
                         }
                         else
                         {
-                            installs = installations2.Where(x => x.UniqueID.Equals(arr.UniqueID) && x.ItemTypeId.Equals(arr.ItemTypeId) && x.RentalStartDate >= arr.TimeStamp).OrderBy(x => x.TimeStamp).ToList();
+                            //installs = installations2.Where(x => x.UniqueID.Equals(arr.UniqueID) && x.ItemTypeId.Equals(arr.ItemTypeId) && x.RentalStartDate >= arr.TimeStamp).OrderBy(x => x.TimeStamp).ToList();
+                            try
+                            {
+                                installs = installations2.Where(x => x.UniqueID.Equals(arr.UniqueID) && x.ItemTypeId.Equals(arr.ItemTypeId) && x.RentalStartDate >= arr.TimeStamp).OrderBy(x => x.TimeStamp).ToList();
+                            }
+                            catch
+                            {
+                                //installs = installations.Where(x => x.UniqueID.Equals(arr.UniqueID) && x.ItemTypeId.Equals(arr.ItemTypeId) && x.RentalStartDate >= arr.TimeStamp).OrderBy(x => x.TimeStamp).ToList();
+                            }
                         }
                         int i = 1;
                         foreach (var item in installs)
@@ -10798,15 +10862,16 @@ namespace MainOps.Controllers
 
                             //if (installs.Count() > 1)
                             //{
-                            if(item.Location != null && item.Location != "" && item.Location != "N/A") { 
-                            if (i == 1)
+                            if (item.Location != null && item.Location != "" && item.Location != "N/A")
                             {
-                                II.location += "(1): " + item.Location;
-                            }
-                            else
-                            {
-                                II.location += "(" + i.ToString() + "): " + item.Location;
-                            }
+                                if (i == 1)
+                                {
+                                    II.location += "(1): " + item.Location;
+                                }
+                                else
+                                {
+                                    II.location += "(" + i.ToString() + "): " + item.Location;
+                                }
                             }
                             //}
                             //else
@@ -10826,7 +10891,7 @@ namespace MainOps.Controllers
                             II.Arrival = arr_new;
                             II.Discounts = arr.ItemType.Discounts.Where(x => x.StartDate.Date <= model.endtime).ToList();
                             arr_new.TimeStamp = item.RentalStartDate;
-                            if(item.DeinstallDate < arr_new.TimeStamp)
+                            if (item.DeinstallDate < arr_new.TimeStamp)
                             {
 
                             }
@@ -10834,7 +10899,7 @@ namespace MainOps.Controllers
                             {
                                 arr_new.EndStamp = item.DeinstallDate;
                             }
-                            
+
                             if (arr_new.Amount != null)
                             {
                                 II.Amount = Convert.ToDouble(arr_new.Amount);
@@ -10948,11 +11013,11 @@ namespace MainOps.Controllers
                                     //II.Days = arrreturn.days;
                                     //II.Arrival.EndStamp = arrreturn.arr.EndStamp;
                                     II.rental_price = arr_new.ItemType.rental_price * (decimal)II.Days * (decimal)arr_new.Amount;
-                                    if(arr_new.PayedAmount != null && arr_new.InvoiceDate.Date >= starttime && arr_new.InvoiceDate.Date <= endtime)
+                                    if (arr_new.PayedAmount != null && arr_new.InvoiceDate.Date >= starttime && arr_new.InvoiceDate.Date <= endtime)
                                     {
                                         II.rental_price -= Convert.ToDecimal(arr_new.PayedAmount);
                                     }
-                                    
+
                                     //var idleitem = IdleItems.Where(x => x.Item_Type.ToLower().Contains(arr.ItemType.Item_Type.ToLower())).SingleOrDefault();
                                     string idleitemname = String.Concat(arr_new.ItemType.Item_Type, " - Idle");
                                     var idleitem = IdleItems.Where(x => x.Item_Type.Equals(idleitemname)).SingleOrDefault();
@@ -10992,21 +11057,21 @@ namespace MainOps.Controllers
                                                 try
                                                 {
 
-                                                
-                                                var nextinstall = InstallIdleAll.Where(x => x.TimeStamp >= installs.Last().DeinstallDate && x.TimeStamp <= endtime && x.UniqueID.Equals(installs.Last().UniqueID)).OrderBy(x => x.TimeStamp).FirstOrDefault();
-                                                if (nextinstall != null)
-                                                {
-                                                    int moredays = (Convert.ToInt32((nextinstall.TimeStamp - Convert.ToDateTime(installs.Last().DeinstallDate)).TotalDays) - 1);
-                                                    if (moredays < 0)
+
+                                                    var nextinstall = InstallIdleAll.Where(x => x.TimeStamp >= installs.Last().DeinstallDate && x.TimeStamp <= endtime && x.UniqueID.Equals(installs.Last().UniqueID)).OrderBy(x => x.TimeStamp).FirstOrDefault();
+                                                    if (nextinstall != null)
                                                     {
-                                                        moredays = 0;
+                                                        int moredays = (Convert.ToInt32((nextinstall.TimeStamp - Convert.ToDateTime(installs.Last().DeinstallDate)).TotalDays) - 1);
+                                                        if (moredays < 0)
+                                                        {
+                                                            moredays = 0;
+                                                        }
+                                                        II2.Days += moredays;
+                                                        if (arr_new.EndStamp != null)
+                                                        {
+                                                            arr_new.EndStamp = arr_new.EndStamp.Value.AddDays(moredays);
+                                                        }
                                                     }
-                                                    II2.Days += moredays;
-                                                    if (arr_new.EndStamp != null)
-                                                    {
-                                                        arr_new.EndStamp = arr_new.EndStamp.Value.AddDays(moredays);
-                                                    }
-                                                }
                                                 }
                                                 catch
                                                 {
@@ -11027,6 +11092,12 @@ namespace MainOps.Controllers
                                         II2.rental_price = idleitem.rental_price * (decimal)II2.Days * (decimal)II2.Amount;
                                         II2.Discounts = idleitem.Discounts.Where(x => x.StartDate.Date <= model.endtime).ToList();
                                     }
+                                }
+                                else if (arr_new.ItemType.Rental_UnitId.Equals(16))
+                                {
+                                    //II.Days = CalculateRentalMonths(arr_new, arr_new.TimeStamp.Date, endtime.Date);//binh 07.04.2025 correct
+                                    II.Days = (endtime.Year - arr_new.TimeStamp.Year) * 12 + endtime.Month - arr_new.TimeStamp.Month;
+                                    II.rental_price = arr_new.ItemType.rental_price * (decimal)II.Days * (decimal)arr_new.Amount;
                                 }
                                 else
                                 {
@@ -11254,25 +11325,37 @@ namespace MainOps.Controllers
                         {
                             II.Days = (endtime - arr.TimeStamp.Date).Days + 1;
                         }
-                        if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. week"))
+                        //if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. week"))
+                        //{
+                        //    var previousdays = 0; Math.Max(Math.Ceiling((starttime.AddDays(-1) - arr.TimeStamp.Date).TotalDays / 7), 0);
+                        //    var alldays = Math.Ceiling((endtime - arr.TimeStamp.Date).TotalDays / 7);
+                        //    II.Days = Convert.ToDouble(alldays - previousdays);
+                        //    //II.Days = Convert.ToDouble(Convert.ToInt32(II.Days / 7));
+                        //}
+                        if (arr?.ItemType?.Rental_Unit?.TheUnit?.ToLower() == "pr. week")
                         {
-                            var previousdays = 0; Math.Max(Math.Ceiling((starttime.AddDays(-1) - arr.TimeStamp.Date).TotalDays / 7), 0);
+                            var previousdays = Math.Max(Math.Ceiling((starttime.AddDays(-1) - arr.TimeStamp.Date).TotalDays / 7), 0);
                             var alldays = Math.Ceiling((endtime - arr.TimeStamp.Date).TotalDays / 7);
                             II.Days = Convert.ToDouble(alldays - previousdays);
-                            //II.Days = Convert.ToDouble(Convert.ToInt32(II.Days / 7));
                         }
-                        else if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. month"))
+
+                        //else if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. month"))
+                        //{
+                        //    II.Days = CalculateRentalMonths(arr, arr.TimeStamp.Date, endtime.Date);
+                        //    //II.Days = modelin.endtime.Month - arr.TimeStamp.Month + (modelin.endtime.Year - arr.TimeStamp.Year) * 12;
+                        //    //II.Days += 1;      
+                        //}
+                        else if (arr?.ItemType?.Rental_Unit?.TheUnit?.ToLower() == "pr. month" && arr?.TimeStamp != null)
                         {
                             II.Days = CalculateRentalMonths(arr, arr.TimeStamp.Date, endtime.Date);
-                            //II.Days = modelin.endtime.Month - arr.TimeStamp.Month + (modelin.endtime.Year - arr.TimeStamp.Year) * 12;
-                            //II.Days += 1;      
                         }
+
                         II.Install_date = arr.TimeStamp.Date;
                         // has rental price
                         if (arr.ItemType.rental_price != null)
                         {
                             // calender day (no amount)
-                            if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. calender day"))
+                            if (arr.ItemType.Rental_Unit?.TheUnit?.ToLower() == "pr. calender day")
                             {
                                 II.rental_price = arr.ItemType.rental_price * (decimal)II.Days * (decimal)arr.Amount;
                             }
@@ -11283,7 +11366,7 @@ namespace MainOps.Controllers
                                 II.rental_price = arr.ItemType.rental_price * (decimal)II.Days * (decimal)arr.Amount;
                                 if (arr.PayedAmount != null && arr.InvoiceDate.Date >= starttime && arr.InvoiceDate.Date <= endtime)
                                 {
-                                    
+
                                     II.rental_price -= Convert.ToDecimal(arr.PayedAmount);
                                 }
                                 string idleitemname = String.Concat(arr.ItemType.Item_Type, " - Idle");
@@ -11316,7 +11399,7 @@ namespace MainOps.Controllers
                                 II.rental_price = arr.ItemType.rental_price * (decimal)II.Days * (decimal)arr.Amount;
                                 if (arr.PayedAmount != null && arr.InvoiceDate.Date >= starttime && arr.InvoiceDate.Date <= endtime)
                                 {
-                                    
+
                                     II.rental_price -= Convert.ToDecimal(arr.PayedAmount);
                                 }
                                 string idleitemname = String.Concat(arr.ItemType.Item_Type, " - Idle");
@@ -11528,6 +11611,7 @@ namespace MainOps.Controllers
                     }
 
                 }
+
                 foreach (ExtraWork ew in extraworks2)
                 {
                     InvoiceItem II = new InvoiceItem();
@@ -11596,13 +11680,14 @@ namespace MainOps.Controllers
                     {
                         II.rental_price = (decimal)0.00;
                     }
-                    
+
                     allItems.Add(II);
                     if (modelin.CheckInconsistensies == true)
                     {
                         allInconsistentItems.Add(II);
                     }
                 }
+
                 foreach (Install inst in installations2)
                 {
                     if (inst.InvoiceDate.Date <= model.endtime.Date && inst.ToBePaid == true)
@@ -11664,11 +11749,12 @@ namespace MainOps.Controllers
                         {
                             II.Total_Discount_Installation = (decimal)0.00;
                         }
-                        
+
                     }
-                    
+
 
                 }
+
                 foreach (Daily_Report_2 DR in dailyreports2)
                 {
                     if (DR.tobepaid.Equals(1) || (DR.tobepaid != 1 && DR.StandingTime.Value.TotalMinutes > 0 && modelin.PayDownTime.Equals(true)))
@@ -11695,7 +11781,7 @@ namespace MainOps.Controllers
                         decimal nighthours = (decimal)0.0;
                         decimal weekendhours = (decimal)0.0;
                         var itemtype = DR.Title.ItemType;
-                        if(weekendtime != null)
+                        if (weekendtime != null)
                         {
                             weekendhours = CalculateWeekendHours(DR);
                         }
@@ -11703,7 +11789,7 @@ namespace MainOps.Controllers
                         {
                             nighthours = CalculateNightTime(DR, DR.StartHour, DR.EndHour, nighttime, itemtype);
                         }
-                        
+
 
                         II.BoQNr = itemtype.BoQnr;
                         II.ItemTypeId = itemtype.Id;
@@ -11732,7 +11818,7 @@ namespace MainOps.Controllers
                         {
                             II.rental_price = itemtype.rental_price * (decimal)II.Days;
                         }
-                        else if(weekendhours > (decimal)0.00)
+                        else if (weekendhours > (decimal)0.00)
                         {
                             II2.Amount = DR.Amount;
                             II2.ItemType = weekendtime;
@@ -11748,11 +11834,11 @@ namespace MainOps.Controllers
                             II2.Daily_Report_2 = DR;
                             II2.Days = Convert.ToDouble(weekendhours * Convert.ToDecimal(DR.Amount));
                             II2.Invoice_date = II.Invoice_date;
-                            if(Convert.ToInt32(II2.rental_price) == 1584)
+                            if (Convert.ToInt32(II2.rental_price) == 1584)
                             {
                                 double muuuuh = 3.40;
                             }
-                            
+
                         }
                         else if (nighthours > (decimal)0.00)
                         {
@@ -11770,7 +11856,7 @@ namespace MainOps.Controllers
                             II2.Daily_Report_2 = DR;
                             II2.Days = Convert.ToDouble(nighthours * Convert.ToDecimal(DR.Amount));
                             II2.Invoice_date = II.Invoice_date;
-                            
+
                         }
 
                         if (DR.tobepaid != 1 && DR.StandingTime.Value.TotalMinutes > 0 && modelin.PayDownTime.Equals(true))
@@ -11846,7 +11932,7 @@ namespace MainOps.Controllers
 
 
                 }
-                
+
                 if (model.SubProjectId != null)
                 {
                     model.Invoices = await _context.Invoices.Where(x => x.TimeStampStart.Date >= starttime && x.TimeStampEnd.Date <= endtime && x.ProjectId.Equals(model.ProjectId) && x.SubProjectId.Equals(model.SubProjectId)).ToListAsync();
@@ -11864,7 +11950,7 @@ namespace MainOps.Controllers
                     //    {
                     //        model.AllInvoices.Add(newinvoice);
                     //    }
-                        
+
                     //}
                     //if(model.AllPayments == null)
                     //{
@@ -11878,7 +11964,7 @@ namespace MainOps.Controllers
                     //        model.AllPayments.Add(newpayment);
                     //    }
                     //}
-                    
+
                     model.SubProject = await _context.SubProjects.Where(x => x.Id.Equals(model.SubProjectId)).SingleOrDefaultAsync();
                 }
                 else
@@ -11929,6 +12015,24 @@ namespace MainOps.Controllers
                 }
                 model.items = items;
                 model.allItems = allItems;
+                model.items.RemoveAll(item => item.ArrivalId == 10000);
+
+                //var headlineList = model.headlines.Where(hl => hl.HeadLine == "6.0 Rental, Reporting and Sampling Costs (Rental)").ToList();
+                //var debugList = model.allItems.Where(item => item.Item_Name.Trim() == "Pressurized active carbon filter stand-by").ToList();
+                //var debugList1 = model.items.Where(x =>  x?.Install?.ItemType?.Item_Type?.Trim() == "Mobilisation of the 10 active carbon filters")
+                //                                .ToList();
+
+                //foreach (var ii in model.allItems)
+                //{
+                //    if (//ii.Item_Name.Trim().Contains("Recharge well equipment 4\" <= 50m3/h" ||
+                //        ii.Item_Name.Trim().Contains("Monitoring well equipment (data logger)"))
+                //    {
+                //        Debug.WriteLine($"Allitem: BoQnr: {ii.BoQNr_Rental}, name: {ii.Item_Name}, arrivalId:{ii.ArrivalId}, arrival: {ii.Arrival?.ItemType?.Item_Type},invoice date: {ii.Arrival?.TimeStamp}, days: {ii.Days}, amount: {ii.Amount}, uniqueId: {ii.Arrival?.UniqueID}");
+
+                //    }
+                //}
+
+
                 if (modelin.CheckInconsistensies == true)
                 {
                     foreach (var item in inconsistentItems)
@@ -11936,16 +12040,17 @@ namespace MainOps.Controllers
 
                         //find corresponding item in all items
                         InvoiceItem allItem = new InvoiceItem();
-                        try {
+                        try
+                        {
                             allItem = allInconsistentItems.Where(x => x.ExtraWorkId == item.ExtraWorkId &&
                            x.InstallationId == item.InstallationId && (x.ArrivalId == item.ArrivalId && x.ArrivalId != 10000)
                            && x.MobilizationId == item.MobilizationId && x.Daily_Report_2Id == item.Daily_Report_2Id).SingleOrDefault();
                         }
                         catch
                         {
-                             var mew = allInconsistentItems.Where(x => x.ExtraWorkId == item.ExtraWorkId &&
-                           x.InstallationId == item.InstallationId && (x.ArrivalId == item.ArrivalId && x.ArrivalId != 10000)
-                           && x.MobilizationId == item.MobilizationId && x.Daily_Report_2Id == item.Daily_Report_2Id).ToList();
+                            var mew = allInconsistentItems.Where(x => x.ExtraWorkId == item.ExtraWorkId &&
+                          x.InstallationId == item.InstallationId && (x.ArrivalId == item.ArrivalId && x.ArrivalId != 10000)
+                          && x.MobilizationId == item.MobilizationId && x.Daily_Report_2Id == item.Daily_Report_2Id).ToList();
                             double miewawa = 2.0;
                         }
 
@@ -11976,40 +12081,101 @@ namespace MainOps.Controllers
                                         model.allInconsistentItems.Add(allItem);
                                     }
                                 }
-                               
+
 
                             }
                             //here we check the change-log for relevant information
-                            if(item.InstallationId != null)
+                            /* if (item.InstallationId != null)
+                             {
+                                 var itemlogs = model.Logs.Where(x => x.Description.Contains("Install") && x.Description.Contains(item.InstallationId.ToString())).OrderByDescending(x => x.Id).ToList();
+                                 foreach (var before_log in itemlogs.Where(x => x.Description.Contains("Before")))
+                                 {
+                                     var after_log = itemlogs[itemlogs.IndexOf(before_log) - 1];
+                                     string invoiceDatebefore = before_log.otherinfo.Substring(before_log.otherinfo.IndexOf("Invoicedate: ") + 13).Split(".")[0];
+                                     string invoiceDateafter = after_log.otherinfo.Substring(after_log.otherinfo.IndexOf("Invoicedate: ") + 13).Split(".")[0];
+                                     DateTime InvoiceDateBefore = Convert.ToDateTime(invoiceDatebefore);
+                                     DateTime InvoiceDateAfter = Convert.ToDateTime(invoiceDateafter);
+                                     //check moving of invoicedates
+                                     // if this was previously invoiced!
+                                     if (InvoiceDateBefore < starttime)
+                                     {
+                                         if (InvoiceDateAfter >= starttime)
+                                         {
+                                             model.inconsistentItems.Add(item);
+                                             model.allInconsistentItems.Add(item);
+                                         }
+                                     }
+                                     else if (InvoiceDateBefore >= starttime && InvoiceDateAfter < starttime)
+                                     {
+                                         model.inconsistentItems.Add(item);
+                                         model.allInconsistentItems.Add(item);
+                                     }
+
+                                 }
+                             }*/
+                            // ... existing code ...
+
+                            //here we check the change-log for relevant information
+                            if (item.InstallationId != null && model.Logs != null)
                             {
-                                var itemlogs = model.Logs.Where(x => x.Description.Contains("Install") && x.Description.Contains(item.InstallationId.ToString())).OrderByDescending(x => x.Id).ToList();
-                                foreach(var before_log in itemlogs.Where(x => x.Description.Contains("Before")))
+                                var itemlogs = model.Logs
+                                    .Where(x => x != null &&
+                                                x.Description != null &&
+                                                x.Description.Contains("Install") &&
+                                                x.Description.Contains(item.InstallationId.ToString()))
+                                    .OrderByDescending(x => x.Id)
+                                    .ToList();
+
+                                if (itemlogs != null && itemlogs.Any())
                                 {
-                                    var after_log = itemlogs[itemlogs.IndexOf(before_log) - 1];
-                                    string invoiceDatebefore = before_log.otherinfo.Substring(before_log.otherinfo.IndexOf("Invoicedate: ") + 13).Split(".")[0];
-                                    string invoiceDateafter = after_log.otherinfo.Substring(after_log.otherinfo.IndexOf("Invoicedate: ") + 13).Split(".")[0];
-                                    DateTime InvoiceDateBefore = Convert.ToDateTime(invoiceDatebefore);
-                                    DateTime InvoiceDateAfter = Convert.ToDateTime(invoiceDateafter);
-                                    //check moving of invoicedates
-                                    // if this was previously invoiced!
-                                    if(InvoiceDateBefore < starttime)
+                                    foreach (var before_log in itemlogs.Where(x => x != null &&
+                                                                                x.Description != null &&
+                                                                                x.Description.Contains("Before")))
                                     {
-                                        if(InvoiceDateAfter >= starttime)
+                                        try
                                         {
-                                            model.inconsistentItems.Add(item);
-                                            model.allInconsistentItems.Add(item);
+                                            var after_log = itemlogs[itemlogs.IndexOf(before_log) - 1];
+                                            if (after_log != null &&
+                                                before_log.otherinfo != null &&
+                                                after_log.otherinfo != null)
+                                            {
+                                                string invoiceDatebefore = before_log.otherinfo.Substring(before_log.otherinfo.IndexOf("Invoicedate: ") + 13).Split(".")[0];
+                                                string invoiceDateafter = after_log.otherinfo.Substring(after_log.otherinfo.IndexOf("Invoicedate: ") + 13).Split(".")[0];
+
+                                                DateTime InvoiceDateBefore = Convert.ToDateTime(invoiceDatebefore);
+                                                DateTime InvoiceDateAfter = Convert.ToDateTime(invoiceDateafter);
+
+                                                //check moving of invoicedates
+                                                // if this was previously invoiced!
+                                                if (InvoiceDateBefore < starttime)
+                                                {
+                                                    if (InvoiceDateAfter >= starttime)
+                                                    {
+                                                        model.inconsistentItems.Add(item);
+                                                        model.allInconsistentItems.Add(item);
+                                                    }
+                                                }
+                                                else if (InvoiceDateBefore >= starttime && InvoiceDateAfter < starttime)
+                                                {
+                                                    model.inconsistentItems.Add(item);
+                                                    model.allInconsistentItems.Add(item);
+                                                }
+                                            }
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            // Optionally log the error
+                                            // _logger.LogError(ex, "Error processing installation log entries");
+                                            continue; // Skip this iteration if there's an error
                                         }
                                     }
-                                    else if(InvoiceDateBefore >= starttime && InvoiceDateAfter < starttime) {
-                                        model.inconsistentItems.Add(item);
-                                        model.allInconsistentItems.Add(item);
-                                    }
-                                    
                                 }
                             }
+
+                            // ... existing code ...
                             else if (item.ArrivalId != null)
                             {
-                                var itemlogs = model.Logs.Where(x => x.Description.Contains("Arrival") && x.Description.Contains(item.ArrivalId.ToString())).OrderByDescending(x => x.Id).ToList();
+                                /*var itemlogs = model.Logs.Where(x => x.Description.Contains("Arrival") && x.Description.Contains(item.ArrivalId.ToString())).OrderByDescending(x => x.Id).ToList();
                                 foreach (var before_log in itemlogs.Where(x => x.Description.Contains("Before")))
                                 {
                                     var after_log = itemlogs[itemlogs.IndexOf(before_log) - 1];
@@ -12033,7 +12199,75 @@ namespace MainOps.Controllers
                                         model.allInconsistentItems.Add(item);
                                     }
 
+                                }*/
+
+
+                                // ... existing code ...
+
+                                if (model.Logs != null) // Add null check for Logs collection
+                                {
+                                    var itemlogs = model.Logs
+                                        .Where(x => x != null &&
+                                                    x.Description != null &&
+                                                    item.ArrivalId != null &&
+                                                    x.Description.Contains("Arrival") &&
+                                                    x.Description.Contains(item.ArrivalId.ToString()))
+                                        .OrderByDescending(x => x.Id)
+                                        .ToList();
+
+                                    if (itemlogs != null && itemlogs.Any())
+                                    {
+                                        foreach (var before_log in itemlogs.Where(x => x != null &&
+                                                                                    x.Description != null &&
+                                                                                    x.Description.Contains("Before")))
+                                        {
+                                            try
+                                            {
+                                                var after_log = itemlogs[itemlogs.IndexOf(before_log) - 1];
+                                                if (after_log != null &&
+                                                    before_log.otherinfo != null &&
+                                                    after_log.otherinfo != null)
+                                                {
+                                                    string invoiceDatebefore = before_log.otherinfo.Substring(before_log.otherinfo.IndexOf("Invoicedate: ") + 13).Split(".")[0];
+                                                    string invoiceDateafter = after_log.otherinfo.Substring(after_log.otherinfo.IndexOf("Invoicedate: ") + 13).Split(".")[0];
+
+                                                    DateTime InvoiceDateBefore = Convert.ToDateTime(invoiceDatebefore);
+                                                    DateTime InvoiceDateAfter = Convert.ToDateTime(invoiceDateafter);
+
+                                                    //check moving of invoicedates
+                                                    // if this was previously invoiced!
+                                                    if (InvoiceDateBefore < starttime)
+                                                    {
+                                                        if (InvoiceDateAfter >= starttime)
+                                                        {
+                                                            model.inconsistentItems.Add(item);
+                                                            model.allInconsistentItems.Add(item);
+                                                        }
+                                                    }
+                                                    else if (InvoiceDateBefore >= starttime && InvoiceDateAfter < starttime)
+                                                    {
+                                                        model.inconsistentItems.Add(item);
+                                                        model.allInconsistentItems.Add(item);
+                                                    }
+                                                }
+                                            }
+                                            catch (Exception ex)
+                                            {
+                                                // Optionally log the error
+                                                // _logger.LogError(ex, "Error processing log entries");
+                                                continue; // Skip this iteration if there's an error
+                                            }
+                                        }
+                                    }
                                 }
+
+                                // ... existing code ...
+
+
+
+
+
+
                             }
                         }
                     }
@@ -12046,7 +12280,7 @@ namespace MainOps.Controllers
                     InvoiceSnapShot InvoiceSS = new InvoiceSnapShot(modelin.starttime.Date, modelin.endtime.Date, Convert.ToInt32(modelin.ProjectId), modelin.SubProjectId);
                     if (model.SubProjectId == null)
                     {
-                        InvoiceSS.SnapShotName =  model.Project.Abbreviation + "_" + DateTime.Now.ToShortDateString() + " : " + InvoiceSS.SnapShotStartDate.ToShortDateString() + "_" + InvoiceSS.SnapShotEndDate.ToShortDateString();
+                        InvoiceSS.SnapShotName = model.Project.Abbreviation + "_" + DateTime.Now.ToShortDateString() + " : " + InvoiceSS.SnapShotStartDate.ToShortDateString() + "_" + InvoiceSS.SnapShotEndDate.ToShortDateString();
                     }
                     else
                     {
@@ -12060,7 +12294,7 @@ namespace MainOps.Controllers
                     {
                         if (item.Item_Name.ToLower().Contains("idle"))
                         {
-                            InvoiceItemDB iidb = new InvoiceItemDB(item, iiSSId, false,true);
+                            InvoiceItemDB iidb = new InvoiceItemDB(item, iiSSId, false, true);
                             _context.Add(iidb);
                         }
                         else
@@ -12068,8 +12302,8 @@ namespace MainOps.Controllers
                             InvoiceItemDB iidb = new InvoiceItemDB(item, iiSSId, false, false);
                             _context.Add(iidb);
                         }
-                        
-                      
+
+
                     }
                     foreach (var item in model.allItems.Where(x => x.price > 0 || x.price < 0 || x.rental_price > 0 || x.rental_price < 0))
                     {
@@ -12105,11 +12339,11 @@ namespace MainOps.Controllers
                     {
                         if (modelin.GenerateAkontoBackGround)
                         {
-                            await SaveAsPdfBackGround(pdfmodel, true,model.GenerationTime); // Not awaited
+                            await SaveAsPdfBackGround(pdfmodel, true, model.GenerationTime); // Not awaited
                         }
                         else
                         {
-                            await SaveAsPdf(pdfmodel,model.GenerationTime, true);
+                            await SaveAsPdf(pdfmodel, model.GenerationTime, true);
                         }
 
                     }
@@ -12117,11 +12351,11 @@ namespace MainOps.Controllers
                     {
                         if (modelin.GenerateAkontoBackGround)
                         {
-                            await SaveAsPdfBackGround(pdfmodel, false,model.GenerationTime); // Not awaited
+                            await SaveAsPdfBackGround(pdfmodel, false, model.GenerationTime); // Not awaited
                         }
                         else
                         {
-                            await SaveAsPdf(pdfmodel,model.GenerationTime, false);
+                            await SaveAsPdf(pdfmodel, model.GenerationTime, false);
                         }
 
                     }
@@ -12177,22 +12411,22 @@ namespace MainOps.Controllers
                         if (modelin.SplitSubProjects)
                         {
 
-                            await SaveDocumentationAsPdf2(docmodel, true,model.GenerationTime);
+                            await SaveDocumentationAsPdf2(docmodel, true, model.GenerationTime);
                         }
                         else
                         {
-                            await SaveDocumentationAsPdf2(docmodel, false,model.GenerationTime);
+                            await SaveDocumentationAsPdf2(docmodel, false, model.GenerationTime);
                         }
                     }
                     else if (modelin.AddDocumentationBackGround)
                     {
                         if (modelin.SplitSubProjects)
                         {
-                            await SaveDocumenationAsPdfBackGround(docmodel, true,model.GenerationTime); // Not awaited
+                            await SaveDocumenationAsPdfBackGround(docmodel, true, model.GenerationTime); // Not awaited
                         }
                         else
                         {
-                            await SaveDocumenationAsPdfBackGround(docmodel, false,model.GenerationTime); // Not awaited
+                            await SaveDocumenationAsPdfBackGround(docmodel, false, model.GenerationTime); // Not awaited
                         }
                     }
                     if (modelin.ShowDocumentation)
@@ -12232,6 +12466,10 @@ namespace MainOps.Controllers
                 {
                     return View("Invoice_all", model);
                 }
+
+                stopwatch.Stop();
+                ViewBag.ProcessingTime = stopwatch.ElapsedMilliseconds; // time in ms
+
                 return View("Invoice", model);
             }
             else
@@ -12239,6 +12477,7 @@ namespace MainOps.Controllers
                 return NotFound();
             }
         }
+
         public StringBuilder DownloadSimpleExcel(InvoiceModel Model)
         {
             StringBuilder sb = new StringBuilder();
