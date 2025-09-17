@@ -18,18 +18,25 @@ namespace MainOps.Models
         [ForeignKey("Comment")]
         [Display(Name = "The Comment")]
         public int? CommentId { get; set; }
-        [Display(Name = "Comment")]
+
+        [Display(Name = "General Comment")]
         public virtual Comment? TheComment { get; set; }
         [Required]
         [DisplayFormat(DataFormatString = "{0:dd-MMM-yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public DateTime When { get; set; }
         [Display(Name = "Measurement Point")]
-        public string BaseName { get; set; }
+        public string? BaseName { get; set; }
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
         [Display(Name = "Done By")]
-        public string DoneBy { get; set; }
+        public string? DoneBy { get; set; }
         public int ProjectId { get; set; }
+
+        [Display(Name = "Project")]
+        public virtual Project? Project { get; set; }
+
+        [Display(Name = "Measurement Point")]
+        public virtual MeasPoint? MeasPoint { get; set; }
         public List<int> MeasPointLevelIds { get; set; }
         public List<int> MeasPointFlowIds { get; set; }
         public List<int> MeasPointWMIds { get; set; }

@@ -21,6 +21,8 @@ using MainOps.Services;
 using Microsoft.Extensions.Options;
 using Renci.SshNet.Common;
 using System.Net;
+using System.Diagnostics;
+using Rotativa.AspNetCore;
 
 namespace MainOps.Controllers
 {
@@ -95,9 +97,12 @@ namespace MainOps.Controllers
             if (User.IsInRole("Guest") || User.IsInRole("MemberGuest"))
             {
                 var theuser = await _userManager.GetUserAsync(User);
-                var data = await (from m in _context.Measures.Include(m => m.MeasPoint).ThenInclude(x=>x.Project)
-                                  .Include(x => x.TheComment).Include(x=>x.MeasPoint).ThenInclude(x=>x.MeasType).OrderByDescending(x => x.When)
-                join pu in _context.ProjectUsers on m.MeasPoint.ProjectId
+                var measList = _context.Measures.Include(m => m.MeasPoint).ThenInclude(x => x.Project)
+                                  .Include(x => x.TheComment)
+                                  .Include(x => x.MeasPoint).ThenInclude(x => x.MeasType)
+                                  .OrderByDescending(x => x.When);
+                var data = await (from m in measList
+                                  join pu in _context.ProjectUsers on m.MeasPoint.ProjectId
                                   equals pu.projectId
                                   where pu.userId == theuser.Id && m.MeasPoint.Project.Active.Equals(true)
                                   select m).OrderByDescending(x=>x.When).Take(100).ToListAsync();
@@ -107,9 +112,11 @@ namespace MainOps.Controllers
             if (User.IsInRole("Admin"))
             {
                 var dataContextAdmin = _context.Measures
-                .Include(m => m.MeasPoint).ThenInclude(x => x.Project).ThenInclude(x => x.Division).Include(x => x.MeasPoint).ThenInclude(x => x.MeasType)
-                .Include(m => m.TheComment).Where(x=>x.MeasPoint.Project.Active.Equals(true))
-                .OrderByDescending(x => x.When).Take(100);
+                        .Include(m => m.MeasPoint).ThenInclude(x => x.Project).ThenInclude(x => x.Division)
+                        .Include(x => x.MeasPoint).ThenInclude(x => x.MeasType)
+                        .Include(m => m.TheComment).Where(x=>x.MeasPoint.Project.Active.Equals(true))
+                        .OrderByDescending(x => x.When).Take(100);
+
                 return View(await dataContextAdmin.ToListAsync());
             }
             var dataContext = _context.Measures
@@ -122,7 +129,7 @@ namespace MainOps.Controllers
         }
         [HttpPost]
         [Authorize(Roles = ("Admin,DivisionAdmin,Member,Manager,Guest,MemberGuest"))]
-        public async Task<IActionResult> Combsearch(string searchstring, string filterchoice, DateTime? startdate, DateTime? enddate)
+        public async Task<IActionResult> Combsearch_origin(string searchstring, string filterchoice, DateTime? startdate, DateTime? enddate)
         {
             int f_c_converted;
             f_c_converted = Convert.ToInt32(filterchoice);
@@ -278,9 +285,88 @@ namespace MainOps.Controllers
                     
                 }
 
-
             }
+
             return View(nameof(Index));
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin,DivisionAdmin,Member,Manager,Guest,MemberGuest")]
+        public async Task<IActionResult> Combsearch(string searchstring,
+                                                    string filterchoice,
+                                                    DateTime? startdate,
+                                                    DateTime? enddate,
+                                                    int page = 1,
+                                                    int pageSize = 100)
+        {
+            int f_c_converted;
+            int.TryParse(filterchoice, out f_c_converted);
+
+            IEnumerable<SelectListItem> selList = await createFilterlist();
+            ViewData["Filterchoices"] = new SelectList(selList, "Value", "Text");
+
+            // Default date range
+            startdate = startdate ?? new DateTime(1990, 1, 1);
+            enddate = (enddate ?? new DateTime(2100, 1, 1)).AddDays(1);
+
+            var theuser = await _userManager.GetUserAsync(User);
+
+            // Base query
+            var query = _context.Measures
+                .Include(m => m.MeasPoint).ThenInclude(mp => mp.Project).ThenInclude(p => p.Division)
+                .Include(m => m.MeasPoint).ThenInclude(mp => mp.MeasType)
+                .Include(m => m.TheComment)
+                .Where(m => m.When >= startdate && m.When <= enddate);
+
+            // Role-based restrictions
+            if (User.IsInRole("Guest") || User.IsInRole("MemberGuest"))
+            {
+                query = from m in query
+                        join pu in _context.ProjectUsers on m.MeasPoint.ProjectId equals pu.projectId
+                        where pu.userId == theuser.Id && m.MeasPoint.Project.Active
+                        select m;
+            }
+            else if (!User.IsInRole("Admin"))
+            {
+                query = query.Where(m => m.MeasPoint.Project.Division.Id == theuser.DivisionId && m.MeasPoint.Project.Active);
+            }
+
+            // Filter by project (if chosen)
+            if (!string.IsNullOrEmpty(filterchoice) && filterchoice != "All")
+            {
+                query = query.Where(m => m.MeasPoint.ProjectId == f_c_converted);
+            }
+
+            // Search by name (case-insensitive)
+            if (!string.IsNullOrEmpty(searchstring))
+            {
+                query = query.Where(m => EF.Functions.Like(m.MeasPoint.Name, $"%{searchstring}%"));
+            }
+
+            // Order + pagination
+            var data = await query
+                .OrderByDescending(m => m.When)
+                .ThenBy(m => m.MeasPoint.Name)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // Repopulate filter dropdown
+            //IEnumerable<SelectListItem> selList = await createFilterlist();
+            //ViewData["Filterchoices"] = new SelectList(selList, "Value", "Text");
+
+            ViewData["CurrentPage"] = page;
+            ViewData["PageSize"] = pageSize;
+            ViewData["HasMore"] = data.Count == pageSize; // true if there might be more results
+
+            ViewData["SearchString"] = searchstring;
+            ViewData["FilterChoice"] = filterchoice;
+            ViewData["StartDate"] = startdate;
+            ViewData["EndDate"] = enddate;
+
+            Debug.WriteLine($"FilterChoice: {filterchoice}");
+
+            return View(nameof(Index), data);
         }
         [HttpGet]
         [Authorize(Roles = ("Admin,DivisionAdmin,Member,Manager,Guest,MemberGuest"))]
@@ -319,6 +405,78 @@ namespace MainOps.Controllers
                 }).OrderBy(x => x.label));
             }
             
+        }
+
+        [HttpGet]
+        [Authorize(Roles = ("Admin,DivisionAdmin,Member,MemberGuest"))]
+        public async Task<IActionResult> Meas_PDF(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user.Active == false)
+            {
+                return RedirectToAction("ErrorMessage", "Home", new { text = "You are inactive" });
+            }
+            
+            var meas = await _context.Measures
+                .Include(m => m.MeasPoint).ThenInclude(m => m.Project).ThenInclude(m => m.Division)
+                .Include(m => m.MeasPhotos)
+                .Include(m => m.TheComment)
+                .FirstOrDefaultAsync(m => m.Id == id);
+           
+
+            if (meas == null)
+            {
+                return NotFound(); 
+            }
+
+            int? mpId = meas.MeasPointId;
+            var mp = meas.MeasPoint;
+
+            var measguest = await _context.Measures
+                            .Include(x => x.MeasPoint).ThenInclude(x => x.MeasType)
+                            .Where(x => x.When.Equals(meas.When) && (x.MeasPoint.Name.Contains(mp.Name)))
+                            .ToListAsync();
+
+            MeasMoreVM model = new MeasMoreVM();
+            model.ProjectId = Convert.ToInt32(mp.ProjectId);
+            model.BaseName = mp.getBaseName;
+            model.Project = mp.Project;
+            model.TheComment = meas.TheComment;
+            model.When = meas.When;
+            model.DoneBy = meas.DoneBy;
+            
+            foreach (Meas mg in measguest)
+            {
+                var measp = mg.MeasPoint;
+                if (measp.MeasType.Type.ToLower().Equals("water level"))
+                {                    
+                    model.MeasPointNameLevelIds.Add(mg.MeasPoint.Name);                 
+                    model.MeasPointLevelComment.Add(mg.NewComment);                    
+                    model.TheMeasurement = mg.TheMeasurement;
+                    model.MeasPoint = mg.MeasPoint;
+                }
+                else if (measp.MeasType.Type.ToLower().Equals("flow rate"))
+                {
+                    model.MeasPointNameFlowIds.Add(mg.MeasPoint.Name);
+                    model.MeasPointFlowComment.Add(mg.NewComment);
+                    model.TheFlowMeasurement = mg.TheMeasurement;
+                }
+                else if (measp.MeasType.Type.ToLower().Equals("water meter"))// || mp.MeasType.Type.ToLower().Equals("water meter *10") || mp.MeasType.Type.ToLower().Equals("water meter *100"))
+                {
+                    //model.MeasPointWMIds.Add(mp.Id);
+                    //model.MeasPointWMMeasures.Add(null);
+                    model.MeasPointNameWMIds.Add(mg.MeasPoint.Name);
+                    model.MeasPointWMComment.Add(mg.NewComment);
+                    model.TheWMMeasurement = mg.TheMeasurement;
+                }
+            }
+
+            return new ViewAsPdf("_AllDetails", model);
         }
 
         // GET: Meas/Details/5
@@ -605,7 +763,7 @@ namespace MainOps.Controllers
                     string fileExtension = Path.GetExtension(postedFile.FileName);
 
                     //Validate uploaded file and return error.
-                    if (fileExtension != ".csv")
+                    if (fileExtension.ToLower() != ".csv")
                     {
                         return View("Index");
                     }
@@ -1323,15 +1481,17 @@ namespace MainOps.Controllers
                             LevelMeas.CommentId = model.CommentId;
                             LevelMeas.When = model.When;
                             LevelMeas.DoneBy = user.full_name();
-                            if(LevelMeas.CommentId == null && (LevelMeas.NewComment == null || LevelMeas.NewComment == "") && LevelMeas.TheMeasurement == null)
-                            {
-
-                            }
-                            else
+                            //if (LevelMeas.CommentId == null && (LevelMeas.NewComment == null || LevelMeas.NewComment == "") && LevelMeas.TheMeasurement == null)
+                            if (LevelMeas.CommentId != null || !string.IsNullOrEmpty(LevelMeas.NewComment) || LevelMeas.TheMeasurement != null)
                             {
                                 _context.Add(LevelMeas);
                                 await UploadMeasToFTP(LevelMeas);
                             }
+                            //else
+                            //{
+                            //    _context.Add(LevelMeas);
+                            //    await UploadMeasToFTP(LevelMeas);
+                            //}
                             
                         }
                     }
@@ -1734,14 +1894,14 @@ namespace MainOps.Controllers
                         var measpointsguest = await _context.MeasPoints
                             .Include(x => x.MeasType)
                             .Where(x => x.ProjectId.Equals(measp.ProjectId)
-                            && (
-                            x.Name.Equals(measp.Name)
-                            || (x.getBaseName.Equals(measp.getBaseName) && x.Name.Contains("_1"))
-                            || (x.getBaseName.Equals(measp.getBaseName) && x.Name.Contains("_2"))
-                            || (x.getBaseName.Equals(measp.getBaseName) && x.Name.Contains("_3"))
-                            || (x.getBaseName.Equals(measp.getBaseName) && x.Name.ToLower().Contains("watermeter"))
-                            || (x.getBaseName.Equals(measp.getBaseName) && x.Name.ToLower().Contains("flow"))
-                            )
+                                            && (
+                                                x.Name.Equals(measp.Name)
+                                                || (x.getBaseName.Equals(measp.getBaseName) && x.Name.Contains("_1"))
+                                                || (x.getBaseName.Equals(measp.getBaseName) && x.Name.Contains("_2"))
+                                                || (x.getBaseName.Equals(measp.getBaseName) && x.Name.Contains("_3"))
+                                                || (x.getBaseName.Equals(measp.getBaseName) && x.Name.ToLower().Contains("watermeter"))
+                                                || (x.getBaseName.Equals(measp.getBaseName) && x.Name.ToLower().Contains("flow"))
+                                            )
                             ).ToListAsync();
 
                         if (measpointsguest.Count > 1)
@@ -1789,7 +1949,11 @@ namespace MainOps.Controllers
 
 
                     }
-                    var measpoints = await _context.MeasPoints.Include(x => x.MeasType).Where(x => x.ProjectId.Equals(measp.ProjectId) && (x.Name.Equals(measp.Name) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.Contains("_1")) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.Contains("_2")) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.Contains("_3")) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.ToLower().Contains("watermeter")) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.ToLower().Contains("flow")))).ToListAsync();
+                    
+                    var measpoints = await _context.MeasPoints
+                        .Include(x => x.MeasType)
+                        .Where(x => x.ProjectId.Equals(measp.ProjectId) && 
+                                    (x.Name.Equals(measp.Name) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.Contains("_1")) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.Contains("_2")) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.Contains("_3")) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.ToLower().Contains("watermeter")) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.ToLower().Contains("flow")))).ToListAsync();
                     if (measpoints.Count > 1)
                     {
                         MeasMoreVM model = new MeasMoreVM();

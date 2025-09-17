@@ -20,6 +20,10 @@ namespace MainOps.Models
         public virtual SubProject? SubProject { get; set; }
         [Display(Name = "Generator Name/Location")]
         public string? GeneratorNameLocation { get; set; }
+
+        [Display(Name = "Generator Name")]
+        public string? GeneratorName { get; set; }
+
         [Display(Name = "Time Stamp")]
         public DateTime TimeStamp { get; set; }
         [Display(Name = "Report Done By")]
@@ -34,12 +38,25 @@ namespace MainOps.Models
         public bool Oil_Level { get; set; }
         [Display(Name = "Comments")]
         public string? Oil_Level_Comment { get; set; }
-        [Display(Name = "What is the diesel level?")]
+        [Display(Name = "What is the diesel level in the generator?")]
         public double Diesel_Level { get; set; }
         [Display(Name = "Comments")]
         public string? Diesel_Level_Comment { get; set; }
+
+        [Display(Name = "What is the diesel level in the spare tank?")]
+        public double SpareTank_Level { get; set; }
+        [Display(Name = "Comments")]
+        public string? SpareTank_Level_Comment { get; set; }
+
         [Display(Name = "Is coolant ok?")]
         public bool Coolant { get; set; }
+
+        [Display(Name = "Test type")]
+        public bool Full_Load { get; set; } = true; // Default to true
+
+        [Display(Name = "Comments")]
+        public string? Test_Type_Comment { get; set; }
+
         [Display(Name = "Comments")]
         public string? Coolant_Comment { get; set; }
         [Display(Name = "Generator started without problems?")]
@@ -65,6 +82,7 @@ namespace MainOps.Models
         public DateTime? EnteredIntoDataBase { get; set; }
         [Display(Name = "General Comments")]
         public string? GeneralComments { get; set; }
-        public ICollection<PhotoFileGeneratorCheck>? Photos { get; set; }
+        public string? Address { get; set; }
+        public ICollection<PhotoFileGeneratorCheck> Photos { get; set; } = new List<PhotoFileGeneratorCheck>();
     }
 }

@@ -1,8 +1,14 @@
 ﻿@model MainOps.Models.MeasPointViewModel
-
+<!DOCTYPE html>
+<html>
 <head>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBZBU48i_mLH-TfVWO-UfsKM_Qu7fyPdWs"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
+<body>
 
 @{
     ViewData["Title"] = "All details";
@@ -66,8 +72,8 @@
 
 
 @section scripts{
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js"></script>
+    
+    @* <script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js"></script> *@
     <script>
         var thename = document.getElementById('graphname').value;
         var theid = document.getElementById('mpId').value;
@@ -78,6 +84,7 @@
         google.load('visualization', '1.0', { 'packages': ['corechart'], 'callback': drawchart });
 
         function drawchart() {
+                console.log('Start drawing points.....');
             var data = new google.visualization.DataTable();
             var options = {
                 title: thename,
@@ -241,3 +248,6 @@
 
     </script>
 }
+
+</body>
+</html>

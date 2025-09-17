@@ -3,12 +3,16 @@
     Layout = null;
 }
 <head>
-    <meta name="viewport" content="width=device-width" />
-    <title>@SharedLocalizer.GetLocalizedHtmlString("WTP Check")</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBZBU48i_mLH-TfVWO-UfsKM_Qu7fyPdWs"></script>
+    <meta name="viewport" content="width=device-width" charset="UTF-8" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("Generator Test PDF")</title>
     <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
 </head>
-
-<div>
+@if (string.IsNullOrEmpty(Model.GeneratorName))
+{
+    Model.GeneratorName = Model.GeneratorNameLocation;
+}
+<body>
     <table style="page-break-inside:avoid;">
         <tr>
             <td colspan="3">
@@ -37,7 +41,7 @@
                 @Html.DisplayFor(Model => Model.Project.ProjectNr)
             </td>
         </tr>
-        @if (Model.SubProjectId != null)
+        @*  @if (Model.SubProjectId != null)
         {
             <tr>
                 <td style="text-align:left;">
@@ -49,7 +53,42 @@
                     @Html.DisplayFor(Model => Model.SubProject.Name) : @Html.DisplayFor(Model => Model.SubProject.SubProjectNr)
                 </td>
             </tr>
+        } *@
+        <tr>
+            <td style="text-align:left;">
+                @if (Model.ProjectId == 437 || Model.ProjectId == 653)
+                {
+                    <b>Generator Name (owner of the generator)</b>
+                }
+                else
+                {
+                    <b>@Html.DisplayNameFor(Model => Model.GeneratorNameLocation)</b>
+                }
+            </td>
+            <td id="selectedGeneratorKey">
+                @* @Html.DisplayFor(Model => Model.GeneratorNameLocation) *@
+                @if (Model.ProjectId == 437 || Model.ProjectId == 653)
+                {
+                    
+                    @Html.DisplayFor(Model => Model.GeneratorName)
+                }
+                else
+                {
+                    @Html.DisplayFor(Model => Model.GeneratorNameLocation)
+                }
+            </td>
+        </tr>
+
+        @if (Model.ProjectId == 437 || Model.ProjectId == 653) //437 is NHT project, 653: TestMainOpsProject
+        {
+            <tr>
+                <td style="text-align:left;" ><b>Location</b></td>
+                <td >              
+                     @Html.DisplayFor(Model => Model.Address)
+                </td>
+            </tr>
         }
+
         <tr>
             <td style="text-align:left;">
                 <b>
@@ -58,17 +97,6 @@
             </td>
             <td>
                 @Html.DisplayFor(Model => Model.Project.Client)
-            </td>
-
-        </tr>
-        <tr>
-            <td style="text-align:left;">
-                <b>
-                    @Html.DisplayNameFor(Model => Model.GeneratorNameLocation)
-                </b>
-            </td>
-            <td>
-                @Html.DisplayFor(Model => Model.GeneratorNameLocation)
             </td>
         </tr>
         <tr>
@@ -83,17 +111,43 @@
         </tr>
     </table>
     <table>
+        @if (Model.ProjectId == 437 || Model.ProjectId == 653)
+        {
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(model => model.Full_Load)</b></td>
+
+                @if (Model.Full_Load == true)
+                {
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Full load")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No Full load")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Full load")</td>
+                    <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No Full load")</span_circle></td>
+                }
+            </tr>    
+
+            @if (Model.Test_Type_Comment != null)
+            {
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(model => model.Test_Type_Comment)</b></td>
+                    <td colspan="2">@Html.DisplayFor(model => model.Test_Type_Comment)</td>
+                </tr>
+            }
+            
+        }
         <tr>
             <td style="width:50%"><b>@Html.DisplayNameFor(model => model.Oil_Level)</b></td>
             @if (Model.Oil_Level == true)
             {
-                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%;"><span_circle style="background-color:forestgreen;">@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
                 <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
             }
             else
             {
                 <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
-                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                <td style="width:25%"><span_circle style="background-color:red;">@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
             }
         </tr>
         @if (Model.Oil_Level_Comment != null)
@@ -103,37 +157,70 @@
                 <td colspan="2">@Html.DisplayFor(model => model.Oil_Level_Comment)</td>
             </tr>
         }
-        <tr>
-            <td style="width:50%"><b>@Html.DisplayNameFor(model => model.AdBlue_Level)</b></td>
-            @if (Model.AdBlue_Level == true)
+
+
+        @if (Model.ProjectId == 437 || Model.ProjectId == 653)
+        {
+            if (Model.GeneratorName == "Generator Nr. 6 (Atlas Copco)" || Model.GeneratorName == "Generator Nr. 7 (Atlas Copco)")
             {
-                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
-                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(model => model.AdBlue_Level)</b></td>
+                    @if (Model.AdBlue_Level == true)
+                    {
+                        <td style="width:25%"><span_circle style="background-color:forestgreen;">@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                        <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                    }
+                    else
+                    {
+                        <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                        <td style="width:25%"><span_circle style="background-color:red;">@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                    }
+                </tr>
+                @if (Model.AdBlue_Level_Comment != null)
+                {
+                    <tr>
+                        <td style="width:50%"><b>@Html.DisplayNameFor(model => model.AdBlue_Level_Comment)</b></td>
+                        <td colspan="2">@Html.DisplayFor(model => model.AdBlue_Level_Comment)</td>
+                    </tr>
+                }        
             }
-            else
-            {
-                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
-                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
-            }
-        </tr>
-        @if (Model.AdBlue_Level_Comment != null)
+        }
+        else
         {
             <tr>
-                <td style="width:50%"><b>@Html.DisplayNameFor(model => model.AdBlue_Level_Comment)</b></td>
-                <td colspan="2">@Html.DisplayFor(model => model.AdBlue_Level_Comment)</td>
+                <td style="width:50%"><b>@Html.DisplayNameFor(model => model.AdBlue_Level)</b></td>
+                @if (Model.AdBlue_Level == true)
+                {
+                    <td style="width:25%"><span_circle style="background-color:forestgreen;">@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+                }
+                else
+                {
+                    <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                    <td style="width:25%"><span_circle style="background-color:red;">@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                }
             </tr>
+            @if (Model.AdBlue_Level_Comment != null)
+            {
+                <tr>
+                    <td style="width:50%"><b>@Html.DisplayNameFor(model => model.AdBlue_Level_Comment)</b></td>
+                    <td colspan="2">@Html.DisplayFor(model => model.AdBlue_Level_Comment)</td>
+                </tr>
+            }
+
+        
         }
         <tr>
             <td style="width:50%"><b>@Html.DisplayNameFor(model => model.Diesel_Level)</b></td>
-            @if (Model.Diesel_Level >= 50)
+            <td style="width:25%">@Html.DisplayFor(Model => Model.Diesel_Level)%</td>
+            @* @if (Model.Diesel_Level >= 50) *@
+            @if (Model.Diesel_Level >= 80)
             {
-                <td style="width:25%">@Html.DisplayFor(Model => Model.Diesel_Level)</td>
-                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("OK")</span_circle></td>
+                <td style="width:25%"><span_circle style="background-color:forestgreen;">@SharedLocalizer.GetLocalizedHtmlString("OK")</span_circle></td>
             }
             else
             {
-                <td style="width:25%">@Html.DisplayFor(Model => Model.Diesel_Level)</td>
-                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Not OK")</span_circle></td>
+                <td style="width:25%"><span_circle style="background-color:red;">@SharedLocalizer.GetLocalizedHtmlString("Not OK")</span_circle></td>
             }
         </tr>
         @if (Model.Diesel_Level_Comment != null)
@@ -143,17 +230,43 @@
                 <td colspan="2">@Html.DisplayFor(model => model.Diesel_Level_Comment)</td>
             </tr>
         }
+
+        @if (Model.ProjectId == 437 || Model.ProjectId == 653)
+        {
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(model => model.SpareTank_Level)</b></td>
+                <td style="width:25%">@Html.DisplayFor(Model => Model.SpareTank_Level)%</td>
+                @if (Model.SpareTank_Level >= 80)
+                {
+                    <td style="width:25%"><span_circle style="background-color:forestgreen;">@SharedLocalizer.GetLocalizedHtmlString("OK")</span_circle></td>
+                }
+                else
+                {
+                    <td style="width:25%"><span_circle style="background-color:red;">@SharedLocalizer.GetLocalizedHtmlString("Not OK")</span_circle></td>
+                }
+            </tr>
+        }
+        
+        @if (Model.SpareTank_Level_Comment != null)
+        {
+            <tr>
+                <td style="width:50%"><b>@Html.DisplayNameFor(model => model.SpareTank_Level_Comment)</b></td>
+                <td colspan="2">@Html.DisplayFor(model => model.SpareTank_Level_Comment)</td>
+            </tr>
+        }
+
+
         <tr>
             <td style="width:50%"><b>@Html.DisplayNameFor(model => model.Coolant)</b></td>
             @if (Model.Coolant == true)
             {
-                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%"><span_circle style="background-color:forestgreen;">@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
                 <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
             }
             else
             {
                 <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
-                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                <td style="width:25%"><span_circle style="background-color:red;">@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
             }
         </tr>
         @if (Model.Coolant_Comment != null)
@@ -167,13 +280,17 @@
             <td style="width:50%"><b>@Html.DisplayNameFor(model => model.Generator_Started)</b></td>
             @if (Model.Generator_Started == "Yes")
             {
-                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%"><span_circle style="background-color:forestgreen;">@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
                 <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else if (Model.Generator_Started == "No")
+            {
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td style="width:25%"><span_circle style="background-color:red;">@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
             }
             else
             {
-                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
-                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                <td colspan="2"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</span_circle></td>
             }
         </tr>
         @if (Model.Generator_Started_Comment != null)
@@ -187,13 +304,31 @@
             <td style="width:50%"><b>@Html.DisplayNameFor(model => model.Equipment_Started)</b></td>
             @if (Model.Equipment_Started == "Yes")
             {
-                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%"><span_circle style="background-color:forestgreen;">@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
                 <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
             }
             else
             {
                 <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
-                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                @if (Model.ProjectId == 437 || Model.ProjectId == 653)
+                {
+                    @if (Model.Full_Load)
+                    {
+                        <td style="width:25%"><span_circle style="background-color:red;">@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+
+                    }
+                    else
+                    {
+                         <td style="width:25%"><span_circle style="background-color:forestgreen;">@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+
+                    }
+                }
+                else
+                {
+                    <td style="width:25%"><span_circle style="background-color:red;">@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+
+                }
+               
             }
         </tr>
         @if (Model.Equipment_Started_Comment != null)
@@ -207,13 +342,17 @@
             <td style="width:50%"><b>@Html.DisplayNameFor(model => model.Generator_Stopped)</b></td>
             @if (Model.Generator_Stopped == "Yes")
             {
-                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%"><span_circle style="background-color:forestgreen;">@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
                 <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else if (Model.Generator_Stopped == "No")
+            {
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+                <td style="width:25%"><span_circle style="background-color:red;">@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
             }
             else
             {
-                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
-                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                <td colspan="2"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</span_circle></td>
             }
         </tr>
         @if (Model.Generator_Stopped_Comment != null)
@@ -227,13 +366,35 @@
             <td style="width:50%"><b>@Html.DisplayNameFor(model => model.Equipment_Started_After)</b></td>
             @if (Model.Equipment_Started_After == "Yes")
             {
-                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
+                <td style="width:25%"><span_circle style="background-color:forestgreen;">@SharedLocalizer.GetLocalizedHtmlString("Yes")</span_circle></td>
                 <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
+            }
+            else if (Model.Equipment_Started_After == "No")
+            {
+                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
+
+                @if (Model.ProjectId == 437 || Model.ProjectId == 653)
+                {
+                    @if (Model.Full_Load)
+                    {
+                        <td style="width:25%"><span_circle style="background-color:red;">@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                    }
+                    else
+                    {
+                         <td style="width:25%"><span_circle style="background-color:forestgreen;">@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                    }
+                }
+                else
+                {
+                    <td style="width:25%"><span_circle style="background-color:red;">@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+
+                }               
             }
             else
             {
-                <td style="width:25%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td>
-                <td style="width:25%"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("No")</span_circle></td>
+                @*  <td style="width:16%">@SharedLocalizer.GetLocalizedHtmlString("Yes")</td> 
+                <td style="width:25%">Yes/No</td>*@
+                <td colspan="2"><span_circle>@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</span_circle></td>
             }
         </tr>
         @if (Model.Equipment_Started_After_Comment != null)
@@ -320,4 +481,139 @@
 
         }
     </table>
-</div>
+    <table name="maptable">
+         <tr>
+            <td colspan="7" width="400px" height="400px">              
+                @if (Model.ProjectId == 437 || Model.ProjectId == 653)
+                {
+                    var encodedAddress = System.Net.WebUtility.UrlEncode(Model.Address + ", Denmark");
+                    string mapSrc = "https://maps.googleapis.com/maps/api/staticmap?center=" + encodedAddress + "&zoom=16&size=600x300&maptype=roadmap&markers=color:red%7Clabel:G%7C" + encodedAddress +"&key=AIzaSyBZBU48i_mLH-TfVWO-UfsKM_Qu7fyPdWs";                    
+                    <img src=@mapSrc alt="Google Map" />
+                }
+                else
+                {
+                    string mapSrc = "https://maps.googleapis.com/maps/api/staticmap?center=" + @Model.Latitude +","+ @Model.Longitude + "&zoom=16&size=600x300&maptype=roadmap&markers=color:red%7Clabel:G%7C" + @Model.Latitude +"," + @Model.Longitude +"&key=AIzaSyBZBU48i_mLH-TfVWO-UfsKM_Qu7fyPdWs";
+                    <img src=@mapSrc alt="Google Map" />
+                }      
+
+            </td>
+            <td colspan="3" width="400px" height="400px" style="text-align: left;padding-left: 20px;">
+                <div style="margin-top: 10px;">                   
+                    <strong>  Name:</strong> 
+                    @if (Model.ProjectId == 437  || Model.ProjectId == 653)
+                    {
+                        @Model.GeneratorName<br />
+                    }
+                    else
+                    {
+                        @Model.GeneratorNameLocation<br />
+                    }
+                    
+                    
+                    @if (Model.ProjectId == 437  || Model.ProjectId == 653)
+                    {
+                        <strong>Address:</strong> @Model.Address
+                    }                   
+                </div>
+            </td>
+           
+        </tr>
+    </table>
+</body>
+@* 
+<script src="~/js/jquery-ui-timepicker-addon.min.js"></script> *@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://rawgit.com/moment/moment/2.2.1/min/moment.min.js"></script>
+
+<script >
+   
+        // Define the key/value list
+        // const generatorMap = {
+        //       "Generator Nr. 1 (Atlas Copco)": "Svaneknoppen",
+        //       "Generator Nr. 2 (Atlas Copco)": "Svaneknoppen",
+        //       "Generator Nr. 3 (Atlas Copco)": "Svaneknoppen",
+        //       "Generator Nr. 4 (Repto)": "Færgehavnsvej",
+        //       "Generator Nr. 5 (Atlas Copco)": "Baltikavej",
+        //       "Generator Nr. 6 (Atlas Copco)": "Baltikavej",
+        //       "Generator Nr. 7 (Atlas Copco)": "Baltikavej",
+        //       "Generator Nr. 8 (GSV)": "Baltikavej",
+        //       "Generator Nr. 9 (Repto)": "Baltikavej",
+        //       "Generator Nr. 10 (Repto)": "Baltikavej",
+        //       "Generator Nr. 11 (Repto)": "Baltikavej",
+        //       "Generator Nr. 12 (Repto)": "Baltikavej",
+        //       "Generator Nr. 13 (Repto)": "Nordsøvej"
+        // };
+
+   
+          // Function to decode HTML entities like &#230; → æ
+        function decodeHTMLEntities(text) {
+          const txt = document.createElement('textarea');
+          txt.innerHTML = text;
+          return txt.value;
+        }
+
+        const key = document.getElementById("selectedGeneratorKey").textContent.trim();
+        const valueTd = document.getElementById("selectedGeneratorValue");
+        const rawValue = generatorMap[key];
+        if (rawValue) {
+            const decodedValue = decodeHTMLEntities(rawValue);
+            valueTd.textContent = decodedValue;
+        } else {
+            valueTd.textContent =  "Address not found";
+
+        }
+
+        // $(document).ready(function () {
+        //     DisplayGoogleMap();
+        // });
+
+        // function DisplayGoogleMap() {
+        //     //Set the Latitude and Longitude of the Map
+           
+        //     var myLatLng = { lat: @Model.Latitude, lng: @Model.Longitude };
+        //     console.log('lat: ' +myLatLng.lat + ', longi: ' + myLatLng.lng );
+        //     //Create Options or set different Characteristics of Google Map
+        //     var mapOptions = {
+        //         center: myLatLng,
+        //         zoom: 11,
+        //         minZoom: 4,
+        //         mapTypeId: google.maps.MapTypeId.ROADMAP
+        //     };
+        //     //Display the Google map in the div control with the defined Options
+        //     window.map = new google.maps.Map(document.getElementById("myDiv"), mapOptions);
+
+
+        //     var marker = new google.maps.Marker({
+        //           map: window.map,
+        //             position: { lat: @Model.Latitude, lng: @Model.Longitude },
+                   
+        //           title: "hi",
+        //     });
+        //     marker['infowindow'] = new google.maps.InfoWindow({
+        //         content: "@Model.GeneratorNameLocation : @Model.Latitude"
+        //     });
+
+        //     google.maps.event.addListener(marker, 'click', function () {
+        //         this['infowindow'].open(map, this);
+        //     });
+
+        //     marker.setMap(window.map);
+        // }
+        // function addmarker(lati, longi, name) {
+        //      var marker = new google.maps.Marker({
+        //           map: window.map,
+        //             position: { lat: lati, lng: longi },
+        //           title: "hi",
+        //     });
+        //     marker['infowindow'] = new google.maps.InfoWindow({
+        //         content: name
+        //     });
+        //     google.maps.event.addListener(marker, 'click', function () {
+        //         this['infowindow'].open(window.map, this);
+        //     });
+        //     marker.setMap(map);
+        // }
+   
+    </script>
+
+

@@ -3,6 +3,7 @@
     ViewData["Title"] = "Basis for Invoice";
     var thevaluta = "";
     var firstitem = Model.allItems.Where(x => x.ItemTypeId != 0 && x.ItemTypeId != null).FirstOrDefault();
+    var months = GetRoundedMonthDifference(Model.starttime, Model.endtime);
 
     @if (firstitem != null)
     {
@@ -35,7 +36,28 @@
             thevaluta = "DKK";
         }
 
-    }}
+    }
+}
+
+@functions {
+    public int GetRoundedMonthDifference(DateTime start, DateTime end)
+    {
+        int months = (end.Year - start.Year) * 12 + end.Month - start.Month;
+        int dayDifference = end.Day - start.Day;
+
+        // Round based on day difference
+        // if (dayDifference >= 15)
+        //     months++;
+        // else if (dayDifference < -15)
+        //     months--;
+
+        return months;
+    }
+}
+
+
+
+
 @if (Model.AllInvoicesSent.Equals(false))
 {
     <span style="color:red;"><b><big><big><big><big>@SharedLocalizer.GetLocalizedHtmlString("PREVIOUS INVOICE(S) MISSING! Please") <a asp-action="Index" asp-controller="Invoices" asp-route-id="@Model.ProjectId">@SharedLocalizer.GetLocalizedHtmlString("CHECK!")</a></big></big></big></big></b></span>
@@ -129,7 +151,8 @@
 </form>
 <br />
 
-@{ var totaltotalcost = (decimal)0.0;
+@{
+    var totaltotalcost = (decimal)0.0;
     var numRecords = 0;
 }
 @foreach (var boqheadline in Model.headlines.OrderBy(x => x.BoQnum).ThenBy(x => x.HeadLine))
@@ -140,6 +163,7 @@
         if (numRecords > 0)
         {
             <h2>@SharedLocalizer.GetLocalizedHtmlString(boqheadline.HeadLine)</h2>
+            
             var cost = (decimal)0.0;
             <table style="width:100%">
                 <thead>
@@ -177,13 +201,25 @@
                             @if (item.Mobilize.UniqueID != "N/A" && item.Mobilize.UniqueID != null)
                             {
                                 <form asp-action="Details_Mobilize" asp-controller="TrackItems" asp-route-id="@item.MobilizationId" method="get" target="_blank">
-                                    <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Mobilize.UniqueID)) </button>
-                                </form>
+                                   <button>
+                                        @if (item.BoQNr != 0)
+                                        {
+                                            @($"{item.BoQNr:N3} : ")
+                                        }
+                                        @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Mobilize.UniqueID))
+                                    </button>
+                                    </form>
                             }
                             else
                             {
                                 <form asp-action="Details_Mobilize" asp-controller="TrackItems" asp-route-id="@item.MobilizationId" method="get" target="_blank">
-                                    <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name)</button>
+                                   <button>
+                                        @if (item.BoQNr != 0)
+                                        {
+                                            @($"{item.BoQNr:N3} : ")
+                                        }
+                                        @Html.DisplayFor(modelItem => item.Item_Name)
+                                    </button>
                                 </form>
                             }
 
@@ -221,6 +257,7 @@
         if (numRecords > 0)
         {
             <h2>@SharedLocalizer.GetLocalizedHtmlString(boqheadline.HeadLine)</h2>
+           
             var cost = (decimal)0.0;
             <table style="width:100%">
                 <thead>
@@ -261,20 +298,61 @@
                                 {
                                     @if (item.Install.Location != "" && item.Install.Location != null)
                                     {
-                                        <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Install.UniqueID)) : @Html.DisplayFor(modelItem => item.location)</button>
+                                        @* <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Install.UniqueID)) : @Html.DisplayFor(modelItem => item.location)</button>
+                                         *@
+                                        @if (item.rental_price > 0)
+                                        {
+                                            <button>
+                                                @if (item.BoQNr != 0)
+                                                {
+                                                    @($"{item.BoQNr:N3} : ")
+                                                }
+                                                @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Install.Location))
+                                            </button>
+                                            }
+                                        else
+                                        {
+                                            <button>@Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Install.UniqueID)) : @Html.DisplayFor(modelItem => item.location)</button>
+                                        }
                                     }
                                     else
                                     {
-                                        <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Install.UniqueID))</button>
+                                        @* <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Install.UniqueID))</button> *@
+                                        @if (item.rental_price > 0)
+                                        {
+                                            <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Install.UniqueID))</button>
+
+                                        }
+                                        else
+                                        {
+                                            <button>@Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Install.UniqueID))</button>
+                                        }
                                     }
                                 }
                                 else if (item.Install.Location != "" && item.Install.Location != null)
                                 {
-                                    <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) : @Html.DisplayFor(modelItem => item.location)</button>
+                                    @if (item.rental_price > 0)
+                                    {
+                                        <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) : @Html.DisplayFor(modelItem => item.location)</button>
+                                    }
+                                    else
+                                    {
+                                        <button>@Html.DisplayFor(modelItem => item.Item_Name) : @Html.DisplayFor(modelItem => item.location)</button>
+                                                                               
+                                    }
                                 }
                                 else
                                 {
-                                    <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name)</button>
+                                    @* <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name)</button> *@
+                                    @if (item.rental_price > 0)
+                                    {
+                                        <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name)</button>
+                                    }
+                                    else
+                                    {
+                                        <button>@Html.DisplayFor(modelItem => item.Item_Name)</button>
+
+                                    }
                                 }
                             </form>
                         </td>
@@ -403,6 +481,8 @@
                             period = SharedLocalizer.GetLocalizedHtmlString("Weeks");
                         }
 
+                        
+
                         <tr>
                             @if (item.ArrivalId.Equals(10000))
                             {
@@ -411,7 +491,6 @@
                                     <td style="text-align:left">
                                         @String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) @Html.DisplayFor(modelItem => item.Arrival.UniqueID) : @Html.DisplayFor(modelItem => item.location)
                                     </td>
-
                                 }
                                 else
                                 {
@@ -419,25 +498,28 @@
                                         @String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) : @Html.DisplayFor(modelItem => item.location)
                                     </td>
                                 }
-
-
-
                             }
                             else
                             {
                                 if (item.Arrival.UniqueID != null && item.Arrival.UniqueID != "N/A")
                                 {
-                                    <td style="text-align:left">debug1
+                                    <td style="text-align:left">
                                         <form asp-action="Details_Arrival" asp-controller="TrackItems" asp-route-id="@item.ArrivalId" method="get" target="_blank">
-                                            <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) @Html.DisplayFor(modelItem => item.Arrival.UniqueID) : @Html.DisplayFor(modelItem => item.location)</button>
+                                            <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) @Html.DisplayFor(modelItem => item.Arrival.UniqueID) @(string.IsNullOrEmpty(item.location) ? "" : " : " + item.location)</button>
                                         </form>
                                     </td>
                                 }
                                 else
                                 {
-                                    <td style="text-align:left">debug2
+                                    <td style="text-align:left">
                                         <form asp-action="Details_Arrival" asp-controller="TrackItems" asp-route-id="@item.ArrivalId" method="get" target="_blank">
-                                            <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) : @Html.DisplayFor(modelItem => item.location)</button>
+                                            <button>
+                                                @if (item.BoQNr != (decimal)0.0)
+                                                {
+                                                    @($"{item.BoQNr:N3} : ")
+                                                }
+                                                @Html.DisplayFor(modelItem => item.Item_Name)  @(" - rental")
+                                            </button>
                                         </form>
                                     </td>
                                 }
@@ -515,12 +597,13 @@
                         }
                     }
                 }
-                catch
+                catch(Exception ex)
                 {
                     @foreach (var item in Model.items.Where(x => x.ArrivalId != null && x.Arrival.VariationOrderId == null && (x.BoQNr_Rental >= boqheadline.BoQnum && x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0)) && (x.rental_price > (decimal)0.0 || x.rental_price < (decimal)0.0)).OrderBy(x => x.BoQNr).ThenBy(x => x.Install_date))
                     {
                         var subtotal = (decimal)item.rental_price; // Convert.ToDecimal(item.ItemType.rental_price * (decimal)item.Days * (decimal)item.Amount);
                         var period = SharedLocalizer.GetLocalizedHtmlString("Days");
+                        
                         if (item.ItemType.Rental_UnitId.Equals(16) || item.ItemType.Rental_UnitId.Equals(18))
                         {
                             period = SharedLocalizer.GetLocalizedHtmlString("Months");
@@ -546,26 +629,35 @@
                                         @String.Format("{0:N3}", item.BoQNr_Rental) : @Html.DisplayFor(modelItem => item.Item_Name) : @Html.DisplayFor(modelItem => item.location)
                                     </td>
                                 }
-
-
-
                             }
                             else
                             {
                                 if (item.Arrival.UniqueID != null && item.Arrival.UniqueID != "N/A")
                                 {
-                                    <td style="text-align:left">debug3
+                                    <td style="text-align:left">
                                         <form asp-action="Details_Arrival" asp-controller="TrackItems" asp-route-id="@item.ArrivalId" method="get" target="_blank">
-                                            <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) @Html.DisplayFor(modelItem => item.Arrival.UniqueID) : @Html.DisplayFor(modelItem => item.location)</button>
+                                            <button>
+                                                @if (item.BoQNr != (decimal)0.0)
+                                                {
+                                                    @($"{item.BoQNr:N3} : ")
+                                                }
+                                                @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Arrival.UniqueID)) @(" - rental")
+                                            </button>                                            
                                         </form>
                                     </td>
                                 }
                                 else
                                 {
-                                    <td style="text-align:left">debug4
+                                    <td style="text-align:left">
                                         <form asp-action="Details_Arrival" asp-controller="TrackItems" asp-route-id="@item.ArrivalId" method="get" target="_blank">
-                                            <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) : @Html.DisplayFor(modelItem => item.location)</button>
-                                        </form>
+                                           <button>
+                                                @if (item.BoQNr != (decimal)0.0)
+                                                {
+                                                    @($"{item.BoQNr:N3} : ")
+                                                }
+                                                @Html.DisplayFor(modelItem => item.Item_Name) @(item.BoQNr != (decimal)0.0? " - rental" : "")
+                                           </button>
+                                       	 </form>
                                     </td>
                                 }
                             }
@@ -662,7 +754,7 @@
         numRecords = Model.items.Where(x => x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId == null && x.BoQNr >= boqheadline.BoQnum && x.BoQNr < (decimal)(boqheadline.BoQnum + 1)).Count();
         if (numRecords > 0)
         {
-            <h2>@SharedLocalizer.GetLocalizedHtmlString(boqheadline.HeadLine)</h2>
+            <h2>@SharedLocalizer.GetLocalizedHtmlString(boqheadline.HeadLine)</h2>           
             var cost = (decimal)0.0;
             <table style="width:100%">
                 <thead>
@@ -717,14 +809,26 @@
                             @if (item.Daily_Report_2.short_Description != null && item.Daily_Report_2.short_Description != "")
                             {
                                 <form asp-action="Daily_Report_2_DetailsPdf" asp-controller="TrackItems" asp-route-id="@item.Daily_Report_2Id" method="get" target="_blank">
-                                    <button class="btn-hoelscher" style="text-align:left;">@Html.DisplayFor(modelItem => item.Item_Name) (@item.Daily_Report_2.short_Description)</button>
-                                </form>
+                                    <button>
+                                        @if (item.BoQNr != 0)
+                                        {
+                                            @($"{item.BoQNr:N3} : ")
+                                        }
+                                        @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Daily_Report_2.short_Description))
+                                    </button>
+                                    </form>
                             }
                             else
                             {
                                 <form asp-action="Daily_Report_2_DetailsPdf" asp-controller="TrackItems" asp-route-id="@item.Daily_Report_2Id" method="get" target="_blank">
-                                    <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name)</button>
-                                </form>
+                                   <button>
+                                    @if (item.BoQNr != (decimal)0.0)
+                                    {
+                                        @($"{item.BoQNr:N3} : ")
+                                    }
+                                    @Html.DisplayFor(modelItem => item.Item_Name)
+                                </button>
+                                 </form>
                             }
 
                         </td>
@@ -823,7 +927,7 @@
                         }
                     </tr>
                 </thead>
-                @foreach (var item in Model.items.Where(x => (x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId.Equals(boqheadline.Id)) || (x.MobilizationId != null && x.Mobilize.VariationOrderId.Equals(boqheadline.Id)) || (x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId.Equals(boqheadline.Id)) || (x.ArrivalId != null && x.Arrival.VariationOrderId.Equals(boqheadline.Id))))
+                @foreach (var item in Model.items.Where(x => (x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId.Equals(boqheadline.Id)) || (x.MobilizationId != null && x.Mobilize.VariationOrderId.Equals(boqheadline.Id)) || (x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId.Equals(boqheadline.Id)) || (x.ArrivalId != null && x.Arrival.VariationOrderId.Equals(boqheadline.Id))).OrderBy(x => x.BoQNr))
                 {
                     var subtotal = (decimal)0.0;
                     @if (item.rental_price != null && item.price != null)
@@ -842,219 +946,289 @@
                         }
                     }
 
-                    <tr>
-                        @if (item.InstallationId == null && item.Daily_Report_2Id == null && item.ArrivalId == null && item.MobilizationId == null)
-                        {
-                            <td style="text-align:left">
-                                <form asp-action="Details" asp-controller="ExtraWorks" asp-route-id="@item.ExtraWorkId" method="get" target="_blank">
-                                    <button class="btn-hoelscher" style="text-align:left;">@Html.DisplayFor(modelItem => item.Item_Name)</button>
-                                </form>
-                            </td>
-                            <td style="text-align:right">@Html.DisplayFor(Model => item.ExtraWork.TimeStamp)</td>
-                            <td style="text-align:right">@Html.DisplayFor(Model => item.ExtraWork.EndStamp)</td>
-                            <td style="text-align:right">1</td>
-                        }
-                        else if (item.InstallationId != null)
-                        {
-                            <td style="text-align:left">
-                                @if (item.Install.UniqueID != null && item.Install.UniqueID != "N/A")
+                    @if (subtotal > (decimal)0.0)
+                    {
+                        <tr>
+                                @if (item.InstallationId == null && item.Daily_Report_2Id == null && item.ArrivalId == null && item.MobilizationId == null)
                                 {
-                                    <form asp-action="Details_Install" asp-controller="TrackItems" asp-route-id="@item.InstallationId" method="get" target="_blank">
-                                        <button class="btn-hoelscher" style="text-align:left;">@Html.DisplayFor(modelItem => item.Item_Name) (@item.Install.UniqueID)</button>
-                                    </form>
-                                }
-                                else
-                                {
-                                    <form asp-action="Details_Install" asp-controller="TrackItems" asp-route-id="@item.InstallationId" method="get" target="_blank">
-                                        <button class="btn-hoelscher" style="text-align:left;">@Html.DisplayFor(modelItem => item.Item_Name)</button>
-                                    </form>
-                                }
-
-                            </td>
-                            <td style="text-align:right">@Html.DisplayFor(Model => item.Install.TimeStamp)</td>
-                            <td style="text-align:right">@Html.DisplayFor(Model => item.Install.DeinstallDate)</td>
-                            <td style="text-align:right">@Html.DisplayFor(Model => item.Install.Amount)</td>
-                        }
-                        else if (item.MobilizationId != null)
-                        {
-                            <td style="text-align:left">
-                                @if (item.Mobilize.UniqueID != null && item.Mobilize.UniqueID != "N/A")
-                                {
-                                    <form asp-action="Details_Mobilize" asp-controller="TrackItems" asp-route-id="@item.MobilizationId" method="get" target="_blank">
-                                        <button class="btn-hoelscher" style="text-align:left;">@Html.DisplayFor(modelItem => item.Item_Name) (@item.Mobilize.UniqueID)</button>
-                                    </form>
-                                }
-                                else
-                                {
-                                    <form asp-action="Details_Mobilize" asp-controller="TrackItems" asp-route-id="@item.MobilizationId" method="get" target="_blank">
-                                        <button class="btn-hoelscher" style="text-align:left;">@Html.DisplayFor(modelItem => item.Item_Name)</button>
-                                    </form>
-                                }
-
-                            </td>
-                            <td style="text-align:right">@Html.DisplayFor(Model => item.Mobilize.TimeStamp)</td>
-                            <td style="text-align:right">@Html.DisplayFor(Model => item.Mobilize.TimeStamp)</td>
-                            <td style="text-align:right">@Html.DisplayFor(Model => item.Mobilize.Amount)</td>
-                        }
-                        else if (item.ArrivalId != null)
-                        {
-                            if (item.ArrivalId == 10000)
-                            {
-                                <td style="text-align:left">
-                                    @if (item.Arrival.UniqueID != null && item.Arrival.UniqueID != "N/A")
-                                    {
-
-                                        <span class="btn-hoelscher" style="text-align:left;background-color:lightcoral;color:white;">@Html.DisplayFor(modelItem => item.Item_Name) (@item.Arrival.UniqueID)</span>
-
-                                    }
-                                    else
-                                    {
-
-                                        <span class="btn-hoelscher" style="text-align: left; background-color: lightcoral;color:white;">@Html.DisplayFor(modelItem => item.Item_Name)</span>
-
-                                    }
-
-                                </td>
-                            }
-                            else
-                            {
-                                <td style="text-align:left">debug5
-                                    @if (item.Arrival.UniqueID != null && item.Arrival.UniqueID != "N/A")
-                                    {
-                                        <form asp-action="Details_Arrival" asp-controller="TrackItems" asp-route-id="@item.ArrivalId" method="get" target="_blank">
-                                            <button class="btn-hoelscher" style="text-align:left;">@Html.DisplayFor(modelItem => item.Item_Name) (@item.Arrival.UniqueID)</button>
+                                    <td style="text-align:left">
+                                        <form asp-action="Details" asp-controller="ExtraWorks" asp-route-id="@item.ExtraWorkId" method="get" target="_blank">
+                                            <button class="btn-hoelscher" style="text-align:left;">
+                                                @if (item.BoQNr != (decimal)0.0)
+                                                {
+                                                    @($"{item.BoQNr:N3} : ")
+                                                }
+                                                @Html.DisplayFor(modelItem => item.Item_Name)
+                                            </button>
                                         </form>
+                                    </td>                                                  
+
+                                    <td style="text-align:right">@Html.DisplayFor(Model => item.ExtraWork.TimeStamp)</td>
+                                    <td style="text-align:right">@Html.DisplayFor(Model => item.ExtraWork.EndStamp)</td>
+                                    <td style="text-align:right">1</td>
+                                }
+                                else if (item.InstallationId != null)
+                                {
+                                    <td style="text-align:left">
+                                        @if (item.Install.UniqueID != null && item.Install.UniqueID != "N/A")
+                                        {
+                                            <form asp-action="Details_Install" asp-controller="TrackItems" asp-route-id="@item.InstallationId" method="get" target="_blank">
+                                                @* <button class="btn-hoelscher" style="text-align:left;">@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) (@item.Install.UniqueID)</button> *@
+                                                @if (item.rental_price!=null){
+                                                    
+                                                    <button class="btn-hoelscher" style="text-align:left;">
+                                                        @if (item.BoQNr != (decimal)0.0)
+                                                        {
+                                                            @($"{item.BoQNr:N3} : ")
+                                                        }
+                                                        @Html.DisplayFor(modelItem => item.Item_Name) (@item.Install.UniqueID)
+                                                    </button>
+
+                                                }else{
+                                                    <button class="btn-hoelscher" style="text-align:left;">@Html.DisplayFor(modelItem => item.Item_Name) (@item.Install.UniqueID)</button>
+
+                                                }
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <form asp-action="Details_Install" asp-controller="TrackItems" asp-route-id="@item.InstallationId" method="get" target="_blank">
+                                                @if (item.rental_price != null)
+                                                { 
+                                                    <button class="btn-hoelscher" style="text-align:left;">
+                                                        @if (item.BoQNr != (decimal)0.0)
+                                                        {
+                                                            @($"{item.BoQNr:N3} : ")
+                                                        }
+                                                        @Html.DisplayFor(modelItem => item.Item_Name)
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn-hoelscher" style="text-align:left;">@Html.DisplayFor(modelItem => item.Item_Name)</button>
+                                                }
+                                            </form>
+                                        }
+
+                                    </td>
+                                    <td style="text-align:right">@Html.DisplayFor(Model => item.Install.TimeStamp)</td>
+                                    <td style="text-align:right">@Html.DisplayFor(Model => item.Install.DeinstallDate)</td>
+                                    <td style="text-align:right">@Html.DisplayFor(Model => item.Install.Amount)</td>
+                                }
+                                else if (item.MobilizationId != null)
+                                {
+                                    <td style="text-align:left">
+                                        @if (item.Mobilize.UniqueID != null && item.Mobilize.UniqueID != "N/A")
+                                        {
+                                            <form asp-action="Details_Mobilize" asp-controller="TrackItems" asp-route-id="@item.MobilizationId" method="get" target="_blank">
+                                                <button class="btn-hoelscher" style="text-align:left;">
+                                                    @if (item.BoQNr != (decimal)0.0)
+                                                    {
+                                                        @($"{item.BoQNr:N3} : ")
+                                                    }
+                                                    @Html.DisplayFor(modelItem => item.Item_Name) (@item.Mobilize.UniqueID)
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <form asp-action="Details_Mobilize" asp-controller="TrackItems" asp-route-id="@item.MobilizationId" method="get" target="_blank">
+                                                <button class="btn-hoelscher" style="text-align:left;">
+                                                    @if (item.BoQNr != (decimal)0.0)
+                                                    {
+                                                        @($"{item.BoQNr:N3} : ")
+                                                    }
+                                                    @Html.DisplayFor(modelItem => item.Item_Name)
+                                                </button>
+                                            </form>
+                                        }
+
+                                    </td>
+                                    <td style="text-align:right">@Html.DisplayFor(Model => item.Mobilize.TimeStamp)</td>
+                                    <td style="text-align:right">@Html.DisplayFor(Model => item.Mobilize.TimeStamp)</td>
+                                    <td style="text-align:right">@Html.DisplayFor(Model => item.Mobilize.Amount)</td>
+                                }
+                                else if (item.ArrivalId != null)
+                                {
+                                    if (item.ArrivalId == 10000)
+                                    {
+                                        <td style="text-align:left">
+                                            @if (item.Arrival.UniqueID != null && item.Arrival.UniqueID != "N/A")
+                                            {
+                                                <span class="btn-hoelscher" style="text-align:left;background-color:lightcoral;color:white;">@Html.DisplayFor(modelItem => item.Item_Name) (@item.Arrival.UniqueID)</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="btn-hoelscher" style="text-align: left; background-color: lightcoral;color:white;">@Html.DisplayFor(modelItem => item.Item_Name)</span>
+                                            }
+                                        </td>
                                     }
                                     else
                                     {
-                                        <form asp-action="Details_Arrival" asp-controller="TrackItems" asp-route-id="@item.ArrivalId" method="get" target="_blank">
-                                            <button class="btn-hoelscher" style="text-align:left;">@Html.DisplayFor(modelItem => item.Item_Name)</button>
-                                        </form>
+                                        <td style="text-align:left">
+                                            @if (item.Arrival.UniqueID != null && item.Arrival.UniqueID != "N/A")
+                                            {
+                                                <form asp-action="Details_Arrival" asp-controller="TrackItems" asp-route-id="@item.ArrivalId" method="get" target="_blank">                                                                                           
+                                                    <button class="btn-hoelscher" style="text-align:left;">
+                                                        @if (item.BoQNr != (decimal)0.0)
+                                                        {
+                                                            @($"{item.BoQNr:N3} : ")
+                                                        }
+                                                        @Html.DisplayFor(modelItem => item.Item_Name) (@item.Arrival.UniqueID)
+                                                    </button>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <form asp-action="Details_Arrival" asp-controller="TrackItems" asp-route-id="@item.ArrivalId" method="get" target="_blank">
+                                                    <button class="btn-hoelscher" style="text-align:left;">
+                                                    @if (item.BoQNr != (decimal)0.0)
+                                                        {
+                                                            @($"{item.BoQNr:N3} : ")
+                                                        }
+                                                        @Html.DisplayFor(modelItem => item.Item_Name)
+                                                    </button>
+                                                </form>
+                                            }
+
+                                        </td>
                                     }
 
-                                </td>
-                            }
-
-                            <td style="text-align:right">@Html.DisplayFor(Model => item.Arrival.TimeStamp)</td>
-                            <td style="text-align:right">@Html.DisplayFor(Model => item.Arrival.EndStamp)</td>
-                            <td style="text-align:right">@Html.DisplayFor(Model => item.Arrival.Amount)</td>
-                        }
-                        else
-                        {
-                            <td style="text-align:left">
-                                @if (item.Daily_Report_2.short_Description != null && item.Daily_Report_2.short_Description != "")
-                                {
-                                    <form asp-action="Daily_Report_2_DetailsPdf" asp-controller="TrackItems" asp-route-id="@item.Daily_Report_2Id" method="get" target="_blank">
-                                        <button class="btn-hoelscher" style="text-align:left;">@Html.DisplayFor(modelItem => item.Item_Name) (@item.Daily_Report_2.short_Description)</button>
-                                    </form>
+                                    <td style="text-align:right">@Html.DisplayFor(Model => item.Arrival.TimeStamp)</td>
+                                    <td style="text-align:right">@Html.DisplayFor(Model => item.Arrival.EndStamp)</td>
+                                    <td style="text-align:right">@Html.DisplayFor(Model => item.Arrival.Amount)</td>
                                 }
                                 else
                                 {
-                                    <form asp-action="Daily_Report_2_DetailsPdf" asp-controller="TrackItems" asp-route-id="@item.Daily_Report_2Id" method="get" target="_blank">
-                                        <button class="btn-hoelscher" style="text-align:left;">@Html.DisplayFor(modelItem => item.Item_Name)</button>
-                                    </form>
-                                }
+                                    <td style="text-align:left">
+                                        @if (item.Daily_Report_2.short_Description != null && item.Daily_Report_2.short_Description != "")
+                                        {
+                                            <form asp-action="Daily_Report_2_DetailsPdf" asp-controller="TrackItems" asp-route-id="@item.Daily_Report_2Id" method="get" target="_blank">
+                                                <button class="btn-hoelscher" style="text-align:left;">
+                                                    @if (item.BoQNr != (decimal)0.0)
+                                                    {
+                                                        @($"{item.BoQNr:N3} : ")
+                                                    }
+                                                    @Html.DisplayFor(modelItem => item.Item_Name) (@item.Daily_Report_2.short_Description)
+                                                </button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <form asp-action="Daily_Report_2_DetailsPdf" asp-controller="TrackItems" asp-route-id="@item.Daily_Report_2Id" method="get" target="_blank">
+                                                <button class="btn-hoelscher" style="text-align:left;">
+                                                    @if (item.BoQNr != (decimal)0.0)
+                                                    {
+                                                        @($"{item.BoQNr:N3} : ")
+                                                    }
+                                                    @Html.DisplayFor(modelItem => item.Item_Name)
+                                                </button>
+                                            </form>
+                                        }
 
-                            </td>
-                            <td style="text-align:right">@String.Format("{0:yyyy-MM-dd}", item.Daily_Report_2.Report_Date)</td>
-                            <td style="text-align:right">@String.Format("{0:yyyy-MM-dd}", item.Daily_Report_2.Report_Date)</td>
-                            <td style="text-align:right">@Html.DisplayFor(Model => item.Daily_Report_2.Amount)</td>
-                        }
-                        @if (Model.NoMoneyNumbers.Equals(false))
-                        {
-                            @if (item.price != null)
-                            {
-                                <td style="text-align:right">@Html.DisplayFor(Model => item.price) @thevaluta</td>
-                            }
-                            else
-                            {
-                                <td style="text-align:right">0.00 @thevaluta</td>
-                            }
-                        }
-                        @if (item.rental_price > (decimal)0.01 || item.rental_price < (decimal)-0.01)
-                        {
-                            @if (Model.NoMoneyNumbers.Equals(false))
-                            {
-                                if (item.InstallationId == null && item.Daily_Report_2Id == null && item.ArrivalId == null && item.MobilizationId == null)
+                                    </td>
+                                    <td style="text-align:right">@String.Format("{0:yyyy-MM-dd}", item.Daily_Report_2.Report_Date)</td>
+                                    <td style="text-align:right">@String.Format("{0:yyyy-MM-dd}", item.Daily_Report_2.Report_Date)</td>
+                                    <td style="text-align:right">@Html.DisplayFor(Model => item.Daily_Report_2.Amount)</td>
+                                }
+                                @if (Model.NoMoneyNumbers.Equals(false))
                                 {
-                                    if (item.ExtraWork.Rental_Price != 0)
+                                    @if (item.price != null)
                                     {
-                                        <td style="text-align:right">@Html.DisplayFor(Model => item.ExtraWork.Rental_Price) @thevaluta/@SharedLocalizer.GetLocalizedHtmlString("calender day")</td>
-                                        <td style="text-align:right">@Html.DisplayFor(Model => item.Days) @SharedLocalizer.GetLocalizedHtmlString("Days")</td>
+                                        <td style="text-align:right">@Html.DisplayFor(Model => item.price) @thevaluta</td>
                                     }
                                     else
                                     {
-                                        <td></td>
-                                        <td></td>
+                                        <td style="text-align:right">0.00 @thevaluta</td>
                                     }
                                 }
-                                else if (item.Daily_Report_2Id == null)
+                                @if (item.rental_price > (decimal)0.01 || item.rental_price < (decimal)-0.01)
                                 {
-                                    if (item.InstallationId != null || item.MobilizationId != null)
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        if (item.InstallationId == null && item.Daily_Report_2Id == null && item.ArrivalId == null && item.MobilizationId == null)
+                                        {
+                                            if (item.ExtraWork.Rental_Price != 0)
+                                            {
+                                                <td style="text-align:right">@Html.DisplayFor(Model => item.ExtraWork.Rental_Price) @thevaluta/@SharedLocalizer.GetLocalizedHtmlString("calender day")</td>
+                                                <td style="text-align:right">@Html.DisplayFor(Model => item.Days) @SharedLocalizer.GetLocalizedHtmlString("Days")</td>
+                                            }
+                                            else
+                                            {
+                                                <td></td>
+                                                <td></td>
+                                            }
+                                        }
+                                        else if (item.Daily_Report_2Id == null)
+                                        {
+                                            if (item.InstallationId != null || item.MobilizationId != null)
+                                            {
+                                                <td style="text-align:right"></td>
+                                                <td style="text-align:right"></td>
+                                            }
+                                            else
+                                            {
+                                                var theunit = "Days";
+                                                if (item.ItemType.Rental_UnitId.Equals(16))
+                                                {
+                                                    theunit = "Months";
+                                                }
+                                                else if (item.ItemType.Rental_UnitId.Equals(17))
+                                                {
+                                                    theunit = "Weeks";
+                                                }
+                                                else if (item.ItemType.Rental_UnitId.Equals(18))
+                                                {
+                                                    theunit = "m-Months";
+                                                }
+                                                <td style="text-align:right">@Html.DisplayFor(Model => item.Arrival.ItemType.rental_price) @thevaluta  @item.Arrival.ItemType.Rental_Unit.TheUnit </td>
+                                                <td style="text-align:right">@Html.DisplayFor(Model => item.Days) @SharedLocalizer.GetLocalizedHtmlString(theunit)</td>
+                                            }
+                                        }
+                                        else
+                                        {
+
+
+                                            @if (item.ItemType.Rental_UnitId.Equals(19))
+                                            {
+                                                <td style="text-align:right">@String.Format("{0:N2}", item.ItemType.rental_price * (decimal)100.00) @SharedLocalizer.GetLocalizedHtmlString("% Surcharge") </td>
+                                                <td style="text-align:right">@Html.DisplayFor(Model => item.Days) @SharedLocalizer.GetLocalizedHtmlString("Hours")</td>
+                                            }
+                                            else
+                                            {
+                                                <td style="text-align:right">@Html.DisplayFor(Model => item.Daily_Report_2.Title.ItemType.rental_price) @thevaluta/@SharedLocalizer.GetLocalizedHtmlString("pr. Hour")</td>
+                                                <td style="text-align:right">@Html.DisplayFor(Model => item.Days) @SharedLocalizer.GetLocalizedHtmlString("Hours")</td>
+                                            }
+
+                                        }
+                                    }
+
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
+                                        <td style="text-align:right">@Html.DisplayFor(Model => item.rental_price) @thevaluta</td>
+                                    }
+                                }
+                                else
+                                {
+                                    @if (Model.NoMoneyNumbers.Equals(false))
                                     {
                                         <td style="text-align:right"></td>
+                                    }
+                                    <td style="text-align:right"></td>
+                                    @if (Model.NoMoneyNumbers.Equals(false))
+                                    {
                                         <td style="text-align:right"></td>
                                     }
-                                    else
-                                    {
-                                        var theunit = "Days";
-                                        if (item.ItemType.Rental_UnitId.Equals(16))
-                                        {
-                                            theunit = "Months";
-                                        }
-                                        else if (item.ItemType.Rental_UnitId.Equals(17))
-                                        {
-                                            theunit = "Weeks";
-                                        }
-                                        else if (item.ItemType.Rental_UnitId.Equals(18))
-                                        {
-                                            theunit = "m-Months";
-                                        }
-                                        <td style="text-align:right">@Html.DisplayFor(Model => item.Arrival.ItemType.rental_price) @thevaluta  @item.Arrival.ItemType.Rental_Unit.TheUnit </td>
-                                        <td style="text-align:right">@Html.DisplayFor(Model => item.Days) @SharedLocalizer.GetLocalizedHtmlString(theunit)</td>
-                                    }
                                 }
-                                else
+                                @if (Model.NoMoneyNumbers.Equals(false))
                                 {
-
-
-                                    @if (item.ItemType.Rental_UnitId.Equals(19))
-                                    {
-                                        <td style="text-align:right">@String.Format("{0:N2}", item.ItemType.rental_price * (decimal)100.00) @SharedLocalizer.GetLocalizedHtmlString("% Surcharge") </td>
-                                        <td style="text-align:right">@Html.DisplayFor(Model => item.Days) @SharedLocalizer.GetLocalizedHtmlString("Hours")</td>
-                                    }
-                                    else
-                                    {
-                                        <td style="text-align:right">@Html.DisplayFor(Model => item.Daily_Report_2.Title.ItemType.rental_price) @thevaluta/@SharedLocalizer.GetLocalizedHtmlString("pr. Hour")</td>
-                                        <td style="text-align:right">@Html.DisplayFor(Model => item.Days) @SharedLocalizer.GetLocalizedHtmlString("Hours")</td>
-                                    }
-
+                                    <td style="text-align:right">@String.Format("{0:N2} ", subtotal)@thevaluta</td>
                                 }
-                            }
+                            </tr>
+                    
+                    }
 
-                            @if (Model.NoMoneyNumbers.Equals(false))
-                            {
-                                <td style="text-align:right">@Html.DisplayFor(Model => item.rental_price) @thevaluta</td>
-                            }
-                        }
-                        else
-                        {
-                            @if (Model.NoMoneyNumbers.Equals(false))
-                            {
-                                <td style="text-align:right"></td>
-                            }
-                            <td style="text-align:right"></td>
-                            @if (Model.NoMoneyNumbers.Equals(false))
-                            {
-                                <td style="text-align:right"></td>
-                            }
-                        }
-                        @if (Model.NoMoneyNumbers.Equals(false))
-                        {
-                            <td style="text-align:right">@String.Format("{0:N2} ", subtotal)@thevaluta</td>
-                        }
-                    </tr>
-                    cost += subtotal;
+                   cost += subtotal;
                     totaltotalcost += subtotal;
                 }
                 @if (Model.NoMoneyNumbers.Equals(false))
@@ -1140,10 +1314,13 @@
                 }
             }
 
-            <tr>
+           
+             <tr>
                 <td style="text-align:left">
                     <form asp-action="Details" asp-controller="ExtraWorks" asp-route-id="@item.ExtraWorkId" method="get" target="_blank">
-                        <button class="btn-hoelscher" style="text-align:left;">@Html.DisplayFor(modelItem => item.Item_Name)</button>
+                        <button class="btn-hoelscher" style="text-align:left;">
+                            @Html.DisplayFor(modelItem => item.Item_Name)
+                        </button>
                     </form>
                 </td>
                 <td style="text-align:right">@Html.DisplayFor(Model => item.ExtraWork.TimeStamp)</td>
@@ -1188,6 +1365,7 @@
                     <td style="text-align:right">@String.Format("{0:N2} ", subtotal)@thevaluta</td>
                 }
             </tr>
+            
             cost += subtotal;
             totaltotalcost += subtotal;
         }
@@ -1245,8 +1423,15 @@ else
 {
     <h2>@SharedLocalizer.GetLocalizedHtmlString("Summary Table - Old items hidden.")</h2>
 }
-@{ var totalalways = (decimal)0.0;}
-@{ var totalthis = (decimal)0.0;}
+@{
+    var totalalways = (decimal)0.0;
+    var totalthis = (decimal)0.0;
+}
+@* @{
+    var totalthis = (decimal)0.0;
+} *@
+
+
 <table style="width:100%;page-break-inside:avoid;page-break-after:always !important">
     <thead>
         <tr>
@@ -1288,10 +1473,18 @@ else
                         totalthis += (decimal)totalcostMobilized;
                         if (Model.HideOldItems.Equals(false))
                         {
-
-
                             <tr>
-                                <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                <td style="text-align:left;">
+                                    @if (itemtype.First().BoQNr != 0)
+                                    {
+                                        @($"{itemtype.First().BoQNr:N3} : {itemtype.First().Item_Name}")
+                                    }
+                                    else
+                                    {
+                                        @itemtype.First().Item_Name
+                                    }
+                                </td>
+
                                 <td style="text-align:right;">@totalamountmobilizedalways @itemtype.First().ItemType.Install_Unit.TheUnit </td>
                                 <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmount @itemtype.First().ItemType.Install_Unit.TheUnit</td>
                                 @if (Model.NoMoneyNumbers.Equals(false))
@@ -1310,7 +1503,14 @@ else
                             if (totalamountmobilized > 0)
                             {
                                 <tr>
-                                    <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                    @if (itemtype.First().BoQNr != (decimal)0.0)
+                                    {
+                                        <td style="text-align:left;">@String.Format("{0:N3}", itemtype.First().BoQNr) : @itemtype.First().Item_Name</td>
+                                    }
+                                    else
+                                    {
+                                        <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                    }
                                     <td style="text-align:right;">@totalamountmobilizedalways @itemtype.First().ItemType.Install_Unit.TheUnit</td>
                                     <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmount @itemtype.First().ItemType.Install_Unit.TheUnit</td>
                                     @if (Model.NoMoneyNumbers.Equals(false))
@@ -1354,10 +1554,16 @@ else
                         totalthis += (decimal)totalcostInstalled;
                         if (Model.HideOldItems.Equals(false))
                         {
-
-
                             <tr>
-                                <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                @if (itemtype.First().BoQNr != 0)
+                                {
+                                    <td style="text-align:left;">@String.Format("{0:N3}", itemtype.First().BoQNr) : @itemtype.First().Item_Name</td>
+                                }
+                                else
+                                {
+                                    <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                }
+                                                                
                                 @if (itemtype.First().ItemType.Install_Unit.TheUnit.ToLower().Contains("pr. m"))
                                 {
                                     <td style="text-align:right;">@String.Format("{0:N2} ", totalamountinstalledalways) @SharedLocalizer.GetLocalizedHtmlString("Meters")</td>
@@ -1457,10 +1663,17 @@ else
 
                             if (Model.HideOldItems.Equals(false))
                             {
-
-
                                 <tr>
-                                    <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                    <td style="text-align:left;">
+                                        @if (itemtype.First().BoQNr_Rental != (decimal)0.0)
+                                        {
+                                            @($"{itemtype.First().BoQNr_Rental:N3} : {itemtype.First().Item_Name} - rental")
+                                        }
+                                        else
+                                        {
+                                            @itemtype.First().Item_Name
+                                        }
+                                    </td>
                                     <td style="text-align:right;">@totalamountarrivedalways @SharedLocalizer.GetLocalizedHtmlString("Days")</td>
                                     <td style="text-align:right;">@String.Format("{0:N2} ", itemtype.First().ItemType.ExpectedAmountRental) @SharedLocalizer.GetLocalizedHtmlString("Days")</td>
                                     @if (Model.NoMoneyNumbers.Equals(false))
@@ -1479,7 +1692,16 @@ else
                                 if (totalamountarrived > 0)
                                 {
                                     <tr>
-                                        <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                        <td style="text-align:left;">
+                                            @if (itemtype.First().BoQNr_Rental != (decimal)0.0)
+                                            {
+                                                @($"{itemtype.First().BoQNr_Rental:N3} : {itemtype.First().Item_Name} - rental")
+                                            }
+                                            else
+                                            {
+                                                @itemtype.First().Item_Name
+                                            }
+                                        </td>
                                         <td style="text-align:right;">@totalamountarrivedalways @SharedLocalizer.GetLocalizedHtmlString("Days")</td>
                                         <td style="text-align:right;">@String.Format("{0:N2} ", itemtype.First().ItemType.ExpectedAmountRental) @SharedLocalizer.GetLocalizedHtmlString("Days")</td>
                                         @if (Model.NoMoneyNumbers.Equals(false))
@@ -1500,16 +1722,60 @@ else
                             var totalamountarrived = Model.items.Where(x => x.ItemTypeId.Equals(itemtype.First().ItemTypeId) && x.ArrivalId != null && x.Arrival.VariationOrderId == null && (x.Days > 0 || x.rental_price < 0) && x.BoQNr_Rental >= boqheadline.BoQnum && (x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0))).Sum(x => x.Amount * x.Days);
                             var totalamountarrivedalways = Model.allItems.Where(x => x.ItemTypeId.Equals(itemtype.First().ItemTypeId) && x.ArrivalId != null && x.Arrival.VariationOrderId == null && (x.Days > 0 || x.rental_price < 0) && x.BoQNr_Rental >= boqheadline.BoQnum && (x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0))).Sum(x => x.Amount * x.Days);
                             var totalcostarrivedalways = Model.allItems.Where(x => x.ItemTypeId.Equals(itemtype.First().ItemTypeId) && x.ArrivalId != null && x.Arrival.VariationOrderId == null && (x.Days > 0 || x.rental_price < 0) && x.BoQNr_Rental >= boqheadline.BoQnum && (x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0))).Sum(x => x.Arrival == null ? x.rental_price - (decimal)x.Total_Discount : x.Item_Name.ToLower().Contains("idle") ? x.rental_price - (decimal)x.Total_Discount : x.rental_price - (decimal)x.Total_Discount + Convert.ToDecimal(x.Arrival.PayedAmount));
-                            var totalcostarrived = Model.items.Where(x => x.Item_Name.Equals(itemtype.First().Item_Name) && (x.Days > 0 || x.rental_price < 0) && x.ArrivalId != null && x.Arrival.VariationOrderId == null && x.Install_date.Date <= Model.endtime.Date && (x.Arrival.EndStamp == null || x.Arrival.EndStamp >= Model.starttime) && x.BoQNr_Rental >= boqheadline.BoQnum && (x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0))).Sum(x => x.rental_price - (decimal)x.Total_Discount);
+
+                            var totalcostarrived = Model.items.Where(x => x.Item_Name.Equals(itemtype.First().Item_Name) && (x.Days > 0 || x.rental_price < 0) && x.ArrivalId != null && x.Arrival.VariationOrderId == null && x.Install_date.Date <= Model.endtime.Date && (x.Arrival.EndStamp == null || x.Arrival.EndStamp >= Model.starttime) && x.BoQNr_Rental >= boqheadline.BoQnum && (x.BoQNr_Rental < (boqheadline.BoQnum + (decimal)1.0)))
+                                                              .Sum(x => x.rental_price - (decimal)x.Total_Discount);
+                            if (itemtype.First().ItemType.Id == 1947){
+                                //months = 1;
+                                if (Model.endtime.Month == 3 & Model.endtime.Year == 2025 & Model.starttime.Month == 2 & Model.starttime.Year == 2025)
+                                {
+									months = 2; //due to the error in the invoice of January 2025
+                                }
+
+                                if (Model.endtime.Month == 4 & Model.endtime.Year == 2025 & Model.starttime.Month == 3 & Model.starttime.Year == 2025)
+                                {
+                                    months = 3; //due to the error in the invoice of January 2025
+                                }
+
+                                if (Model.endtime.Month == 5 & Model.endtime.Year == 2025 & Model.starttime.Month == 4 & Model.starttime.Year == 2025)
+                                {
+                                    months = 4; //due to the error in the invoice of January 2025
+                                }
+
+                                if (Model.endtime.Month == 6 & Model.endtime.Year == 2025 & Model.starttime.Month == 5 & Model.starttime.Year == 2025)
+                                {
+                                    months = 5; //due to the error in the invoice of January 2025
+                                }
+
+                                if (Model.endtime.Month == 7 & Model.endtime.Year == 2025 & Model.starttime.Month == 6 & Model.starttime.Year == 2025)
+                                {
+                                    months = 7; //due to the error in the invoice of January 2025
+                                }
+
+                                decimal expectedAmount = (decimal)(itemtype.First().ItemType.ExpectedAmount ?? 0.0) * (decimal)months;
+                                decimal rentalPrice = (decimal)itemtype.First().ItemType.rental_price; 
+
+                                totalcostarrived = rentalPrice * expectedAmount;
+                                totalamountarrived = months; // (double)expectedAmount ;
+
+                            }
                             totalalways += (decimal)totalcostarrivedalways;
                             totalthis += (decimal)totalcostarrived;
 
+                            @* <p>Debug: Id: @itemtype.First().ItemType.Id, Months: @months, totalamountarrivedalways: @totalamountarrivedalways, expected amount: @totalamountarrived, totalcost: @String.Format("{0:N2} ", totalcostarrived)  </p> *@
                             if (Model.HideOldItems.Equals(false))
                             {
-
-
                                 <tr>
-                                    <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                    <td style="text-align:left;">
+                                        @if (itemtype.First().BoQNr_Rental != (decimal)0.0)
+                                        {
+                                            @($"{itemtype.First().BoQNr_Rental:N3} : {itemtype.First().Item_Name} - rental")
+                                        }
+                                        else
+                                        {
+                                            @itemtype.First().Item_Name
+                                        }
+                                    </td>
                                     @if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("day"))
                                     {
                                         if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("pr. m"))
@@ -1550,7 +1816,6 @@ else
                                             <td style="text-align:right;">@totalamountarrivedalways @SharedLocalizer.GetLocalizedHtmlString("Weeks")</td>
                                             <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmount @SharedLocalizer.GetLocalizedHtmlString("Weeks")</td>
                                         }
-
                                     }
                                     else
                                     {
@@ -1604,7 +1869,7 @@ else
 
                                     @if (Model.NoMoneyNumbers.Equals(false))
                                     {
-                                        <td style="text-align:right;">@String.Format("{0:N2} ", totalcostarrived)@thevaluta</td>
+                                        <td style="text-align:right;">@String.Format("{0:N2} ", totalcostarrived)@thevaluta</td>                                           
                                     }
                                 </tr>
                             }
@@ -1613,7 +1878,16 @@ else
                                 if (totalamountarrived > 0)
                                 {
                                     <tr>
-                                        <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                        <td style="text-align:left;">
+                                            @if (itemtype.First().BoQNr_Rental != (decimal)0.0)
+                                            {
+                                                @($"{itemtype.First().BoQNr_Rental:N3} : {itemtype.First().Item_Name} - rental")
+                                            }
+                                            else
+                                            {
+                                                @itemtype.First().Item_Name
+                                            }
+                                        </td>
                                         @if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("day"))
                                         {
                                             if (itemtype.First().ItemType.Rental_Unit.TheUnit.ToLower().Contains("pr. m"))
@@ -1708,6 +1982,7 @@ else
                                         @if (Model.NoMoneyNumbers.Equals(false))
                                         {
                                             <td style="text-align:right;">@String.Format("{0:N2} ", totalcostarrived)@thevaluta</td>
+
                                         }
                                     </tr>
                                 }
@@ -1801,7 +2076,14 @@ else
                         if (Model.HideOldItems.Equals(false))
                         {
                             <tr>
-                                <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                @if (itemtype.First().BoQNr != 0)
+                                {
+                                    <td style="text-align:left;">@String.Format("{0:N3}", itemtype.First().BoQNr) : @itemtype.First().Item_Name</td>
+                                }
+                                else
+                                {
+                                    <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                }
                                 <td style="text-align:right;">@String.Format("{0:N2} ", totalamounthoursalways) @SharedLocalizer.GetLocalizedHtmlString("Hours")</td>
                                 <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmount @SharedLocalizer.GetLocalizedHtmlString("Hours")</td>
                                 @if (Model.NoMoneyNumbers.Equals(false))
@@ -1820,7 +2102,14 @@ else
                             if (totalamounthours > 0)
                             {
                                 <tr>
-                                    <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                    @if (itemtype.First().BoQNr != 0)
+                                    {
+                                        <td style="text-align:left;">@String.Format("{0:N3}", itemtype.First().BoQNr) : @itemtype.First().Item_Name</td>
+                                    }
+                                    else
+                                    {
+                                        <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                    }
                                     <td style="text-align:right;">@String.Format("{0:N2} ", totalamounthoursalways) @SharedLocalizer.GetLocalizedHtmlString("Hours")</td>
                                     <td style="text-align:right;">@itemtype.First().ItemType.ExpectedAmount @SharedLocalizer.GetLocalizedHtmlString("Hours")</td>
                                     @if (Model.NoMoneyNumbers.Equals(false))
@@ -1850,7 +2139,7 @@ else
                         </td>
                     </tr>
 
-                    @foreach (var itemtype in Model.allItems.Where(x => (x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId.Equals(boqheadline.Id)) || (x.MobilizationId != null && x.Mobilize.VariationOrderId.Equals(boqheadline.Id)) || (x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId.Equals(boqheadline.Id)) || (x.ArrivalId != null && x.Arrival.VariationOrderId.Equals(boqheadline.Id))).GroupBy(x => String.Concat(x.Item_Name, "_", x.InstallationId == null ? "" : "1", "_", x.ArrivalId == null ? "" : "1")))
+                    @foreach (var itemtype in Model.allItems.Where(x => (x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId.Equals(boqheadline.Id)) || (x.MobilizationId != null && x.Mobilize.VariationOrderId.Equals(boqheadline.Id)) || (x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId.Equals(boqheadline.Id)) || (x.ArrivalId != null && x.Arrival.VariationOrderId.Equals(boqheadline.Id))).OrderBy(x => x.BoQNr).GroupBy(x => String.Concat(x.Item_Name, "_", x.InstallationId == null ? "" : "1", "_", x.ArrivalId == null ? "" : "1")))
                     {
                         var totalamountExtraWork = Model.items.Where(x => x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId.Equals(boqheadline.Id)) || (x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.Amount);
                         var totalamountExtraWorkalways = Model.allItems.Where(x => x.Item_Name.Equals(itemtype.First().Item_Name) && ((x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId.Equals(boqheadline.Id)) || (x.InstallationId != null && x.Install.VariationOrderId.Equals(boqheadline.Id)) || (x.Daily_Report_2Id != null && x.Daily_Report_2.VariationOrderId.Equals(boqheadline.Id)))).Sum(x => x.Amount);
@@ -1914,7 +2203,14 @@ else
                         if (Model.HideOldItems.Equals(false))
                         {
                             <tr>
-                                <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                @if (itemtype.First().BoQNr != 0)
+                                {
+                                    <td style="text-align:left;">@String.Format("{0:N3}", itemtype.First().BoQNr) : @itemtype.First().Item_Name</td>
+                                }
+                                else
+                                {
+                                    <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                }
                                 <td style="text-align:right;">@totalamountExtraWorkalways @theunit</td>
                                 <td style="text-align:right;"></td>
                                 @if (Model.NoMoneyNumbers.Equals(false))
@@ -1933,7 +2229,14 @@ else
                             if (totalamountExtraWork > 0)
                             {
                                 <tr>
-                                    <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                    @if (itemtype.First().BoQNr != 0)
+                                    {
+                                        <td style="text-align:left;">@String.Format("{0:N3}", itemtype.First().BoQNr) : @itemtype.First().Item_Name</td>
+                                    }
+                                    else
+                                    {
+                                        <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                                    }
                                     <td style="text-align:right;">@totalamountExtraWorkalways @theunit</td>
                                     <td style="text-align:right;"></td>
                                     @if (Model.NoMoneyNumbers.Equals(false))
@@ -1955,7 +2258,9 @@ else
                 }
             }
         }
-        @{ numRecords = Model.allItems.Where(x => x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId == null).Count();}
+        @{
+            numRecords = Model.allItems.Where(x => x.ExtraWorkId != null && x.ExtraWork.BoQHeadLineId == null).Count();
+        }
         @if (numRecords > 0)
         {
             <tr style="text-align:left;">
@@ -1976,7 +2281,17 @@ else
                 if (Model.HideOldItems.Equals(false))
                 {
                     <tr>
-                        <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                        <td style="text-align:left;">
+                            @if (itemtype.First().BoQNr != 0)
+                            {
+                                @($"{itemtype.First().BoQNr:N3} : {itemtype.First().Item_Name}")
+                            }
+                            else
+                            {
+                                @itemtype.First().Item_Name
+                            }
+                        </td>
+
                         <td style="text-align:right;">@totalamountExtraWorkalways</td>
                         <td style="text-align:right;"></td>
                         @if (Model.NoMoneyNumbers.Equals(false))
@@ -1995,7 +2310,17 @@ else
                     if (totalamountExtraWork > 0)
                     {
                         <tr>
-                            <td style="text-align:left;">@itemtype.First().Item_Name</td>
+                            <td style="text-align:left;">
+                                @if (itemtype.First().BoQNr != 0)
+                                {
+                                    @($"{itemtype.First().BoQNr:N3} : {itemtype.First().Item_Name}")
+                                }
+                                else
+                                {
+                                    @itemtype.First().Item_Name
+                                }
+                            </td>
+
                             <td style="text-align:right;">@totalamountExtraWorkalways</td>
                             <td style="text-align:right;"></td>
                             @if (Model.NoMoneyNumbers.Equals(false))
@@ -2083,13 +2408,25 @@ else
                             if (item.Mobilize.UniqueID != "N/A" && item.Mobilize.UniqueID != null)
                             {
                                 <form asp-action="Details_Mobilize" asp-controller="TrackItems" asp-route-id="@item.MobilizationId" method="get" target="_blank">
-                                    <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Mobilize.UniqueID)) </button>
-                                </form>
+                                     <button>
+                                        @if (item.BoQNr != 0)
+                                        {
+                                            @($"{item.BoQNr:N3} : ")
+                                        }
+                                        @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Mobilize.UniqueID))
+                                    </button>
+                               </form>
                             }
                             else
                             {
                                 <form asp-action="Details_Mobilize" asp-controller="TrackItems" asp-route-id="@item.MobilizationId" method="get" target="_blank">
-                                    <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name)</button>
+                                    <button>
+                                        @if (item.BoQNr != 0)
+                                        {
+                                            @($"{item.BoQNr:N3} : ")
+                                        }
+                                        @Html.DisplayFor(modelItem => item.Item_Name)
+                                    </button> 
                                 </form>
                             }
                         }
@@ -2098,14 +2435,24 @@ else
                             if (item.Install.UniqueID != "N/A" && item.Install.UniqueID != null)
                             {
                                 <form asp-action="Details_Install" asp-controller="TrackItems" asp-route-id="@item.InstallationId" method="get" target="_blank">
-                                    <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Install.UniqueID)) </button>
-                                </form>
+                                   <button>
+                                        @if (item.BoQNr != 0)
+                                        {
+                                            @($"{item.BoQNr:N3} : ")
+                                        }
+                                        @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Install.UniqueID))
+                                    </button></form>
                             }
                             else
                             {
                                 <form asp-action="Details_Install" asp-controller="TrackItems" asp-route-id="@item.InstallationId" method="get" target="_blank">
-                                    <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name)</button>
-                                </form>
+                                   <button>
+                                        @if (item.BoQNr != 0)
+                                        {
+                                            @($"{item.BoQNr:N3} : ")
+                                        }
+                                        @Html.DisplayFor(modelItem => item.Item_Name)
+                                    </button></form>
                             }
                         }
                         else if (item.ArrivalId != null)
@@ -2113,13 +2460,24 @@ else
                             if (item.Arrival.UniqueID != "N/A" && item.Arrival.UniqueID != null)
                             {
                                 <form asp-action="Details_Arrival" asp-controller="TrackItems" asp-route-id="@item.ArrivalId" method="get" target="_blank">
-                                    <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Arrival.UniqueID)) </button>
-                                </form>
+                                   <button>
+                                        @if (item.BoQNr != 0)
+                                        {
+                                            @($"{item.BoQNr:N3} : ")
+                                        }
+                                        @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Arrival.UniqueID))
+                                    </button> </form>
                             }
                             else
                             {
                                 <form asp-action="Details_Arrival" asp-controller="TrackItems" asp-route-id="@item.ArrivalId" method="get" target="_blank">
-                                    <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name)</button>
+                                   <button>
+                                        @if (item.BoQNr != 0)
+                                        {
+                                            @($"{item.BoQNr:N3} : ")
+                                        }
+                                        @Html.DisplayFor(modelItem => item.Item_Name)
+                                    </button>
                                 </form>
                             }
                         }
@@ -2128,21 +2486,37 @@ else
                             if (item.Daily_Report_2.short_Description != "N/A" && item.Daily_Report_2.short_Description != null)
                             {
                                 <form asp-action="Daily_Report_2_DetailsPdf" asp-controller="TrackItems" asp-route-id="@item.Daily_Report_2Id" method="get" target="_blank">
-                                    <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Daily_Report_2.short_Description)) </button>
-                                </form>
+                                    <button>
+                                        @if (item.BoQNr != 0)
+                                        {
+                                            @($"{item.BoQNr:N3} : ")
+                                        }
+                                        @Html.DisplayFor(modelItem => item.Item_Name) (@Html.DisplayFor(modelItem => item.Daily_Report_2.short_Description))
+                                    </button></form>
                             }
                             else
                             {
                                 <form asp-action="Daily_Report_2_DetailsPdf" asp-controller="TrackItems" asp-route-id="@item.Daily_Report_2Id" method="get" target="_blank">
-                                    <button>@String.Format("{0:N3}", item.BoQNr) : @Html.DisplayFor(modelItem => item.Item_Name)</button>
-                                </form>
+                                   <button>
+                                        @if (item.BoQNr != 0)
+                                        {
+                                            @($"{item.BoQNr:N3} : ")
+                                        }
+                                        @Html.DisplayFor(modelItem => item.Item_Name)
+                                    </button></form>
                             }
                         }
                         else if (item.ExtraWorkId != null)
                         {
                             <form asp-action="Details" asp-controller="ExtraWorks" asp-route-id="@item.ExtraWorkId" method="get" target="_blank">
-                                <button class="btn-hoelscher" style="text-align:left;">@Html.DisplayFor(modelItem => item.Item_Name)</button>
-                            </form>
+                               <button>
+                                    @if (item.BoQNr != 0)
+                                    {
+                                        @($"{item.BoQNr:N3} : ")
+                                    }
+                                    @Html.DisplayFor(modelItem => item.Item_Name)
+                                </button>
+                             </form>
                         }
 
                     </td>
@@ -2171,23 +2545,23 @@ else
                     <td>
                         @if (item.MobilizationId != null)
                         {
-                            <text>@item.price // @Model.allInconsistentItems.Where(x => x.MobilizationId.Equals(item.MobilizationId)).First().price </text>
+                            <text>@String.Format("{0:N2}", item.price) // @String.Format("{0:N2}", Model.allInconsistentItems.Where(x => x.MobilizationId.Equals(item.MobilizationId)).First().price) </text>
                         }
                         else if (item.InstallationId != null)
                         {
-                            <text>@item.price // @Model.allInconsistentItems.Where(x => x.InstallationId.Equals(item.InstallationId)).First().price </text>
+                            <text>@String.Format("{0:N2}", item.price) // @String.Format("{0:N2}",Model.allInconsistentItems.Where(x => x.InstallationId.Equals(item.InstallationId)).First().price) </text>
                         }
                         else if (item.ArrivalId != null)
                         {
-                            <text>@item.rental_price // @Model.allInconsistentItems.Where(x => x.ArrivalId.Equals(item.ArrivalId)).First().rental_price </text>
+                            <text>@String.Format("{0:N2}", item.rental_price) // @String.Format("{0:N2}",Model.allInconsistentItems.Where(x => x.ArrivalId.Equals(item.ArrivalId)).First().rental_price) </text>
                         }
                         else if (item.Daily_Report_2Id != null)
                         {
-                            <text>@item.rental_price // @Model.allInconsistentItems.Where(x => x.ArrivalId.Equals(item.ArrivalId)).First().rental_price </text>
+                            <text>@String.Format("{0:N2}", item.rental_price) // @String.Format("{0:N2}",Model.allInconsistentItems.Where(x => x.ArrivalId.Equals(item.ArrivalId)).First().rental_price) </text>
                         }
                         else if (item.ExtraWorkId != null)
                         {
-                            <text>@item.price : @item.rental_price // @Model.allInconsistentItems.Where(x => x.ExtraWorkId.Equals(item.ExtraWorkId)).First().price : @Model.allInconsistentItems.Where(x => x.ExtraWorkId.Equals(item.ExtraWorkId)).First().rental_price </text>
+                            <text>@String.Format("{0:N2}", item.price) : @String.Format("{0:N2}", item.rental_price) // @String.Format("{0:N2}", Model.allInconsistentItems.Where(x => x.ExtraWorkId.Equals(item.ExtraWorkId)).First().price) : @String.Format("{0:N2}", Model.allInconsistentItems.Where(x => x.ExtraWorkId.Equals(item.ExtraWorkId)).First().rental_price) </text>
                         }
                     </td>
                     <td>
@@ -2254,7 +2628,6 @@ else
 }
 @if (Model.Logs != null && Model.Logs.Count() > 0)
 {
-
     <table style="width:100%;table-layout:fixed;border:1px solid black;">
         <thead>
             <tr>
@@ -2281,4 +2654,3 @@ else
     </table>
 
 }
-

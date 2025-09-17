@@ -6,97 +6,188 @@
 
 <h2>@SharedLocalizer.GetLocalizedHtmlString("Generator Tests")</h2>
 
-<table class="table" style="width:100%;table-layout:fixed;">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Project)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SubProject)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TimeStamp)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Generator_Hours)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EnteredIntoDataBase)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DoneBy)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            if (item.Diesel_Level < 50 || item.Coolant == false || item.Equipment_Started.Equals("No")
-                || item.Equipment_Started_After.Equals("No") || item.Generator_Started.Equals("No") || item.Generator_Stopped.Equals("No")
-                || item.Oil_Level == false)
-            {
-                <tr style="background-color:red;">
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Project.Name)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.SubProject.Name)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.TimeStamp)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Generator_Hours)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.EnteredIntoDataBase)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.DoneBy)
-                    </td>
-                    <td>
-                        <form asp-controller="TrackItems" asp-action="GeneratorCheckReport_PDF"  asp-route-id="@item.Id" method="get" target="_blank">
-                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
-                        </form>
-                        <a asp-action="Edit_GeneratorCheck" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                        }
-                    </td>
-                </tr>
-            }
-            else
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Project.Name)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.SubProject.Name)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.TimeStamp)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Generator_Hours)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.EnteredIntoDataBase)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.DoneBy)
-                    </td>
-                    <td>
-                        <form asp-controller="TrackItems" asp-action="GeneratorCheckReport_PDF" asp-route-id="@item.Id" method="get" target="_blank">
-                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
-                        </form>
-                        <a asp-action="Edit_GeneratorCheck" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
-                    </td>
-                </tr>
-            }
-        }
-    </tbody>
+<div style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;">
+
+	<div>
+		<select id="generatorTestSelect" class="form-control" onchange="filterTable(this.value)">
+			<option value="all">@SharedLocalizer.GetLocalizedHtmlString("- Choose a project -")</option>
+			@foreach (var item in Model.Select(x => x.Project?.Name).Distinct())
+			{
+				<option value="@item">@item</option>
+			}
+		</select>
+	</div>
+
+	@* <div>
+		<input type="text" id="searchInput" class="form-control" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Search by Well Name...")" />
+	</div> *@
+</div>
+
+
+<table class="table" id="generatorTestTable">
+	<thead>
+		<tr>
+			<th>
+				@Html.DisplayNameFor(model => model.Project)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.SubProject)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.TimeStamp)
+			</th>
+			<th>Generator Name</th>
+			<th>Location</th>
+			<th>
+				@Html.DisplayNameFor(model => model.EnteredIntoDataBase)
+			</th>
+			<th>
+				@Html.DisplayNameFor(model => model.DoneBy)
+			</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		@foreach (var item in Model)
+		{
+			bool notOK = false;
+			if (item.ProjectId == 437 || item.ProjectId == 653)
+			{
+				notOK = item.Diesel_Level < 80
+				|| item.SpareTank_Level < 80
+				|| !item.Coolant
+				|| !item.Oil_Level
+				|| item.Generator_Started.Equals("No")
+				|| (item.Equipment_Started.Equals("No") && item.Full_Load)
+				|| item.Generator_Stopped.Equals("No")
+				|| (item.Equipment_Started_After.Equals("No") && item.Full_Load);
+
+			}
+			else
+			{
+				notOK = item.Diesel_Level < 50
+				|| !item.Coolant
+				|| !item.Oil_Level
+				|| item.Generator_Started.Equals("No")
+				|| item.Equipment_Started.Equals("No")
+				|| item.Generator_Stopped.Equals("No")
+				|| item.Equipment_Started_After.Equals("No");				
+			}
+			
+			if (notOK)
+			{
+				<tr style="background-color:red;">
+					<td>
+						@Html.DisplayFor(modelItem => item.Project.Name)
+					</td>
+					<td>
+						@Html.DisplayFor(modelItem => item.SubProject.Name)
+					</td>
+					<td>
+						@Html.DisplayFor(modelItem => item.TimeStamp)
+					</td>
+
+					@if (item.ProjectId == 437 || item.ProjectId == 653)
+					{
+
+						<td>@Html.DisplayFor(modelItem => item.GeneratorName)</td>
+					}
+					else
+					{
+						<td>
+							@Html.DisplayFor(modelItem => item.GeneratorNameLocation)
+						</td>
+					}
+					<td>@Html.DisplayFor(modelItem => item.Address)</td>
+					<td>
+						@Html.DisplayFor(modelItem => item.EnteredIntoDataBase)
+					</td>
+					<td>
+						@Html.DisplayFor(modelItem => item.DoneBy)
+					</td>
+					<td>
+						<form asp-controller="TrackItems" asp-action="GeneratorCheckReport_PDF" asp-route-id="@item.Id" method="get" target="_blank">
+							<button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+						</form>
+						<a asp-action="Edit_GeneratorCheck" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
+						@if (User.IsInRole("Admin"))
+						{
+							<a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+						}
+					</td>
+				</tr>
+			}
+			else
+			{
+				<tr>
+					<td>
+						@Html.DisplayFor(modelItem => item.Project.Name)
+					</td>
+					<td>
+						@Html.DisplayFor(modelItem => item.SubProject.Name)
+					</td>
+					<td>
+						@Html.DisplayFor(modelItem => item.TimeStamp)
+					</td>
+					@if (item.ProjectId == 437 || item.ProjectId == 653)
+					{
+
+						<td>@Html.DisplayFor(modelItem => item.GeneratorName)</td>
+					}
+					else
+					{
+						<td>
+							@Html.DisplayFor(modelItem => item.GeneratorNameLocation)
+						</td>
+					}
+					<td>@Html.DisplayFor(modelItem => item.Address)</td>
+					<td>
+						@Html.DisplayFor(modelItem => item.EnteredIntoDataBase)
+					</td>
+					<td>
+						@Html.DisplayFor(modelItem => item.DoneBy)
+					</td>
+					<td>
+						<form asp-controller="TrackItems" asp-action="GeneratorCheckReport_PDF" asp-route-id="@item.Id" method="get" target="_blank">
+							<button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+						</form>
+						<a asp-action="Edit_GeneratorCheck" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
+					</td>
+				</tr>
+			}
+		}
+	</tbody>
 </table>
+
+
+@section Scripts {
+	<script>
+		// Hide the table initially until an option is selected
+		 // document.addEventListener("DOMContentLoaded", function () {
+			//  document.getElementById('generatorTestTable').style.display = 'none';
+		 // });
+
+
+		   function filterTable(projectName) {
+			   const table = document.getElementById('generatorTestTable');
+			   const rows =  document.querySelectorAll('#generatorTestTable tbody tr');
+			   console.log('Selected: ' + projectName);
+			   let hasVisibleRow = false; // To track if at least one row matches
+
+			   rows.forEach(row => {
+					  const projectCell = row.cells[0].textContent.trim(); // Adjust index based on Project column
+
+					   console.log('Project: ' + projectCell);
+					   if (projectCell === projectName || projectName === 'all') {
+						  row.style.display = "";
+						  hasVisibleRow = true;
+						 } else {
+						  row.style.display = "none";
+					  }
+			   });
+
+			   // Show table only if there are visible rows and project is not "Choose project"
+			   table.style.display = (hasVisibleRow);// && (projectName !== '- Choose a project -')) ? '' : 'none';
+		   }
+	</script>
+}

@@ -3915,6 +3915,23 @@ namespace MainOps.Controllers
             var installations = _context.MeasPoints.Include(x => x.Project).Include(x => x.MeasType).Where(x => x.ProjectId.Equals(Id) && x.MeasType.Type.ToLower().Equals("water level")).OrderBy(x => x.Name).ToList();
             return Json(installations);
         }
+
+
+        [HttpGet]
+        public JsonResult GetMeasPointsProjectLevel2(string theId)
+        {
+            int Id = Convert.ToInt32(theId);
+            var measpoints = _context.MeasPoints.Include(x => x.Project).Include(x => x.MeasType).Where(x => x.ProjectId.Equals(Id) && x.MeasType.Type.ToLower().Equals("water level")).OrderBy(x => x.Name).ToList();
+            IEnumerable<SelectListItem> selList = from s in measpoints
+                                                  select new SelectListItem
+                                                  {
+                                                      Value = s.Id.ToString(),
+                                                      Text = s.Name //s.Project.Name + " ID: " + s.Id + " : " + s.Name
+                                                  };
+
+            return Json(selList);
+        }
+
         [HttpGet]
         public JsonResult GetMeasPointsSubProjectLevel(string theId)
         {
@@ -3927,6 +3944,7 @@ namespace MainOps.Controllers
             }
             return Json(installations);
         }
+                     
         [HttpGet]
         public JsonResult GetMeasPointsProject(string theId)
         {
@@ -3940,6 +3958,9 @@ namespace MainOps.Controllers
                                                   };
             return Json(selList);
         }
+
+       
+       
 
         [HttpGet]
         public JsonResult GetWellsProject(string theId)
@@ -8920,7 +8941,7 @@ namespace MainOps.Controllers
                     }
                     if (arr.UniqueID.Contains("#"))
                     {
-                        List<Install> installs = new List<Install>();
+                        List<Install>? installs = new List<Install>();
                         if (arr.EndStamp != null)
                         {
                             //installs = installations.Where(x => x.UniqueID.Equals(arr.UniqueID) && x.ItemTypeId.Equals(arr.ItemTypeId) && x.RentalStartDate >= arr.TimeStamp && x.RentalStartDate <= arr.EndStamp).OrderBy(x => x.TimeStamp).ToList();
@@ -15034,10 +15055,12 @@ namespace MainOps.Controllers
                 //await _emailSender.SendEmailAsync2("rml@hj-as.dk", "Time Registrering",
                 //    "<strong>Hej HR</strong><br />Vedhaeftet finder du timeregistrering for " + newvm.HourRegistration.FullName + " for uge " + newvm.HourRegistration.Week1 + " og uge " + newvm.HourRegistration.Week2 + "."
                 //    , footerstringHTML, footerstringPLAIN, pdf.FileName, file);
-                //await _emailSender.SendEmailAsync2("ofw@hj-as.dk", "Time Registrering",
-                //    "<strong>Hej Sneh</strong><br />Vedhaeftet finder du timeregistrering for " + newvm.HourRegistration.FullName + " for uge " + newvm.HourRegistration.Week1 + " og uge " + newvm.HourRegistration.Week2 + "."
-                //    , footerstringHTML, footerstringPLAIN, pdf.FileName, file);
-                if(theuser.Division.HourSheetEmail != null && theuser.Division.HourSheetEmail != "")
+
+                await _emailSender.SendEmailAsync2("bin@hj-as.dk", "Time Registrering",
+                    "<strong>Hej HR!</strong><br />Vedhaeftet finder du timeregistrering for " + newvm.HourRegistration.FullName + " for uge " + newvm.HourRegistration.Week1 + " og uge " + newvm.HourRegistration.Week2 + "."
+                    , footerstringHTML, footerstringPLAIN, pdf.FileName, file);
+                                
+                if (theuser.Division.HourSheetEmail != null && theuser.Division.HourSheetEmail != "")
                 {
                     await _emailSender.SendEmailAsync2("jav@hj-as.dk", "Time Registrering",
                   "<strong>Hej HR!</strong><br />Vedhaeftet finder du timeregistrering for " + newvm.HourRegistration.FullName + " for uge " + newvm.HourRegistration.Week1 + " og uge " + newvm.HourRegistration.Week2 + "."
@@ -15446,11 +15469,49 @@ namespace MainOps.Controllers
                 return NotFound();
             }
         }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin,Supervisor")]
+        public async Task<IActionResult> Delete_HourRegistration(int? id)
+        {
+            if (id!=null)
+            { 
+                // Find the entry in HourRegistrations
+                var hourRegistration = await _context.HourRegistrations.FindAsync(id);
+
+                if (hourRegistration == null)
+                {
+                    return NotFound(); // No record with this ID
+                }
+
+                // Get all related rows in RowHours
+                var relatedRows = _context.RowHours.Where(r => r.HourRegistrationId == id);
+
+                // Remove related rows
+                _context.RowHours.RemoveRange(relatedRows);
+
+                // Remove parent row
+                _context.HourRegistrations.Remove(hourRegistration);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("HourRegistrations");
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
         [HttpGet]
         [Authorize(Roles = "Admin,Supervisor,DivisionAdmin,ProjectMember")]
         public async Task<IActionResult> HourRegistrations()
         {
             var user = await _userManager.GetUserAsync(User);
+            var receiverDiv = await _context.Divisions.SingleOrDefaultAsync(x => x.Id.Equals(user.DivisionId));
+            var receiverEmail = receiverDiv.HourSheetEmail;
+            ViewData["ReceiverEmail"] = receiverEmail;
+            ViewData["DivisionId"] = user.DivisionId;
+
             List<HourRegistration> hours = new List<HourRegistration>();
             if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Supervisor"))
             {
@@ -15579,6 +15640,32 @@ namespace MainOps.Controllers
                 return View("HourRegistrations", hours);
             }
         }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin,DivisionAdmin")]
+        public async Task<IActionResult> Edit_Receiver(int Id, string ReceiverEmail)
+        {
+            Debug.WriteLine("Edit reveiver.....email: " + ReceiverEmail);
+
+            var division = await _context.Divisions.FindAsync(Id);            
+            if (division == null)
+            {
+                return NotFound();
+            }
+
+            division.HourSheetEmail = ReceiverEmail;
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                return StatusCode(500, "Error updating database");
+            }
+
+            return RedirectToAction("HourRegistrations");
+        }
+
         [HttpGet]
         [Authorize(Roles = "Admin,DivisionAdmin,Supervisor")]
         public async Task<IActionResult> Edit_HourRegistration(int? id)
@@ -17040,6 +17127,7 @@ namespace MainOps.Controllers
                 var gentest = await _context.GeneratorChecks.FindAsync(id);
                 ViewData["ProjectId"] = await GetProjectList();
                 ViewData["SubProjectId"] = new SelectList(_context.SubProjects.Where(x => x.ProjectId.Equals(gentest.ProjectId)), "Id", "Name");
+
                 return View(gentest);
 
             }
@@ -17053,6 +17141,24 @@ namespace MainOps.Controllers
         public async Task<IActionResult> GeneratorCheck()
         {
             ViewData["ProjectId"] = await GetProjectList();
+            ViewData["Text"] = new List<SelectListItem>
+                                {
+                                    new SelectListItem { Text = "Generator Nr. 1 (Atlas Copco)", Value = "Svaneknoppen" },
+                                    new SelectListItem { Text = "Generator Nr. 2 (Atlas Copco)", Value = "Svaneknoppen" },
+                                    new SelectListItem { Text = "Generator Nr. 3 (Repto)", Value = "Svaneknoppen" },
+                                    new SelectListItem { Text = "Generator Nr. 4 (Repto)", Value = "Færgehavnsvej" },
+                                    new SelectListItem { Text = "Generator Nr. 5 (Atlas Copco)", Value = "Baltikavej" },
+                                    new SelectListItem { Text = "Generator Nr. 6 (Atlas Copco)", Value = "Baltikavej" },
+                                    new SelectListItem { Text = "Generator Nr. 7 (Atlas Copco)", Value = "Baltikavej" },
+                                    new SelectListItem { Text = "Generator Nr. 8 (GSV)", Value = "Baltikavej" },
+                                    new SelectListItem { Text = "Generator Nr. 9 (Repto)", Value = "Baltikavej" },
+                                    new SelectListItem { Text = "Generator Nr. 10 (Repto)", Value = "Baltikavej" },
+                                    new SelectListItem { Text = "Generator Nr. 11 (Repto)", Value = "Baltikavej" },
+                                    new SelectListItem { Text = "Generator Nr. 12 (Repto)", Value = "Baltikavej" },
+                                    new SelectListItem { Text = "Generator Nr. 13 (Repto)", Value = "Nordsøvej, Copenhagen" }
+                                };
+
+
             return View();
         }
         [HttpGet]
@@ -17102,10 +17208,33 @@ namespace MainOps.Controllers
                     {
                         PhotoExtensions.SaveAndCompressJpeg(path, 80);
                     }
-
                 }
                 await _context.SaveChangesAsync();
-                if (lastadded.Diesel_Level < 50 || !lastadded.Coolant || !lastadded.Oil_Level || lastadded.Generator_Started.Equals("No") || lastadded.Equipment_Started.Equals("No") || lastadded.Generator_Stopped.Equals("No") || lastadded.Equipment_Started_After.Equals("No"))
+                bool sendMail = false;
+                if (lastadded.ProjectId == 437 || lastadded.ProjectId == 653)
+                {
+                    sendMail = (lastadded.Diesel_Level < 80
+                        || lastadded.SpareTank_Level < 80
+                        || !lastadded.Coolant
+                        || !lastadded.Oil_Level
+                        || lastadded.Generator_Started.Equals("No")
+                        || (lastadded.Equipment_Started.Equals("No") && lastadded.Full_Load)
+                        || lastadded.Generator_Stopped.Equals("No")
+                        || (lastadded.Equipment_Started_After.Equals("No") && lastadded.Full_Load));
+
+                }
+                else
+                {
+                    sendMail = (lastadded.Diesel_Level < 50
+                        || !lastadded.Coolant
+                        || !lastadded.Oil_Level
+                        || lastadded.Generator_Started.Equals("No")
+                        || lastadded.Equipment_Started.Equals("No")
+                        || lastadded.Generator_Stopped.Equals("No")
+                        || lastadded.Equipment_Started_After.Equals("No"));
+                }
+
+                if (sendMail)
                 {
                     ViewAsPdf pdf = new ViewAsPdf("Reports/_GeneratorCheck", lastadded)
                     {
@@ -17116,25 +17245,88 @@ namespace MainOps.Controllers
                     var file = Convert.ToBase64String(pdfData);
                     string footerstringHTML = "<br />Hölscher Jensen A/S<br />Fabriksparken 37<br />2600 Glostrup<br />Denmark";
                     string footerstringPLAIN = "\r\n\r\nHölscher Jensen A/S \r\nFabriksparken 37\r\n2600 Glostrup\r\nDenmark";
-                    await _emailSender.SendEmailAsync2("ofw@hj-as.dk", "Generator Test Problem",
-                       "Problems during Generator test: " + lastadded.Id.ToString() + ". Test performed on: " + lastadded.TimeStamp.ToString() + ". On Project: " + lastadded.Project.Name
-                        , footerstringHTML, footerstringPLAIN, pdf.FileName, file);
-                    if (lastadded.Project.Responsible_Person != "")
+
+                    var recipients = new List<string> { "ofw@hj-as.dk", "jaj@hj-as.dk", "dmm@hj-as.dk", "bin@hj-as.dk" };
+
+                    string subject = "Generator Test Problem";
+                    string message = "Problems during Generator test: " + lastadded.Id.ToString() +
+                                     ". Test performed on: " + lastadded.TimeStamp.ToString() +
+                                     ". On Project: " + lastadded.Project.Name;
+
+                    if (lastadded.ProjectId == 437 || lastadded.ProjectId == 653)
                     {
-                        var projResp = await _context.Users.Where(x => x.full_name().Equals(lastadded.Project.Responsible_Person)).SingleOrDefaultAsync();
-                        if (projResp != null)
+                        recipients.Add("jonba@BESIX-MTH.com");//jonba@besix-mth.dk
+
+                        if (lastadded.GeneratorName == "Generator Nr. 1 (Atlas Copco)"
+                            || lastadded.GeneratorName == "Generator Nr. 2 (Atlas Copco)"
+                            //|| lastadded.GeneratorName == "Generator Nr. 3 (Repto)"
+                            || lastadded.GeneratorName == "Generator Nr. 5 (Atlas Copco)"
+                            || lastadded.GeneratorName == "Generator Nr. 6 (Atlas Copco)"
+                            || lastadded.GeneratorName == "Generator Nr. 7 (Atlas Copco)")
                         {
-                            await _emailSender.SendEmailAsync2(projResp.Email, "Generator Test Problem",
-                       "Problems during Generator test: " + lastadded.Id.ToString() + ". Test performed on: " + lastadded.TimeStamp.ToString() + ". On Project: " + lastadded.Project.Name
-                        , footerstringHTML, footerstringPLAIN, pdf.FileName, file);
+                            recipients.Add("jan.saltoft@atlascopco.com");
+                            recipients.Add("erfan.danesh@atlascopco.com");
+                        }
+                        else if (lastadded.GeneratorName == "Generator Nr. 4 (Repto)"
+                            || lastadded.GeneratorName == "Generator Nr. 3 (Repto)"
+                            || lastadded.GeneratorName == "Generator Nr. 9 (Repto)"
+                            || lastadded.GeneratorName == "Generator Nr. 10 (Repto)"
+                            || lastadded.GeneratorName == "Generator Nr. 11 (Repto)"
+                            || lastadded.GeneratorName == "Generator Nr. 12 (Repto)"
+                            || lastadded.GeneratorName == "Generator Nr. 13 (Repto)")
+                        {
+                            recipients.Add("ml@repto.dk");
+                            recipients.Add("lh@repto.dk");
+                        }
+                        else if (lastadded.GeneratorName == "Generator Nr. 8 (GSV)")
+                        {
+                            recipients.Add("bss@gsv.dk");
                         }
                     }
+
+                    Debug.WriteLine($"Message: {message}");
+                    foreach (var email in recipients)
+                    {
+                        Debug.WriteLine($"Send email to: {email}");
+                        await _emailSender.SendEmailAsync2(email, subject, message, footerstringHTML, footerstringPLAIN, pdf.FileName, file);
+
+                    }
                 }
+
+                /*if (lastadded.Diesel_Level < 50 || !lastadded.Coolant || !lastadded.Oil_Level || lastadded.Generator_Started.Equals("No") || lastadded.Equipment_Started.Equals("No") || lastadded.Generator_Stopped.Equals("No") || lastadded.Equipment_Started_After.Equals("No"))
+                    {
+                        ViewAsPdf pdf = new ViewAsPdf("Reports/_GeneratorCheck", lastadded)
+                        {
+                            FileName = "GeneratorCheck_" + lastadded.Project.Abbreviation + "_" + lastadded.TimeStamp.ToString("yyyy-MM-dd") + ".pdf",
+                        };
+                        byte[] pdfData = await pdf.BuildFile(ControllerContext);
+
+                        var file = Convert.ToBase64String(pdfData);
+                        string footerstringHTML = "<br />Hölscher Jensen A/S<br />Fabriksparken 37<br />2600 Glostrup<br />Denmark";
+                        string footerstringPLAIN = "\r\n\r\nHölscher Jensen A/S \r\nFabriksparken 37\r\n2600 Glostrup\r\nDenmark";
+
+                        var recipients = new[] { "bin@hj-as.dk" };                       
+
+                        string subject = "Generator Test Problem";
+                        string message = "Problems during Generator test: " + lastadded.Id.ToString() +
+                                         ". Test performed on: " + lastadded.TimeStamp.ToString() +
+                                         ". On Project: " + lastadded.Project.Name;
+
+                        foreach (var email in recipients)
+                        {
+                           await _emailSender.SendEmailAsync2(email, subject, message, footerstringHTML, footerstringPLAIN, pdf.FileName, file);
+                        }
+                }*/
 
                 return RedirectToAction("MainMenu");
             }
             else
             {
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    System.Diagnostics.Debug.WriteLine("Errors in GeneratorCheck: " + error.ErrorMessage);
+
+                }
                 return NotFound();
             }
         }
@@ -17239,6 +17431,15 @@ namespace MainOps.Controllers
             ViewData["ProjectId"] = await GetProjectList();
             return View();
         }
+
+        //WaterCare
+        [HttpGet]
+        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember")]
+        public async Task<IActionResult> WaterCareCheck()
+        {
+            ViewData["ProjectId"] = await GetProjectList();
+            return View();
+        }
         [HttpGet]
         [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember")]
         public async Task<IActionResult> WTPChecks()
@@ -17252,6 +17453,21 @@ namespace MainOps.Controllers
 
             var checks = await _context.WTPChecks.Include(x => x.Project).ThenInclude(x => x.Division).Include(x => x.SubProject).Where(x => x.Project.DivisionId.Equals(user.DivisionId)).OrderByDescending(x => x.TimeStamp).ToListAsync();
             return View("Reports/WTPChecks", checks);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember")]
+        public async Task<IActionResult> WatercareChecks()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (User.IsInRole("Admin"))
+            {
+                var checksAdmin = await _context.Wtc_Checks.Include(x => x.Project).ThenInclude(x => x.Division).Include(x => x.SubProject).OrderByDescending(x => x.TimeStamp).ToListAsync();
+                return View("Reports/WatercareChecks", checksAdmin);
+            }
+
+            var checks = await _context.Wtc_Checks.Include(x => x.Project).ThenInclude(x => x.Division).Include(x => x.SubProject).Where(x => x.Project.DivisionId.Equals(user.DivisionId)).OrderByDescending(x => x.TimeStamp).ToListAsync();
+            return View("Reports/WatercareChecks", checks);
         }
         [HttpPost]
         [Authorize(Roles = "Admin,DivisionAdmin,ProjectMember")]
@@ -17273,14 +17489,62 @@ namespace MainOps.Controllers
                 }
                 foreach (IFormFile photo in files)
                 {
-                    var path = Path.Combine(directory, photo.FileName);
-                    var path2 = Path.Combine(directory, photo.FileName.Split(".")[0] + "_edit." + photo.FileName.Split(".")[1]);
+                    var fileNameCleaned = photo.FileName.Replace(" ", ""); // Remove all spaces
+                    var path = Path.Combine(directory, fileNameCleaned);
+                    //var path2 = Path.Combine(directory, photo.FileName.Split(".")[0] + "_edit." + photo.FileName.Split(".")[1]);
                     PhotoFileWTPCheck checkphoto = new PhotoFileWTPCheck { Path = path, TimeStamp = model.TimeStamp, WTPCheckId = lastadded.Id, Latitude = Convert.ToDouble(model.Latitude), Longitude = Convert.ToDouble(model.Longitude) };
                     _context.Add(checkphoto);
                     using (var stream = new FileStream(path, FileMode.Create))
                     {
                         await photo.CopyToAsync(stream);
-                    };
+                    }
+                    ;
+                    if (path.ToLower().Contains(".jpg") || path.ToLower().Contains(".jpeg"))
+                    {
+                        PhotoExtensions.SaveAndCompressJpeg(path, 80);
+                    }
+
+                }
+                await _context.SaveChangesAsync();
+                return RedirectToAction("MainMenu");
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin,DivisionAdmin,ProjectMember")]
+        [RequestSizeLimit(900000000)]
+        public async Task<IActionResult> WatercareCheck(WatercareCheck model, IFormFile[] files)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                model.DoneBy = user.full_name();
+                model.EnteredIntoDataBase = DateTime.Now;
+                _context.Add(model);
+                await _context.SaveChangesAsync();
+                var lastadded = await _context.Wtc_Checks.LastAsync();
+                var directory = _env.WebRootPath + "\\AHAK\\WatercareChecks\\" + lastadded.Id.ToString() + "\\";
+                if (!Directory.Exists(directory) && files != null)
+                {
+                    Directory.CreateDirectory(directory);
+                }
+                foreach (IFormFile photo in files)
+                {
+                    var fileNameCleaned = photo.FileName.Replace(" ", ""); // Remove all spaces
+                    var path = Path.Combine(directory, fileNameCleaned);
+
+                    // var path2 = Path.Combine(directory, photo.FileName.Split(".")[0] + "_edit." + photo.FileName.Split(".")[1]);
+                    PhotoFileWtcCheck checkphoto = new PhotoFileWtcCheck { Path = path, TimeStamp = model.TimeStamp, WaterCareCheckId = lastadded.Id, Latitude = Convert.ToDouble(model.Latitude), Longitude = Convert.ToDouble(model.Longitude) };
+                    _context.Add(checkphoto);
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await photo.CopyToAsync(stream);
+                    }
+                    ;
                     if (path.ToLower().Contains(".jpg") || path.ToLower().Contains(".jpeg"))
                     {
                         PhotoExtensions.SaveAndCompressJpeg(path, 80);
@@ -17312,6 +17576,24 @@ namespace MainOps.Controllers
                 return NotFound();
             }
         }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember")]
+        public async Task<IActionResult> WatercareCheckReport(int? id)
+        {
+            if (id != null)
+            {
+                var check = await _context.Wtc_Checks.Where(x => x.Id.Equals(id))
+                    .Include(x => x.Photos)
+                    .Include(x => x.Project).ThenInclude(x => x.Division)
+                    .Include(x => x.SubProject).SingleOrDefaultAsync();
+                return View("Reports/_WatercareCheck", check);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> WTPCheckReport_PDF(int? id)
@@ -17323,6 +17605,24 @@ namespace MainOps.Controllers
                     .Include(x => x.Project).ThenInclude(x => x.Division)
                     .Include(x => x.SubProject).SingleOrDefaultAsync();
                 return new ViewAsPdf("Reports/_WTPCheck", check);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> WatercareCheckReport_PDF(int? id)
+        {
+            if (id != null)
+            {
+                var check = await _context.Wtc_Checks.Where(x => x.Id.Equals(id))
+                    .Include(x => x.Photos)
+                    .Include(x => x.Project).ThenInclude(x => x.Division)
+                    .Include(x => x.SubProject).SingleOrDefaultAsync();
+                return new ViewAsPdf("Reports/_WatercareCheck", check);
             }
             else
             {
@@ -17349,6 +17649,234 @@ namespace MainOps.Controllers
             }
             else { return NotFound(); }
         }
+
+        //Sensor Calibration
+        [HttpGet]
+        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember")]
+        public async Task<IActionResult> SensorCalibration()
+        {
+            ViewData["ProjectId"] = await GetProjectList();
+            return View("SensorCalibration");
+        }
+        
+        [HttpPost]
+        [RequestSizeLimit(900000000)]
+        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember")]
+        public async Task<IActionResult> SensorCalibration(SensorCalibrationVM model, IFormFile[] files)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+
+                try
+                {
+                    SensorCalibration sensorCalibration = new SensorCalibration
+                    {
+                        EnteredIntoDataBase = DateTime.Now,
+                        WellId = model.WellId,
+                        RefLevel = model.RefLevel,
+                        Hand_dip = model.Hand_dip,
+                        ExpectedWaterlevel = model.ExpectedWaterlevel,
+                        ScadaWaterlevel = model.ScadaWaterlevel,
+                        SCADA_LevelMatch = model.SCADA_LevelMatch,
+                        Comment = model.Comment,
+                        TimeStamp = model.TimeStamp,
+                        DoneBy = user.full_name(),
+                        Signature = model.Signature,
+                        ProjectId = model.ProjectId,
+                        SubProjectId = model.SubProjectId
+                    };
+                    _context.Add(sensorCalibration);
+                    await _context.SaveChangesAsync();
+
+                    var itemadded = await _context.SensorCalibrations
+                        .Include(x => x.Well)
+                        .Include(x => x.Photos)
+                        .Include(x => x.Project).ThenInclude(x => x.Division)
+                        .LastAsync();
+
+                    Debug.WriteLine($"Last item id: {itemadded.Id.ToString()}");
+
+                    //var directory = _env.WebRootPath + "\\AHAK\\SsCPhotos\\" + itemadded.Id.ToString() + "\\";
+                    //if (!Directory.Exists(directory) && files != null)
+                    //{
+                    //    Directory.CreateDirectory(directory);
+                    //}
+                    //foreach (IFormFile photo in files)
+                    //{
+
+                    //    var path = Path.Combine(directory, photo.FileName);
+
+                    //    PhotoFileSensorCalibration scphoto = new PhotoFileSensorCalibration { Path = path, TimeStamp = model.TimeStamp, SensorCalibrationId = itemadded.Id };
+                    //    _context.Add(scphoto);
+                    //    var stream = new FileStream(path, FileMode.Create);
+                    //    await photo.CopyToAsync(stream);
+                    //    stream.Close();
+                    //    if (path.ToLower().Contains(".jpg") || path.ToLower().Contains(".jpeg"))
+                    //    {
+                    //        PhotoExtensions.SaveAndCompressJpeg(path, 80);
+                    //    }
+                    //}
+                    //await _context.SaveChangesAsync();
+
+                    // send email
+                    string file = "";
+                    ViewAsPdf pdf = null;
+                    try
+                    {
+                        pdf = new ViewAsPdf("Reports/_SensorCalibration", itemadded)
+                        {
+                            FileName = "SensorCalibration_" + itemadded.Project.Abbreviation + "_" + itemadded.TimeStamp.ToString("yyyy-MM-dd") + ".pdf",
+                        };
+                        byte[] pdfData = await pdf.BuildFile(ControllerContext);
+
+                        file = Convert.ToBase64String(pdfData);
+                    }
+                    catch(Exception ex)
+                    {
+                        Debug.WriteLine($"Fail on creating Pdf: {ex.Message}");
+                    }
+                    
+
+                    string footerstringHTML = "<br />Hölscher Jensen A/S<br />Fabriksparken 37<br />2600 Glostrup<br />Denmark";
+                    string footerstringPLAIN = "\r\n\r\nHölscher Jensen A/S \r\nFabriksparken 37\r\n2600 Glostrup\r\nDenmark";
+
+                    var recipients = new List<string> { "ofw@hj-as.dk", "bin@hj-as.dk" };// 
+                    string subject = "Sensor Calibration";
+                    string message = "Sensor Calibration for well: " + itemadded.Well.WellName +
+                                     ". Performed on: " + itemadded.TimeStamp.ToString() +
+                                     ". On Project: " + itemadded.Project.Name + "<br /><br />";
+
+                    Debug.WriteLine($"Calibration Message: {message}");
+                    foreach (var email in recipients)
+                    {
+                        Debug.WriteLine($"Send email to: {email}");
+                        await _emailSender.SendEmailAsync2(email, subject, message, footerstringHTML, footerstringPLAIN, pdf.FileName, file);
+                        //await _emailSender.TestSendEmailAsync(email, subject, message, footerstringHTML, footerstringPLAIN, pdf.FileName, file);
+
+                    }
+                    //done sending email
+                }
+                catch (Exception e)
+                {
+                    Debug.WriteLine($"Fail on sensor calibration: {e.Message}");
+                    //return RedirectToAction("ErrorMessage", "Home", new { text = "Please take picture of this:" + Environment.NewLine +  e.ToString() });
+                    return RedirectToAction("MainMenu", "TrackItems");
+                }
+            }
+            return RedirectToAction("MainMenu", "TrackItems");
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember")]
+        public async Task<IActionResult> SensorCalibrations()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            //if (User.IsInRole("Admin"))
+            //{
+            //    var checksAdmin = await _context.GeneratorChecks.Include(x => x.Project).ThenInclude(x => x.Division).Include(x => x.SubProject).OrderByDescending(x => x.TimeStamp).ToListAsync();
+            //    return View("Reports/GeneratorChecks", checksAdmin);
+            //}
+
+            var calibrations = await _context.SensorCalibrations.Include(x => x.Project).Include(x => x.SubProject).Include(x => x.Well).OrderByDescending(x => x.TimeStamp).ToListAsync();
+            return View("Reports/SensorCalibrations", calibrations);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember")]
+        public async Task<IActionResult> Edit_SensorCalibration(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user.Active == false)
+            {
+                return RedirectToAction("ErrorMessage", "Home", new { text = "You are inactive" });
+            }
+            var model = await _context.SensorCalibrations.FindAsync(id);
+            
+            ViewData["ProjectId"] = await GetProjectList();
+            ViewData["WellId"] = new SelectList(_context.Wells.Where(x => x.ProjectId.Equals(model.ProjectId)).OrderBy(x => x.WellName), "Id", "WellName", model.WellId);
+            return View("Reports/Edit_SensorCalibration", model);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember")]
+        public async Task<IActionResult> Edit_SensorCalibration(SensorCalibration model, IFormFile[] files)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Update(model);
+                await _context.SaveChangesAsync();
+
+                //var directory = _env.WebRootPath + "\\AHAK\\MaintenancePhotos\\" + model.Id.ToString() + "\\";
+                //if (!Directory.Exists(directory) && files != null)
+                //{
+                //    Directory.CreateDirectory(directory);
+                //}
+                //foreach (IFormFile photo in files)
+                //{
+
+                //    var path = Path.Combine(directory, photo.FileName);
+
+                //    PhotoFileMaintenance maintenancephoto = new PhotoFileMaintenance { Path = path, TimeStamp = model.TimeStamp, MaintenanceId = model.Id, Latitude = Convert.ToDouble(model.Latitude), Longitude = Convert.ToDouble(model.Longitude) };
+                //    _context.Add(maintenancephoto);
+                //    var stream = new FileStream(path, FileMode.Create);
+                //    await photo.CopyToAsync(stream);
+                //    stream.Close();
+                //    if (path.ToLower().Contains(".jpg") || path.ToLower().Contains(".jpeg"))
+                //    {
+                //        PhotoExtensions.SaveAndCompressJpeg(path, 80);
+                //    }
+                //    await _context.SaveChangesAsync();
+                //}
+                return RedirectToAction("SensorCalibrations");
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember")]
+        public async Task<IActionResult> Delete_SensorCalibration(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var ssCalibration = await _context.SensorCalibrations
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (ssCalibration == null)
+            {
+                return NotFound();
+            }
+
+            _context.Remove(ssCalibration);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("SensorCalibrations", "TrackItems");
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> SensorCalibrationReport_PDF(int? id)
+        {
+            if (id != null)
+            {
+                var check = await _context.SensorCalibrations.Where(x => x.Id.Equals(id))
+                    .Include(x => x.Well)
+                    .Include(x => x.Photos)
+                    .Include(x => x.Project).ThenInclude(x => x.Division)
+                    .Include(x => x.SubProject).SingleOrDefaultAsync();
+                return new ViewAsPdf("Reports/_SensorCalibration", check);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+
         [HttpGet]
         [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember")]
         public async Task<IActionResult> StepTestReport_PDF(int? id)
@@ -17780,10 +18308,119 @@ namespace MainOps.Controllers
         }
         public async Task<IActionResult> PipeCuts()
         {
+            /* var user = await _userManager.GetUserAsync(User);
+            if (User.IsInRole("Admin"))
+            {
+                var checksAdmin = await _context.WTPChecks.Include(x => x.Project).ThenInclude(x => x.Division).Include(x => x.SubProject).OrderByDescending(x => x.TimeStamp).ToListAsync();
+                return View("Reports/WTPChecks", checksAdmin);
+            }
+
+            var checks = await _context.WTPChecks
+            .Include(x => x.Project)
+            .ThenInclude(x => x.Division)
+            .Include(x => x.SubProject).Where(x => x.Project.DivisionId.Equals(user.DivisionId)).OrderByDescending(x => x.TimeStamp).ToListAsync();
+            return View("Reports/WTPChecks", checks);*/
+
+
             var user = await _userManager.GetUserAsync(User);
-            var pipecuts = await _context.PipeCuts.Include(x => x.MeasPoint).ThenInclude(x => x.Project).Where(x => x.MeasPoint.Project.DivisionId.Equals(user.DivisionId)).ToListAsync();
+            var pipecuts = await _context.PipeCuts
+               .Include(x => x.MeasPoint)
+               .ThenInclude(x => x.Project)
+               .Where(x => x.MeasPoint.Project.DivisionId.Equals(user.DivisionId))
+               .OrderByDescending(x => x.TimeStamp) // Ensure "Date" is the correct property
+               .ToListAsync();
+
             return View("Reports/PipeCuts", pipecuts);
         }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Delete_PipeCuts(int? Id)
+        {
+            var pipeCut = await _context.PipeCuts
+                .Include(pc => pc.Offset)
+                .FirstOrDefaultAsync(pc => pc.Id == Id);
+            if (pipeCut == null)
+                return NotFound();
+
+            int measPointId = pipeCut.MeasPointId ?? 0;
+            DateTime deletedStartTime = pipeCut.Offset.starttime;
+            // 2. Delete the PipeCut and its Offset
+            _context.Offsets.Remove(pipeCut.Offset);
+            await _context.SaveChangesAsync();
+
+            // 3. Find the previous surviving Offset (the "anchor")
+            var previousOffset = await _context.Offsets
+                .Where(o => o.MeasPointId == measPointId && o.starttime < deletedStartTime)
+                .OrderByDescending(o => o.starttime)
+                .FirstOrDefaultAsync();
+
+            if (previousOffset != null)
+            {
+                double currentOffsetValue = previousOffset.offset;
+
+                // 4. Get later PipeCuts in order (they each have an Offset linked)
+                var laterPipeCuts = await _context.PipeCuts
+                    .Include(pc => pc.Offset)
+                    .Where(pc => pc.MeasPointId == measPointId && pc.Offset.starttime > deletedStartTime)
+                    .OrderBy(pc => pc.Offset.starttime)
+                    .ToListAsync();
+
+                foreach (var pCut in laterPipeCuts)
+                {
+                    // Recalculate the linked offset
+                    currentOffsetValue = currentOffsetValue - pCut.Meters_Cut;
+
+                    pCut.Offset.offset = currentOffsetValue;
+                    _context.Offsets.Update(pCut.Offset);
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            // Find related MeasPoint
+            var mp = await _context.MeasPoints
+                .FirstOrDefaultAsync(m => m.Id == pipeCut.MeasPointId);
+
+            if (mp != null)
+            {
+                // Find the same ItemTypeId used in creation
+                var lastOffset = await _context.Offsets
+                .Where(o => o.MeasPointId == measPointId)
+                .OrderByDescending(o => o.starttime)
+                .FirstOrDefaultAsync();
+
+                if (lastOffset != null)
+                {
+                    mp.Offset = lastOffset.offset;
+                    _context.MeasPoints.Update(mp);
+                    await _context.SaveChangesAsync();
+                }
+
+
+                var itemtype = await _context.ItemTypes
+                    .FirstOrDefaultAsync(x => x.ProjectId == mp.ProjectId && x.ReportTypeId == 17);
+
+                if (itemtype != null)
+                {
+                    var relatedInstall = await _context.Installations.FirstOrDefaultAsync(i => i.ProjectId == mp.ProjectId &&
+                            i.SubProjectId == mp.SubProjectId &&
+                            i.UniqueID == mp.Name &&
+                            i.TimeStamp == pipeCut.TimeStamp &&
+                            i.ItemTypeId == itemtype.Id);
+
+                    if (relatedInstall != null)
+                        _context.Installations.Remove(relatedInstall);
+                }
+            }
+
+            _context.PipeCuts.Remove(pipeCut);
+
+            await _context.SaveChangesAsync();
+                      
+            return RedirectToAction("PipeCuts", "TrackItems");
+        }
+        
         [HttpGet]
         public async Task<IActionResult> PipeCut_Details(int? id)
         {
@@ -17914,8 +18551,8 @@ namespace MainOps.Controllers
                 {
                     
                     var prev_inst = await _context.Installations.Where(x => x.ItemTypeId.Equals(itemtype.Id) && x.TimeStamp.Equals(model.TimeStamp) && x.UniqueID.Equals(mp.Name)).ToListAsync();
-                    
-                    if(prev_inst.Count() < 1)
+
+                    if (prev_inst.Count() < 1)
                     {
                         Install inst = new Install();
                         inst.TimeStamp = model.TimeStamp;
@@ -17948,6 +18585,141 @@ namespace MainOps.Controllers
                 return NotFound();
             }
         }
+
+
+        [HttpPost]
+        public async Task<IActionResult> Edit_PipeCut_Implementing(PipeCut model, IFormFile[] files)
+        {
+            if (ModelState.IsValid)
+            {
+                // 1. Load the PipeCut + Offset
+                var pipeCutToEdit = await _context.PipeCuts
+                    .Include(pc => pc.Offset)
+                    .Where(pc => pc.Id == model.Id)
+                    .FirstOrDefaultAsync();
+                if (pipeCutToEdit == null)
+                    return NotFound();
+
+                int measPointId = pipeCutToEdit.MeasPointId ?? 0;
+                DateTime editStartTime = pipeCutToEdit.Offset.starttime;
+
+
+
+                // 2. Update the PipeCut with the new meters_cut value
+                _context.PipeCuts.Update(model);
+                await _context.SaveChangesAsync();                                                    
+
+                // 3. Find the previous surviving Offset (the "anchor")
+                var previousOffset = await _context.Offsets
+                    .Where(o => o.MeasPointId == measPointId && o.starttime < editStartTime)
+                    .OrderByDescending(o => o.starttime)
+                    .FirstOrDefaultAsync();
+
+                double currentOffsetValue = previousOffset?.offset ?? 0;
+
+                // 4. Get this PipeCut and all later ones
+                var affectedPipeCuts = await _context.PipeCuts
+                    .Include(pc => pc.Offset)
+                    .Where(pc => pc.MeasPointId == measPointId && pc.Offset.starttime >= editStartTime)
+                    .OrderBy(pc => pc.Offset.starttime)
+                    .ToListAsync();
+
+                foreach (var pipeCut in affectedPipeCuts)
+                {
+                    // Recalculate the linked offset
+                    currentOffsetValue = currentOffsetValue - pipeCut.Meters_Cut;
+
+                    pipeCut.Offset.offset = currentOffsetValue;
+                    _context.Offsets.Update(pipeCut.Offset);
+                }
+
+                await _context.SaveChangesAsync();
+
+                // 5. Update MeasPoint.Offset to the last offset in chain
+                var measPoint = await _context.MeasPoints.FirstOrDefaultAsync(mpt => mpt.Id == measPointId);
+                if (measPoint != null)
+                {
+                    var lastOffset = await _context.Offsets
+                        .Where(o => o.MeasPointId == measPointId)
+                        .OrderByDescending(o => o.starttime)
+                        .FirstOrDefaultAsync();
+
+                    if (lastOffset != null)
+                    {
+                        measPoint.Offset = lastOffset.offset;
+                        _context.MeasPoints.Update(measPoint);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+
+
+                if (files != null)
+                {
+                    var directory = _env.WebRootPath + "\\AHAK\\PipeCutPhotos\\" + model.Id.ToString() + "\\";
+                    if (!Directory.Exists(directory) && files != null)
+                    {
+                        Directory.CreateDirectory(directory);
+                    }
+                    foreach (IFormFile photo in files)
+                    {
+                        var path = Path.Combine(directory, photo.FileName);
+                        var path2 = Path.Combine(directory, photo.FileName.Split(".")[0] + "_edit." + photo.FileName.Split(".")[1]);
+                        PipeCutPhoto cutphoto = new PipeCutPhoto { Path = path, TimeStamp = model.TimeStamp, PipeCutId = model.Id };
+                        _context.Add(cutphoto);
+                        var stream = new FileStream(path, FileMode.Create);
+                        await photo.CopyToAsync(stream);
+                        stream.Close();
+                        if (path.ToLower().Contains(".jpg") || path.ToLower().Contains(".jpeg"))
+                        {
+                            PhotoExtensions.SaveAndCompressJpeg(path, 85);
+                        }
+                    }
+                    await _context.SaveChangesAsync();
+                }
+
+                //
+                var mp = await _context.MeasPoints.SingleOrDefaultAsync(x => x.Id.Equals(model.MeasPointId));
+                var itemtype = await _context.ItemTypes.FirstOrDefaultAsync(x => x.ProjectId.Equals(mp.ProjectId) && x.ReportTypeId.Equals(17));
+
+                if (itemtype != null)
+                {
+                    var prev_inst = await _context.Installations.Where(x => x.ItemTypeId.Equals(itemtype.Id) && x.TimeStamp.Equals(model.TimeStamp) && x.UniqueID.Equals(mp.Name)).ToListAsync();
+
+                    if (prev_inst.Count() < 1)
+                    {
+                        Install inst = new Install();
+                        inst.TimeStamp = model.TimeStamp;
+                        inst.ProjectId = mp.ProjectId;
+                        inst.SubProjectId = mp.SubProjectId;
+                        inst.RentalStartDate = model.TimeStamp;
+                        inst.InvoiceDate = DateTime.Now;
+                        inst.Install_Text = "Automatic Installation Report of Pipe Cut/Extension of " + model.Meters_Cut.ToString("F") + " meters";
+                        inst.isInstalled = false;
+                        inst.DeinstallDate = model.TimeStamp;
+                        inst.EnteredIntoDataBase = DateTime.Now;
+                        inst.LastEditedInDataBase = DateTime.Now;
+                        inst.ItemTypeId = itemtype.Id;
+                        inst.Latitude = 0;
+                        inst.Longitude = 0;
+                        inst.UniqueID = mp.Name;
+                        inst.PayedAmount = 0;
+                        inst.DoneBy = model.DoneBy;
+                        inst.Amount = 1;
+                        inst.ToBePaid = true;
+                        _context.Add(inst);
+                        await _context.SaveChangesAsync();
+                    }
+                }
+                //
+                return RedirectToAction("MainMenu");
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+
         [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,Guest,International,ExternalDriller")]
         public async Task<IActionResult> DailyReports()
         {
@@ -18032,7 +18804,7 @@ namespace MainOps.Controllers
             {
                 items = await (from pu in _context.ProjectUsers
                                join dr in _context.Arrivals.Include(x => x.ItemType).Include(x => x.Project).ThenInclude(x => x.Division).Include(x => x.SubProject) on pu.projectId equals dr.ProjectId
-                               where pu.userId.Equals(user.Id) && dr.Project.DivisionId.Equals(user.DivisionId) 
+                               where pu.userId.Equals(user.Id) && dr.Project.DivisionId.Equals(user.DivisionId)
                                select dr).OrderByDescending(x => x.TimeStamp).Take(100).ToListAsync();
             }
             else
@@ -18371,10 +19143,12 @@ namespace MainOps.Controllers
                 string footerstringPLAIN = "\r\n\r\nHölscher Jensen A/S \r\nFabriksparken 37\r\n2600 Glostrup\r\nDenmark";
                 var file2 = Convert.ToBase64String(pdfData);
                 await _emailSender.SendEmailAsync2("ofw@hj-as.dk", Subject, HtmlContent, footerstringHTML, footerstringPLAIN, pdf.FileName, file2);
-                if(model.ProjectId.Equals(437) || model.ProjectId.Equals(562))
+                await _emailSender.SendEmailAsync2("bin@hj-as.dk", Subject, HtmlContent, footerstringHTML, footerstringPLAIN, pdf.FileName, file2);
+                if (model.ProjectId.Equals(437) || model.ProjectId.Equals(562))
                 {
                     await _emailSender.SendEmailAsync2("mak@hj-as.dk", Subject, HtmlContent, footerstringHTML, footerstringPLAIN, pdf.FileName, file2);
                     await _emailSender.SendEmailAsync2("ase@hj-as.dk", Subject, HtmlContent, footerstringHTML, footerstringPLAIN, pdf.FileName, file2);
+                    await _emailSender.SendEmailAsync2("bin@hj-as.dk", Subject, HtmlContent, footerstringHTML, footerstringPLAIN, pdf.FileName, file2);
                 }
                 return RedirectToAction("MainMenu", "TrackItems");
             }
@@ -18837,9 +19611,14 @@ namespace MainOps.Controllers
                 //}
                 var user = await _userManager.GetUserAsync(User);
                 var before = await _context.Installations.AsNoTracking().Where(x => x.Id.Equals(model.Id)).SingleOrDefaultAsync();
-                Log2 newLog = new Log2 { ItemTypeId = before.ItemTypeId, Description = _SharedLocalizer.GetLocalizedHtmlString("Install Before Edit.:") + " " + before.Install_Text + " : " + before.Id.ToString() + " : AMOUNT: " + before.Amount.ToString(), TimeStamp = before.TimeStamp, 
+                Log2 newLog = new Log2
+                {
+                    ItemTypeId = before.ItemTypeId,
+                    Description = _SharedLocalizer.GetLocalizedHtmlString("Install Before Edit.:") + " " + before.Install_Text + " : " + before.Id.ToString() + " : AMOUNT: " + before.Amount.ToString(),
+                    TimeStamp = before.TimeStamp,
                     TheUser = user.full_name(),
-                    otherinfo = "Edited On: " + DateTime.Now.ToString() + ". Invoicedate: " + before.InvoiceDate + ". RentalStartDate: " + before.RentalStartDate + ". DeInstallDate: " + Convert.ToDateTime(before.DeinstallDate).ToString() + ". PayedAmount: " + before.PayedAmount.ToString() + ". UNIQUEID: " + before.UniqueID + ". ToBePaid: " + before.ToBePaid.ToString() + ". "  };
+                    otherinfo = "Edited On: " + DateTime.Now.ToString() + ". Invoicedate: " + before.InvoiceDate + ". RentalStartDate: " + before.RentalStartDate + ". DeInstallDate: " + Convert.ToDateTime(before.DeinstallDate).ToString() + ". PayedAmount: " + before.PayedAmount.ToString() + ". UNIQUEID: " + before.UniqueID + ". ToBePaid: " + before.ToBePaid.ToString() + ". "
+                };
                 _context.Add(newLog);
                 if (before.ProjectId != model.ProjectId)
                 {
@@ -18985,7 +19764,7 @@ namespace MainOps.Controllers
                     Description = _SharedLocalizer.GetLocalizedHtmlString("Install After Edit.:") + " " + model.Install_Text + " : " + model.Id.ToString() + " : AMOUNT: " + model.Amount.ToString(),
                     TimeStamp = model.TimeStamp,
                     TheUser = user.full_name(),
-                    otherinfo = "Edited On: " + DateTime.Now.ToString() + ". Invoicedate: " + model.InvoiceDate + ". RentalStartDate: " + model.RentalStartDate + ". DeInstallDate: " +  Convert.ToDateTime(model.DeinstallDate).ToString() + ". PayedAmount: " + model.PayedAmount.ToString() + ". UNIQUEID: " + model.UniqueID + ". ToBePaid: " + model.ToBePaid.ToString() + ". "
+                    otherinfo = "Edited On: " + DateTime.Now.ToString() + ". Invoicedate: " + model.InvoiceDate + ". RentalStartDate: " + model.RentalStartDate + ". DeInstallDate: " + Convert.ToDateTime(model.DeinstallDate).ToString() + ". PayedAmount: " + model.PayedAmount.ToString() + ". UNIQUEID: " + model.UniqueID + ". ToBePaid: " + model.ToBePaid.ToString() + ". "
                 };
                 _context.Add(newLogafter);
                 await _context.SaveChangesAsync();
@@ -20078,8 +20857,11 @@ namespace MainOps.Controllers
         [Route("/TrackItems/Installations/data.csv")]
         [Produces("text/csv")]
         [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,Guest")]
-        public async Task<IActionResult> ExportInstall(int ProjectId)
+        public async Task<IActionResult> ExportInstall(int ProjectId, int ItemTypeId)
         {
+            Debug.WriteLine($"ProjectId: {ProjectId}");
+            Debug.WriteLine($"ItemTypeId: {ItemTypeId}");
+
             if (User.IsInRole("Guest"))
             {
                 var user = await _userManager.GetUserAsync(User);
@@ -20095,11 +20877,11 @@ namespace MainOps.Controllers
             }
             StringBuilder sb = new StringBuilder();
             var data = await _context.Installations.Include(x => x.ItemType).Include(x => x.Project).Where(x => x.ProjectId.Equals(ProjectId)).ToListAsync();
-            List<string> headerrow = new List<string>(new string[] { "Id", "Project", "ItemType", "Unique ID", "Location", "Install Text", "TimeStamp", "Latitude", "Longitude", "isInstalled", "Amount", "Total Amount Installed", "DeInstall Date" });
+            List<string> headerrow = new List<string>(new string[] { "Id", "Project", "ItemType", "Unique ID", "Location", "Install Text", "TimeStamp", "Latitude", "Longitude", "isInstalled", "Amount", "Total Amount Installed", "ToBePaid", "Paid Amount", "DeInstall Date" });
             sb.AppendLine(string.Join(";", headerrow.ToArray()));
             foreach (Install item in data)
             {
-                List<string> fillerrow = new List<string>(new string[] { "", "", "", "", "", "", "", "", "", "", "", "", "" })
+                List<string> fillerrow = new List<string>(new string[] { "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" })
                 {
                     [0] = item.Id.ToString(),
                     [1] = item.Project.Name,
@@ -20111,7 +20893,9 @@ namespace MainOps.Controllers
                     [8] = item.Longitude.ToString(),
                     [9] = item.isInstalled.ToString(),
                     [10] = item.Amount.ToString(),
-                    [11] = data.Where(x => x.ItemTypeId.Equals(item.ItemTypeId)).Sum(x => x.Amount).ToString()
+                    [11] = data.Where(x => x.ItemTypeId.Equals(item.ItemTypeId)).Sum(x => x.Amount).ToString(),
+                    [12] = item.ToBePaid.ToString(),
+                    [13] = item.PayedAmount != null ? item.PayedAmount.ToString() : "" //.Where(x => x.ItemTypeId.Equals(item.ItemTypeId)).Sum(x => x.Amount).ToString()
                 };
                 if (item.Install_Text != null)
                 {
@@ -20124,12 +20908,101 @@ namespace MainOps.Controllers
 
                 if (item.DeinstallDate != null)
                 {
-                    fillerrow[12] = String.Format("{0:yyyy-MM-dd}", item.DeinstallDate);
+                    fillerrow[14] = String.Format("{0:yyyy-MM-dd}", item.DeinstallDate);
                 }
                 else
                 {
-                    fillerrow[12] = "";
+                    fillerrow[14] = "";
                 }
+
+                if (ItemTypeId == -1)
+                {
+                    sb.AppendLine(string.Join(";", fillerrow.ToArray()));
+                }
+                else
+                {
+                    if (item.ItemTypeId.Equals(ItemTypeId))
+                    {
+                        sb.AppendLine(string.Join(";", fillerrow.ToArray()));
+                    }
+                }
+
+            }
+            return File(System.Text.Encoding.ASCII.GetBytes(sb.ToString()), "text/csv", "data.csv");
+        }
+
+        [HttpPost]
+        [Route("/PumpInstallations/data.csv")]
+        [Produces("text/csv")]
+        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,Guest")]
+        public async Task<IActionResult> ExportPumpInstall(int ProjectId)//, int ItemTypeId)
+        {
+            Debug.WriteLine($"ProjectId: {ProjectId}");
+            //Debug.WriteLine($"ItemTypeId: {ItemTypeId}");
+
+            if (User.IsInRole("Guest"))
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user.Active == false)
+                {
+                    return RedirectToAction("ErrorMessage", "Home", new { text = "You are inactive" });
+                }
+                var projectuser = await _context.ProjectUsers.SingleOrDefaultAsync(x => x.projectId.Equals(ProjectId) && x.userId.Equals(user.Id));
+                if (projectuser == null)
+                {
+                    return RedirectToAction("ErrorMessage", "Home", new { text = "You do not have access to that project" });
+                }
+            }
+            StringBuilder sb = new StringBuilder();
+            var data = await _context.PumpInstallation
+                .Include(x => x.Project)
+                .Include(x => x.SubProject)
+                .Include(x => x.MeasPoint)
+                //.Where(x => x.Id.Equals(ProjectId))
+                .OrderByDescending(x => x.TimeStamp)
+                .ToListAsync();
+            List<string> headerrow = new List<string>(new string[] { "Id", "Project", "SubProject", "Well Name",
+                "Date and Time", "PumpType", "Sensor Range", "Depth of Well (m)",
+                "Depth of Pump (m)", "Depth of Sensor (m)", "Hose/Pipe diameter", "Water level from top of pipe",
+                "Cut/Extend" });
+            sb.AppendLine(string.Join(";", headerrow.ToArray()));
+            foreach (PumpInstallation item in data)
+            {
+                //List<string> fillerrow = new List<string>(new string[] { "", "", "", "", "", "", "", "", "", "", "", "", "" })
+                //{
+                //    [0] = item.Id.ToString(), //Id
+                //    [1] = item.Project.Abbreviation, //Project
+                //    [2] = item.SubProject != null ? item.SubProject.Id.ToString() : "", //SubProject
+                //    [3] = item.WellName, //Well Name
+                //    [4] = String.Format("{0:yyyy-MM-dd}", item.TimeStamp), //Date and Time
+                //    [5] = item.PumpTypeId != null?  item.PumpType.Item_Type : item.PumpTypeWritten, //PumpType
+                //    [6] = item.SensorRange?.ToString(), //Sensor Range
+                //    [7] = item.WellDepth?.ToString(), //Depth of Well
+                //    [8] = item.PumpDepth?.ToString(), //Depth of Pump
+                //    [9] = item.SensorDepth?.ToString(), //Depth of Sensor
+                //    [10] = item.DiameterHose?.ToString(), //Hose/Pipe diameter
+                //    [11] = item.WaterLevel?.ToString(), //Water level from top of pipe
+                //    [12] = item.PipeCut?.ToString(), //cut/Extend                 
+                //};
+                List<string> fillerrow = new List<string>
+                {
+                    item?.Id.ToString() ?? "", // Id
+                    item?.Project?.Abbreviation ?? "", // Project
+                    item?.SubProject?.Id.ToString() ?? "", // SubProject
+                    item?.WellName ?? "", // Well Name
+                    item?.TimeStamp != null ? item.TimeStamp.ToString("yyyy-MM-dd") : "", // Date and Time
+                    item?.PumpTypeId != null
+                        ? item?.PumpType?.Item_Type ?? ""
+                        : item?.PumpTypeWritten ?? "", // PumpType
+                    item?.SensorRange?.ToString() ?? "", // Sensor Range
+                    item?.WellDepth?.ToString() ?? "", // Depth of Well
+                    item?.PumpDepth?.ToString() ?? "", // Depth of Pump
+                    item?.SensorDepth?.ToString() ?? "", // Depth of Sensor
+                    item?.DiameterHose?.ToString() ?? "", // Hose/Pipe diameter
+                    item?.WaterLevel?.ToString() ?? "", // Water level from top of pipe
+                    item?.PipeCut?.ToString() ?? "" // Cut/Extend
+                };
+
                 sb.AppendLine(string.Join(";", fillerrow.ToArray()));
 
             }

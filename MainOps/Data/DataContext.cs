@@ -68,8 +68,11 @@ namespace MainOps.Data
         public DbSet<Division> Divisions { get; set; }
         public DbSet<Document> Documents { get; set; }
         public DbSet<HJItem> HJItems { get; set; }
+        public DbSet<CGJItem> CGJItems { get; set; }
         public DbSet<HJItemClass> HJItemClasses { get; set; }
+        public DbSet<CGJItemClass> CGJItemClasses { get; set; }
         public DbSet<HJItemMasterClass> HJItemMasterClasses { get; set; }
+        public DbSet<CGJItemMasterClass> CGJItemMasterClasses { get; set; }
         public DbSet<DocumentType> DocumentTypes { get; set; }
         public DbSet<PumpActivity> PumpActivities { get; set; }
         public DbSet<Generator_Test> Generator_Test { get; set; }
@@ -128,10 +131,14 @@ namespace MainOps.Data
         public DbSet<PhotoFileMaintenance> PhotoFilesMaintenance { get; set; }
         public DbSet<MaintenanceType> MaintenanceTypes { get; set; }
         public DbSet<MaintenanceSubType> MaintenanceSubTypes { get; set; }
+        public DbSet<SensorCalibration> SensorCalibrations { get; set; }
+        public DbSet<PhotoFileSensorCalibration> PhotoFilesSensorCalibration { get; set; }
         public DbSet<PumpTestDataDevice> PumpTestDatasDevice { get; set; }
         public DbSet<ClearPumpTestDataDevice> ClearPumpTestDatasDevice { get; set; }
         public DbSet<WTPCheck> WTPChecks { get; set; }
+        public DbSet<WatercareCheck> Wtc_Checks { get; set; }
         public DbSet<PhotoFileWTPCheck> PhotoFilesWTPCheck { get; set; }
+        public DbSet<PhotoFileWtcCheck> PhotoFilesWtcCheck { get; set; }
         public DbSet<GeneratorCheck> GeneratorChecks { get; set; }
         public DbSet<PhotoFileGeneratorCheck> PhotoFilesGeneratorCheck { get; set; }
         public DbSet<SensorsCheck> SensorsChecks { get; set; }
@@ -240,6 +247,7 @@ namespace MainOps.Data
         public DbSet<WaterSampleTypeWaterSamplePackage> WaterSampleTypeWaterSamplePackages { get; set; }
         public DbSet<Discount_Installation> Discount_Installations { get; set; }
         public DbSet<Item_Location> Item_Locations { get; set; }
+        public DbSet<CGJItem_Location> CGJItem_Locations { get; set; }
         public DbSet<SystemCheck> SystemChecks { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
