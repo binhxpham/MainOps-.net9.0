@@ -36,6 +36,7 @@ using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
 using MySqlConnector;
 using Newtonsoft.Json;
 using Rotativa.AspNetCore;
+using Azure.Identity;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -48,6 +49,7 @@ builder.Services.Configure<GoogleMapsSettings>(
 var vaultSecretUri = builder.Configuration["KeyVault:SecretUri"];
 var vaultClientId = builder.Configuration["KeyVault:ClientId"];
 var vaultClientSecret = builder.Configuration["KeyVault:ClientSecret"];
+
 
 // Add logging configuration
 builder.Logging.ClearProviders();
@@ -72,7 +74,11 @@ builder.Services.AddResponseCompression(options =>
 });
 
 
-builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
+#if DEBUG
+    builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
+#else
+    builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
+#endif
 
 // Update JSON options
 builder.Services.AddControllers()
@@ -82,13 +88,22 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.WriteIndented = true;
     });
 
-// Load configuration
-builder.Configuration
-    .SetBasePath(builder.Environment.ContentRootPath)
-    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-    //.AddAzureKeyVault(vaultSecretUri, vaultClientId, vaultClientSecret)
-    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
-    .AddEnvironmentVariables();
+
+try
+{ // Load configuration
+    builder.Configuration
+        .SetBasePath(builder.Environment.ContentRootPath)
+        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+        .AddAzureKeyVault(vaultSecretUri, vaultClientId, vaultClientSecret)
+        .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+        .AddEnvironmentVariables();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Key Vault error: {ex.Message}");
+    // Optionally log to Application Insights
+}
+
 
 
 if (builder.Environment.IsDevelopment())
@@ -96,10 +111,6 @@ if (builder.Environment.IsDevelopment())
     builder.Configuration.AddUserSecrets<MyAppSecretConfig>();
 }
 
-//var builder = new ConfigurationBuilder()
-//    .AddAzureKeyVault(
-//        new Uri(configuration["KeyVault:SecretUri"]),
-//        new DefaultAzureCredential());
 
 
 //Must uncomment on Release
@@ -279,7 +290,24 @@ builder.Services.AddRateLimiter(options =>
             }));
 });
 
+
 var app = builder.Build();
+
+
+// Correct setup (since exe is directly under /Rotativa)
+//var rootPath = app.Environment.WebRootPath ?? Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+//RotativaConfiguration.Setup(rootPath, "Rotativa");
+
+// Guarantee a valid wwwroot path
+var rootPath = app.Environment.WebRootPath;
+if (string.IsNullOrEmpty(rootPath))
+{
+    // Fallback for Azure or when WebRootPath is null
+    rootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+}
+
+RotativaConfiguration.Setup(rootPath, "Rotativa");
+app.UseStaticFiles();
 
 // Configure middleware
 if (app.Environment.IsDevelopment())
@@ -344,9 +372,9 @@ app.MapControllerRoute(
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    //var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
-    //MyIdentityDataInitializer.SeedData(userManager, roleManager);
+    MyIdentityDataInitializer.SeedData(userManager, roleManager);
     MyIdentityDataInitializer.SeedData(roleManager);
 }
 
@@ -380,6 +408,17 @@ lifetime.ApplicationStopping.Register(() =>
     // Perform cleanup
     Thread.Sleep(TimeSpan.FromSeconds(5));
 });
+
+//debug not production
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
+{
+    app.UseExceptionHandler("/Home/Error"); // Your error handler route
+    app.UseHsts();
+}
 
 app.Run();
 

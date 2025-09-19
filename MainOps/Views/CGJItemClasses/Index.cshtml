@@ -1,0 +1,81 @@
+﻿@model IEnumerable<MainOps.Models.CGJItemClass>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Sub Class Name")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Sub Class")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Master Class Name")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Master Class Number")
+            </th>
+            <th>
+                @SharedLocalizer.GetLocalizedHtmlString("Internal Rent")
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ClassName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ClassNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CGJItemMasterClass.ClassName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CGJItemMasterClass.ClassNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Internal_Rent)
+            </td>
+            <td>
+                <form asp-action="Edit" asp-route-id="@item.Id" target="_blank" method="get">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                </form>
+                <form asp-action="Details" asp-route-id="@item.Id" target="_blank" method="get">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Details")</button>
+                </form>
+                <form asp-action="Delete" asp-route-id="@item.Id" target="_blank" method="get">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button>
+                </form>
+                <form asp-action="UploadPhotoHJClassItem" asp-controller="CGJItemClasses" asp-route-id="@item.Id" enctype="multipart/form-data" method="post">
+                    <input type="file" name="files" multiple accept=".jpg,.jpeg,.png" style="width:100%;" />
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload")</button>
+                </form>
+                <form asp-action="DetailsSmallClassPdf" asp-controller="CGJItems" asp-route-id="@item.Id" target="_blank" method="get">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Small(H) Tags Class")</button>
+                </form>
+                <form asp-action="DetailsSpecificClassPdf" asp-controller="CGJItems" asp-route-id="@item.Id" target="_blank" method="get">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Small(V) Tags Class")</button>
+                </form>
+                <form asp-action="ChangeClasses" asp-controller="CGJItemClasses" method="post">
+                    <input hidden="hidden" name="id" value="@item.Id" />
+                    new Master:<select name="newMasterId" asp-items="ViewBag.CGJItemMasterClassId"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Select new master class")</option></select>
+                    new SubClass: <input name="newClassNum" type="number" min="1" max="99" step="1" />
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Change Classes!")</button>
+                </form>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

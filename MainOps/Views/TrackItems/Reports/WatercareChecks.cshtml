@@ -1,0 +1,138 @@
+﻿@model IEnumerable<MainOps.Models.WatercareCheck>
+
+@{
+    ViewData["Title"] = "Watercare Checks";
+}
+
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Watercare Checks")</h2>
+
+<div style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;" >
+
+    <div>
+        <select id="wtpChecksSelect" class="form-control" onchange="filterTable(this.value)">
+            <option value="all">@SharedLocalizer.GetLocalizedHtmlString("- Choose a project -")</option>
+            @foreach (var item in Model.Select(x => x.Project?.Name).Distinct())
+            {
+                <option value="@item">@item</option>
+            }
+        </select>
+    </div>
+
+    @* <div>
+		<input type="text" id="searchInput" class="form-control" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Search by Well Name...")" />
+	</div> *@
+</div>
+
+<table class="table" id="wtpCheckTable">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Project)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubProject)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TimeStamp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EnteredIntoDataBase)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DoneBy)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            if (item.Valves == false ||  item.Valves.Equals("No")
+                || item.Water_Clear.Equals("No") || item.Tanks.Equals("No") 
+                || item.FlowMeters == false)
+            {
+                <tr style="background-color:red;">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubProject.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TimeStamp)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EnteredIntoDataBase)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DoneBy)
+                    </td>
+                    <td>
+                        <form asp-controller="TrackItems" asp-action="WatercareCheckReport_PDF" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            else
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Project.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubProject.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TimeStamp)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.EnteredIntoDataBase)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DoneBy)
+                    </td>
+                    <td>
+                        <form asp-controller="TrackItems" asp-action="WatercareCheckReport_PDF" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+
+@section Scripts {
+    <script>
+        // Hide the table initially until an option is selected
+         // document.addEventListener("DOMContentLoaded", function () {
+         //     document.getElementById('wtpCheckTable').style.display = 'none';
+         // });
+
+
+           function filterTable(projectName) {
+               const table = document.getElementById('wtpCheckTable');
+               const rows =  document.querySelectorAll('#wtpCheckTable tbody tr');
+               console.log('Selected: ' + projectName);
+               let hasVisibleRow = false; // To track if at least one row matches
+
+               rows.forEach(row => {
+                      const projectCell = row.cells[0].textContent.trim(); // Adjust index based on Project column
+
+                       console.log('Project: ' + projectCell);
+                       if (projectCell === projectName || projectName === 'all') {
+                          row.style.display = "";
+                          hasVisibleRow = true;
+                         } else {
+                          row.style.display = "none";
+                      }
+               });
+
+               // Show table only if there are visible rows and project is not "Choose project"
+               table.style.display = (hasVisibleRow);// && (projectName !== '- Choose a project -')) ? '' : 'none';
+           }
+    </script>
+}
+<a asp-action="MainMenu">@SharedLocalizer.GetLocalizedHtmlString("Back to List")</a>

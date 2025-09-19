@@ -12,17 +12,17 @@ namespace MainOps.Models
         [Key]
         public int Id { get; set; }
         [Display(Name = "Equipment")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
         [Display(Name = "CGJ ID")]
-        public string CGJId { get; set; }
+        public string? CGJId { get; set; }
         [Display(Name = "Weight [Kg]")]
         public double? weight { get; set; }
 
         [Display(Name = "Dpt.")]
-        public string Department { get; set; }
+        public string? Department { get; set; }
 
         [Display(Name = "Contact person")]
-        public string ContactPerson { get; set; }
+        public string? ContactPerson { get; set; }
         [Display(Name = "Latitude")]
         public double? latitude { get; set; }
         [Display(Name = "Longitude")]
@@ -33,24 +33,24 @@ namespace MainOps.Models
         public double? ItemWidth { get; set; }
         [Display(Name = "Height")]
         public double? ItemHeight { get; set; }
-        public string PathToPicture { get; set; }
-        public string PathTo3DDrawing { get; set; }
-        public string Comments { get; set; }
+        public string? PathToPicture { get; set; }
+        public string? PathTo3DDrawing { get; set; }
+        public string? Comments { get; set; }
         [ForeignKey("Division")]
         public int? DivisionId { get; set; }
-        public virtual Division Division { get; set; }
+        public virtual Division? Division { get; set; }
         [ForeignKey("CGJItemClass")]
         public int? CGJItemClassId { get; set; }
         [Display(Name = "Item Class")]
-        public virtual CGJItemClass CGJItemClass { get; set; }
+        public virtual CGJItemClass? CGJItemClass { get; set; }
         [Display(Name = "Owned By")]
-        public string Ownership { get; set; }
+        public string? Ownership { get; set; }
         [Display(Name = "GPS Track On")]
         public bool GPS_Tracker { get; set; }
 
        // [Display(Name = "Maintenance List")]
         //public ICollection<Maintenance> MaintenanceList { get; set; }
-        public ICollection<CGJItem_Location> Locations { get; set; }
+        public ICollection<CGJItem_Location>? Locations { get; set; }
         [Display(Name = "Dimensions [m] L x W x H")]
         public string Measures
         {
@@ -177,13 +177,13 @@ namespace MainOps.Models
     }
     public class CGJItemClasses
     {
-        public List<CGJItemMasterClass> masters { get; set; }
-        public List<CGJItemClass> subclasses { get; set; }
+        public List<CGJItemMasterClass>? masters { get; set; }
+        public List<CGJItemClass>? subclasses { get; set; }
     }
     public class CGJItemMaintenaceVM
     {
         public int? CGJItemId { get; set; }
-        public virtual CGJItem CGJItem { get; set; }
+        public virtual CGJItem? CGJItem { get; set; }
         [Display(Name = "Last Service Maintenance")]
         public DateTime? Last_Service { get; set; }
         [Display(Name = "Last Safety Check")]
@@ -353,7 +353,7 @@ namespace MainOps.Models
     }
     public class CGJItem_Locations_VM
     {
-        public List<CGJItem_Location> Locations { get; set; }
+        public List<CGJItem_Location>? Locations { get; set; }
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
     }
@@ -362,9 +362,9 @@ namespace MainOps.Models
         [Key]
         public int Id { get; set; }
         public int? CGJItemId { get; set; }
-        public virtual CGJItem CGJItem { get; set; }
+        public virtual CGJItem? CGJItem { get; set; }
         public int ProjectId { get; set; }
-        public virtual Project Project { get; set; }
+        public virtual Project? Project { get; set; }
         public int? SubProjectId { get; set; }
         public virtual SubProject SubProject { get; set; }
         public DateTime StartTime { get; set; }

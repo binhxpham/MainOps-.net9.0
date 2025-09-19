@@ -12,11 +12,11 @@ namespace MainOps.Models
         [Key]
         public int Id { get; set; }
         [Display(Name = "Item Class")]
-        public string ClassName { get; set; }
-        public string ClassNumber { get; set; }
+        public string? ClassName { get; set; }
+        public string? ClassNumber { get; set; }
         [ForeignKey("CGJItemMasterClass")]
         public int? CGJItemMasterClassId { get; set; }
-        public virtual CGJItemMasterClass CGJItemMasterClass { get; set; }
+        public virtual CGJItemMasterClass? CGJItemMasterClass { get; set; }
         [Range(0, int.MaxValue, ErrorMessage = "Only positive number allowed")]
         public int? Service_Maintenance_Freq { get; set; }
         [Range(0, int.MaxValue, ErrorMessage = "Only positive number allowed")]

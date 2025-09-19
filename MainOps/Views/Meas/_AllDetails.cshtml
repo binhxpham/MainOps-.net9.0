@@ -1,0 +1,186 @@
+﻿@model MainOps.Models.MeasMoreVM
+
+@{
+    Layout = null;
+}
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@SharedLocalizer.GetLocalizedHtmlString("Measurement")</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+
+<table style="page-break-inside:avoid;">
+    <tr>
+        <td colspan="3">
+            <b>@SharedLocalizer.GetLocalizedHtmlString("All Measurement Reports")</b>
+        </td>
+    </tr>
+    
+    <tr>       
+        <td style="text-align:left;">
+            <b>@Html.DisplayNameFor(Model => Model.BaseName)</b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.BaseName)
+        </td>
+        <td rowspan="4" align="right"><img src="~/images/Divisions/Photos/@Model.Project.Division.Id/@Model.Project.Division.LogoPath" width="151" height="66" /></td>
+    </tr>
+    
+    <tr>       
+        <td style="text-align:left;">
+            <b>@SharedLocalizer.GetLocalizedHtmlString("TimeStamp")</b>
+        </td>
+        <td>
+            @Html.DisplayFor(Model => Model.When)
+        </td>
+    </tr>
+    
+    <tr>
+        <td style="text-align:left;">
+            <b>@Html.DisplayNameFor(Model => Model.Project)</b>
+        </td>
+        <td>@Html.DisplayFor(Model => Model.Project.Name)</td>
+    </tr>
+
+    <tr>
+        <td style="text-align:left;">
+            <b>@Html.DisplayNameFor(Model => Model.DoneBy)</b>
+        </td>
+        <td>@Html.DisplayFor(Model => Model.DoneBy)</td>
+    </tr>
+
+    <tr>
+        <td style="text-align:left;">
+            <b>@Html.DisplayNameFor(Model => Model.TheComment)</b>
+        </td>
+        <td>@Html.DisplayFor(Model => Model.TheComment.comment)</td>
+    </tr>
+</table>
+
+<br />
+
+@if (Model.MeasPointNameLevelIds != null && Model.MeasPointNameLevelIds.Any())
+{
+    <table style="page-break-inside:avoid;">
+        <tr>
+            <td colspan="2">
+                <b>@Html.DisplayNameFor(Model => Model.TheMeasurement)</b>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="text-align:left;">
+                <b>Unique ID</b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.MeasPointNameLevelIds[0])
+            </td>
+        </tr>
+
+        <!--Top of Pipe-->
+        <tr>
+            <td style="text-align:left;">
+                <b>
+                    @Html.DisplayNameFor(Model => Model.MeasPoint.Offset)
+                </b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.MeasPoint.Offset)
+            </td>
+        </tr>
+
+        <tr>
+            <td style="text-align:left;">
+                <b>Measurement</b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.TheMeasurement)
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>Main Reading Comment</b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.MeasPointLevelComment[0])
+            </td>
+        </tr>
+    </table>
+
+}
+
+@if (Model.MeasPointNameFlowIds != null && Model.MeasPointNameFlowIds.Any())
+{
+    <table style="page-break-inside:avoid;">
+        <tr>
+            <td colspan="2">
+                <b>@Html.DisplayNameFor(Model => Model.TheFlowMeasurement)</b>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="text-align:left;">
+                <b>Unique ID</b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.MeasPointNameFlowIds[0])
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>Measurement</b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.TheFlowMeasurement)
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>Flow Comment</b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.MeasPointFlowComment[0])
+            </td>
+        </tr>
+    </table>
+
+}
+
+@if (Model.MeasPointNameWMIds != null && Model.MeasPointNameWMIds.Any())
+{
+    <table style="page-break-inside:avoid;">
+        <tr>
+            <td colspan="2">
+                <b>@Html.DisplayNameFor(Model => Model.TheWMMeasurement)</b>
+            </td>
+        </tr>
+
+        <tr>
+            <td style="text-align:left;">
+                <b>Unique ID</b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.MeasPointNameWMIds[0])
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>Measurement</b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.TheWMMeasurement)
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;">
+                <b>Water Meter Comment</b>
+            </td>
+            <td>
+                @Html.DisplayFor(Model => Model.MeasPointWMComment[0])
+            </td>
+        </tr>
+    </table>
+    
+}
+
+

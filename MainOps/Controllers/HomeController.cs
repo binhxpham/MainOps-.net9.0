@@ -369,16 +369,28 @@ namespace MainOps.Controllers
 
         public IActionResult Index()
         {
-            var url = _http.HttpContext.Request.GetDisplayUrl();
-            if (url.ToLower().Contains("tjaden-maps") || url.ToLower().Contains("mainops-test"))
+          
+            try
             {
-                Response.Cookies.Append(
-                CookieRequestCultureProvider.DefaultCookieName,
-                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture("nl-NL")),
-                new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
-            );
+                // your logic
+                var url = _http.HttpContext.Request.GetDisplayUrl();
+                if (url.ToLower().Contains("tjaden-maps") || url.ToLower().Contains("mainops-test"))
+                {
+                    Response.Cookies.Append(
+                    CookieRequestCultureProvider.DefaultCookieName,
+                    CookieRequestCultureProvider.MakeCookieValue(new RequestCulture("nl-NL")),
+                    new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
+                );
+                }
+                return View();
             }
-            return View();
+            catch (Exception ex)
+            {
+                // log error
+                return Content($"Error in Index: {ex.Message}");
+            }    
+
+       
         }
         [AllowAnonymous]
         public async Task<ActionResult> Footer(int? id)

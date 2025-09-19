@@ -15,20 +15,16 @@ namespace MainOps.Models
 
         [Required]
         [Display(Name = "Equipment")]
-        public string Name { get; set; } = string.Empty;
-
+        public string Name { get; set; }
         [Display(Name = "HJ ID")]
         public string? HJId { get; set; }
 
         [Display(Name = "Weight [Kg]")]
-        public double? Weight { get; set; }
-
+        public double? weight { get; set; }
         [Display(Name = "Latitude")]
-        public double? Latitude { get; set; }
-
+        public double? latitude { get; set; }
         [Display(Name = "Longitude")]
-        public double? Longitude { get; set; }
-
+        public double? longitude { get; set; }
         [Display(Name = "Length")]
         public double? ItemLength { get; set; }
 
@@ -59,154 +55,86 @@ namespace MainOps.Models
         public bool GPS_Tracker { get; set; }
 
         [Display(Name = "Maintenance List")]
-        public ICollection<Maintenance> MaintenanceList { get; set; } = new List<Maintenance>();
-
-        public ICollection<Item_Location> Locations { get; set; } = new List<Item_Location>();
-
+        public ICollection<Maintenance> MaintenanceList { get; set; }
+        public ICollection<Item_Location> Locations { get; set; }
         [Display(Name = "Dimensions [m] L x W x H")]
-        public string Measures =>
-            ItemLength.HasValue && ItemWidth.HasValue && ItemHeight.HasValue
-                ? $"{ItemLength:N2} x {ItemWidth:N2} x {ItemHeight:N2}"
-                : string.Empty;
-
-        public void SetHJNumber(int lastNum, string masterClassNumber, string itemClassNumber)
+        public string Measures
         {
-            var newNum = lastNum + 1;
-
-            // Pad numbers as needed
-            string master = int.Parse(masterClassNumber) < 10 ? $"0{masterClassNumber}" : masterClassNumber;
-            string item = int.Parse(itemClassNumber) < 10 ? $"0{itemClassNumber}" : itemClassNumber;
-            string num = newNum switch
+            get
             {
-                < 10 => $"00{newNum}",
-                < 100 => $"0{newNum}",
-                _ => newNum.ToString()
-            };
+                if(this.ItemLength != null && this.ItemHeight != null && this.ItemWidth != null)
+                {
 
-            HJId = $"{master}-{item}-{num}";
+                
+                return string.Format("{0:N2} x {1:N2} x {2:N2}", this.ItemLength, this.ItemWidth, this.ItemHeight);
+                }
+                else
+                {
+                    return "";
+                }
+            }
+        }
+        public void SetHJNumber(int lastNum,string masterclassnumber,string itemclassnumber)
+        {
+            var newnum = lastNum + 1;
+
+            if (Convert.ToInt32(masterclassnumber) < 10 && Convert.ToInt32(itemclassnumber) < 10 && newnum < 10)
+            {
+                this.HJId = string.Format("0{0}-0{1}-00{2}", masterclassnumber, itemclassnumber, newnum);
+            }
+            else if (Convert.ToInt32(masterclassnumber) < 10 && Convert.ToInt32(itemclassnumber) < 10 && newnum < 100)
+            {
+                this.HJId = string.Format("0{0}-0{1}-0{2}", masterclassnumber, itemclassnumber, newnum);
+            }
+            else if (Convert.ToInt32(masterclassnumber) < 10 && Convert.ToInt32(itemclassnumber) < 10 && newnum < 1000)
+            {
+                this.HJId = string.Format("0{0}-0{1}-{2}", masterclassnumber, itemclassnumber, newnum);
+            }
+            else if (Convert.ToInt32(masterclassnumber) >= 10 && Convert.ToInt32(itemclassnumber) < 10 && newnum < 10)
+            {
+                this.HJId = string.Format("{0}-0{1}-00{2}", masterclassnumber, itemclassnumber, newnum);
+            }
+            else if (Convert.ToInt32(masterclassnumber) >= 10 && Convert.ToInt32(itemclassnumber) < 10 && newnum < 100)
+            {
+                this.HJId = string.Format("{0}-0{1}-0{2}", masterclassnumber, itemclassnumber, newnum);
+            }
+            else if (Convert.ToInt32(masterclassnumber) >= 10 && Convert.ToInt32(itemclassnumber) < 10 && newnum < 1000)
+            {
+                this.HJId = string.Format("{0}-0{1}-{2}", masterclassnumber, itemclassnumber, newnum);
+            }
+            else if (Convert.ToInt32(masterclassnumber) < 10 && Convert.ToInt32(itemclassnumber) >= 10 && newnum < 10)
+            {
+                this.HJId = string.Format("0{0}-{1}-00{2}", masterclassnumber, itemclassnumber, newnum);
+            }
+            else if (Convert.ToInt32(masterclassnumber) < 10 && Convert.ToInt32(itemclassnumber) >= 10 && newnum < 100)
+            {
+                this.HJId = string.Format("0{0}-{1}-0{2}", masterclassnumber, itemclassnumber, newnum);
+            }
+            else if (Convert.ToInt32(masterclassnumber) < 10 && Convert.ToInt32(itemclassnumber) >= 10 && newnum < 1000)
+            {
+                this.HJId = string.Format("0{0}-{1}-{2}", masterclassnumber, itemclassnumber, newnum);
+            }
+            else if (Convert.ToInt32(masterclassnumber) >= 10 && Convert.ToInt32(itemclassnumber) >= 10 && newnum < 10)
+            {
+                this.HJId = string.Format("{0}-{1}-00{2}", masterclassnumber, itemclassnumber, newnum);
+            }
+            else if (Convert.ToInt32(masterclassnumber) >= 10 && Convert.ToInt32(itemclassnumber) >= 10 && newnum < 100)
+            {
+                this.HJId = string.Format("{0}-{1}-0{2}", masterclassnumber, itemclassnumber, newnum);
+            }
+            else
+            {
+                this.HJId = string.Format("{0}-{1}-{2}", masterclassnumber, itemclassnumber, newnum);
+            }
+
         }
     }
 
     public class HJItemClasses
     {
-        public List<HJItemMasterClass> Masters { get; set; } = new();
-        public List<HJItemClass> Subclasses { get; set; } = new();
+        public List<HJItemMasterClass> masters { get; set; }
+        public List<HJItemClass> subclasses { get; set; }
     }
-
-    //public class HJItem
-    //{
-    //    [Key]
-    //    public int Id { get; set; }
-    //    [Display(Name = "Equipment")]
-    //    public string Name { get; set; }
-    //    [Display(Name = "HJ ID")]
-    //    public string HJId { get; set; }
-    //    [Display(Name = "Weight [Kg]")]
-    //    public double? weight { get; set; }
-    //    [Display(Name = "Latitude")]
-    //    public double? latitude { get; set; }
-    //    [Display(Name = "Longitude")]
-    //    public double? longitude { get; set; }
-    //    [Display(Name = "Length")]
-    //    public double? ItemLength { get; set; }
-    //    [Display(Name = "Width")]
-    //    public double? ItemWidth { get; set; }
-    //    [Display(Name = "Height")]
-    //    public double? ItemHeight { get; set; }
-    //    public string PathToPicture { get; set; }
-    //    public string PathTo3DDrawing { get; set; }
-    //    public string Comments { get; set; }
-    //    [ForeignKey("Division")]
-    //    public int? DivisionId { get; set; }
-    //    public virtual Division Division { get; set; }
-    //    [ForeignKey("HJItemClass")]
-    //    public int? HJItemClassId { get; set; }
-    //    [Display(Name = "Item Class")]
-    //    public virtual HJItemClass HJItemClass { get; set; }
-    //    [Display(Name = "Owned By")]
-    //    public string Ownership { get; set; }
-    //    [Display(Name = "GPS Track On")]
-    //    public bool GPS_Tracker { get; set; }
-    //    [Display(Name = "Maintenance List")]
-    //    public ICollection<Maintenance> MaintenanceList { get; set; }
-    //    public ICollection<Item_Location> Locations { get; set; }
-    //    [Display(Name = "Dimensions [m] L x W x H")]
-    //    public string Measures
-    //    {
-    //        get
-    //        {
-    //            if(this.ItemLength != null && this.ItemHeight != null && this.ItemWidth != null)
-    //            {
-
-                
-    //            return string.Format("{0:N2} x {1:N2} x {2:N2}", this.ItemLength, this.ItemWidth, this.ItemHeight);
-    //            }
-    //            else
-    //            {
-    //                return "";
-    //            }
-    //        }
-    //    }
-    //    public void SetHJNumber(int lastNum,string masterclassnumber,string itemclassnumber)
-    //    {
-    //        var newnum = lastNum + 1;
-
-    //        if (Convert.ToInt32(masterclassnumber) < 10 && Convert.ToInt32(itemclassnumber) < 10 && newnum < 10)
-    //        {
-    //            this.HJId = string.Format("0{0}-0{1}-00{2}", masterclassnumber, itemclassnumber, newnum);
-    //        }
-    //        else if (Convert.ToInt32(masterclassnumber) < 10 && Convert.ToInt32(itemclassnumber) < 10 && newnum < 100)
-    //        {
-    //            this.HJId = string.Format("0{0}-0{1}-0{2}", masterclassnumber, itemclassnumber, newnum);
-    //        }
-    //        else if (Convert.ToInt32(masterclassnumber) < 10 && Convert.ToInt32(itemclassnumber) < 10 && newnum < 1000)
-    //        {
-    //            this.HJId = string.Format("0{0}-0{1}-{2}", masterclassnumber, itemclassnumber, newnum);
-    //        }
-    //        else if (Convert.ToInt32(masterclassnumber) >= 10 && Convert.ToInt32(itemclassnumber) < 10 && newnum < 10)
-    //        {
-    //            this.HJId = string.Format("{0}-0{1}-00{2}", masterclassnumber, itemclassnumber, newnum);
-    //        }
-    //        else if (Convert.ToInt32(masterclassnumber) >= 10 && Convert.ToInt32(itemclassnumber) < 10 && newnum < 100)
-    //        {
-    //            this.HJId = string.Format("{0}-0{1}-0{2}", masterclassnumber, itemclassnumber, newnum);
-    //        }
-    //        else if (Convert.ToInt32(masterclassnumber) >= 10 && Convert.ToInt32(itemclassnumber) < 10 && newnum < 1000)
-    //        {
-    //            this.HJId = string.Format("{0}-0{1}-{2}", masterclassnumber, itemclassnumber, newnum);
-    //        }
-    //        else if (Convert.ToInt32(masterclassnumber) < 10 && Convert.ToInt32(itemclassnumber) >= 10 && newnum < 10)
-    //        {
-    //            this.HJId = string.Format("0{0}-{1}-00{2}", masterclassnumber, itemclassnumber, newnum);
-    //        }
-    //        else if (Convert.ToInt32(masterclassnumber) < 10 && Convert.ToInt32(itemclassnumber) >= 10 && newnum < 100)
-    //        {
-    //            this.HJId = string.Format("0{0}-{1}-0{2}", masterclassnumber, itemclassnumber, newnum);
-    //        }
-    //        else if (Convert.ToInt32(masterclassnumber) < 10 && Convert.ToInt32(itemclassnumber) >= 10 && newnum < 1000)
-    //        {
-    //            this.HJId = string.Format("0{0}-{1}-{2}", masterclassnumber, itemclassnumber, newnum);
-    //        }
-    //        else if (Convert.ToInt32(masterclassnumber) >= 10 && Convert.ToInt32(itemclassnumber) >= 10 && newnum < 10)
-    //        {
-    //            this.HJId = string.Format("{0}-{1}-00{2}", masterclassnumber, itemclassnumber, newnum);
-    //        }
-    //        else if (Convert.ToInt32(masterclassnumber) >= 10 && Convert.ToInt32(itemclassnumber) >= 10 && newnum < 100)
-    //        {
-    //            this.HJId = string.Format("{0}-{1}-0{2}", masterclassnumber, itemclassnumber, newnum);
-    //        }
-    //        else
-    //        {
-    //            this.HJId = string.Format("{0}-{1}-{2}", masterclassnumber, itemclassnumber, newnum);
-    //        }
-
-    //    }
-    //}
-    //public class HJItemClasses
-    //{
-    //    public List<HJItemMasterClass> masters { get; set; }
-    //    public List<HJItemClass> subclasses { get; set; }
-    //}
     public class HJItemMaintenaceVM
     {
         public int? HJItemId { get; set; }
@@ -235,211 +163,145 @@ namespace MainOps.Models
         {
 
         }
-
-        //public HJItemMaintenaceVM(HJItem item)
-        //{
-        //    this.HJItemId = item.Id;
-        //    this.HJItem = item;
-        //    this.Service_Maintenance_Freq = item.HJItemClass?.Service_Maintenance_Freq;
-        //    this.Safety_Maintenance_Freq = item.HJItemClass?.Safety_Maintenance_Freq;
-        //    this.Electrical_Maintenance_Freq = item.HJItemClass.Electrical_Maintenance_Freq;
-        //    if(item.MaintenanceList.Count > 0) {
-        //        var last_elec = item.MaintenanceList.Where(x => x.MaintenanceEntries.Where(y => y.MaintenanceSubTypeId.Equals(14) && y.MaintenanceSubTypeId.Equals(46)).Count() >= 1).LastOrDefault();
-        //        //var last_elec = item.MaintenanceList.Where(x => x.MaintenanceEntriesMaintenanceTypeId.Equals(14) && x.MaintenanceSubTypeId.Equals(46)).LastOrDefault();
-        //        if(last_elec != null)
-        //        {
-        //            this.Last_Electrical = last_elec.TimeStamp;
-        //            this.Next_Electrical = Convert.ToDateTime(this.Last_Electrical).AddDays(Convert.ToInt32(this.Electrical_Maintenance_Freq));
-        //        }
-        //        var last_safety = item.MaintenanceList.Where(x => x.MaintenanceEntries.Where(y => y.MaintenanceSubTypeId.Equals(14) && y.MaintenanceSubTypeId.Equals(47)).Count() >= 1).LastOrDefault();
-        //        //var last_safety = item.MaintenanceList.Where(x => x.MaintenanceTypeId.Equals(14) && x.MaintenanceSubTypeId.Equals(47)).LastOrDefault();
-        //        if (last_safety != null)
-        //        {
-        //            this.Last_Safety = last_safety.TimeStamp;
-        //            this.Next_Safety = Convert.ToDateTime(this.Last_Safety).AddDays(Convert.ToInt32(this.Safety_Maintenance_Freq));
-        //        }
-        //        var last_service = item.MaintenanceList.Where(x => x.MaintenanceEntries.Where(y => y.MaintenanceSubTypeId.Equals(14) && y.MaintenanceSubTypeId.Equals(45)).Count() >= 1).LastOrDefault();
-        //        //var last_service = item.MaintenanceList.Where(x => x.MaintenanceTypeId.Equals(14) && x.MaintenanceSubTypeId.Equals(45)).LastOrDefault();
-        //        if (last_service != null)
-        //        {
-        //            this.Last_Service = last_service.TimeStamp;
-        //            this.Next_Service = Convert.ToDateTime(this.Last_Service).AddDays(Convert.ToInt32(this.Service_Maintenance_Freq));
-        //        }
-        //        if(last_elec != null && last_safety != null && last_service != null && this.Electrical_Maintenance_Freq > 0 && this.Service_Maintenance_Freq > 0 && this.Safety_Maintenance_Freq > 0)
-        //        {
-        //            if(this.Last_Electrical <= this.Last_Safety && this.Last_Electrical <= this.Last_Service)
-        //            {
-        //                this.Next_Check = Convert.ToDateTime(this.Next_Electrical);
-        //            }
-        //            else if (this.Last_Safety <= this.Last_Electrical && this.Last_Safety <= this.Last_Service)
-        //            {
-        //                this.Next_Check = Convert.ToDateTime(this.Next_Safety);
-        //            }
-        //            else
-        //            {
-        //                this.Next_Check = Convert.ToDateTime(this.Next_Service);
-        //            }
-        //        }
-        //        else if (last_elec != null && last_safety != null && Last_Service == null)
-        //        {
-        //            if(this.Service_Maintenance_Freq > 0)
-        //            {
-        //                Next_Check = DateTime.Now;
-        //            }
-        //            else if (this.Last_Electrical <= this.Last_Safety)
-        //            {
-        //                this.Next_Check = Convert.ToDateTime(this.Next_Electrical);
-        //            }
-        //            else 
-        //            {
-        //                this.Next_Check = Convert.ToDateTime(this.Next_Safety);
-        //            }
-        //        }
-        //        else if (last_elec != null && last_safety == null && Last_Service != null)
-        //        {
-        //            if (this.Safety_Maintenance_Freq > 0)
-        //            {
-        //                Next_Check = DateTime.Now;
-        //            }
-        //            else if (this.Last_Electrical <= this.Last_Service)
-        //            {
-        //                this.Next_Check = Convert.ToDateTime(this.Next_Electrical);
-        //            }
-        //            else
-        //            {
-        //                this.Next_Check = Convert.ToDateTime(this.Next_Service);
-        //            }
-        //        }
-        //        else if (last_elec == null && last_safety != null && Last_Service != null)
-        //        {
-        //            if (this.Electrical_Maintenance_Freq > 0)
-        //            {
-        //                Next_Check = DateTime.Now;
-        //            }
-        //            else if (this.Last_Safety <= this.Last_Service)
-        //            {
-        //                this.Next_Check = Convert.ToDateTime(this.Next_Safety);
-        //            }
-        //            else
-        //            {
-        //                this.Next_Check = Convert.ToDateTime(this.Next_Service);
-        //            }
-        //        }
-        //        else if(last_elec != null && last_safety == null && last_service == null)
-        //        {
-        //            if(this.Safety_Maintenance_Freq > 0 || this.Service_Maintenance_Freq > 0)
-        //            {
-        //                this.Next_Check = DateTime.Now;
-        //            }
-        //            else
-        //            {
-        //                this.Next_Check = Convert.ToDateTime(this.Next_Electrical);
-        //            }
-        //        }
-        //        else if (last_elec == null && last_safety != null && last_service == null)
-        //        {
-        //            if (this.Electrical_Maintenance_Freq > 0 || this.Service_Maintenance_Freq > 0)
-        //            {
-        //                this.Next_Check = DateTime.Now;
-        //            }
-
-        //            else
-        //            {
-        //                this.Next_Check = Convert.ToDateTime(this.Next_Safety);
-        //            }
-        //        }
-        //        else if (last_elec == null && last_safety == null && last_service != null)
-        //        {
-        //            if (this.Electrical_Maintenance_Freq > 0 || this.Safety_Maintenance_Freq > 0)
-        //            {
-        //                this.Next_Check = DateTime.Now;
-        //            }
-
-        //            else
-        //            {
-        //                this.Next_Check = Convert.ToDateTime(this.Next_Service);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            if(this.Electrical_Maintenance_Freq > 0 || this.Safety_Maintenance_Freq > 0 || this.Service_Maintenance_Freq > 0)
-        //            {
-        //                this.Next_Check = DateTime.Now;
-        //            }
-        //        }
-        //    }
-        //    else
-        //    {
-        //        this.Next_Check = DateTime.Now;
-        //        this.Next_Service = DateTime.Now;
-        //        this.Next_Electrical = DateTime.Now;
-        //        this.Next_Safety = DateTime.Now;
-        //    }
-
-        //}
-
+        
         public HJItemMaintenaceVM(HJItem item)
         {
-            HJItemId = item.Id;
-            HJItem = item;
-
-            Service_Maintenance_Freq = item.HJItemClass?.Service_Maintenance_Freq ?? 0;
-            Safety_Maintenance_Freq = item.HJItemClass?.Safety_Maintenance_Freq ?? 0;
-            Electrical_Maintenance_Freq = item.HJItemClass?.Electrical_Maintenance_Freq ?? 0;
-
-            if (item.MaintenanceList?.Any() == true)
-            {
-                var last_elec = item.MaintenanceList
-                    .Where(x => x.MaintenanceEntries.Any(y => y.MaintenanceSubTypeId == 14 && y.MaintenanceSubTypeId == 46))
-                    .LastOrDefault();
-
-                if (last_elec != null)
+            this.HJItemId = item.Id;
+            this.HJItem = item;
+            this.Service_Maintenance_Freq = item.HJItemClass.Service_Maintenance_Freq;
+            this.Safety_Maintenance_Freq = item.HJItemClass.Safety_Maintenance_Freq;
+            this.Electrical_Maintenance_Freq = item.HJItemClass.Electrical_Maintenance_Freq;
+            if(item.MaintenanceList.Count > 0) {
+                var last_elec = item.MaintenanceList.Where(x => x.MaintenanceEntries.Where(y => y.MaintenanceSubTypeId.Equals(14) && y.MaintenanceSubTypeId.Equals(46)).Count() >= 1).LastOrDefault();
+                //var last_elec = item.MaintenanceList.Where(x => x.MaintenanceEntriesMaintenanceTypeId.Equals(14) && x.MaintenanceSubTypeId.Equals(46)).LastOrDefault();
+                if(last_elec != null)
                 {
-                    Last_Electrical = last_elec.TimeStamp;
-                    Next_Electrical = Convert.ToDateTime(Last_Electrical).AddDays(Convert.ToInt32(this.Electrical_Maintenance_Freq));
+                    this.Last_Electrical = last_elec.TimeStamp;
+                    this.Next_Electrical = Convert.ToDateTime(this.Last_Electrical).AddDays(Convert.ToInt32(this.Electrical_Maintenance_Freq));
                 }
-
-                var last_safety = item.MaintenanceList
-                    .Where(x => x.MaintenanceEntries.Any(y => y.MaintenanceSubTypeId == 14 && y.MaintenanceSubTypeId == 47))
-                    .LastOrDefault();
-
+                var last_safety = item.MaintenanceList.Where(x => x.MaintenanceEntries.Where(y => y.MaintenanceSubTypeId.Equals(14) && y.MaintenanceSubTypeId.Equals(47)).Count() >= 1).LastOrDefault();
+                //var last_safety = item.MaintenanceList.Where(x => x.MaintenanceTypeId.Equals(14) && x.MaintenanceSubTypeId.Equals(47)).LastOrDefault();
                 if (last_safety != null)
                 {
-                    Last_Safety = last_safety.TimeStamp;
-                    Next_Safety = Convert.ToDateTime(Last_Safety).AddDays(Convert.ToInt32(Safety_Maintenance_Freq)); //Last_Safety.AddDays(Safety_Maintenance_Freq);
+                    this.Last_Safety = last_safety.TimeStamp;
+                    this.Next_Safety = Convert.ToDateTime(this.Last_Safety).AddDays(Convert.ToInt32(this.Safety_Maintenance_Freq));
                 }
-
-                var last_service = item.MaintenanceList
-                    .Where(x => x.MaintenanceEntries.Any(y => y.MaintenanceSubTypeId == 14 && y.MaintenanceSubTypeId == 45))
-                    .LastOrDefault();
-
+                var last_service = item.MaintenanceList.Where(x => x.MaintenanceEntries.Where(y => y.MaintenanceSubTypeId.Equals(14) && y.MaintenanceSubTypeId.Equals(45)).Count() >= 1).LastOrDefault();
+                //var last_service = item.MaintenanceList.Where(x => x.MaintenanceTypeId.Equals(14) && x.MaintenanceSubTypeId.Equals(45)).LastOrDefault();
                 if (last_service != null)
                 {
-                    Last_Service = last_service.TimeStamp;
-                    Next_Service = Convert.ToDateTime(Last_Service).AddDays(Convert.ToInt32(Service_Maintenance_Freq));// Last_Service.AddDays(Service_Maintenance_Freq);
+                    this.Last_Service = last_service.TimeStamp;
+                    this.Next_Service = Convert.ToDateTime(this.Last_Service).AddDays(Convert.ToInt32(this.Service_Maintenance_Freq));
                 }
-
-                // Determine the next check
-                var lastDates = new List<DateTime?> { Last_Electrical, Last_Safety, Last_Service };
-                var nextDates = new List<DateTime?> { Next_Electrical, Next_Safety, Next_Service };
-
-                if (lastDates.All(d => d.HasValue) && Electrical_Maintenance_Freq > 0 && Safety_Maintenance_Freq > 0 && Service_Maintenance_Freq > 0)
+                if(last_elec != null && last_safety != null && last_service != null && this.Electrical_Maintenance_Freq > 0 && this.Service_Maintenance_Freq > 0 && this.Safety_Maintenance_Freq > 0)
                 {
-                    Next_Check = nextDates.OrderBy(d => d).FirstOrDefault() ?? DateTime.Now;
+                    if(this.Last_Electrical <= this.Last_Safety && this.Last_Electrical <= this.Last_Service)
+                    {
+                        this.Next_Check = Convert.ToDateTime(this.Next_Electrical);
+                    }
+                    else if (this.Last_Safety <= this.Last_Electrical && this.Last_Safety <= this.Last_Service)
+                    {
+                        this.Next_Check = Convert.ToDateTime(this.Next_Safety);
+                    }
+                    else
+                    {
+                        this.Next_Check = Convert.ToDateTime(this.Next_Service);
+                    }
+                }
+                else if (last_elec != null && last_safety != null && Last_Service == null)
+                {
+                    if(this.Service_Maintenance_Freq > 0)
+                    {
+                        Next_Check = DateTime.Now;
+                    }
+                    else if (this.Last_Electrical <= this.Last_Safety)
+                    {
+                        this.Next_Check = Convert.ToDateTime(this.Next_Electrical);
+                    }
+                    else 
+                    {
+                        this.Next_Check = Convert.ToDateTime(this.Next_Safety);
+                    }
+                }
+                else if (last_elec != null && last_safety == null && Last_Service != null)
+                {
+                    if (this.Safety_Maintenance_Freq > 0)
+                    {
+                        Next_Check = DateTime.Now;
+                    }
+                    else if (this.Last_Electrical <= this.Last_Service)
+                    {
+                        this.Next_Check = Convert.ToDateTime(this.Next_Electrical);
+                    }
+                    else
+                    {
+                        this.Next_Check = Convert.ToDateTime(this.Next_Service);
+                    }
+                }
+                else if (last_elec == null && last_safety != null && Last_Service != null)
+                {
+                    if (this.Electrical_Maintenance_Freq > 0)
+                    {
+                        Next_Check = DateTime.Now;
+                    }
+                    else if (this.Last_Safety <= this.Last_Service)
+                    {
+                        this.Next_Check = Convert.ToDateTime(this.Next_Safety);
+                    }
+                    else
+                    {
+                        this.Next_Check = Convert.ToDateTime(this.Next_Service);
+                    }
+                }
+                else if(last_elec != null && last_safety == null && last_service == null)
+                {
+                    if(this.Safety_Maintenance_Freq > 0 || this.Service_Maintenance_Freq > 0)
+                    {
+                        this.Next_Check = DateTime.Now;
+                    }
+                    else
+                    {
+                        this.Next_Check = Convert.ToDateTime(this.Next_Electrical);
+                    }
+                }
+                else if (last_elec == null && last_safety != null && last_service == null)
+                {
+                    if (this.Electrical_Maintenance_Freq > 0 || this.Service_Maintenance_Freq > 0)
+                    {
+                        this.Next_Check = DateTime.Now;
+                    }
+                    
+                    else
+                    {
+                        this.Next_Check = Convert.ToDateTime(this.Next_Safety);
+                    }
+                }
+                else if (last_elec == null && last_safety == null && last_service != null)
+                {
+                    if (this.Electrical_Maintenance_Freq > 0 || this.Safety_Maintenance_Freq > 0)
+                    {
+                        this.Next_Check = DateTime.Now;
+                    }
+
+                    else
+                    {
+                        this.Next_Check = Convert.ToDateTime(this.Next_Service);
+                    }
                 }
                 else
                 {
-                    // fallback logic for missing data
-                    Next_Check = DateTime.Now;
+                    if(this.Electrical_Maintenance_Freq > 0 || this.Safety_Maintenance_Freq > 0 || this.Service_Maintenance_Freq > 0)
+                    {
+                        this.Next_Check = DateTime.Now;
+                    }
                 }
             }
             else
             {
-                // No maintenance records exist
-                Next_Check = DateTime.Now;
-                Next_Service = DateTime.Now;
-                Next_Electrical = DateTime.Now;
-                Next_Safety = DateTime.Now;
+                this.Next_Check = DateTime.Now;
+                this.Next_Service = DateTime.Now;
+                this.Next_Electrical = DateTime.Now;
+                this.Next_Safety = DateTime.Now;
             }
         }
 

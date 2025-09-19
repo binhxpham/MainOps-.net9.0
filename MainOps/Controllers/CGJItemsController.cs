@@ -23,42 +23,42 @@ using MainOps.Resources;
 
 namespace MainOps.Controllers
 {
-    
-    public class HJItemsController : BaseController
+
+    public class CGJItemsController : BaseController
     {
         private readonly DataContext _context;
         private readonly IWebHostEnvironment _env;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly LocService _sharedLocalizer;
 
-        public HJItemsController(LocService SharedLocalizer,DataContext context, IWebHostEnvironment hostingenvironment,UserManager<ApplicationUser> userManager):base(context,userManager)
+        public CGJItemsController(LocService SharedLocalizer, DataContext context, IWebHostEnvironment hostingenvironment, UserManager<ApplicationUser> userManager) : base(context, userManager)
         {
             _context = context;
             _env = hostingenvironment;
             _userManager = userManager;
             _sharedLocalizer = SharedLocalizer;
-                    
+
         }
         [HttpGet]
-        [Route("/HJItems/DataOutPut/data.csv")]
+        [Route("/CGJItems/DataOutPut/data.csv")]
         [Produces("text/csv")]
         public async Task<IActionResult> DataOutPut()
         {
             StringBuilder sb = new StringBuilder();
-            List<string> headerrow = new List<string>(new string[] { "ID","Master Klasse","Under Klasse", "weight", "length", "width", "height"});
+            List<string> headerrow = new List<string>(new string[] { "ID", "Master Klasse", "Under Klasse", "weight", "length", "width", "height" });
             List<string> datarow = new List<string>(new string[] { "", "", "", "", "", "", "" });
             sb.AppendLine(string.Join(";", headerrow.ToArray()));
             var items = await _context.HJItems.Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass).ToListAsync();
-            foreach(var item in items)
+            foreach (var item in items)
             {
                 datarow[0] = item.HJId;
                 datarow[1] = item.HJItemClass.HJItemMasterClass.ClassName;
                 datarow[2] = item.HJItemClass.ClassName;
-                datarow[3] = String.Format("{0:N2}",item.weight);
+                datarow[3] = String.Format("{0:N2}", item.weight);
                 datarow[4] = String.Format("{0:N2}", item.ItemLength);
                 datarow[5] = String.Format("{0:N2}", item.ItemWidth);
                 datarow[6] = String.Format("{0:N2}", item.ItemHeight);
-                sb.AppendLine(string.Join(";",datarow.ToArray()));
+                sb.AppendLine(string.Join(";", datarow.ToArray()));
             }
             return File(System.Text.Encoding.ASCII.GetBytes(sb.ToString()), "text/csv", "data.csv");
         }
@@ -68,7 +68,7 @@ namespace MainOps.Controllers
             var Class1 = await _context.HJItemClasses.FindAsync(41);
             var Class2 = await _context.HJItemClasses.FindAsync(42);
             var Class3 = await _context.HJItemClasses.FindAsync(43);
-            for(int i = 0; i < 233; i++)
+            for (int i = 0; i < 233; i++)
             {
                 HJItem newitem = new HJItem();
                 newitem.Name = Class1.ClassName;
@@ -77,8 +77,8 @@ namespace MainOps.Controllers
                 newitem.SetHJNumber(i, MasterClass.ClassNumber, Class1.ClassNumber);
                 newitem.Ownership = "HJ";
                 _context.Add(newitem);
-            }            
-            for(int i = 0; i < 150; i++)
+            }
+            for (int i = 0; i < 150; i++)
             {
                 HJItem newitem = new HJItem();
                 newitem.Name = Class2.ClassName;
@@ -88,7 +88,7 @@ namespace MainOps.Controllers
                 newitem.Ownership = "HJ";
                 _context.Add(newitem);
             }
-            for(int i = 0; i < 150; i++)
+            for (int i = 0; i < 150; i++)
             {
                 HJItem newitem = new HJItem();
                 newitem.Name = Class3.ClassName;
@@ -103,7 +103,7 @@ namespace MainOps.Controllers
         }
         // GET: HJItems
         [Authorize(Roles = "DivisionAdmin,Admin,Member,StorageManager")]
-        public async Task<IActionResult> Index(int? ProjectId = null,int? SubProjectId = null, bool AllCategories = false)
+        public async Task<IActionResult> Index(int? ProjectId = null, int? SubProjectId = null, bool AllCategories = false)
         {
             var theuser = await _userManager.GetUserAsync(User);
             //IEnumerable<SelectListItem> selList = await createFilterlist();
@@ -111,21 +111,26 @@ namespace MainOps.Controllers
             if (theuser != null)
             {
                 ViewData["AllCategories"] = AllCategories;
-                ViewData["masters"] = await _context.HJItemMasterClasses.Where(x => x.DivisionId.Equals(theuser.DivisionId)).OrderBy(x =>Convert.ToInt32(x.ClassNumber)).ToListAsync();
-                ViewData["subclasses"] = await _context.HJItemClasses.Include(x => x.HJItemMasterClass).Where(x => x.HJItemMasterClass.DivisionId.Equals(theuser.DivisionId)).OrderBy(x => Convert.ToInt32(x.ClassNumber)).ToListAsync();
+                //ViewData["masters"] = await _context.HJItemMasterClasses.Where(x => x.DivisionId.Equals(theuser.DivisionId)).OrderBy(x => Convert.ToInt32(x.ClassNumber)).ToListAsync();
+                ViewData["masters"] = await _context.CGJItemMasterClasses.Where(x => x.DivisionId.Equals(theuser.DivisionId)).OrderBy(x => Convert.ToInt32(x.ClassNumber)).ToListAsync();
+                //ViewData["subclasses"] = await _context.HJItemClasses.Include(x => x.HJItemMasterClass).Where(x => x.HJItemMasterClass.DivisionId.Equals(theuser.DivisionId)).OrderBy(x => Convert.ToInt32(x.ClassNumber)).ToListAsync();
+                ViewData["subclasses"] = await _context.CGJItemClasses.Include(x => x.CGJItemMasterClass).Where(x => x.CGJItemMasterClass.DivisionId.Equals(theuser.DivisionId)).OrderBy(x => Convert.ToInt32(x.ClassNumber)).ToListAsync();
                 ViewData["ProjectId"] = await GetProjectList();
                 if (User.IsInRole("Admin"))
                 {
-                    var items = await _context.HJItems.Include(x => x.Locations).ThenInclude(x => x.Project)
+                    //var items = await _context.HJItems
+                    var items = await _context.CGJItems
+                        .Include(x => x.Locations).ThenInclude(x => x.Project)
                         .Include(x => x.Locations).ThenInclude(x => x.SubProject)
-                        .Include(x => x.HJItemClass).ThenInclude(x=>x.HJItemMasterClass).OrderBy(x => x.HJItemClass.HJItemMasterClass.ClassNumber).ThenBy(x => x.HJItemClass.ClassNumber).ThenBy(x => x.HJId).ToListAsync();
-                    if(SubProjectId != null)
+                    //    .Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass).OrderBy(x => x.HJItemClass.HJItemMasterClass.ClassNumber).ThenBy(x => x.HJItemClass.ClassNumber).ThenBy(x => x.HJId).ToListAsync();
+                    .Include(x => x.CGJItemClass).ThenInclude(x => x.CGJItemMasterClass).OrderBy(x => x.CGJItemClass.CGJItemMasterClass.ClassNumber).ThenBy(x => x.CGJItemClass.ClassNumber).ThenBy(x => x.CGJId).ToListAsync();
+                    if (SubProjectId != null)
                     {
                         items = items.Where(x => x.Locations != null).ToList();
                         items = items.Where(x => x.Locations.LastOrDefault() != null).ToList();
                         items = items.Where(x => x.Locations.Last().SubProjectId == SubProjectId).ToList();
                     }
-                    else if(ProjectId != null && SubProjectId == null)
+                    else if (ProjectId != null && SubProjectId == null)
                     {
                         items = items.Where(x => x.Locations != null).ToList();
                         items = items.Where(x => x.Locations.LastOrDefault() != null).ToList();
@@ -135,10 +140,10 @@ namespace MainOps.Controllers
                 }
                 else
                 {
-                    var items = await _context.HJItems.Include(x => x.Locations).ThenInclude(x => x.Project)
+                    var items = await _context.CGJItems.Include(x => x.Locations).ThenInclude(x => x.Project)
                         .Include(x => x.Locations).ThenInclude(x => x.SubProject)
-                        .Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass).Where(x => x.DivisionId.Equals(theuser.DivisionId))
-                        .OrderBy(x => x.HJItemClass.HJItemMasterClass.ClassNumber).ThenBy(x => x.HJItemClass.ClassNumber).ThenBy(x => x.HJId)
+                        .Include(x => x.CGJItemClass).ThenInclude(x => x.CGJItemMasterClass).Where(x => x.DivisionId.Equals(theuser.DivisionId))
+                        .OrderBy(x => x.CGJItemClass.CGJItemMasterClass.ClassNumber).ThenBy(x => x.CGJItemClass.ClassNumber).ThenBy(x => x.CGJId)
                         .ToListAsync();
                     if (SubProjectId != null)
                     {
@@ -154,23 +159,39 @@ namespace MainOps.Controllers
                     }
                     return View(items);
                 }
-                
+
             }
             else
             {
-                List<HJItem> theitems = new List<HJItem>();
+                //List<HJItem> theitems = new List<HJItem>();
+                List<CGJItem> theitems = new List<CGJItem>();
                 return View(theitems);
             }
-            
+
         }
-        public async Task<IActionResult> Classes()
+        public async Task<IActionResult> Classes_()
         {
             var theuser = await _userManager.GetUserAsync(User);
             ViewData["masters"] = await _context.HJItemMasterClasses.Include(x => x.Division).Where(x => x.DivisionId.Equals(theuser.DivisionId)).OrderBy(x => Convert.ToInt32(x.ClassNumber)).ToListAsync();
             ViewData["subclasses"] = await _context.HJItemClasses.Include(x => x.HJItemMasterClass).Where(x => x.HJItemMasterClass.DivisionId.Equals(theuser.DivisionId)).OrderBy(x => Convert.ToInt32(x.ClassNumber)).ToListAsync();
 
             return View();
-            
+
+        }
+
+
+        public async Task<IActionResult> Classes()
+        {
+            var theuser = await _userManager.GetUserAsync(User);
+            ViewData["masters"] = await _context.CGJItemMasterClasses.Include(x => x.Division)
+                .Where(x => x.DivisionId.Equals(theuser.DivisionId))
+                .OrderBy(x => Convert.ToInt32(x.ClassNumber)).ToListAsync();
+            ViewData["subclasses"] = await _context.CGJItemClasses.Include(x => x.CGJItemMasterClass)
+                .Where(x => x.CGJItemMasterClass.DivisionId.Equals(theuser.DivisionId))
+                .OrderBy(x => Convert.ToInt32(x.ClassNumber)).ToListAsync();
+
+            return View();
+
         }
         [AllowAnonymous]
         public ActionResult Footer()
@@ -188,7 +209,8 @@ namespace MainOps.Controllers
             //string customSwitches = string.Format("--print-media-type --allow {0} --footer-html {0} --footer-spacing -10 --footer-center [page]",
             //    Url.Action("Footer", "Document", new { area = "" }, "https"));
             string footer = "--footer-center \"" + _sharedLocalizer.GetLocalizedHtmlString("Printed on:").Value + DateTime.Now.Date.ToString("yyyy-MM-dd") + "  Page: [page]/[toPage]\"" + " --footer-line --footer-font-size \"9\" --footer-spacing 6 --footer-font-name \"calibri light\"";
-            return new ViewAsPdf("_ClassesPDF", model) {
+            return new ViewAsPdf("_ClassesPDF", model)
+            {
                 FileName = String.Concat(_sharedLocalizer.GetLocalizedHtmlString("Machine Account Plan"), ".pdf"),
                 PageOrientation = Orientation.Portrait,
                 MinimumFontSize = 10,
@@ -232,13 +254,13 @@ namespace MainOps.Controllers
             foreach (var master in masters)
             {
                 string masterclassnumber = String.Concat("'31-", Convert.ToInt32(master.ClassNumber).ToString("D2"));
-                row = new List<string>(new string[] { String.Concat(masterclassnumber," : ",master.ClassName), "","" });
+                row = new List<string>(new string[] { String.Concat(masterclassnumber, " : ", master.ClassName), "", "" });
                 sb.AppendLine(string.Join(";", row.ToArray()));
                 var subclasses = await _context.HJItemClasses.Include(x => x.HJItemMasterClass).Where(x => x.HJItemMasterClass.DivisionId.Equals(theuser.DivisionId) && x.HJItemMasterClassId.Equals(master.Id)).OrderBy(x => Convert.ToInt32(x.ClassNumber)).ToListAsync();
-                foreach(var subclass in subclasses)
+                foreach (var subclass in subclasses)
                 {
-                    string subclassnumber = String.Concat(masterclassnumber, "-", Convert.ToInt32(subclass.ClassNumber).ToString("D2")) ;
-                    row = new List<string>(new string[] {subclassnumber, "",Convert.ToInt32(subclass.ClassNumber).ToString("D2"), subclass.ClassName });
+                    string subclassnumber = String.Concat(masterclassnumber, "-", Convert.ToInt32(subclass.ClassNumber).ToString("D2"));
+                    row = new List<string>(new string[] { subclassnumber, "", Convert.ToInt32(subclass.ClassNumber).ToString("D2"), subclass.ClassName });
                     sb.AppendLine(string.Join(";", row.ToArray()));
                 }
             }
@@ -253,18 +275,18 @@ namespace MainOps.Controllers
             var theuser = await _userManager.GetUserAsync(User);
             var masters = await _context.HJItemMasterClasses.Where(x => x.DivisionId.Equals(theuser.DivisionId)).OrderBy(x => Convert.ToInt32(x.ClassNumber)).ToListAsync();
             StringBuilder sb = new StringBuilder();
-            List<string> row = new List<string>(new string[] { "masternumber", "mastername", "subclassnumber", "subclassname","rent" });
+            List<string> row = new List<string>(new string[] { "masternumber", "mastername", "subclassnumber", "subclassname", "rent" });
             foreach (var master in masters)
             {
                 string masterclassnumber = String.Concat("'31-", Convert.ToInt32(master.ClassNumber).ToString("D2"));
-                row = new List<string>(new string[] { String.Concat(masterclassnumber, " : ",master.ClassName), "", "","" });
+                row = new List<string>(new string[] { String.Concat(masterclassnumber, " : ", master.ClassName), "", "", "" });
                 sb.AppendLine(string.Join(";", row.ToArray()));
                 var subclasses = await _context.HJItemClasses.Include(x => x.HJItemMasterClass).Where(x => x.HJItemMasterClass.DivisionId.Equals(theuser.DivisionId) && x.HJItemMasterClassId.Equals(master.Id)).OrderBy(x => Convert.ToInt32(x.ClassNumber)).ToListAsync();
                 foreach (var subclass in subclasses)
                 {
                     string subclassnumber = String.Concat(masterclassnumber, "-", Convert.ToInt32(subclass.ClassNumber).ToString("D2"));
                     double internal_rent = subclass.Internal_Rent;
-                    row = new List<string>(new string[] { subclassnumber, "", Convert.ToInt32(subclass.ClassNumber).ToString("D2"), subclass.ClassName,internal_rent.ToString() });
+                    row = new List<string>(new string[] { subclassnumber, "", Convert.ToInt32(subclass.ClassNumber).ToString("D2"), subclass.ClassName, internal_rent.ToString() });
                     sb.AppendLine(string.Join(";", row.ToArray()));
                 }
             }
@@ -272,7 +294,7 @@ namespace MainOps.Controllers
         }
 
 
-        // GET: HJItems/Details/5
+        // GET: CGJItems/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -280,14 +302,14 @@ namespace MainOps.Controllers
                 return NotFound();
             }
             var user = await _userManager.GetUserAsync(User);
-            var hJItem = await _context.HJItems.Include(x=>x.Division).Include(x=>x.HJItemClass).ThenInclude(x=>x.HJItemMasterClass)
+            var hJItem = await _context.CGJItems.Include(x => x.Division).Include(x => x.CGJItemClass).ThenInclude(x => x.CGJItemMasterClass)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (hJItem == null)
             {
                 return NotFound();
             }
-            else if(user == null)
+            else if (user == null)
             {
 
             }
@@ -296,11 +318,13 @@ namespace MainOps.Controllers
                 return RedirectToAction("ErrorMessage", "Home", new { text = "You do not have access to this item" });
             }
             List<string> pathstofotos = new List<string>();
-            if(hJItem.PathToPicture != "" && hJItem.PathToPicture != null) {
-                try { 
+            if (hJItem.PathToPicture != "" && hJItem.PathToPicture != null)
+            {
+                try
+                {
                     foreach (string fileName in Directory.GetFiles(hJItem.PathToPicture))
                     {
-                        pathstofotos.Add(Path.Combine(_env.WebRootPath.ReplaceFirst("/", ""),"images","Items","Photos", hJItem.Id.ToString()) + $@"\{fileName.Split("\\").Last()}");
+                        pathstofotos.Add(Path.Combine(_env.WebRootPath.ReplaceFirst("/", ""), "images", "Items", "Photos", hJItem.Id.ToString()) + $@"\{fileName.Split("\\").Last()}");
                     }
                 }
                 catch
@@ -312,12 +336,12 @@ namespace MainOps.Controllers
             List<string> pathsgeneralphotos = new List<string>();
             try
             {
-                var directory = Path.Combine(_env.WebRootPath.ReplaceFirst("/", ""), "Images", "ItemClasses", "Photos", hJItem.HJItemClassId.ToString());
+                var directory = Path.Combine(_env.WebRootPath.ReplaceFirst("/", ""), "Images", "ItemClasses", "Photos", hJItem.CGJItemClassId.ToString());
                 foreach (string fileName in Directory.GetFiles(directory))
                 {
                     if (fileName.Contains("edit"))
                     {
-                        pathsgeneralphotos.Add(Path.Combine(_env.WebRootPath.ReplaceFirst("/", ""), "images", "ItemClasses", "Photos", hJItem.HJItemClassId.ToString()) + $@"\{fileName.Split("\\").Last()}");
+                        pathsgeneralphotos.Add(Path.Combine(_env.WebRootPath.ReplaceFirst("/", ""), "images", "ItemClasses", "Photos", hJItem.CGJItemClassId.ToString()) + $@"\{fileName.Split("\\").Last()}");
                     }
                 }
             }
@@ -327,12 +351,14 @@ namespace MainOps.Controllers
             }
             ViewBag.GeneralPhotos = pathsgeneralphotos;
             List<string> pathstodrawings = new List<string>();
-            if(hJItem.PathTo3DDrawing != "" && hJItem.PathTo3DDrawing != null) {
-                try { 
-                foreach (string fileName in Directory.GetFiles(hJItem.PathTo3DDrawing))
+            if (hJItem.PathTo3DDrawing != "" && hJItem.PathTo3DDrawing != null)
+            {
+                try
                 {
-                    pathstodrawings.Add(Path.Combine(_env.WebRootPath.ReplaceFirst("/", ""), "images", "Items", "Drawings", hJItem.Id.ToString()) + $@"\{fileName.Split("\\").Last()}");
-                }
+                    foreach (string fileName in Directory.GetFiles(hJItem.PathTo3DDrawing))
+                    {
+                        pathstodrawings.Add(Path.Combine(_env.WebRootPath.ReplaceFirst("/", ""), "images", "Items", "Drawings", hJItem.Id.ToString()) + $@"\{fileName.Split("\\").Last()}");
+                    }
                 }
                 catch
                 {
@@ -346,38 +372,39 @@ namespace MainOps.Controllers
         public async Task<IActionResult> ShowItems(int? ProjectId = null)
         {
             var user = await _userManager.GetUserAsync(User);
-            if(ProjectId == null) { 
-                var items = await _context.HJItems.Include(x=>x.Division).Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass).Where(x=>x.latitude != null && x.longitude != null && x.DivisionId.Equals(user.DivisionId)).ToListAsync();
+            if (ProjectId == null)
+            {
+                var items = await _context.CGJItems.Include(x => x.Division).Include(x => x.CGJItemClass).ThenInclude(x => x.CGJItemMasterClass).Where(x => x.latitude != null && x.longitude != null && x.DivisionId.Equals(user.DivisionId)).ToListAsync();
                 ViewData["ProjectId"] = await GetProjectList();
-                ViewData["HJItemClassId"] = new SelectList(_context.HJItemClasses.Include(x=>x.HJItemMasterClass).Where(x=>x.HJItemMasterClass.DivisionId.Equals(user.DivisionId)).OrderBy(x=>x.ClassName).ToList(), "Id", "ClassName");
-                ViewData["HJItemMasterClassId"] = new SelectList(_context.HJItemMasterClasses.Where(x=>x.DivisionId.Equals(user.DivisionId)).OrderBy(x=>x.ClassName).ToList(), "Id", "ClassName");
+                ViewData["CGJItemClassId"] = new SelectList(_context.CGJItemClasses.Include(x => x.CGJItemMasterClass).Where(x => x.CGJItemMasterClass.DivisionId.Equals(user.DivisionId)).OrderBy(x => x.ClassName).ToList(), "Id", "ClassName");
+                ViewData["CGJItemMasterClassId"] = new SelectList(_context.CGJItemMasterClasses.Where(x => x.DivisionId.Equals(user.DivisionId)).OrderBy(x => x.ClassName).ToList(), "Id", "ClassName");
                 return View(items);
             }
             else
             {
                 var proj = await _context.Projects.FindAsync(ProjectId);
-                var items = await _context.HJItems.Include(x => x.Locations).Include(x => x.Division).Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass)
-                    .Where(x => x.latitude != null && x.longitude != null 
+                var items = await _context.CGJItems.Include(x => x.Locations).Include(x => x.Division).Include(x => x.CGJItemClass).ThenInclude(x => x.CGJItemMasterClass)
+                    .Where(x => x.latitude != null && x.longitude != null
                     && x.DivisionId.Equals(user.DivisionId)
                     ).ToListAsync();
-                List<HJItem> filtered_items = new List<HJItem>();
-                foreach(var item in items)
+                List<CGJItem> filtered_items = new List<CGJItem>();
+                foreach (var item in items)
                 {
-                    if(item.Locations.Count >= 1)
+                    if (item.Locations.Count >= 1)
                     {
-                        if(item.Locations.OrderByDescending(x => x.StartTime).First().ProjectId.Equals(ProjectId))
+                        if (item.Locations.OrderByDescending(x => x.StartTime).First().ProjectId.Equals(ProjectId))
                         {
                             filtered_items.Add(item);
                         }
-                        else if(DistanceAlgorithm.DistanceBetweenPlaces(Convert.ToDouble(item.longitude),Convert.ToDouble(item.latitude),Convert.ToDouble(proj.Longitude),Convert.ToDouble(proj.Latitude)) <= 0.5)
+                        else if (DistanceAlgorithm.DistanceBetweenPlaces(Convert.ToDouble(item.longitude), Convert.ToDouble(item.latitude), Convert.ToDouble(proj.Longitude), Convert.ToDouble(proj.Latitude)) <= 0.5)
                         {
                             filtered_items.Add(item);
                         }
                     }
                 }
                 ViewData["ProjectId"] = await GetProjectList();
-                ViewData["HJItemClassId"] = new SelectList(_context.HJItemClasses.Include(x => x.HJItemMasterClass).Where(x => x.HJItemMasterClass.DivisionId.Equals(user.DivisionId)).OrderBy(x => x.ClassName).ToList(), "Id", "ClassName");
-                ViewData["HJItemMasterClassId"] = new SelectList(_context.HJItemMasterClasses.Where(x => x.DivisionId.Equals(user.DivisionId)).OrderBy(x => x.ClassName).ToList(), "Id", "ClassName");
+                ViewData["CGJItemClassId"] = new SelectList(_context.CGJItemClasses.Include(x => x.CGJItemMasterClass).Where(x => x.CGJItemMasterClass.DivisionId.Equals(user.DivisionId)).OrderBy(x => x.ClassName).ToList(), "Id", "ClassName");
+                ViewData["CGJItemMasterClassId"] = new SelectList(_context.CGJItemMasterClasses.Where(x => x.DivisionId.Equals(user.DivisionId)).OrderBy(x => x.ClassName).ToList(), "Id", "ClassName");
                 return View(filtered_items);
             }
         }
@@ -385,16 +412,16 @@ namespace MainOps.Controllers
         public async Task<JsonResult> getItems(string theId)
         {
             int id = Convert.ToInt32(theId);
-            var items = await _context.HJItemClasses.Where(x => x.HJItemMasterClassId.Equals(id)).ToListAsync();
+            var items = await _context.CGJItemClasses.Where(x => x.CGJItemMasterClassId.Equals(id)).ToListAsync();
             return Json(items);
         }
         [HttpPost]
-        public async Task<IActionResult> AddItemToProject([Bind("Id,HJItemId,StartTime,EndTime,ProjectId,SubProjectId")] Item_Location model)
+        public async Task<IActionResult> AddItemToProject_([Bind("Id,HJItemId,StartTime,EndTime,ProjectId,SubProjectId")] Item_Location model)
         {
             if (ModelState.IsValid)
             {
                 var previous_location = await _context.Item_Locations.Where(x => x.HJItemId.Equals(model.HJItemId)).OrderByDescending(x => x.StartTime).FirstOrDefaultAsync();
-                if(previous_location != null)
+                if (previous_location != null)
                 {
                     if (previous_location.EndTime == null)
                     {
@@ -411,30 +438,54 @@ namespace MainOps.Controllers
                 return View(model);
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> AddItemToProject([Bind("Id,CGJItemId,StartTime,EndTime,ProjectId,SubProjectId")] CGJItem_Location model)
+        {
+            if (ModelState.IsValid)
+            {
+                var previous_location = await _context.CGJItem_Locations.Where(x => x.CGJItemId.Equals(model.CGJItemId)).OrderByDescending(x => x.StartTime).FirstOrDefaultAsync();
+                if (previous_location != null)
+                {
+                    if (previous_location.EndTime == null)
+                    {
+                        previous_location.EndTime = model.StartTime.AddDays(-1);
+                        _context.Update(previous_location);
+                    }
+                }
+                _context.Add(model);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Details", new { id = model.CGJItemId });
+            }
+            else
+            {
+                return View(model);
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> AddItemToProject(int? id)
         {
-            if(id != null)
+            if (id != null)
             {
                 var user = await _userManager.GetUserAsync(User);
-                var theitem = await _context.HJItems.FindAsync(id);
+                var theitem = await _context.CGJItems.FindAsync(id);
                 int nearestProjectId = 0;
                 double smallest_dist = 1000000.0;
                 int? nearestSubProjectId = null;
                 double smallestsub_dist = 1000000.0;
-                foreach (Project p in _context.Projects.Where(x=>x.DivisionId.Equals(user.DivisionId) && x.Active.Equals(true)))
+                foreach (Project p in _context.Projects.Where(x => x.DivisionId.Equals(user.DivisionId) && x.Active.Equals(true)))
                 {
                     double distance = DistanceAlgorithm.DistanceBetweenPlaces(Convert.ToDouble(theitem.latitude), Convert.ToDouble(theitem.longitude), Convert.ToDouble(p.Latitude), Convert.ToDouble(p.Longitude));
-                    if(distance < smallest_dist)
+                    if (distance < smallest_dist)
                     {
                         nearestProjectId = p.Id;
                         smallest_dist = distance;
                     }
                 }
                 var subprojects = await _context.SubProjects.Where(x => x.ProjectId.Equals(nearestProjectId)).ToListAsync();
-                if(subprojects.Count > 0)
+                if (subprojects.Count > 0)
                 {
-                    foreach(SubProject p in subprojects)
+                    foreach (SubProject p in subprojects)
                     {
                         double distance = DistanceAlgorithm.DistanceBetweenPlaces(Convert.ToDouble(theitem.latitude), Convert.ToDouble(theitem.longitude), Convert.ToDouble(p.Latitude), Convert.ToDouble(p.Longitude));
                         if (distance < smallest_dist)
@@ -444,13 +495,22 @@ namespace MainOps.Controllers
                         }
                     }
                 }
-                Item_Location loc = new Item_Location();
-                loc.HJItemId = theitem.Id;
-                loc.HJItem = theitem;
+                //Item_Location loc = new Item_Location();
+                //loc.HJItemId = theitem.Id;
+                //loc.HJItem = theitem;
+                //loc.ProjectId = nearestProjectId;
+                //loc.SubProjectId = nearestSubProjectId;
+                //ViewData["ProjectId"] = await GetProjectList();
+                //loc.Id = 0;
+
+                CGJItem_Location loc = new CGJItem_Location();
+                loc.CGJItemId = theitem.Id;
+                loc.CGJItem = theitem;
                 loc.ProjectId = nearestProjectId;
                 loc.SubProjectId = nearestSubProjectId;
                 ViewData["ProjectId"] = await GetProjectList();
                 loc.Id = 0;
+
                 return View(loc);
             }
             else { return NotFound(); }
@@ -458,14 +518,14 @@ namespace MainOps.Controllers
         [HttpGet]
         public async Task<string> getItem(int id)
         {
-            var item = await _context.HJItemClasses.FindAsync(id);
+            var item = await _context.CGJItemClasses.FindAsync(id);
             return item.ClassName;
         }
         [HttpPost]
         [AllowAnonymous]
-        public async Task<string> UpdateCoords(int theid,double lati, double longi)
+        public async Task<string> UpdateCoords(int theid, double lati, double longi)
         {
-            var theitem = await _context.HJItems.Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass).Where(x=>x.Id.Equals(theid)).FirstAsync();
+            var theitem = await _context.CGJItems.Include(x => x.CGJItemClass).ThenInclude(x => x.CGJItemMasterClass).Where(x => x.Id.Equals(theid)).FirstAsync();
             theitem.latitude = lati;
             theitem.longitude = longi;
             _context.Update(theitem);
@@ -478,7 +538,7 @@ namespace MainOps.Controllers
             _context.CoordTrack3s.Add(coordtrack);
             await _context.SaveChangesAsync();
             var user = await _userManager.GetUserAsync(User);
-            if(user != null)
+            if (user != null)
             {
                 return "isuser";
             }
@@ -511,10 +571,10 @@ namespace MainOps.Controllers
             {
                 return NotFound();
             }
-            var hJItem = await _context.HJItems.Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass)
+            var hJItem = await _context.CGJItems.Include(x => x.CGJItemClass).ThenInclude(x => x.CGJItemMasterClass)
                 .FirstOrDefaultAsync(m => m.Id == id);
             var user = await _userManager.GetUserAsync(User);
-            if(user != null)
+            if (user != null)
             {
                 if (hJItem == null)
                 {
@@ -532,7 +592,7 @@ namespace MainOps.Controllers
                     return NotFound();
                 }
             }
-            
+
 
             return View(hJItem);
         }
@@ -542,13 +602,15 @@ namespace MainOps.Controllers
         public async Task<IActionResult> Create()
         {
             IEnumerable<SelectListItem> selList = await createFilterlist();
-            ViewData["HJItemClassId"] = new SelectList(selList, "Value", "Text");
+            ViewData["CGJItemClassId"] = new SelectList(selList, "Value", "Text");
             return View();
         }
         public async Task<IActionResult> DetailsAll()
         {
             var theuser = await _userManager.GetUserAsync(User);
-            var items = await _context.HJItems.Where(x=>x.DivisionId.Equals(theuser.DivisionId)).Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass).ToListAsync();
+            var items = await _context.CGJItems.Where(x => x.DivisionId.Equals(theuser.DivisionId))
+                .Include(x => x.CGJItemClass)
+                .ThenInclude(x => x.CGJItemMasterClass).ToListAsync();
             return View(items);
         }
         [HttpGet]
@@ -557,7 +619,10 @@ namespace MainOps.Controllers
             var theuser = await _userManager.GetUserAsync(User);
             if (id != null)
             {
-                var model = await _context.HJItems.Include(x=>x.Division).Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass).Where(x => x.Id.Equals(id) && x.DivisionId.Equals(theuser.DivisionId)).FirstAsync();
+                var model = await _context.CGJItems.Include(x => x.Division)
+                    .Include(x => x.CGJItemClass)
+                    .ThenInclude(x => x.CGJItemMasterClass)
+                    .Where(x => x.Id.Equals(id) && x.DivisionId.Equals(theuser.DivisionId)).FirstAsync();
                 return new ViewAsPdf("_DetailsSmall", model);
             }
             else
@@ -571,7 +636,7 @@ namespace MainOps.Controllers
             var theuser = await _userManager.GetUserAsync(User);
             if (id != null)
             {
-                var model = await _context.HJItems.Include(x => x.Division).Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass).Where(x => x.Id.Equals(id) && x.DivisionId.Equals(theuser.DivisionId)).FirstAsync();
+                var model = await _context.CGJItems.Include(x => x.Division).Include(x => x.CGJItemClass).ThenInclude(x => x.CGJItemMasterClass).Where(x => x.Id.Equals(id) && x.DivisionId.Equals(theuser.DivisionId)).FirstAsync();
                 return new ViewAsPdf("_DetailsSpecific", model);
             }
             else
@@ -582,16 +647,17 @@ namespace MainOps.Controllers
         [HttpGet]
         public async Task<IActionResult> CreateNewItem(int? id)
         {
-            if(id != null)
+            if (id != null)
             {
                 var user = await _userManager.GetUserAsync(User);
                 var division = await _context.Divisions.FindAsync(user.DivisionId);
-                var lastitem = await _context.HJItems.Where(x => x.HJItemClassId.Equals(id)).OrderBy(x => x.HJId).LastOrDefaultAsync();
-                HJItem new_item = new HJItem();
-                new_item.HJItemClassId = id;
+                var lastitem = await _context.CGJItems.Where(x => x.CGJItemClassId.Equals(id)).OrderBy(x => x.CGJId).LastOrDefaultAsync();
+                CGJItem new_item = new CGJItem();
+                new_item.CGJItemClassId = id;
                 new_item.DivisionId = user.DivisionId;
                 new_item.Ownership = division.Name;
-                if(lastitem != null) { 
+                if (lastitem != null)
+                {
                     new_item.weight = lastitem.weight;
                     new_item.ItemHeight = lastitem.ItemHeight;
                     new_item.ItemLength = lastitem.ItemLength;
@@ -599,8 +665,8 @@ namespace MainOps.Controllers
                     new_item.Name = lastitem.Name;
                 }
                 IEnumerable<SelectListItem> selList = await createFilterlist();
-                ViewData["HJItemClassId"] = new SelectList(selList, "Value", "Text");
-                return View("Create",new_item);
+                ViewData["CGJItemClassId"] = new SelectList(selList, "Value", "Text");
+                return View("Create", new_item);
             }
             else
             {
@@ -613,7 +679,7 @@ namespace MainOps.Controllers
             var theuser = await _userManager.GetUserAsync(User);
             if (id != null)
             {
-                var model = await _context.HJItems.Include(x => x.Division).Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass).Where(x => x.HJItemClassId.Equals(id) && x.DivisionId.Equals(theuser.DivisionId)).OrderBy(x=>x.HJId).ToListAsync();
+                var model = await _context.CGJItems.Include(x => x.Division).Include(x => x.CGJItemClass).ThenInclude(x => x.CGJItemMasterClass).Where(x => x.CGJItemClassId.Equals(id) && x.DivisionId.Equals(theuser.DivisionId)).OrderBy(x => x.CGJId).ToListAsync();
                 //return View("_DetailsClassSmall", model);
                 return new ViewAsPdf("_DetailsClassSmall", model);
             }
@@ -628,7 +694,7 @@ namespace MainOps.Controllers
             var theuser = await _userManager.GetUserAsync(User);
             if (id != null)
             {
-                var model = await _context.HJItems.Include(x => x.Division).Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass).Where(x => x.HJItemClassId.Equals(id) && x.DivisionId.Equals(theuser.DivisionId)).OrderBy(x => x.HJId).ToListAsync();
+                var model = await _context.CGJItems.Include(x => x.Division).Include(x => x.CGJItemClass).ThenInclude(x => x.CGJItemMasterClass).Where(x => x.CGJItemClassId.Equals(id) && x.DivisionId.Equals(theuser.DivisionId)).OrderBy(x => x.CGJId).ToListAsync();
                 //return View("_DetailsClassSmall", model);
                 return new ViewAsPdf("_DetailsClassSpecific", model);
             }
@@ -640,12 +706,12 @@ namespace MainOps.Controllers
         public async Task<IActionResult> DetailsPdf(int? id)
         {
             var theuser = await _userManager.GetUserAsync(User);
-            if(id != null)
+            if (id != null)
             {
-                var model = await _context.HJItems.Include(x  => x.Division).Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass).Where(x=>x.Id.Equals(id) && x.DivisionId.Equals(theuser.DivisionId)).FirstAsync();
+                var model = await _context.CGJItems.Include(x => x.Division).Include(x => x.CGJItemClass).ThenInclude(x => x.CGJItemMasterClass).Where(x => x.Id.Equals(id) && x.DivisionId.Equals(theuser.DivisionId)).FirstAsync();
                 ViewAsPdf pdf = new ViewAsPdf("_Details", model)
                 {
-                    FileName = model.HJId + ".pdf",
+                    FileName = model.CGJId + ".pdf",
                     PageSize = Rotativa.AspNetCore.Options.Size.A5,
                     PageOrientation = Orientation.Landscape,
                     PageMargins = new Margins(0, 0, 0, 0),
@@ -664,10 +730,10 @@ namespace MainOps.Controllers
             var theuser = await _userManager.GetUserAsync(User);
             if (id != null)
             {
-                var model = await _context.HJItems.Include(x => x.Division).Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass).Where(x => x.Id.Equals(id) && x.DivisionId.Equals(theuser.DivisionId)).FirstAsync();
+                var model = await _context.CGJItems.Include(x => x.Division).Include(x => x.CGJItemClass).ThenInclude(x => x.CGJItemMasterClass).Where(x => x.Id.Equals(id) && x.DivisionId.Equals(theuser.DivisionId)).FirstAsync();
                 ViewAsPdf pdf = new ViewAsPdf("_Details", model)
                 {
-                    FileName = model.HJId + ".pdf",
+                    FileName = model.CGJId + ".pdf",
                     PageHeight = 385,
                     PageSize = Rotativa.AspNetCore.Options.Size.A5,
                     PageOrientation = Orientation.Landscape,
@@ -688,47 +754,47 @@ namespace MainOps.Controllers
         public async Task<IActionResult> DetailsAllPdf()
         {
             var theuser = await _userManager.GetUserAsync(User);
-            var model = await _context.HJItems.Include(x => x.Division).Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass).Where(x=>x.DivisionId.Equals(theuser.DivisionId)).Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass).ToListAsync();
+            var model = await _context.CGJItems.Include(x => x.Division).Include(x => x.CGJItemClass).ThenInclude(x => x.CGJItemMasterClass).Where(x => x.DivisionId.Equals(theuser.DivisionId)).Include(x => x.CGJItemClass).ThenInclude(x => x.CGJItemMasterClass).ToListAsync();
             return new ViewAsPdf("_DetailsAll", model);
         }
         [Authorize]
         public async Task<IActionResult> DetailsAllPdf2()
         {
             var theuser = await _userManager.GetUserAsync(User);
-            var model = await _context.HJItems.Include(x => x.Division).Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass).Where(x=>x.DivisionId.Equals(theuser.DivisionId)).Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass).ToListAsync();
-            return new ViewAsPdf("_DetailsAll2", model);
+            var model = await _context.CGJItems.Include(x => x.Division).Include(x => x.CGJItemClass).ThenInclude(x => x.CGJItemMasterClass).Where(x => x.DivisionId.Equals(theuser.DivisionId)).Include(x => x.CGJItemClass).ThenInclude(x => x.CGJItemMasterClass).ToListAsync();
+            return new ViewAsPdf("_DetailsAll4", model);//ViewAsPdf("_DetailsAll2", model);
         }
 
-        // POST: HJItems/Create
+        // POST: CGJItems/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "DivisionAdmin,Admin,Member,StorageManager")]
-        public async Task<IActionResult> Create([Bind("Id,Name,weight,ItemLength,ItemWidth,ItemHeight,HJItemClassId,PathToPicture,PathTo3DDrawing,Comments,Ownership,GPS_Tracker")] HJItem hJItem)
+        public async Task<IActionResult> Create_([Bind("Id,Name,weight,ItemLength,ItemWidth,ItemHeight,CGJItemClassId,PathToPicture,PathTo3DDrawing,Comments,Ownership,GPS_Tracker")] CGJItem hJItem)
         {
             var theuser = await _userManager.GetUserAsync(User);
             if (ModelState.IsValid)
             {
                 try
                 {
-                    var lastitem = await _context.HJItems.Where(x=>x.HJItemClassId.Equals(hJItem.HJItemClassId)).OrderByDescending(x=>x.HJId).FirstAsync();
-                    var itemclass = await _context.HJItemClasses.Include(x => x.HJItemMasterClass).Where(x => x.Id.Equals(hJItem.HJItemClassId)).FirstAsync();
-                    var masterclass = itemclass.HJItemMasterClass;
+                    var lastitem = await _context.CGJItems.Where(x => x.CGJItemClassId.Equals(hJItem.CGJItemClassId)).OrderByDescending(x => x.CGJId).FirstAsync();
+                    var itemclass = await _context.CGJItemClasses.Include(x => x.CGJItemMasterClass).Where(x => x.Id.Equals(hJItem.CGJItemClassId)).FirstAsync();
+                    var masterclass = itemclass.CGJItemMasterClass;
                     if (lastitem != null)
                     {
-                        hJItem.SetHJNumber(Convert.ToInt32(lastitem.HJId.Split("-")[2]),masterclass.ClassNumber,itemclass.ClassNumber);
+                        hJItem.SetCGJNumber(Convert.ToInt32(lastitem.CGJId.Split("-")[2]), masterclass.ClassNumber, itemclass.ClassNumber);
                     }
                     else
                     {
-                        hJItem.SetHJNumber(0, masterclass.ClassNumber, itemclass.ClassNumber);
+                        hJItem.SetCGJNumber(0, masterclass.ClassNumber, itemclass.ClassNumber);
                     }
                 }
                 catch
                 {
-                    var itemclass = await _context.HJItemClasses.Include(x => x.HJItemMasterClass).Where(x => x.Id.Equals(hJItem.HJItemClassId)).FirstAsync();
-                    var masterclass = itemclass.HJItemMasterClass;
-                    hJItem.SetHJNumber(0, masterclass.ClassNumber, itemclass.ClassNumber);
+                    var itemclass = await _context.CGJItemClasses.Include(x => x.CGJItemMasterClass).Where(x => x.Id.Equals(hJItem.CGJItemClassId)).FirstAsync();
+                    var masterclass = itemclass.CGJItemMasterClass;
+                    hJItem.SetCGJNumber(0, masterclass.ClassNumber, itemclass.ClassNumber);
                 }
                 hJItem.DivisionId = theuser.DivisionId;
                 _context.Add(hJItem);
@@ -736,12 +802,53 @@ namespace MainOps.Controllers
                 return RedirectToAction(nameof(Index));
             }
             IEnumerable<SelectListItem> selList = await createFilterlist();
-            ViewData["HJItemClassId"] = new SelectList(selList, "Value", "Text");
+            ViewData["CGJItemClassId"] = new SelectList(selList, "Value", "Text");
+            ViewData["DivisionId"] = new SelectList(_context.Divisions, "Id", "Name");
+            return View(hJItem);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "DivisionAdmin,Admin,Member,StorageManager")]
+        public async Task<IActionResult> Create([Bind("Id,Name,Department,ContactPerson,CGJItemClassId,PathToPicture,PathTo3DDrawing,Comments,Ownership,GPS_Tracker")] CGJItem hJItem)
+        {
+            var theuser = await _userManager.GetUserAsync(User);
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var lastitem = await _context.CGJItems.Where(x => x.CGJItemClassId.Equals(hJItem.CGJItemClassId)).OrderByDescending(x => x.CGJId).FirstAsync();
+                    var itemclass = await _context.CGJItemClasses.Include(x => x.CGJItemMasterClass).Where(x => x.Id.Equals(hJItem.CGJItemClassId)).FirstAsync();
+                    var masterclass = itemclass.CGJItemMasterClass;
+                    if (lastitem != null)
+                    {
+                        //hJItem.SetCGJNumber(Convert.ToInt32(lastitem.CGJId.Split("-")[2]), masterclass.ClassNumber, itemclass.ClassNumber);
+                        hJItem.SetCGJNumber(Convert.ToInt32(lastitem.CGJId.Split("-")[2]), itemclass.ClassNumber);
+                    }
+                    else
+                    {
+                        //hJItem.SetCGJNumber(0, masterclass.ClassNumber, itemclass.ClassNumber);
+                        hJItem.SetCGJNumber(0, itemclass.ClassNumber);
+                    }
+                }
+                catch
+                {
+                    var itemclass = await _context.CGJItemClasses.Include(x => x.CGJItemMasterClass).Where(x => x.Id.Equals(hJItem.CGJItemClassId)).FirstAsync();
+                    var masterclass = itemclass.CGJItemMasterClass;
+                    //hJItem.SetCGJNumber(0, masterclass.ClassNumber, itemclass.ClassNumber);
+                    hJItem.SetCGJNumber(0, itemclass.ClassNumber);
+                }
+                hJItem.DivisionId = theuser.DivisionId;
+                _context.Add(hJItem);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            IEnumerable<SelectListItem> selList = await createFilterlist();
+            ViewData["CGJItemClassId"] = new SelectList(selList, "Value", "Text");
             ViewData["DivisionId"] = new SelectList(_context.Divisions, "Id", "Name");
             return View(hJItem);
         }
 
-        // GET: HJItems/Edit/5
+        // GET: CGJItems/Edit/5
         [Authorize(Roles = "DivisionAdmin,Admin,Member,StorageManager")]
         [HttpGet]
         public async Task<IActionResult> Edit(int? id)
@@ -751,17 +858,17 @@ namespace MainOps.Controllers
                 return NotFound();
             }
             var user = await _userManager.GetUserAsync(User);
-            var hJItem = await _context.HJItems.Include(x=>x.Division).Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass).Where(x=>x.Id.Equals(id)).FirstOrDefaultAsync();
+            var hJItem = await _context.CGJItems.Include(x => x.Division).Include(x => x.CGJItemClass).ThenInclude(x => x.CGJItemMasterClass).Where(x => x.Id.Equals(id)).FirstOrDefaultAsync();
             if (hJItem == null)
             {
                 return NotFound();
             }
-            else if(!hJItem.DivisionId.Equals(user.DivisionId) && !User.IsInRole("Admin"))
+            else if (!hJItem.DivisionId.Equals(user.DivisionId) && !User.IsInRole("Admin"))
             {
                 return RedirectToAction("ErrorMessage", "Home", new { text = "You do not have access to this item" });
             }
             IEnumerable<SelectListItem> selList = await createFilterlist();
-            ViewData["HJItemClassId"] = new SelectList(selList, "Value", "Text");
+            ViewData["CGJItemClassId"] = new SelectList(selList, "Value", "Text");
             ViewData["DivisionId"] = new SelectList(_context.Divisions, "Id", "Name");
             //photos part
             List<string> pathstofotos = new List<string>();
@@ -784,12 +891,12 @@ namespace MainOps.Controllers
             List<string> pathsgeneralphotos = new List<string>();
             try
             {
-                var directory = Path.Combine(_env.WebRootPath.ReplaceFirst("/", ""), "Images", "ItemClasses", "Photos", hJItem.HJItemClassId.ToString());
+                var directory = Path.Combine(_env.WebRootPath.ReplaceFirst("/", ""), "Images", "ItemClasses", "Photos", hJItem.CGJItemClassId.ToString());
                 foreach (string fileName in Directory.GetFiles(directory))
                 {
                     if (fileName.Contains("edit"))
                     {
-                        pathsgeneralphotos.Add(Path.Combine(_env.WebRootPath.ReplaceFirst("/", ""), "images", "ItemClasses", "Photos", hJItem.HJItemClassId.ToString()) + $@"\{fileName.Split("\\").Last()}");
+                        pathsgeneralphotos.Add(Path.Combine(_env.WebRootPath.ReplaceFirst("/", ""), "images", "ItemClasses", "Photos", hJItem.CGJItemClassId.ToString()) + $@"\{fileName.Split("\\").Last()}");
                     }
                 }
             }
@@ -864,14 +971,14 @@ namespace MainOps.Controllers
         public async Task<IEnumerable<SelectListItem>> createFilterlist()
         {
             var user = await _userManager.GetUserAsync(User);
-            var filternames = await _context.HJItemClasses.Include(x=>x.HJItemMasterClass).Where(x=>x.HJItemMasterClass.DivisionId.Equals(user.DivisionId)).OrderBy(b => b.HJItemMasterClass.ClassNumber).ThenBy(x=>x.ClassNumber).ToListAsync();
+            var filternames = await _context.CGJItemClasses.Include(x => x.CGJItemMasterClass).Where(x => x.CGJItemMasterClass.DivisionId.Equals(user.DivisionId)).OrderBy(b => b.CGJItemMasterClass.ClassNumber).ThenBy(x => x.ClassNumber).ToListAsync();
 
 
             IEnumerable<SelectListItem> selList = from s in filternames
                                                   select new SelectListItem
                                                   {
                                                       Value = s.Id.ToString(),
-                                                      Text = s.HJItemMasterClass.ClassName + "-" + s.ClassNumber + " : " + s.ClassName
+                                                      Text = s.CGJItemMasterClass.ClassName + "-" + s.ClassNumber + " : " + s.ClassName
                                                   };
             return selList;
         }
@@ -879,7 +986,7 @@ namespace MainOps.Controllers
         [Authorize(Roles = "Admin,DivisionAdmin,StorageManager")]
         public void PutOnInternationalList(int? id)
         {
-            if(id != null)
+            if (id != null)
             {
                 var hjitem = _context.HJItems.Find(id);
             }
@@ -888,21 +995,22 @@ namespace MainOps.Controllers
         [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,StorageManager")]
         public async Task<IActionResult> Maintenances(int? id)
         {
-            
-            if (id != null) { 
-            var user = await _userManager.GetUserAsync(User);
+
+            if (id != null)
+            {
+                var user = await _userManager.GetUserAsync(User);
                 List<MaintenanceWithEntry> maintenanceviews = new List<MaintenanceWithEntry>();
-            var maintenances = await _context.Maintenances
-                .Include(x => x.Project)
-                .Include(x => x.MeasPoint)
-                .Include(x => x.SubProject)
-                .Include(x => x.HJItem)
-                .Include(x => x.Install)
-                .Include(x => x.MaintenanceEntries).ThenInclude(x => x.MaintenanceType)
-                .Include(x => x.MaintenanceEntries).ThenInclude(x => x.MaintenanceSubType)
-                .Where(x => x.Project.DivisionId.Equals(user.DivisionId) && x.HJItemId.Equals(id))
-                .OrderByDescending(x => x.TimeStamp)
-                .ToListAsync();
+                var maintenances = await _context.Maintenances
+                    .Include(x => x.Project)
+                    .Include(x => x.MeasPoint)
+                    .Include(x => x.SubProject)
+                    .Include(x => x.HJItem)
+                    .Include(x => x.Install)
+                    .Include(x => x.MaintenanceEntries).ThenInclude(x => x.MaintenanceType)
+                    .Include(x => x.MaintenanceEntries).ThenInclude(x => x.MaintenanceSubType)
+                    .Where(x => x.Project.DivisionId.Equals(user.DivisionId) && x.HJItemId.Equals(id))
+                    .OrderByDescending(x => x.TimeStamp)
+                    .ToListAsync();
                 foreach (var m in maintenances)
                 {
                     foreach (var m_entry in m.MaintenanceEntries)
@@ -924,22 +1032,22 @@ namespace MainOps.Controllers
                 .Include(x => x.Project)
                 .Where(x => x.isInstalled.Equals(true) && x.Project.DivisionId.Equals(user.DivisionId))
                 .ToListAsync();
-            IEnumerable<SelectListItem> selList = from s in installations
-                                                  select new SelectListItem
-                                                  {
-                                                      Value = s.Id.ToString(),
-                                                      Text = s.Project.Name + " ID: " + s.Id + " : " + s.ItemType.Item_Type
-                                                  };
-            ViewData["MeasPointId"] = new SelectList(_context.MeasPoints.Include(x => x.Project).Where(x => x.Project.DivisionId.Equals(user.DivisionId)), "Id", "Name");
-            ViewData["ProjectId"] = await GetProjectList();
-            ViewData["SubProjectId"] = new SelectList(_context.SubProjects.Include(x => x.Project).Where(x => x.Project.DivisionId.Equals(user.DivisionId)), "Id", "Name");
-            ViewData["TitleId"] = new SelectList(_context.Titles.Include(x => x.Project).Where(x => x.Project.DivisionId.Equals(user.DivisionId)), "Id", "TheTitle");
-            ViewData["InstallId"] = new SelectList(selList, "Value", "Text");
-            ViewData["MaintenanceTypeId"] = new SelectList(_context.MaintenanceTypes, "Id", "Type");
-            ViewData["MaintenanceSubTypeId"] = new SelectList(_context.MaintenanceSubTypes, "Id", "Type");
-            var hjitems = await createHJItemlist();
-            ViewData["HJItemId"] = new SelectList(hjitems, "Value", "Text");
-            return View(maintenanceviews);
+                IEnumerable<SelectListItem> selList = from s in installations
+                                                      select new SelectListItem
+                                                      {
+                                                          Value = s.Id.ToString(),
+                                                          Text = s.Project.Name + " ID: " + s.Id + " : " + s.ItemType.Item_Type
+                                                      };
+                ViewData["MeasPointId"] = new SelectList(_context.MeasPoints.Include(x => x.Project).Where(x => x.Project.DivisionId.Equals(user.DivisionId)), "Id", "Name");
+                ViewData["ProjectId"] = await GetProjectList();
+                ViewData["SubProjectId"] = new SelectList(_context.SubProjects.Include(x => x.Project).Where(x => x.Project.DivisionId.Equals(user.DivisionId)), "Id", "Name");
+                ViewData["TitleId"] = new SelectList(_context.Titles.Include(x => x.Project).Where(x => x.Project.DivisionId.Equals(user.DivisionId)), "Id", "TheTitle");
+                ViewData["InstallId"] = new SelectList(selList, "Value", "Text");
+                ViewData["MaintenanceTypeId"] = new SelectList(_context.MaintenanceTypes, "Id", "Type");
+                ViewData["MaintenanceSubTypeId"] = new SelectList(_context.MaintenanceSubTypes, "Id", "Type");
+                var hjitems = await createHJItemlist();
+                ViewData["HJItemId"] = new SelectList(hjitems, "Value", "Text");
+                return View(maintenanceviews);
             }
             else
             {
@@ -949,7 +1057,7 @@ namespace MainOps.Controllers
         public async Task<IEnumerable<SelectListItem>> createHJItemlist()
         {
             var user = await _userManager.GetUserAsync(User);
-            var filternames = await _context.HJItems.Where(x=>x.DivisionId.Equals(user.DivisionId)).Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass).OrderBy(b => b.HJItemClass.HJItemMasterClass.ClassNumber).ThenBy(x => x.HJItemClass.ClassNumber).ThenBy(x => x.HJId).ToListAsync();
+            var filternames = await _context.HJItems.Where(x => x.DivisionId.Equals(user.DivisionId)).Include(x => x.HJItemClass).ThenInclude(x => x.HJItemMasterClass).OrderBy(b => b.HJItemClass.HJItemMasterClass.ClassNumber).ThenBy(x => x.HJItemClass.ClassNumber).ThenBy(x => x.HJId).ToListAsync();
 
 
             IEnumerable<SelectListItem> selList = from s in filternames
@@ -967,7 +1075,7 @@ namespace MainOps.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "DivisionAdmin,Admin,Member,StorageManager")]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,HJId,weight,ItemLength,ItemWidth,ItemHeight,HJItemClassId,latitude,longitude,PathToPicture,PathTo3DDrawing,Comments,DivisionId,Ownership,GPS_Tracker")] HJItem hJItem)
+        public async Task<IActionResult> Edit_(int id, [Bind("Id,Name,HJId,weight,ItemLength,ItemWidth,ItemHeight,HJItemClassId,latitude,longitude,PathToPicture,PathTo3DDrawing,Comments,DivisionId,Ownership,GPS_Tracker")] HJItem hJItem)
         {
             if (id != hJItem.Id)
             {
@@ -983,7 +1091,7 @@ namespace MainOps.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!HJItemExists(hJItem.Id))
+                    if (!CGJItemExists(hJItem.Id))
                     {
                         return NotFound();
                     }
@@ -999,7 +1107,42 @@ namespace MainOps.Controllers
             return View(hJItem);
         }
 
-        // GET: HJItems/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "DivisionAdmin,Admin,Member,StorageManager")]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,CGJId,Department,ContactPerson,CGJItemClassId,latitude,longitude,PathToPicture,PathTo3DDrawing,Comments,DivisionId,Ownership,GPS_Tracker")] CGJItem hJItem)
+        {
+            if (id != hJItem.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(hJItem);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!CGJItemExists(hJItem.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            IEnumerable<SelectListItem> selList = await createFilterlist();
+            ViewData["CGJItemClassId"] = new SelectList(selList, "Value", "Text");
+            return View(hJItem);
+        }
+
+        // GET: CGJItems/Delete/5
         [Authorize(Roles = "DivisionAdmin,Admin,Member,StorageManager")]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -1010,30 +1153,30 @@ namespace MainOps.Controllers
                 return NotFound();
             }
 
-            var hJItem = await _context.HJItems
+            var cgJItem = await _context.CGJItems
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (hJItem == null)
+            if (cgJItem == null)
             {
                 return NotFound();
             }
 
-            return View(hJItem);
+            return View(cgJItem);
         }
 
-        // POST: HJItems/Delete/5
+        // POST: CGJItems/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var hJItem = await _context.HJItems.FindAsync(id);
-            _context.HJItems.Remove(hJItem);
+            var cgJItem = await _context.CGJItems.FindAsync(id);
+            _context.CGJItems.Remove(cgJItem);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool HJItemExists(int id)
+        private bool CGJItemExists(int id)
         {
-            return _context.HJItems.Any(e => e.Id == id);
+            return _context.CGJItems.Any(e => e.Id == id);
         }
         private static byte[] BitmapToBytes(Bitmap img)
         {
@@ -1045,11 +1188,11 @@ namespace MainOps.Controllers
         }
         public async Task<ActionResult> GetQR(int? Id)
         {
-            if(Id != null)
+            if (Id != null)
             {
                 string webRootPath = _env.WebRootPath;
-                var item = await _context.HJItems.FindAsync(Id);
-                var routeUrl = Url.Action("DetailsAndUpdate","HJItems", new { id = Id });
+                var item = await _context.CGJItems.FindAsync(Id);
+                var routeUrl = Url.Action("DetailsAndUpdate", "CGJItems", new { id = Id });
                 var absUrl = string.Format("{0}://{1}{2}", Request.Scheme, Request.Host, routeUrl);
                 //var uri = new Uri(absUrl, UriKind.Absolute);
 
@@ -1126,14 +1269,14 @@ namespace MainOps.Controllers
         }
         [HttpPost]
         [Authorize(Roles = "DivisionAdmin,Admin,Member,StorageManager")]
-        public async Task<IActionResult> UploadPhotoHJItem(int? id)
+        public async Task<IActionResult> UploadPhotoCGJItem(int? id)
         {
-            if(id != null)
+            if (id != null)
             {
 
-                var item = await _context.HJItems.FindAsync(id);
+                var item = await _context.CGJItems.FindAsync(id);
                 //var user = await _userManager.GetUserAsync(User);
-                var folderpath = Path.Combine(_env.WebRootPath.ReplaceFirst("/", ""), "Images", "Items","Photos",id.ToString());
+                var folderpath = Path.Combine(_env.WebRootPath.ReplaceFirst("/", ""), "Images", "Items", "Photos", id.ToString());
                 if (!Directory.Exists(folderpath))
                 {
                     Directory.CreateDirectory(folderpath);
@@ -1175,7 +1318,7 @@ namespace MainOps.Controllers
 
                 var item = await _context.HJItems.FindAsync(id);
                 //var user = await _userManager.GetUserAsync(User);
-                var folderpath = Path.Combine(_env.WebRootPath.ReplaceFirst("/", ""), "Images", "Items","Drawings", id.ToString());
+                var folderpath = Path.Combine(_env.WebRootPath.ReplaceFirst("/", ""), "Images", "Items", "Drawings", id.ToString());
                 if (!Directory.Exists(folderpath))
                 {
                     Directory.CreateDirectory(folderpath);
@@ -1234,20 +1377,24 @@ namespace MainOps.Controllers
             {
                 items = await _context.HJItems.Where(x => (x.HJItemClass.ClassName.ToLower().Contains(searchstring.ToLower()) || x.HJId.Contains(searchstring.ToLower())) || x.HJId.Contains(searchstring.ToLower()) && x.HJItemClassId.Equals(f_c_converted)).ToListAsync();
             }
-            return View(nameof(Index),items);
+            return View(nameof(Index), items);
         }
         [HttpGet]
         public async Task<IActionResult> MaintenanceToDo()
         {
             var user = await _userManager.GetUserAsync(User);
-            var hjitems = await _context.HJItems.Include(x => x.HJItemClass).Include(x=>x.MaintenanceList).Where(x => x.DivisionId.Equals(user.DivisionId)).ToListAsync();
+            var hjitems = await _context.HJItems.Include(x => x.HJItemClass).Include(x => x.MaintenanceList).Where(x => x.DivisionId.Equals(user.DivisionId)).ToListAsync();
             List<HJItemMaintenaceVM> MainToDoList = new List<HJItemMaintenaceVM>();
-            foreach(var item in hjitems)
+            foreach (var item in hjitems)
             {
                 HJItemMaintenaceVM vm_item = new HJItemMaintenaceVM(item);
                 MainToDoList.Add(vm_item);
             }
-            return View(MainToDoList.OrderBy(x=>x.Next_Check));
+            return View(MainToDoList.OrderBy(x => x.Next_Check));
         }
     }
 }
+
+
+
+//CGJItemsController

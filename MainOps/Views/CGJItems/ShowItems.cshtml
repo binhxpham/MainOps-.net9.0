@@ -1,0 +1,164 @@
+﻿@model IEnumerable<MainOps.Models.CGJItem>
+<head>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBZBU48i_mLH-TfVWO-UfsKM_Qu7fyPdWs"></script>
+</head>
+
+@{
+    ViewData["Title"] = "WHERE ARE THE ITEMS";
+}
+
+<br />
+<br />
+<br />
+<form asp-action="ShowItems" asp-controller="CGJItems" method="get">
+    <table>
+        <tr>
+            <td><select id="ProjectId" name="ProjectId" asp-items="ViewBag.ProjectId" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select Project")</option></select></td>
+            <td><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Show Items")</button></td>
+        </tr>
+    </table>
+</form>
+<table style="width:100%;">
+    <tr>
+        <td><button type="button" onclick="setthecenter();" class="btn-hoelscher" style="width:100px;height:50px;">@SharedLocalizer.GetLocalizedHtmlString("Center Map")</button></td>
+        <td><label>@SharedLocalizer.GetLocalizedHtmlString("Choose Master Class")</label></td>
+        <td><select id="CGJItemMasterClassId" asp-items="ViewBag.CGJItemMasterClassId" onchange="FilterMasterItems()" style="width:100%;"></select></td>
+        <td>
+            <label>@SharedLocalizer.GetLocalizedHtmlString("Filter Items")</label>
+        </td>
+        <td><select id="CGJItemClassId" asp-items="ViewBag.CGJItemClassId" onchange="FilterItems();" style="width:100%;"></select></td>
+    </tr>
+</table>
+<div id="myDiv" style="width:100%;height:500px;"></div>
+@section Scripts {
+    <script type="text/javascript">
+        var markers = [];
+        $(document).ready(function () {
+            DisplayGoogleMap();
+        });
+        function FilterMasterItems() {
+            MasterClassId = $("#CGJItemMasterClassId").val();
+            for (i = 0; i < markers.length; i++) {
+                if (markers[i].masterclass != MasterClassId)
+                {
+                    markers[i].setVisible(false);
+                }
+                else {
+                    markers[i].setVisible(true);
+                }
+            }
+            FillItems();
+        }
+        function FilterItems() {
+            var ClassId = $("#CGJItemClassId").val();
+            if (ClassId == "") {
+                for (i = 0; i < markers.length; i++) {
+                    markers[i].setVisible(true);
+                }
+            }
+            else {
+                for (i = 0; i < markers.length; i++) {
+                    if (markers[i].class == ClassId) {
+                        markers[i].setVisible(true);
+                    }
+                    else {
+                        markers[i].setVisible(false);
+                    }
+                }
+            }
+            
+        }
+        function FillItems() {
+            var MasterClassId = $("#CGJItemMasterClassId").val();
+            var url = '@Url.Action("GetItems", "CGJItems")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': MasterClassId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select Item Type</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["className"] + '</option>';
+                        }
+                        $("#CGJItemClassId").html(s);
+                        document.getElementById("CGJItemClassId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">None</option>';
+                        $("#CGJItemClassId").html(s);
+                    }
+                }
+            });
+        }
+        function UpdateList(index) {
+            $.ajax({
+                url: '@Url.Action("getItem", "CGJItems")',
+                data: { id: index },
+                type: "GET",
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    for (i = 0; i < markers.length; i++) {
+                        if (markers[i].title == data) {
+                            markers[i].setVisible(true);
+                        }
+                        else {
+                            markers[i].setVisible(false);
+                        }
+
+                    }
+                },
+                error: function (data) {
+                    for (i = 0; i < markers.length; i++) {
+                        markers[i].setVisible(true);
+                    }
+                },
+            });
+        }
+        function DisplayGoogleMap() {
+
+            //Set the Latitude and Longitude of the Map
+            var meanlat = 0.0;
+            var meanlong = 0.0;
+            
+            var myLatLng = { lat: 55.682936, lng: 12.3729016 };
+            //Create Options or set different Characteristics of Google Map
+            var mapOptions = {
+                center: myLatLng,
+                zoom: 11,
+                minZoom: 4,
+                mapTypeId: google.maps.MapTypeId.ROADMAP
+            };
+            //Display the Google map in the div control with the defined Options
+            var map = new google.maps.Map(document.getElementById("myDiv"), mapOptions);
+            
+            //Set Marker on the Map
+            
+            @foreach(var item in Model){
+             <text>
+                var marker = new google.maps.Marker({
+                  map: map,
+                  position: { lat: @item.latitude, lng: @item.longitude },
+                  title: "@item.CGJItemClass.ClassName",
+                  masterclass: @item.CGJItemClass.CGJItemMasterClassId,
+                  class: @item.CGJItemClassId,
+            });
+            marker['infowindow'] = new google.maps.InfoWindow({
+                content: "@item.CGJId : @item.Name"
+            });
+
+            google.maps.event.addListener(marker, 'click', function () {
+                this['infowindow'].open(map, this);
+            });
+            
+            marker.setMap(map);
+            markers.push(marker);
+            </text>
+            }
+
+            
+        }
+    </script>
+}
+

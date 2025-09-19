@@ -1,0 +1,84 @@
+﻿@model MainOps.Models.CGJItem_Location
+
+@{
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Add To Project");
+}
+<form asp-action="AddItemToProject" asp-controller="CGJItems" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input asp-for="Id" hidden="hidden" value="0" />
+    <input asp-for="CGJItemId" hidden="hidden" />
+    <input asp-for="CGJItem.Id" hidden="hidden" />
+    <input asp-for="EndTime" hidden="hidden" />
+
+    <table style="width:90%;table-layout:fixed;">
+        <tr>
+            <td><label>@Model.CGJItem.Name</label></td>
+            <td><label>@Model.CGJItem.CGJId</label></td>
+        </tr>
+        <tr>
+            <td><label asp-for="ProjectId" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Choose Project")</label></td>
+            <td><select asp-for="ProjectId" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Please choose a project")</option></select></td>
+            <td><span asp-validation-for="ProjectId" class="text-danger" style="width:100%;"></span></td>
+        </tr>
+        <tr>
+            <td><label asp-for="SubProjectId" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Choose Project")</label></td>
+            <td><select asp-for="SubProjectId" asp-items="ViewBag.SubProjectId"><option value="" style="width:100%;">@SharedLocalizer.GetLocalizedHtmlString("Choose SubProject")</option></select></td>
+            <td><span asp-validation-for="SubProjectId" class="text-danger" style="width:100%;"></span></td>
+        </tr>
+        <tr>
+            <td><label asp-for="StartTime" style="width:100%;"></label></td>
+            <td><input asp-for="StartTime" type="date" value="@DateTime.Now.ToString("yyyy-MM-dd")" style="width:100%;" /></td>
+            <td><span asp-validation-for="StartTime" class="text-danger" style="width:100%;"></span></td>
+        </tr>
+        <tr>
+            <td colspan="3"><button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Add to Project")</button></td>
+        </tr>
+    </table>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(function () {
+                FillSubProjects();
+            });
+        });
+        function FindNearestProject() {
+
+        }
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var SubProjectId = $('#SubProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                        var x = document.getElementById("SubProjectId");
+                        var i;
+                        for (i = 0; i < x.length; i++) {
+                            if (x.options[i].value == SubProjectId) {
+                                x.options[i].selected = true;
+                            }
+                        }
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+        }
+    </script>
+}

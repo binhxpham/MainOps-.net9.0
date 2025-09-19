@@ -38,6 +38,7 @@ namespace MainOps.Controllers
         }
 
         // GET: ItemTypes
+        [HttpGet]
         [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,International")]
         public async Task<IActionResult> Index(int? ProjectId = null)
         {
@@ -173,6 +174,7 @@ namespace MainOps.Controllers
         }
 
         // GET: ItemTypes/Create
+        [HttpGet]
         [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,International")]
         public async Task<IActionResult> Create()
         {

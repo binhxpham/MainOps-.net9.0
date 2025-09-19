@@ -1,0 +1,37 @@
+﻿@model IEnumerable<MainOps.Models.CGJItem>
+
+@{
+    ViewData["Title"] = "Details";
+}
+<br />
+<br />
+<br />
+@foreach (var item in Model) {
+
+
+<table style="width: 100%; border:1px black solid;">
+        <tbody>
+            <tr>
+                @* <td rowspan="2" width="20%" align="left"><img src="~/images/Logos/CG_Jensen_logo_253x50.png" height="210" /></td> *@
+                <td rowspan="2" width="40%" align="left"><img src="~/images/Logos/CG_Jensen_logo_253x50.png" height="210" style="width:96%;" /></td>
+                @* <td rowspan="2" width="40%" align="left"><img src="~/images/Divisions/Photos/@Model.First().DivisionId/@Model.First().Division.LogoPath" height="210" style="width:96%;" /></td> *@
+                <td colspan="2" align="center" height="105" style="border-width:thin;border-style:solid;font-weight:bold;font-size:150%;">@Html.DisplayFor(modelItem => item.Name)</td>
+            </tr>
+            <tr>
+                <td width="20%" height="105" style="border-width:thin;border-style:solid;font-weight:bold;">@Html.DisplayNameFor(modelItem => item.CGJId)</td>
+                <td align="center" height="105" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.CGJId)</td>
+            </tr>
+            <tr>
+                <td rowspan="2" width="20%" align="left"><img src='@Url.Action("GetQR","CGJItems",new { Id = item.Id })' alt="" height="210" /></td>
+                <td width="20%" height="105" style="border-width:thin;border-style:solid;font-weight:bold;">@Html.DisplayNameFor(modelItem => item.Department)</td>
+                <td align="center" height="105" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.Department)</td>
+            </tr>
+            <tr>
+                <td width="20%" height="105" style="border-width:thin;border-style:solid;font-weight:bold;">@Html.DisplayNameFor(modelItem => item.ContactPerson)</td>
+                <td align="center" height="105" style="border-width:thin;border-style:solid;">@Html.DisplayFor(modelItem => item.ContactPerson)</td>
+            </tr>
+        </tbody>
+</table>
+<br />
+<br />
+}

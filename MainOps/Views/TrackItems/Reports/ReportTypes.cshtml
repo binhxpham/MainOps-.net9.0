@@ -104,6 +104,11 @@
                             <button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Maintenance Reports")</button>
                         </form>
                     </td>
+                    <td>
+                        <form asp-action="SensorCalibrations" asp-controller="TrackItems" method="get">
+                            <button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Sensor Calibration Reports")</button>
+                        </form>
+                    </td>
                 </tr>
                 <tr>
                     <td>
@@ -213,6 +218,11 @@
                             <button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Get All Site Reports")</button>
                         </form>
                     </td>
+                    <td>
+                        <form asp-action="GeneratorChecks" asp-controller="TrackItems" method="get">
+                            <button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Generator Tests")</button>
+                        </form>
+                    </td>
                 </tr>
                 <tr>
                     <td>
@@ -221,8 +231,8 @@
                         </form>
                     </td>
                     <td>
-                        <form asp-action="GeneratorChecks" asp-controller="TrackItems" method="get">
-                            <button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("Generator Tests")</button>
+                        <form asp-action="WatercareChecks" asp-controller="TrackItems" method="get">
+                            <button class="btn-hoelscher" style="width:100%;height:100px;" onclick="StartSpinner();">@SharedLocalizer.GetLocalizedHtmlString("WTP HMR Checks")</button>
                         </form>
                     </td>
                 </tr>

@@ -9,7 +9,7 @@
     var thevaluta = "";
     var numRecords = 0;
     var firstitem = Model.allItems.Where(x => x.ItemTypeId != 0 && x.ItemTypeId != null).FirstOrDefault();
-    var months = GetRoundedMonthDifference(Model.starttime, Model.endtime);
+    var months = 1;//GetRoundedMonthDifference(Model.starttime, Model.endtime);
     @if (firstitem != null)
     {
         try
@@ -45,7 +45,7 @@
     }
 }
 
-@functions {
+@* @functions {
     public int GetRoundedMonthDifference(DateTime start, DateTime end)
     {
         int months = (end.Year - start.Year) * 12 + end.Month - start.Month;
@@ -59,7 +59,7 @@
 
         return months;
     }
-}
+} *@
 
 <table>
     <tr>

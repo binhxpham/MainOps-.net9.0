@@ -1,15 +1,42 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
+
+
+
+
+
+
+
+
+
+	<PropertyGroup>
 	  <!--<TargetFramework>netcoreapp2.1</TargetFramework>-->
 	  <TargetFramework>net9.0</TargetFramework>
 	  <Nullable>enable</Nullable>
 	  <ImplicitUsings>enable</ImplicitUsings>
+
+
+
+		<PreserveCompilationContext>true</PreserveCompilationContext>
+		<MvcRazorCompileOnPublish>false</MvcRazorCompileOnPublish>
+
+		<!-- To publish views instead of views.dll -->
+		<EnableDefaultRazorGenerateItems>false</EnableDefaultRazorGenerateItems>
+		<EnableDefaultRazorComponentItems>false</EnableDefaultRazorComponentItems>
+		<CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
+		
+		
+		
 	  <UserSecretsId>aspnet-MainOps-9E6211E2-57C6-4B55-B23E-A02A07F5300B</UserSecretsId>
     <ApplicationIcon />
     <OutputType>Exe</OutputType>
     <StartupObject />
   </PropertyGroup>
+
+	
+
+
+
 
 	<PropertyGroup>
 		<EnableDefaultContentItems>false</EnableDefaultContentItems>
@@ -21,8 +48,8 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 	<PropertyGroup>
-		<PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>
-		<!--<PublishWithAspNetCoreTargetManifest>true</PublishWithAspNetCoreTargetManifest>-->
+		<PublishWithAspNetCoreTargetManifest>true</PublishWithAspNetCoreTargetManifest>
+		<!--<PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>-->
 	</PropertyGroup>
 
   <ItemGroup>
@@ -38,8 +65,19 @@
     <Content Remove="wwwroot\%2a%2a" />
   </ItemGroup>
 
+	<ItemGroup>
+		<!--<Content Include="wwwroot\**\*.cshtml" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+
+		<Content Include="Views\**\*.cshtml" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always"/>-->
+		<Content Include="Views\**\*.cshtml" />
+	</ItemGroup>
+	
+
   <ItemGroup>
-    <Content Include="Rotativa\wkhtmltoimage.exe" />
+	  
+	  <Content Include="wwwroot\Rotativa\wkhtmltoimage.exe" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+	  <Content Include="wwwroot\Rotativa\wkhtmltopdf.exe" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+	  <Content Include="Rotativa\wkhtmltoimage.exe" />
     <Content Include="Rotativa\wkhtmltopdf.exe" />
     <Content Include="wwwroot\css\bootstrap-3.3.2.min.css" />
     <Content Include="wwwroot\css\bootstrap-example.min.css" />
@@ -279,7 +317,16 @@
     <Content Include="wwwroot\WellChecks\1\editdatacolumnswellpoints_edit.JPG" />
     <Content Include="wwwroot\WellChecks\1\importwellpointfile_edit.JPG" />
     <Content Include="wwwroot\WellChecks\1\pic1.png" />
+
+	 
+	 
   </ItemGroup>
+
+
+
+
+
+	
 
   <ItemGroup>
     <PackageReference Include="Azure.Identity" Version="1.13.2" />
@@ -319,7 +366,7 @@
     <PackageReference Include="System.Drawing.Common" Version="4.6.0" />
     <PackageReference Include="Telerik.UI.for.AspNet.Core.Trial" Version="2018.3.911" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
-	  <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="9.0.9" />
   </ItemGroup>
 
   <ItemGroup>
@@ -392,8 +439,11 @@
     <Content Update="Views\HJItems\Maintenances.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Views\HJItems\_DetailsAll.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
+	  <Content Update="Views\HJItems\_DetailsAll.cshtml">
+		  <Pack>$(IncludeRazorContentInPack)</Pack>
+	  </Content>
+	<Content Update="Views\Home\Index.cshtml">
+			<Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Views\HJItems\_DetailsAll2.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
@@ -467,9 +517,13 @@
     <Content Update="Views\Offsets\PipeCut2.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Views\Shared\_AlarmPictures.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
+	  <Content Update="Views\Shared\_AlarmPictures.cshtml">
+		  <Pack>$(IncludeRazorContentInPack)</Pack>
+	  </Content>
+		<!--<Content Update="Views\Shared\Index.cshtml">
+			<Pack>$(IncludeRazorContentInPack)</Pack>
+			</Content>-->
+    
     <Content Update="Views\Shared\_Layout - Copy - Copy.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
@@ -587,6 +641,8 @@
     <Content Update="Views\WaterSampleTypes\_AlertEdit.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+
+	  <Content Update="Views\**\*.cshtml" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

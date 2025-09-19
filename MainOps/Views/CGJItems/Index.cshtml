@@ -1,0 +1,421 @@
+﻿@model IEnumerable<MainOps.Models.CGJItem>
+
+@{
+    ViewData["Title"] = "Index";
+}
+<head>
+    <style>
+        .cat-plus {
+            background-image: url("../images/plus.png");
+            background-repeat: no-repeat;
+            background-position: -15px center;
+            border-left: 20px solid lightblue;
+        }
+
+        .cat-minus {
+            background-image: url("../images/minus.png");
+            background-repeat: no-repeat;
+            background-position: -15px center;
+            border-left: 20px solid rgba(0,113,160);
+        }
+
+        .subcat-plus {
+            background-image: url("../images/plus.png");
+            background-repeat: no-repeat;
+            background-position: -15px center;
+            border-left: 20px solid lightblue;
+        }
+
+        .subcat-minus {
+            background-image: url("../images/minus.png");
+            background-repeat: no-repeat;
+            background-position: -15px center;
+            border-left: 20px solid rgba(0,91,138);
+        }
+    </style>
+</head>
+<h2>@SharedLocalizer.GetLocalizedHtmlString("Machinery")</h2>
+<table>
+    <tr>
+        <td><form asp-action="Create" asp-controller="CGJItems" method="get"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Create New")</button></form></td>
+        <td style="border:1px solid black;">
+            <form asp-action="ShowItems" asp-controller="CGJItems" method="get">
+                <table>
+                    <tr>
+                        <td><select id="ProjectId" name="ProjectId" asp-items="ViewBag.ProjectId" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select Project")</option></select></td>
+                        <td><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Show Items")</button></td>
+                    </tr>
+                </table>
+            </form>
+        </td>
+        <td><form asp-action="DetailsAll" asp-controller="CGJItems" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("All Item Tags")</button></form></td>
+        <td><form asp-action="DetailsAllPdf" asp-controller="CGJItems" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("All Item Tags PDF (1 per page)")</button></form></td>
+        <td><form asp-action="DetailsAllPdf2" asp-controller="CGJItems" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("All Item Tags PDF (5 per page)")</button></form></td>
+        @* <td><form asp-action="MaintenanceToDo" asp-controller="CGJItems" method="get"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Show Upcoming Maintenance")</button></form></td> *@
+    </tr>
+</table>
+<form asp-action="Index" asp-controller="CGJItems" method="get">
+    <table>
+        @* <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("search Project")</td>
+            <td><select id="ProjectId" name="ProjectId" asp-items="ViewBag.ProjectId" onchange="FillSubProjects();" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select Project")</option></select></td>
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("search SubProject")</td>
+            <td><select id="SubProjectId" name="SubProjectId" style="width:100%;"><option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select SubProject")</option></select></td>
+        </tr> *@
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Include ALL categories:")</td>
+            @if ((bool)ViewBag.AllCategories == true)
+            {
+                <td><input id="AllCategories" name="AllCategories" type="checkbox" checked="checked" value="true" onchange="CategoryChange(this)" /></td>
+            }
+            else
+            {
+                <td><input id="AllCategories" name="AllCategories" type="checkbox" value="false" onchange="CategoryChange(this)" /></td>
+            }
+
+        </tr>
+        <tr>
+            <td>@SharedLocalizer.GetLocalizedHtmlString("Search: ")</td>
+            <td>
+                <button type="submit" class="btn-hoelscher">
+                    <span class="glyphicon glyphicon-search"></span>
+                </button>
+            </td>
+        </tr>
+    </table>
+
+</form>
+
+
+@if ((bool)ViewData["AllCategories"] == true)
+{
+    @foreach (var master in (List<CGJItemMasterClass>)ViewBag.masters)
+    {
+        <table style="width:100%;table-layout:fixed;">
+            <thead>
+                <tr>
+                    <th style="width:30%;">
+                        <a href="#" class="toggler" data-prod-cat="@master.Id"><span class="cat-plus">+</span></a>
+                    </th>
+                    <th style="width:20%;">
+                        @if (User.IsInRole("Admin") || User.IsInRole("StorageManager"))
+                        {
+                            <form asp-action="Edit" asp-controller="CGJItemMasterClasses" asp-route-id="@master.Id" method="get" target="_blank">
+                                <button class="btn-hoelscher">@master.NameAndNumber</button>
+                            </form>
+                        }
+                        else
+                        {
+                            @master.NameAndNumber
+                        }
+                    </th>
+                    <th style="width:20%;"></th>
+                    <th style="width:20%;"></th>
+                    <th style="width:10%;"></th>
+                </tr>
+            </thead>
+
+            @foreach (var subclass in (List<CGJItemClass>)ViewData["subclasses"])
+            {
+                if (subclass.CGJItemMasterClassId.Equals(master.Id))
+                {
+                    <tr class="@String.Concat("cat", master.Id.ToString())" style="width:100%;">
+                        <td style="width:30%;"></td>
+                        <td style="width:20%;">
+                            <a href="#" class="togglersub" data-prod-subcat="@subclass.Id"><span class="subcat-plus">+</span></a>
+                        </td>
+                        <td style="width:20%;">
+                            @if (User.IsInRole("Admin") || User.IsInRole("StorageManager"))
+                            {
+                                <form asp-action="Edit" asp-controller="CGJItemClasses" asp-route-id="@subclass.Id" method="get" target="_blank">
+                                    <button class="btn-hoelscher">@subclass.NameAndNumber</button>
+                                </form>
+                            }
+                            else
+                            {
+                                @subclass.NameAndNumber
+                            }
+                        </td>
+                        <td colspan="2" style="width:30%;">
+                            <table>
+                                <tr><td style="text-align:right;">@SharedLocalizer.GetLocalizedHtmlString("Internal Rent"):<b> @string.Format("{0:N2}", subclass.Internal_Rent) </b></td><td style="text-align:right;">@SharedLocalizer.GetLocalizedHtmlString("Elec Freq"): <b> @subclass.Electrical_Maintenance_Freq </b></td><td rowspan="2"><form asp-action="CreateNewItem" asp-controller="CGJItems" asp-route-id="@subclass.Id" method="get" target="_blank"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Create New")</button></form></td></tr>
+                                <tr><td style="text-align:right;">@SharedLocalizer.GetLocalizedHtmlString("Safety Freq"):<b> @subclass.Safety_Maintenance_Freq</b></td><td style="text-align:right;">@SharedLocalizer.GetLocalizedHtmlString("Gen Main Freq"):<b> @subclass.Service_Maintenance_Freq </b></td></tr>
+                            </table>
+                        </td>
+
+                    </tr>
+                    @foreach (var item in Model.Where(x => x.CGJItemClassId.Equals(subclass.Id)))
+                    {
+                        <tr class="@String.Concat("subcat", subclass.Id.ToString())" style="width:100%;">
+                            <td style="width:30%;"></td>
+                            <td style="width:20%;"></td>
+                            <td style="width:20%;">
+                                @item.CGJId
+                            </td>
+                            <td style="width:20%;"><button type="button" class="btn-hoelscher" onclick="expanditem(@item.Id)">@SharedLocalizer.GetLocalizedHtmlString("Manage Item") +</button></td>
+                            <td style="width:10%;"></td>
+                        </tr>
+                        <tr class="iteminfo" id="item1_@item.Id" style="width:100%;">
+                            <td style="width:30%;">
+                                <b>@Html.DisplayNameFor(model => model.Name)</b>
+                            </td>
+                            <td style="width:20%;">
+                                <b>@Html.DisplayNameFor(model => model.Ownership)</b>
+                            </td>
+                            <td style="width:20%;"><b>@SharedLocalizer.GetLocalizedHtmlString("Details")</b></td>
+                            <td style="width:20%;"><b>@SharedLocalizer.GetLocalizedHtmlString("Upload")</b></td>
+                            <td style="width:10%;"><b>@SharedLocalizer.GetLocalizedHtmlString("Edits")</b></td>
+                        </tr>
+                        <tr class="iteminfo" id="item2_@item.Id" style="width:100%;">
+                            <td style="width:30%;">
+                                <form asp-action="Maintenances" asp-controller="CGJItems" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@Html.DisplayFor(modelItem => item.Name)</button></form>
+                            </td>
+                            <td style="width:20%;">
+                                @item.Ownership
+                                @if (item.Locations != null)
+                                {
+                                    if (item.Locations.LastOrDefault() != null)
+                                    {
+                                        if (item.Locations.Last().SubProjectId != null)
+                                        {
+                                            <text>on:</text><b> @item.Locations.Last().Project.Name : @item.Locations.Last().SubProject.Name</b>
+                                        }
+                                        else
+                                        {
+                                            <b>on: @item.Locations.Last().Project.Name</b>
+                                        }
+
+                                    }
+                                    <form asp-action="AddItemToProject" asp-controller="CGJItems" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Assign Project")</button></form>
+                                }
+                            </td>
+                            <td style="width:20%;">
+                                <form asp-action="Details" asp-controller="CGJItems" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Details")</button></form>
+                                <form asp-action="DetailsPdf" asp-controller="CGJItems" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Details PDF")</button></form>
+                                <form asp-action="DetailsSmallPdf" asp-controller="CGJItems" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Details Small(H) PDF")</button></form>
+                                <form asp-action="DetailsSpecificPdf" asp-controller="CGJItems" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Details Small(V) PDF")</button></form>
+                            </td>
+                            <td style="width:20%;">
+                                <form asp-action="UploadPhotoCGJItem" asp-controller="CGJItems" enctype="multipart/form-data" method="post">
+                                    <input type="file" name="files" accept=".jpg,.jpeg,.png,.gif" />
+                                    <input hidden="hidden" name="id" value="@item.Id" />
+                                    <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload Photo")</button>
+                                </form>
+                                <form asp-action="UploadDrawingCGJItem" asp-controller="CGJItems" enctype="multipart/form-data" method="post">
+                                    <input type="file" name="files" accept=".jpeg,.jpg,.gif,.png,.pdf,.x-eps" />
+                                    <input hidden="hidden" name="id" value="@item.Id" />
+                                    <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload Drawing")</button>
+                                </form>
+                            </td>
+                            <td style="width:10%;">
+                                <form asp-action="Edit" asp-controller="CGJItems" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button></form>
+                                <form asp-action="Delete" asp-controller="CGJItems" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button></form>
+                            </td>
+                        </tr>
+                    }
+                }
+            }
+        </table>
+    }
+}
+else
+{
+    foreach (var master in Model.OrderBy(x => Convert.ToInt32(x.CGJItemClass.CGJItemMasterClass.ClassNumber)).Select(x => x.CGJItemClass.CGJItemMasterClass).Distinct())
+    {
+        <table style="width:100%;table-layout:fixed;">
+            <thead>
+                <tr>
+                    <th style="width:30%;">
+                        <a href="#" class="toggler" data-prod-cat="@master.Id"><span class="cat-plus">+</span></a>
+                    </th>
+                    <th style="width:20%;">
+                        @if (User.IsInRole("Admin") || User.IsInRole("StorageManager"))
+                        {
+                            <form asp-action="Edit" asp-controller="CGJItemMasterClasses" asp-route-id="@master.Id" method="get" target="_blank">
+                                <button class="btn-hoelscher">@master.NameAndNumber</button>
+                            </form>
+                        }
+                        else
+                        {
+                            @master.NameAndNumber
+                        }
+                    </th>
+                    <th style="width:20%;"></th>
+                    <th style="width:20%;"></th>
+                    <th style="width:10%;"></th>
+                </tr>
+            </thead>
+            @foreach (var subclass in Model.Where(x => x.CGJItemClass.CGJItemMasterClass.Equals(master)).Select(x => x.CGJItemClass).Distinct())
+            {
+                <tr class="@String.Concat("cat",master.Id.ToString())" style="width:100%;">
+                    <td style="width:30%;"></td>
+                    <td style="width:20%;">
+                        <a href="#" class="togglersub" data-prod-subcat="@subclass.Id"><span class="subcat-plus">+</span></a>
+                    </td>
+                    <td style="width:20%;">
+                        @if (User.IsInRole("Admin") || User.IsInRole("StorageManager"))
+                        {
+                            <form asp-action="Edit" asp-controller="CGJItemClasses" asp-route-id="@subclass.Id" method="get" target="_blank">
+                                <button class="btn-hoelscher">@subclass.NameAndNumber</button>
+                            </form>
+                        }
+                        else
+                        {
+                            @subclass.NameAndNumber
+                        }
+                    </td>
+                    <td colspan="2" style="width:30%;">
+                        <table>
+                            <tr><td style="text-align:right;">@SharedLocalizer.GetLocalizedHtmlString("Internal Rent"):<b> @string.Format("{0:N2}", subclass.Internal_Rent) </b></td><td style="text-align:right;">@SharedLocalizer.GetLocalizedHtmlString("Elec Freq"): <b> @subclass.Electrical_Maintenance_Freq </b></td><td rowspan="2"><form asp-action="CreateNewItem" asp-controller="CGJItems" asp-route-id="@subclass.Id" method="get" target="_blank"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Create New")</button></form></td></tr>
+                            <tr><td style="text-align:right;">@SharedLocalizer.GetLocalizedHtmlString("Safety Freq"):<b> @subclass.Safety_Maintenance_Freq</b></td><td style="text-align:right;">@SharedLocalizer.GetLocalizedHtmlString("Gen Main Freq"):<b> @subclass.Service_Maintenance_Freq </b></td></tr>
+                        </table>
+                    </td>
+
+                </tr>
+                @foreach (var item in Model.Where(x => x.CGJItemClassId.Equals(subclass.Id)))
+                {
+                    <tr class="@String.Concat("subcat",subclass.Id.ToString())" style="width:100%;">
+                        <td style="width:30%;"></td>
+                        <td style="width:20%;"></td>
+                        <td style="width:20%;">
+                            @item.CGJId
+                        </td>
+                        <td style="width:20%;"><button type="button" class="btn-hoelscher" onclick="expanditem(@item.Id)">@SharedLocalizer.GetLocalizedHtmlString("Manage Item") +</button></td>
+                        <td style="width:10%;"></td>
+                    </tr>
+                    <tr class="iteminfo" id="item1_@item.Id" style="width:100%;">
+                        <td style="width:30%;">
+                            <b>@Html.DisplayNameFor(model => model.Name)</b>
+                        </td>
+                        <td style="width:20%;">
+                            <b>@Html.DisplayNameFor(model => model.Ownership)</b>
+                        </td>
+                        <td style="width:20%;"><b>@SharedLocalizer.GetLocalizedHtmlString("Details")</b></td>
+                        <td style="width:20%;"><b>@SharedLocalizer.GetLocalizedHtmlString("Upload")</b></td>
+                        <td style="width:10%;"><b>@SharedLocalizer.GetLocalizedHtmlString("Edits")</b></td>
+                    </tr>
+                    <tr class="iteminfo" id="item2_@item.Id" style="width:100%;">
+                        <td style="width:30%;">
+                            <form asp-action="Maintenances" asp-controller="CGJItems" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@Html.DisplayFor(modelItem => item.Name)</button></form>
+                        </td>
+                        <td style="width:20%;">
+                            @item.Ownership
+                            @if (item.Locations != null)
+                            {
+                                if (item.Locations.LastOrDefault() != null)
+                                {
+                                    if (item.Locations.Last().SubProjectId != null)
+                                    {
+                                        <text>on:</text><b> @item.Locations.Last().Project.Name : @item.Locations.Last().SubProject.Name</b>
+                                    }
+                                    else
+                                    {
+                                        <b>on: @item.Locations.Last().Project.Name</b>
+                                    }
+                                }
+                                <form asp-action="AddItemToProject" asp-controller="CGJItems" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Assign Project")</button></form>
+                            }
+                        </td>
+                        <td style="width:20%;">
+                            <form asp-action="Details" asp-controller="CGJItems" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Details")</button></form>
+                            <form asp-action="DetailsPdf" asp-controller="CGJItems" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Details PDF")</button></form>
+                            <form asp-action="DetailsSmallPdf" asp-controller="CGJItems" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Details Small(H) PDF")</button></form>
+                            <form asp-action="DetailsSpecificPdf" asp-controller="CGJItems" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Details Small(V) PDF")</button></form>
+                        </td>
+                        <td style="width:20%;">
+                            <form asp-action="UploadPhotoCGJItem" asp-controller="CGJItems" enctype="multipart/form-data" method="post">
+                                <input type="file" name="files" accept=".jpg,.jpeg,.png,.gif" />
+                                <input hidden="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload Photo")</button>
+                            </form>
+                            <form asp-action="UploadDrawingCGJItem" asp-controller="CGJItems" enctype="multipart/form-data" method="post">
+                                <input type="file" name="files" accept=".jpeg,.jpg,.gif,.png,.pdf,.x-eps" />
+                                <input hidden="hidden" name="id" value="@item.Id" />
+                                <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Upload Drawing")</button>
+                            </form>
+                        </td>
+                        <td style="width:10%;">
+                            <form asp-action="Edit" asp-controller="CGJItems" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button></form>
+                            <form asp-action="Delete" asp-controller="CGJItems" asp-route-id="@item.Id" method="get" target="_blank"><button class="btn-hoelscher" type="submit">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button></form>
+                        </td>
+                    </tr>
+
+                }
+            }
+        </table>
+    }
+}
+
+
+
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            $(".toggler").click(function (e) {
+                e.preventDefault();
+                var prodCat = ($(this).attr("data-prod-cat"));
+                $(".cat" + prodCat).toggle();
+                $(this).parent().find("span").toggleClass("cat-plus");
+                $(this).toggleClass("cat-minus");
+            });
+            $(".togglersub").click(function (e) {
+                e.preventDefault();
+                var prodCat = ($(this).attr("data-prod-subcat"));
+                $(".subcat" + prodCat).toggle();
+                $(this).parent().find("span").toggleClass("subcat-plus");
+                $(this).toggleClass("subcat-minus");
+            });
+            $(".togglersub").each(function () {
+                var prodCat = ($(this).attr("data-prod-subcat"));
+                $(".subcat" + prodCat).toggle();
+                $(this).parent().find("span").toggleClass("subcat-plus");
+                $(this).toggleClass("subcat-minus");
+            });
+            $(".toggler").each(function(){
+                var prodCat = ($(this).attr("data-prod-cat"));
+                $(".cat" + prodCat).toggle();
+                $(this).parent().find("span").toggleClass("cat-plus");
+                $(this).toggleClass("cat-minus");
+            });
+            $(".iteminfo").toggle();
+        });
+        function expanditem(idx) {
+            $("#item1_" + idx).toggle();
+            $("#item2_" + idx).toggle();
+        }
+        function CategoryChange(elem) {
+            if (elem.checked == true) {
+                elem.value = true;
+            }
+            else {
+                elem.value = false;
+            }
+        }
+        function FillSubProjects() {
+            var ProjectId = $('#ProjectId').val();
+            var url = '@Url.Action("GetSubProjectList", "SubProjects")';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                data: { 'theId': ProjectId },
+                success: function (data) {
+                    if (data.length > 0) {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["name"] + '</option>';
+                        }
+                        $("#SubProjectId").html(s);
+                        document.getElementById("SubProjectId").style.width = "100%";
+                    }
+                    else {
+                        var s = '<option value="">Please Select SubProject</option>';
+                        $("#SubProjectId").html(s);
+                    }
+                }
+            });
+        }
+    </script>
+}

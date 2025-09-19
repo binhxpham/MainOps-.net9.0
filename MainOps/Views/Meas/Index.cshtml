@@ -1,5 +1,16 @@
 ﻿@model IEnumerable<MainOps.Models.Meas>
 @inject UserManager<ApplicationUser> _userManager;
+
+<head>
+    <style>
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 10px;
+        }
+    </style>
+</head>
 <h2>@ViewData["Title"]</h2>
 
 <table>
@@ -150,6 +161,10 @@
                 </td>
                 <td>
                     <button type="button" class="btn-hoelscher" onclick="toggleManage(@item.Id)">@SharedLocalizer.GetLocalizedHtmlString("Manage Measurement")</button>
+                    <form asp-action="Meas_PDF" asp-controller="Meas" asp-route-id="@item.Id" method="get" target="_blank">
+                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                    </form>
+
                 </td>
                 <td id="td_@item.Id" style="display:none;">
                     @if (!User.IsInRole("Guest"))
@@ -164,11 +179,11 @@
                 </td>
                 <td id="td2_@item.Id" style="display:none;">
                     <form asp-action="ShowData" asp-controller="MeasPoints">
-                        <input type="hidden" id="theNameidx" name="theName" value="@item.MeasPoint.Name" />
-                        <input type="hidden" id="theididx" name="theid" value="@item.MeasPoint.Id" />
+                        <input type="hidden" id="theNameidx" name="theName" value="@item.MeasPoint?.Name" />
+                        <input type="hidden" id="theididx" name="theid" value="@item.MeasPoint?.Id" />
                         <button type="submit">@SharedLocalizer.GetLocalizedHtmlString("Show data")</button>
                     </form>
-                    @if (item.MeasPoint.MeasType.Type.ToLower().Equals("water meter"))
+                    @if ((item.MeasPoint?.MeasType?.Type ?? "").ToLower().Equals("water meter"))                   
                     {
                         <form asp-action="ShowData_2" asp-controller="MeasPoints">
                             <input type="hidden" id="theNameidx" name="theName" value="@item.MeasPoint.Name" />
@@ -182,6 +197,48 @@
             </tr>
         }
     </tbody>
+
+
+    @* Added 11-09-2025 *@
+    @{
+        var currentPage = ViewData["CurrentPage"] as int? ?? 1;
+        var pageSize = ViewData["PageSize"] as int? ?? 100;
+        var hasMore = ViewData["HasMore"] as bool? ?? false;
+    }
+
+
+    <div class="pagination">
+        @if (currentPage > 1)
+        {
+            <input type="hidden" name="searchstring" value="@ViewData["SearchString"]" />
+            <input type="hidden" name="filterchoice" value="@ViewData["FilterChoice"]" /> 
+            <input type="hidden" name="startdate" value="@ViewData["StartDate"]" />
+            <input type="hidden" name="enddate" value="@ViewData["EndDate"]" />
+
+            <form method="post" asp-action="Combsearch">
+                <input type="hidden" name="filterchoice" value="@ViewData["FilterChoice"]" />
+                <input type="hidden" name="searchstring" value="@ViewData["SearchString"]" />
+                <input type="hidden" name="page" value="@(currentPage - 1)" />
+                <input type="hidden" name="pageSize" value="@pageSize" />
+                <button type="submit" class="btn btn-secondary">Previous</button>
+            </form>
+        }
+
+        <span>Page @currentPage</span>
+
+        @if (hasMore)
+        {
+            <form method="post" asp-action="Combsearch">
+                <input type="hidden" name="filterchoice" value="@ViewData["FilterChoice"]" />
+                <input type="hidden" name="searchstring" value="@ViewData["SearchString"]" />
+                <input type="hidden" name="page" value="@(currentPage + 1)" />
+                <input type="hidden" name="pageSize" value="@pageSize" />
+                <button type="submit" class="btn btn-secondary">Next</button>
+            </form>
+        } 
+
+
+    </div>
 </table>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

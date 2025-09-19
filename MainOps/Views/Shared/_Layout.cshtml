@@ -9,7 +9,10 @@
 }
 <html>
 <head>
-    
+
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+   
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - @SharedLocalizer.GetLocalizedHtmlString("Hölscher Jensen A/S - Maintenance & Operations")</title>
@@ -61,6 +64,8 @@
     <link rel="stylesheet" href="~/css/RandomCss.min.css" asp-append-version="true">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/right-modal.css" asp-append-version="true" />'
 </environment>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+
     <style>
         @@media(max-width:992px) {
             /* On mobile set datepicker to viewport center*/
@@ -72,6 +77,42 @@
                 -webkit-transform: translate(-50%, -50%);
             }
         }
+
+        /* Dropdown content styling */
+        .dropdowndropdown-content {
+            display: none; /* stays hidden until hover */
+            position: absolute; /* positions under the button */
+            background-color: #2c3e50; /* dark blue/gray background */
+            min-width: 180px; /* width of dropdown box */
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.2); /* subtle shadow */
+            border-radius: 6px; /* rounded corners */
+            z-index: 1;
+        }
+
+            /* Dropdown links */
+            .dropdowndropdown-content a {
+                display: block;
+                padding: 10px 16px;
+                color: #f5f5f5; /* text color */
+                text-decoration: none;
+                font-family: 'Poppins', sans-serif;
+            }
+
+                /* Hover effect for links */
+                .dropdowndropdown-content a:hover {
+                    background-color: black; /* slightly lighter background  #34495e; */
+                    color: #ffcc00; /* highlight text color */
+                    border-radius: 6px; /* rounded corners */
+                }
+
+        /* Show dropdown when hovering over parent */
+        .dropdowndropdown:hover .dropdowndropdown-content {
+            display: block;
+        }
+
+
+
+       
     </style>
 </head>
 
@@ -173,6 +214,11 @@
                                         <span class="dropdowndropdown-content">
                                             <a asp-area="" asp-controller="CGJensen" asp-action="CGJensenMainMenu">@SharedLocalizer.GetLocalizedHtmlString("Main Menu")</a>
                                             <a asp-area="" asp-controller="CGJensen" asp-action="Create_Dagsrapport">@SharedLocalizer.GetLocalizedHtmlString("Dagsseddel")</a>
+                                            @* <a asp-area="" asp-controller="CGJItems" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("All Machinery")</a>
+                                            <a asp-area="" asp-controller="CGJItems" asp-action="Classes">@SharedLocalizer.GetLocalizedHtmlString("Classes Overview")</a>
+                                            <a asp-area="" asp-controller="CGJItemMasterClasses" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Machinery Master Classes")</a>
+                                            <a asp-area="" asp-controller="CGJItemClasses" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Machinery Sub Classes")</a>
+ *@
                                         </span>
                                     </button>
                                 </li>
@@ -280,7 +326,7 @@
                                     {
                                         <li class="dropdowndropdown">
                                             <button class="dropdowndropbtn">
-                                                @SharedLocalizer.GetLocalizedHtmlString("Machinery Overview")
+                                                @SharedLocalizer.GetLocalizedHtmlString("HJ Machinery Overview")
                                                 <span class="dropdowndropdown-content">
                                                     <a asp-area="" asp-controller="StockRentalItems" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Rental Administration")</a>
                                                     <a asp-area="" asp-controller="Item_Location" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Internal Rent")</a>
@@ -394,6 +440,23 @@
                                     </button>
                                 </li>
                             }
+
+                            if (user.DivisionId.Equals(6) || user.DivisionId.Equals(10) || User.IsInRole("Admin"))
+                            {
+                                 <li class="dropdowndropdown">
+                                    <button class="dropdowndropbtn">
+                                        @SharedLocalizer.GetLocalizedHtmlString("CGJ Machinery Overview")
+                                        <span class="dropdowndropdown-content">
+                                            <a asp-area="" asp-controller="CGJItems" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("All Machinery")</a>
+                                            <a asp-area="" asp-controller="CGJItems" asp-action="Classes">@SharedLocalizer.GetLocalizedHtmlString("Classes Overview")</a>
+                                            <a asp-area="" asp-controller="CGJItemMasterClasses" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Machinery Master Classes")</a>
+                                            <a asp-area="" asp-controller="CGJItemClasses" asp-action="Index">@SharedLocalizer.GetLocalizedHtmlString("Machinery Sub Classes")</a>
+
+                                        </span>
+                                    </button>
+                                 </li>
+                            }
+
                         }
                     }
                 </ul>

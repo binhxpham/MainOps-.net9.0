@@ -1,0 +1,101 @@
+﻿@model MainOps.Models.CGJItem
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>HJItem</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CGJItemClass.CGJItemMasterClass.ClassName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CGJItemClass.CGJItemMasterClass.ClassName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CGJItemClass.ClassName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CGJItemClass.ClassName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Department)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Department)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.latitude)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.latitude)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.longitude)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.longitude)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script type="text/javascript">
+        var myLat = 0, myLng = 0, myAcc = 0;
+
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(function (position) {
+                myLat = position.coords.latitude;
+                myLng = position.coords.longitude;
+                myAcc = position.coords.accuracy;
+
+                //if (myAcc < 15.0) { // change to 10..
+                getPos(myLat, myLng);
+                //}
+            },
+                function (error) {
+                    if (error.code == error.PERMISSION_DENIED) {
+                                                alert("error geolocation off");
+                    }
+
+                }, { maximumAge: 2500, timeout: 50000, enableHighAccuracy: true });
+        }
+    function getPos(lat, lng) {
+            $.ajax({
+                    type: 'post',
+                    url: '/CGJItems/UpdateCoords',
+                    data: {
+                        'theid': @Model.Id,
+                        'lati': lat,
+                        'longi': lng
+                    },
+                success: function (response) {
+                    if (response == "isuser") {
+                        location.href = '@Url.Action("AddItemToProject", "CGJItems")?Id=' + @Model.Id;
+                    }
+                    else {
+                        location.href = '@Url.Action("Details","CGJItems")?Id=' + @Model.Id;
+                    }
+
+                    },
+                error: function () {
+                        location.href = '@Url.Action("Details","CGJItems")?Id=' + @Model.Id;
+                    }
+                })
+        }
+</script>
+}

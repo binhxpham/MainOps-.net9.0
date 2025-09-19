@@ -1,0 +1,104 @@
+﻿@model IEnumerable<MainOps.Models.CGJItem>
+
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<style>
+    div#myDiv {
+        -ms-transform: rotate(-90deg); /* IE 9 */
+        -webkit-transform: rotate(-90deg); /* Safari prior 9.0 */
+        transform: rotate(-90deg); /* Standard syntax */
+        transform: translate(0,500);
+        page-break-after: always;
+    }
+</style>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Items</title>
+    <link rel="stylesheet" href="@Url.Content("~/css/pdfcss.css")" />
+</head>
+<body>
+    <font size="3">
+        @{ int counter = 0;
+            int divisionId = Convert.ToInt32(Model.First().DivisionId);
+            string logopath = Model.First().Division.LogoPath;}
+        @for (int i = 0; i < Model.Count() / 4; i++)
+        {
+            counter += 1;
+
+            <table style="height: 5.2cm; width: 4cm; margin-bottom: 2cm; margin-right: 1cm; float: left; ">
+                <tbody>
+                    <tr>
+                        <td align="left" style="height: 1.4cm; border-style: solid"><img src="~/images/Divisions/Photos/@divisionId/@logopath" style="width:90%;" /></td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="border-width:thin;border-style:solid;height:0.7cm;">@Html.DisplayFor(Model => Model.ElementAt(i * 3).CGJId)</td>
+                    </tr>
+                    <tr>
+                        <td align="left" style="height: 2.9cm;"><img src='@Url.Action("GetQR","HJItems",new { Id = Model.ElementAt(i * 3).Id })' alt="" style="height:95%;" /></td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="border-width:thin;border-style:solid;height:0.7cm;">@Html.DisplayFor(Model => Model.ElementAt(i * 3).Name)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table style="height: 5.2cm; width: 4cm; margin-bottom: 2cm; margin-right: 1cm; float: left; ">
+                <tbody>
+                    <tr>
+                        <td align="left" style="height: 1.4cm; border-style: solid"><img src="~/images/Divisions/Photos/@divisionId/@logopath" style="width:90%;" /></td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="border-width:thin;border-style:solid;height:0.7cm;">@Html.DisplayFor(Model => Model.ElementAt(i * 3 + 1).CGJId)</td>
+                    </tr>
+                    <tr>
+                        <td align="left" style="height: 2.9cm;"><img src='@Url.Action("GetQR","HJItems",new { Id = Model.ElementAt(i * 3  + 1).Id })' alt="" style="height:95%;" /></td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="border-width:thin;border-style:solid;height:0.7cm;">@Html.DisplayFor(Model => Model.ElementAt(i * 3 + 1).Name)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table style="height: 5.2cm; width: 4cm; margin-bottom: 2cm; margin-right: 1cm; float: left; ">
+                <tbody>
+                    <tr>
+                        <td align="left" style="height: 1.4cm; border-style: solid"><img src="~/images/Divisions/Photos/@divisionId/@logopath" style="width:90%;" /></td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="border-width:thin;border-style:solid;height:0.7cm;">@Html.DisplayFor(Model => Model.ElementAt(i * 3 + 2).CGJId)</td>
+                    </tr>
+                    <tr>
+                        <td align="left" style="height: 2.9cm;"><img src='@Url.Action("GetQR","HJItems",new { Id = Model.ElementAt(i * 3  + 2).Id })' alt="" style="height:95%;" /></td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="border-width:thin;border-style:solid;height:0.7cm;">@Html.DisplayFor(Model => Model.ElementAt(i * 3 + 2).Name)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table style="height: 5.2cm; width: 4cm; margin-bottom: 2cm; margin-right: 1cm; float: left; ">
+                <tbody>
+                    <tr>
+                        <td align="left" style="height: 1.4cm; border-style: solid"><img src="~/images/Divisions/Photos/@divisionId/@logopath" style="width:90%;" /></td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="border-width:thin;border-style:solid;height:0.7cm;">@Html.DisplayFor(Model => Model.ElementAt(i * 3 + 3).CGJId)</td>
+                    </tr>
+                    <tr>
+                        <td align="left" style="height: 2.9cm;"><img src='@Url.Action("GetQR","HJItems",new { Id = Model.ElementAt(i * 3  + 3).Id })' alt="" style="height:95%;" /></td>
+                    </tr>
+                    <tr>
+                        <td align="center" style="border-width:thin;border-style:solid;height:0.7cm;">@Html.DisplayFor(Model => Model.ElementAt(i * 3 + 3).Name)</td>
+                    </tr>
+                </tbody>
+            </table>
+            @*@if (counter % 4 == 0)
+            {
+                <table style="border-style:hidden;page-break-after:always !important;"></table>
+            }*@
+
+
+        }
+    </font>
+</body>
+</html>
