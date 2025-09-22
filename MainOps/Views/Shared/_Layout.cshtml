@@ -10,9 +10,6 @@
 <html>
 <head>
 
-    <link rel="stylesheet" href="~/css/site.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
-   
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - @SharedLocalizer.GetLocalizedHtmlString("Hölscher Jensen A/S - Maintenance & Operations")</title>
@@ -26,93 +23,96 @@
     }
 
 
-<environment include="Development">
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/two-modal.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Blinking.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/three-modal1.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/LoadSpinner2.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Footer.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/dropdown4.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/stepProgressBar.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Different.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Sidebarmenu.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/PicturesHeader.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/jquery-ui-timepicker-addon.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/jquery-ui-timepicker-addon.min.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/RandomCss.css" asp-append-version="true">
-    <link rel="stylesheet" href="~/css/RandomCss.min.css" asp-append-version="true">
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/right-modal.css" asp-append-version="true" />
-</environment>
-<environment exclude="Development">
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/two-modal.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Blinking.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/three-modal1.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/LoadSpinner2.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Footer.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/stepProgressBar.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Different.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Sidebarmenu.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/PicturesHeader.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/dropdown4.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/jquery-ui-timepicker-addon.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/jquery-ui-timepicker-addon.min.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/RandomCss.css" asp-append-version="true">
-    <link rel="stylesheet" href="~/css/RandomCss.min.css" asp-append-version="true">
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/right-modal.css" asp-append-version="true" />'
-</environment>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
-
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/two-modal.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Blinking.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/three-modal1.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/LoadSpinner2.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Footer.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/dropdown4.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/stepProgressBar.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Different.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Sidebarmenu.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/PicturesHeader.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/jquery-ui-timepicker-addon.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/jquery-ui-timepicker-addon.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/RandomCss.css" asp-append-version="true">
+        <link rel="stylesheet" href="~/css/RandomCss.min.css" asp-append-version="true">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/right-modal.css" asp-append-version="true" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/two-modal.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Blinking.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/three-modal1.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/LoadSpinner2.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Footer.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/stepProgressBar.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Different.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/Sidebarmenu.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/PicturesHeader.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/dropdown4.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/jquery-ui-timepicker-addon.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/jquery-ui-timepicker-addon.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/RandomCss.css" asp-append-version="true">
+        <link rel="stylesheet" href="~/css/RandomCss.min.css" asp-append-version="true">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/right-modal.css" asp-append-version="true" />'
+    </environment>
     <style>
         @@media(max-width:992px) {
-            /* On mobile set datepicker to viewport center*/
-            #ui-datepicker-div {
-                position: fixed !important;
-                left: 50% !important;
-                top: 50% !important;
-                transform: translate(-50%, -50%);
-                -webkit-transform: translate(-50%, -50%);
-            }
+        /* On mobile set datepicker to viewport center*/
+        #ui-datepicker-div {
+        position: fixed !important;
+        left: 50% !important;
+        top: 50% !important;
+        transform: translate(-50%, -50%);
+        -webkit-transform: translate(-50%, -50%);
+        }
         }
 
-        /* Dropdown content styling */
-        .dropdowndropdown-content {
-            display: none; /* stays hidden until hover */
-            position: absolute; /* positions under the button */
-            background-color: #2c3e50; /* dark blue/gray background */
-            min-width: 180px; /* width of dropdown box */
-            box-shadow: 0px 8px 16px rgba(0,0,0,0.2); /* subtle shadow */
-            border-radius: 6px; /* rounded corners */
-            z-index: 1;
+        /* Default dropdown style (desktop) */
+         .dropdowndropdown-content {
+            
+            top: 100%; 
+            left: 0;
+            background: #fff;
+            min-width: 200px;
+            border-radius: 8px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            padding: 8px 0;
         }
 
-            /* Dropdown links */
-            .dropdowndropdown-content a {
+        .dropdowndropdown-content a {
                 display: block;
                 padding: 10px 16px;
-                color: #f5f5f5; /* text color */
+                color: #333;
                 text-decoration: none;
                 font-family: 'Poppins', sans-serif;
             }
-
-                /* Hover effect for links */
-                .dropdowndropdown-content a:hover {
-                    background-color: black; /* slightly lighter background  #34495e; */
-                    color: #ffcc00; /* highlight text color */
-                    border-radius: 6px; /* rounded corners */
+                .dropdowndropdown-content a:hover,
+                .dropdowndropdown-content a.active {
+                    background: #f5f5f5;
+                    color: #0078d4;
                 }
 
-        /* Show dropdown when hovering over parent */
-        .dropdowndropdown:hover .dropdowndropdown-content {
-            display: block;
+           
+
+        /* 📱 On mobile, dropdowns expand inline */
+        /* @@media (max-width: 767px) {
+            .dropdowndropdown-content
+
+        {
+            position: static;
+            box-shadow: none; 
+            border-radius: 0;
+            min-width: 100%;
+            padding-left: 15px;
         }
 
-
-
-       
+        } */
     </style>
 </head>
 
@@ -648,7 +648,7 @@
                 <div class="col-md-3">
                     <h5>@SharedLocalizer.GetLocalizedHtmlString("Contact")</h5>
                     <ul>
-                        <li>@SharedLocalizer.GetLocalizedHtmlString("Hölscher Jensen A/S")</li>
+                        <li><b>@SharedLocalizer.GetLocalizedHtmlString("Hölscher Jensen A/S")</b></li>
                         <li>@SharedLocalizer.GetLocalizedHtmlString("Fabriksparken 37")</li>
                         <li>@SharedLocalizer.GetLocalizedHtmlString("2600 Glostrup")</li>
                         @if (theculture == "nl-NL")
@@ -667,7 +667,7 @@
                     <h5>@SharedLocalizer.GetLocalizedHtmlString("Site Admin")</h5>
                     <ul>
                         <li><b>Friederike Wetter</b> (aka Riki)</li>
-                        <li>Phone: +45 27256537</li>
+                        <li>Telefon: +45 27256537</li>
                         <li><a href="mailto:ofw@hj-as.dk"><span class="glyphicon-envelope"> @SharedLocalizer.GetLocalizedHtmlString("ofw@hj-as.dk")</span></a></li>
 
                     </ul>
@@ -865,6 +865,7 @@
             var elements = document.getElementsByClassName("dropdowndropdown");
             var myFunction = function () {
                 var element = this.getElementsByClassName("dropdowndropdown-content")[0];
+                
                 if (element.style.display == "block") {
                     element.style.display = "none";
                 }

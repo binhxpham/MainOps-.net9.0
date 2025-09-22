@@ -10,6 +10,7 @@ using MainOps.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace MainOps.Controllers
 {
@@ -17,11 +18,13 @@ namespace MainOps.Controllers
     public class BoQHeadLinesController : BaseController
     {
         private readonly DataContext _context;
+        private readonly IWebHostEnvironment _env;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public BoQHeadLinesController(DataContext context, UserManager<ApplicationUser> userManager):base(context,userManager)
+        public BoQHeadLinesController(DataContext context, IWebHostEnvironment env, UserManager<ApplicationUser> userManager): base(context,userManager)
         {
-            _context = context;
+            _context = context; 
+            _env = env;
             _userManager = userManager;
         }
         public JsonResult GetVariationOrdersProject(string theId)
@@ -36,19 +39,49 @@ namespace MainOps.Controllers
             return Json(headlinelist);
         }
         // GET: BoQHeadLines
+        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,Guest,International")]
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (User.IsInRole("Admin"))
-            {    
-                var dataContext = _context.BoQHeadLines.Include(b => b.Project).OrderBy(x => x.ProjectId).ThenBy(x => x.BoQnum);
-                return View(await dataContext.ToListAsync());
-            }
-            else
+            try
             {
-                var dataContext = _context.BoQHeadLines.Include(x => x.Project).Where(x=>x.Project.DivisionId.Equals(user.DivisionId)).OrderBy(x => x.ProjectId).ThenBy(x => x.BoQnum);
-                return View(await dataContext.ToListAsync());
+                var user = await _userManager.GetUserAsync(User);
+                //if (User.IsInRole("Admin"))
+                //{
+                //    Debug.WriteLine("BoQ headlines");
+                //    var dataContext = _context.BoQHeadLines.Include(b => b.Project).OrderBy(x => x.ProjectId).ThenBy(x => x.BoQnum);
+                //    var boqHeadLines = await dataContext.ToListAsync();
+                //    return View(boqHeadLines);
+                //}
+                //else
+                //{
+                //    var dataContext = _context.BoQHeadLines.Include(x => x.Project).Where(x => x.Project.DivisionId.Equals(user.DivisionId)).OrderBy(x => x.ProjectId).ThenBy(x => x.BoQnum);
+                //    return View(await dataContext.ToListAsync());
+                //}
+
+                IQueryable<BoQHeadLine> query = _context.BoQHeadLines.Include(b => b.Project);
+
+                if (!User.IsInRole("Admin"))
+                {
+                    query = query.Where(x => x.Project.DivisionId == user.DivisionId);
+                }
+                
+
+                var boqHeadLines = await query
+                    .OrderBy(x => x.ProjectId)
+                    .ThenBy(x => x.BoQnum)
+                    .ToListAsync();
+
+                return View(boqHeadLines);
             }
+            catch (Exception ex) 
+            {
+                Debug.WriteLine("BoQ headlines exception: " + ex.Message);
+                // log or inspect the real exception
+                return StatusCode(500, ex.ToString());
+            }
+
+           
             
         }
         [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,Guest,International")]
@@ -115,6 +148,7 @@ namespace MainOps.Controllers
         }
 
         // GET: BoQHeadLines/Create
+        [HttpGet]
         [Authorize(Roles = "Admin,Manager,DivisionAdmin")]
         public async Task<IActionResult> Create()
         {

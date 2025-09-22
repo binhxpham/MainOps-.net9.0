@@ -1950,10 +1950,23 @@ namespace MainOps.Controllers
 
                     }
                     
-                    var measpoints = await _context.MeasPoints
-                        .Include(x => x.MeasType)
-                        .Where(x => x.ProjectId.Equals(measp.ProjectId) && 
-                                    (x.Name.Equals(measp.Name) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.Contains("_1")) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.Contains("_2")) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.Contains("_3")) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.ToLower().Contains("watermeter")) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.ToLower().Contains("flow")))).ToListAsync();
+                    //var measpoints = await _context.MeasPoints
+                    //    .Include(x => x.MeasType)
+                    //    .Where(x => x.ProjectId.Equals(measp.ProjectId) && 
+                    //                (x.Name.Equals(measp.Name) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.Contains("_1")) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.Contains("_2")) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.Contains("_3")) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.ToLower().Contains("watermeter")) || (x.getBaseName.Equals(measp.getBaseName) && x.Name.ToLower().Contains("flow")))).ToListAsync();
+
+                    var measpoints = (await _context.MeasPoints
+                            .Include(x => x.MeasType)
+                            .Where(x => x.ProjectId == measp.ProjectId)
+                            .ToListAsync())  // Fetch relevant rows from the database first
+                            .Where(x => x.Name == measp.Name ||
+                                        (x.getBaseName == measp.getBaseName && x.Name.Contains("_1")) ||
+                                        (x.getBaseName == measp.getBaseName && x.Name.Contains("_2")) ||
+                                        (x.getBaseName == measp.getBaseName && x.Name.Contains("_3")) ||
+                                        (x.getBaseName == measp.getBaseName && x.Name.ToLower().Contains("watermeter")) ||
+                                        (x.getBaseName == measp.getBaseName && x.Name.ToLower().Contains("flow")))
+                            .ToList();
+
                     if (measpoints.Count > 1)
                     {
                         MeasMoreVM model = new MeasMoreVM();
@@ -2003,7 +2016,9 @@ namespace MainOps.Controllers
                     ViewData["CommentId"] = new SelectList(_context.Comments.OrderBy(x => x.comment), "Id", "comment");
                     List<SelectListItem> selList = await createMeasPointList();
                     ViewData["MeasPointId"] = selList;
-                    var lastMeas = await _context.Measures.LastAsync();
+                    var lastMeas = await _context.Measures
+                            .OrderByDescending(m => m.Id)
+                            .FirstOrDefaultAsync();
                     Meas measvar = new Meas();
                     measvar.When = DateTime.Now;
                     measvar.MeasPointId = id;
@@ -2032,7 +2047,9 @@ namespace MainOps.Controllers
             ViewData["CommentId"] = new SelectList(_context.Comments.OrderBy(x => x.comment), "Id", "comment");
             List<SelectListItem> selList = await createMeasPointList();
             ViewData["MeasPointId"] = selList;
-            var lastMeas = await _context.Measures.LastAsync();
+            var lastMeas = await _context.Measures
+                            .OrderByDescending(m => m.Id)
+                            .FirstOrDefaultAsync();
 
             Meas measvar = new Meas();
             measvar.When = lastMeas.When;

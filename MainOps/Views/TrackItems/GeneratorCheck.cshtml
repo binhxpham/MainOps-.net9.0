@@ -1,8 +1,55 @@
 ﻿@model MainOps.Models.GeneratorCheck
 @{
-    ViewData["Title"] = "GeneratorTest";
+    ViewData["Title"] = "Generator Test";
 }
 <h2>@SharedLocalizer.GetLocalizedHtmlString("Generator Test")</h2>
+
+<style>
+    .border-top-grey {
+        border-top: 1px solid #dee2e6;
+    }
+
+    .custom-radio {
+        display: flex;
+        align-items: center;
+        gap: 10rem;
+    }
+
+        .custom-radio input[type="radio"] {
+            display: none;
+        }
+
+        .custom-radio label {
+            position: relative;
+            padding-left: 25px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+            .custom-radio label::before {
+                content: "";
+                position: absolute;
+                left: 0;
+                top: 2px;
+                width: 25px;
+                height: 25px;
+                border: 2px solid #555;
+                border-radius: 3px;
+                background-color: white;
+            }
+
+        .custom-radio input[type="radio"]:checked + label::after {
+            /*content: "✓";*/
+            content: "X";
+            position: absolute;
+            left: 4px;
+            top: -4px; /* -1px; */
+            font-size: 25px;
+            color: black; /* green; */
+        }
+</style>
+
+
 <div class="row">
     <div class="col-xs-12">
         <form asp-action="GeneratorCheck" asp-controller="TrackItems" id="theform" method="post" onsubmit="retrieveData(event);" enctype="multipart/form-data">
@@ -25,40 +72,133 @@
                         </select>
                     </td>
                 </tr>
-                <tr>
-                    <td><label asp-for="GeneratorNameLocation" class="control-label"></label></td>
-                    <td><input asp-for="GeneratorNameLocation" type="text" style="width:100%;" /><span asp-validation-for="GeneratorNameLocation" class="text-danger"></span></td>
 
+                <tr id="generatorName" hidden="hidden">
+                    <td><label class="control-label">Generator Name (owner of the generator)</label></td>
+                    <td>
+                        <input type="text" asp-for="GeneratorName" id="generatorNameValue" hidden="hidden" />
+
+                        <select id="generatorDropdown" asp-for="GeneratorName" class="form-control" asp-items="ViewBag.Text" onchange="FillAddresses();" style="width:100%;">
+                            <option value="">@SharedLocalizer.GetLocalizedHtmlString("Please Select Generator")</option>
+                        </select>
+                        <span asp-validation-for="GeneratorName" class="text-danger"></span>
+                    </td>
                 </tr>
+                <tr id="generatorNameLocation">
+                    <td><label asp-for="GeneratorNameLocation" class="control-label"></label></td>
+                    <td>
+                        <input asp-for="GeneratorNameLocation" type="text" style="width:100%;" />
+                        <span asp-validation-for="GeneratorNameLocation" class="text-danger"></span>
+                    </td>
+                </tr>
+
+                <tr id="address" hidden="hidden">
+                    <td><label class="control-label">Location</label></td>
+                    <td>
+                        <input id="selectedGeneratorValue" asp-for="Address" type="text" style="width:100%;" readonly />
+                        <span asp-validation-for="Address" class="text-danger"></span>
+                    </td>
+                </tr>
+
                 <tr>
                     <td><label asp-for="TimeStamp" class="control-label"></label></td>
                     <td><input asp-for="TimeStamp" type="datetime" class="date-picker" value="@DateTime.Now" style="width:100%;" /><span asp-validation-for="TimeStamp" class="text-danger"></span></td>
-
                 </tr>
+
+                <tr class="border-top-grey">
+
+                <tr id="testtypefields" hidden="hidden">
+                    <td><label asp-for="Full_Load" class="control-label"></label></td>
+                    <td>
+
+
+                        @* <input style="width:5%;" type="radio" id="fullLoad" name="loadType" value="true" @(Model != null && Model.Full_Load ? "checked" : "checked")>
+                        <label style="width:20%;" for="fullLoad">Full Load</label>
+                       
+                        <input style="width:5%;" type="radio" id="noFullLoad" name="loadType" value="false" @(Model != null && !Model.Full_Load ? "checked" : "")>
+                        <label style="width:20%;" for="noFullLoad">No Full Load</label>   *@
+                        @* <input type="hidden" asp-for="Full_Load" id="fullLoadValue" value="true" />
+                        <div class="custom-radio">
+                            <input type="radio" id="fullLoad" name="loadType" value="true" @(Model != null && Model.Full_Load ? "checked" : "") />
+                            <label for="fullLoad">Full Load</label>
+
+                            <input type="radio" id="noFullLoad" name="loadType" value="false" @(Model != null && !Model.Full_Load ? "checked" : "") />
+                            <label for="noFullLoad">No Full Load</label>
+                        </div> *@
+                        <div class="custom-radio">
+                            <input type="radio" asp-for="Full_Load" id="fullLoad" value="true" checked />
+                            <label for="fullLoad" class="control-label">Full Load</label>
+
+                            <input type="radio" asp-for="Full_Load" id="noFullLoad" value="false" />
+                            <label for="noFullLoad">No Full Load</label>
+                        </div>
+                    </td>
+                </tr>
+                <tr id="testtypecomments" hidden="hidden">
+                    <td><label asp-for="Test_Type_Comment" class="control-label"></label></td>
+                    <td><input asp-for="Test_Type_Comment" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Comment:")" class="form-control" style="width:100%;" /></td>
+                </tr>
+
+                <tr class="border-top-grey">
+
                 <tr>
                     <td><label asp-for="Oil_Level" class="control-label"></label></td>
-                    <td><input asp-for="Oil_Level" class="form-control" style="width:100%;" /></td>
+                    <td>
+                        @* <input asp-for="Oil_Level" class="form-control" style="width:100%;" /> *@
+
+                        <div class="custom-radio">
+                            <input type="radio" asp-for="Oil_Level" id="oilLevelOK" value="true" checked />
+                            <label for="oilLevelOK" class="control-label">Yes</label>
+
+                            <input type="radio" asp-for="Oil_Level" id="oilLevelNotOK" value="false" />
+                            <label for="oilLevelNotOK">No</label>
+                        </div>
+
+                    </td>
+
                 </tr>
                 <tr>
                     <td><label asp-for="Oil_Level_Comment" class="control-label"></label></td>
                     <td><input asp-for="Oil_Level_Comment" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Comment:")" class="form-control" style="width:100%;" /></td>
                 </tr>
-                <tr>
+
+                <tr class="border-top-grey">
+
+
+                <tr id="adBlueLevelFields" >
                     <td><label asp-for="AdBlue_Level" class="control-label"></label></td>
-                    <td><input asp-for="AdBlue_Level" class="form-control" style="width:100%;" /></td>
+                    <td>
+                        @* <input asp-for="AdBlue_Level" class="form-control" style="width:100%;" /> *@
+                        <div class="custom-radio">
+                            <input type="radio" asp-for="AdBlue_Level" id="adBlueLevelOK" value="true" checked />
+                            <label for="adBlueLevelOK" class="control-label">Yes</label>
+
+                            <input type="radio" asp-for="AdBlue_Level" id="adBlueLevelNotOK" value="false" />
+                            <label for="adBlueLevelNotOK">No</label>
+                        </div>
+                    </td>
                 </tr>
-                <tr>
+                <tr id="adBlueLevelComments" >
                     <td><label asp-for="AdBlue_Level_Comment" class="control-label"></label></td>
                     <td><input asp-for="AdBlue_Level_Comment" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Comment:")" class="form-control" style="width:100%;" /></td>
                 </tr>
+
+                <tr class="border-top-grey">
+
                 <tr>
                     <td><label asp-for="Diesel_Level" class="control-label"></label></td>
                     <td>
                         <select asp-for="Diesel_Level" class="form-control" style="width:100%;">
                             <option value="0">@SharedLocalizer.GetLocalizedHtmlString("Empty")</option>
-                            <option value="25">@SharedLocalizer.GetLocalizedHtmlString("25%")</option>
+                            <option value="10">@SharedLocalizer.GetLocalizedHtmlString("10%")</option>
+                            <option value="20">@SharedLocalizer.GetLocalizedHtmlString("20%")</option>
+                            <option value="30">@SharedLocalizer.GetLocalizedHtmlString("30%")</option>
+                            <option value="40">@SharedLocalizer.GetLocalizedHtmlString("40%")</option>
                             <option value="50">@SharedLocalizer.GetLocalizedHtmlString("50%")</option>
-                            <option value="75">@SharedLocalizer.GetLocalizedHtmlString("75%")</option>
+                            <option value="60">@SharedLocalizer.GetLocalizedHtmlString("60%")</option>
+                            <option value="70">@SharedLocalizer.GetLocalizedHtmlString("70%")</option>
+                            <option value="80">@SharedLocalizer.GetLocalizedHtmlString("80%")</option>
+                            <option value="90">@SharedLocalizer.GetLocalizedHtmlString("90%")</option>
                             <option value="100">@SharedLocalizer.GetLocalizedHtmlString("100%")</option>
                         </select>
                     </td>
@@ -67,14 +207,58 @@
                     <td><label asp-for="Diesel_Level_Comment" class="control-label"></label></td>
                     <td><input asp-for="Diesel_Level_Comment" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Comment:")" class="form-control" style="width:100%;" /></td>
                 </tr>
+
+                <tr class="border-top-grey">
+
+
+                <tr id="spareTankFields" hidden="hidden">
+                    <td><label asp-for="SpareTank_Level" class="control-label"></label></td>
+                    <td>
+                        <select asp-for="SpareTank_Level" class="form-control" style="width:100%;">
+                            <option value="0">@SharedLocalizer.GetLocalizedHtmlString("Empty")</option>
+                            <option value="10">@SharedLocalizer.GetLocalizedHtmlString("10%")</option>
+                            <option value="20">@SharedLocalizer.GetLocalizedHtmlString("20%")</option>
+                            <option value="30">@SharedLocalizer.GetLocalizedHtmlString("30%")</option>
+                            <option value="40">@SharedLocalizer.GetLocalizedHtmlString("40%")</option>
+                            <option value="50">@SharedLocalizer.GetLocalizedHtmlString("50%")</option>
+                            <option value="60">@SharedLocalizer.GetLocalizedHtmlString("60%")</option>
+                            <option value="70">@SharedLocalizer.GetLocalizedHtmlString("70%")</option>
+                            <option value="80">@SharedLocalizer.GetLocalizedHtmlString("80%")</option>
+                            <option value="90">@SharedLocalizer.GetLocalizedHtmlString("90%")</option>
+                            <option selected="selected" value="100">@SharedLocalizer.GetLocalizedHtmlString("100%")</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr id="spareTankComments" hidden="hidden">
+                    <td><label asp-for="SpareTank_Level_Comment" class="control-label"></label></td>
+                    <td><input asp-for="SpareTank_Level_Comment" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Comment:")" class="form-control" style="width:100%;" /></td>
+                </tr>
+
+                <tr class="border-top-grey">
+
+
+
+
                 <tr>
                     <td><label asp-for="Coolant" class="control-label"></label></td>
-                    <td><input asp-for="Coolant" class="form-control" style="width:100%;" /></td>
+                    <td>
+                        @* <input asp-for="Coolant" class="form-control" style="width:100%;" /> *@
+                        <div class="custom-radio">
+                            <input type="radio" asp-for="Coolant" id="coolantOK" value="true" checked />
+                            <label for="coolantOK" class="control-label">Yes</label>
+
+                            <input type="radio" asp-for="Coolant" id="coolantNotOK" value="false" />
+                            <label for="coolantNotOK">No</label>
+                        </div>
+                    </td>
                 </tr>
                 <tr>
                     <td><label asp-for="Coolant_Comment" class="control-label"></label></td>
                     <td><input asp-for="Coolant_Comment" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Comment:")" class="form-control" style="width:100%;" /></td>
                 </tr>
+
+                <tr class="border-top-grey">
+
                 <tr>
                     <td><label asp-for="Generator_Started" class="control-label"></label></td>
                     <td>
@@ -89,10 +273,13 @@
                     <td><label asp-for="Generator_Started_Comment" class="control-label"></label></td>
                     <td><input asp-for="Generator_Started_Comment" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Comment:")" class="form-control" style="width:100%;" /></td>
                 </tr>
+
+                <tr class="border-top-grey">
+
                 <tr>
                     <td><label asp-for="Equipment_Started" class="control-label"></label></td>
                     <td>
-                        <select asp-for="Equipment_Started" class="form-control" style="width:100%;">
+                        <select asp-for="Equipment_Started" id="equipmentStarted" class="form-control" style="width:100%;">
                             <option value="No">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
                             <option value="Yes">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
                             <option value="Not Applicable">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
@@ -103,6 +290,9 @@
                     <td><label asp-for="Equipment_Started_Comment" class="control-label"></label></td>
                     <td><input asp-for="Equipment_Started_Comment" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Comment:")" class="form-control" style="width:100%;" /></td>
                 </tr>
+
+                <tr class="border-top-grey">
+
                 <tr>
                     <td><label asp-for="Generator_Stopped" class="control-label"></label></td>
                     <td>
@@ -117,10 +307,13 @@
                     <td><label asp-for="Generator_Stopped_Comment" class="control-label"></label></td>
                     <td><input asp-for="Generator_Stopped_Comment" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Comment:")" class="form-control" style="width:100%;" /></td>
                 </tr>
+
+                <tr class="border-top-grey">
+
                 <tr>
                     <td><label asp-for="Equipment_Started_After" class="control-label"></label></td>
                     <td>
-                        <select asp-for="Equipment_Started_After" class="form-control" style="width:100%;">
+                        <select asp-for="Equipment_Started_After" id="equipmentStartedAfter" class="form-control" style="width:100%;">
                             <option value="No">@SharedLocalizer.GetLocalizedHtmlString("No")</option>
                             <option value="Yes">@SharedLocalizer.GetLocalizedHtmlString("Yes")</option>
                             <option value="Not Applicable">@SharedLocalizer.GetLocalizedHtmlString("Not Applicable")</option>
@@ -131,6 +324,10 @@
                     <td><label asp-for="Equipment_Started_After_Comment" class="control-label"></label></td>
                     <td><input asp-for="Equipment_Started_After_Comment" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Comment:")" class="form-control" style="width:100%;" /></td>
                 </tr>
+
+
+                <tr class="border-top-grey">
+
                 <tr>
                     <td><label asp-for="Generator_Hours" class="control-label"></label></td>
                     <td><input asp-for="Generator_Hours" class="form-control" style="width:100%;" /><span asp-validation-for="Generator_Hours" class="text-danger"></span></td>
@@ -186,7 +383,9 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
     <script src="~/js/signature_pad.min.js"></script>
     <script type="text/javascript">
@@ -227,6 +426,8 @@
                 FillSubProjects();
             });
         });
+
+
         $(document).ready(function () {
             $(function () {
                 var canvas = document.querySelector("#signature");
@@ -240,9 +441,62 @@
                     $('#clear').click(function () {
                         pad.clear();
                     })
-
             })
         });
+
+        //  $(document).ready(function() {
+        //     // Set initial radio button state based on model value
+        //     const fullLoadValue = $('#fullLoadValue').val().toLowerCase();
+        //     if (fullLoadValue === 'true') {
+        //         $('#fullLoad').prop('checked', true);
+        //     } else {
+        //         $('#noFullLoad').prop('checked', true);
+        //     }
+
+        //     // Update hidden field when radio selection of loadType changes
+        //     $('input[name="loadType"]').change(function() {
+        //         $('#fullLoadValue').val($(this).val());
+        //     });
+        // });
+
+        $(document).ready(function()
+        {
+            let forceNo = false;
+
+            // When 'No Full Load' is selected, activate the override
+            $('#noFullLoad').on('change', function() {
+                if ($(this).is (':checked')) {
+                    forceNo = true;
+                    //change due to Luca's wishes
+                    // $('#equipmentStarted').val('No');
+                    // $('#equipmentStartedAfter').val('No');
+                }
+            });
+
+            // When 'Full Load' is selected, remove the override
+            $('#fullLoad').on('change', function() {
+                if ($(this).is (':checked')) {
+                    forceNo = false;
+                }
+            });
+
+            // change due to Luca's wishes
+            // Always force 'No' if override is active
+            // $('#equipmentStarted').on('change', function() {
+            //     if (forceNo)
+            //     {
+            //         $(this).val('No');
+            //     }
+            // });
+
+            // $('#equipmentStartedAfter').on('change', function() {
+            //     if (forceNo)
+            //     {
+            //         $(this).val('No');
+            //     }
+            // });
+        });
+
         function retrieveData(e) {
             var posting = true;
             var s1 = document.getElementById("Signature");
@@ -260,10 +514,102 @@
             if (posting == true) {
                 StartSpinner();
             }
-           
         }
+
+        function FillAddresses() {
+            var dropdown = document.getElementById("generatorDropdown");
+            var selectedValue = dropdown.value;
+            console.log('selectedValue: ' + selectedValue);
+
+            // Get selected option's text
+            var selectedText = dropdown.options[dropdown.selectedIndex].text;
+
+            // Output to console for verification
+            console.log('Selected Text: ' + selectedText);
+                        
+            if (selectedText != "Generator Nr. 6 (Atlas Copco)" && selectedText != "Generator Nr. 7 (Atlas Copco)" ){
+                $("#adBlueLevelFields").attr('hidden', 'hidden');
+                $("#adBlueLevelComments").attr('hidden', 'hidden');
+            }else{
+                 if ($("#adBlueLevelFields").is(":hidden") == true) {
+                        $("#adBlueLevelFields").removeAttr('hidden');
+                }
+
+                if ($("#adBlueLevelComments").is(":hidden") == true) {
+                        $("#adBlueLevelComments").removeAttr('hidden');
+                }
+            }
+
+            // Extract address part after " / Adresse: "
+            // var address = "";
+            // if (selectedValue.includes(" / Adresse: ")) {
+            //     address = selectedValue.split(" / Adresse: ")[1];
+            // }
+
+            var address = dropdown.value;
+
+            var addressField = document.getElementById("selectedGeneratorValue");
+            addressField.value = address;
+
+            //generatorNameValue
+            var nameField = document.getElementById("generatorNameValue");
+            nameField.value = selectedText;
+         }
+
         function FillSubProjects() {
             var ProjectId = $('#ProjectId').val();
+            console.log('Project Id: ' + ProjectId);
+            
+            if ($("#adBlueLevelFields").is(":hidden") == true) {
+                $("#adBlueLevelFields").removeAttr('hidden');
+            }
+            
+            if ($("#adBlueLevelComments").is(":hidden") == true) {
+                $("#adBlueLevelComments").removeAttr('hidden');
+            }
+
+            // Show or hide the <tr> based on ProjectId
+            if (ProjectId == "437" || ProjectId == "653" ) {
+                if ($("#testtypefields").is(":hidden") == true) {
+                        $("#testtypefields").removeAttr('hidden');
+                }
+
+                if ($("#testtypecomments").is(":hidden") == true) {
+                     $("#testtypecomments").removeAttr('hidden');
+                }
+
+                if ($("#address").is(":hidden") == true) {
+                     $("#address").removeAttr('hidden');
+                }
+
+                if ($("#generatorName").is(":hidden") == true) {
+                     $("#generatorName").removeAttr('hidden');
+                }
+
+                //spareTankFields
+                 if ($("#spareTankFields").is(":hidden") == true) {
+                     $("#spareTankFields").removeAttr('hidden');
+                }
+
+                //spareTankComments
+                if ($("#spareTankComments").is(":hidden") == true) {
+                     $("#spareTankComments").removeAttr('hidden');
+                }
+
+                $("#generatorNameLocation").attr('hidden', 'hidden');
+            } else {
+                 $("#testtypefields").attr('hidden', 'hidden'); // Add the hidden attribute back
+                 $("#testtypecomments").attr('hidden', 'hidden');
+                 $("#address").attr('hidden', 'hidden');
+                 $("#generatorName").attr('hidden', 'hidden');
+                 $("#spareTankFields").attr('hidden', 'hidden');
+                 $("#spareTankComments").attr('hidden', 'hidden');
+
+                 if ($("#generatorNameLocation").is(":hidden") == true) {
+                     $("#generatorNameLocation").removeAttr('hidden');
+                }
+            }
+
             var url = '@Url.Action("GetSubProjectList", "SubProjects")';
             $.ajax({
                 type: 'GET',
@@ -286,5 +632,9 @@
                 }
             });
         }
+
     </script>
+
+
+
 }

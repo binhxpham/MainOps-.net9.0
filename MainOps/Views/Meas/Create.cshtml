@@ -1,7 +1,13 @@
 ﻿@model MainOps.Models.Meas
 <link href="~/css/jquery-ui-timepicker-addon.min.css" rel="stylesheet" />
 <head>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM&libraries=places"></script>
+    @* <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDhvR9rVDhwZhuFSlvp9ZYsGLVpLt6KlIM&libraries=places"></script>
+ *@
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBZBU48i_mLH-TfVWO-UfsKM_Qu7fyPdWs&libraries=places"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 
 @inject UserManager<ApplicationUser> _userManager;

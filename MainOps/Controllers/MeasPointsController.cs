@@ -861,11 +861,11 @@ namespace MainOps.Controllers
                     }
 
                     var projid = Convert.ToInt32(flowMeas.ProjectId);
-                    rightlabor = await FindRightLabor(projid, measPoint.LaborId);
-                    flowMeas.LaborId = rightlabor;
-                    _context.Add(flowMeas);
-                    await _context.SaveChangesAsync();
-                    var last_added1 = await _context.MeasPoints.LastAsync();
+                    //var last_added1 = await _context.MeasPoints.LastAsync();
+                    var last_added1 = await _context.MeasPoints
+                                        .OrderByDescending(m => m.Id)
+                                        .FirstOrDefaultAsync();
+
                     Offset newOffsetflow = new Offset();
                     newOffsetflow.MeasPointId = last_added1.Id;
                     newOffsetflow.offset = last_added1.Offset;
@@ -898,7 +898,9 @@ namespace MainOps.Controllers
                     VMMeas.LaborId = rightlabor;
                     _context.Add(VMMeas);
                     await _context.SaveChangesAsync();
-                    var last_added2 = await _context.MeasPoints.LastAsync();
+                    //var last_added2 = await _context.MeasPoints.LastAsync();
+                    var last_added2 = await _context.MeasPoints.OrderByDescending(m => m.Id).FirstOrDefaultAsync();
+
                     Offset newOffsetWM = new Offset();
                     newOffsetWM.MeasPointId = last_added2.Id;
                     newOffsetWM.offset = last_added2.Offset;
@@ -4266,7 +4268,16 @@ namespace MainOps.Controllers
         public JsonResult GetMeasPointsInRadius2(double lati, double longi)
         {
             List<MeasPoint> mps = new List<MeasPoint>();
-            var thedata = _context.MeasPoints.Include(x => x.Project).Where(x => x.Project.Active.Equals(true) && DistanceAlgorithm.DistanceBetweenPlaces(longi, lati, Convert.ToDouble(x.Longi), Convert.ToDouble(x.Lati)) <= 2 && (x.MeasType.Type.ToLower().Equals("water level") || x.MeasType.Type.ToLower().Equals("miscellaneous"))).ToList();
+            //var thedata = _context.MeasPoints.Include(x => x.Project).Where(x => x.Project.Active.Equals(true) && DistanceAlgorithm.DistanceBetweenPlaces(longi, lati, Convert.ToDouble(x.Longi), Convert.ToDouble(x.Lati)) <= 2 && (x.MeasType.Type.ToLower().Equals("water level") || x.MeasType.Type.ToLower().Equals("miscellaneous"))).ToList();
+            var thedata = _context.MeasPoints
+                    .Include(x => x.Project)
+                    .Include(x => x.MeasType)
+                    .Where(x => x.Project.Active) // EF can translate this
+                    .AsEnumerable() // switch to in-memory processing from here
+                    .Where(x => DistanceAlgorithm.DistanceBetweenPlaces(longi, lati, Convert.ToDouble(x.Longi), Convert.ToDouble(x.Lati)) <= 2
+                                && (x.MeasType.Type.ToLower() == "water level" || x.MeasType.Type.ToLower() == "miscellaneous"))
+                    .ToList();
+
             return Json(thedata);
         }
         [HttpPost]

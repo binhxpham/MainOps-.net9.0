@@ -11,12 +11,12 @@ namespace MainOps.Models
         [Key]
         public int? Id { get; set; }
         public int? ProjectId { get; set; }
-        public virtual Project Project { get; set; }
+        public virtual Project? Project { get; set; }
         [Display(Name = "Well Name")]
-        public string WellName { get; set; }
+        public string? WellName { get; set; }
         [Display(Name = "Well Found?")]
         public bool CanBeFound { get; set; }
-        public string Comments { get; set; }
+        public string? Comments { get; set; }
         [Display(Name = "Water Level 1st Pipe(deepest)(m)")]
         public double? Dip { get; set; }
         [Display(Name = "Water Level 2nd deepest Pipe(m)")]
@@ -43,9 +43,9 @@ namespace MainOps.Models
         public bool IsShaftOk { get; set; }
         [Display(Name = "Are well plugs present?")]
         public bool WellHeads { get; set; }
-        public string DoneBy { get; set; }
+        public string? DoneBy { get; set; }
         public DateTime? TimeStamp { get; set; }
-        public ICollection<PhotoFileWellCheck> Photos { get; set; }
+        public ICollection<PhotoFileWellCheck>? Photos { get; set; }
 
 
     }
@@ -53,10 +53,10 @@ namespace MainOps.Models
     {
         [Key]
         public int Id { get; set; }
-        public string Path { get; set; }
+        public string? Path { get; set; }
         [Display(Name = "Time Stamp")]
         public DateTime TimeStamp { get; set; }
         public int WellCheckId { get; set; }
-        public virtual WellCheck WellCheck { get; set; }
+        public virtual WellCheck? WellCheck { get; set; }
     }
 }

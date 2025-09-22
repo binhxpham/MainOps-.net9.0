@@ -11,15 +11,15 @@ namespace MainOps.Models
         [Key]
         public int? Id { get; set; }
         [Display(Name = "Title of Extra Work BoQ")]
-        public string ExtraWorkSubTitle { get; set; }
+        public string? ExtraWorkSubTitle { get; set; }
         [Display(Name = "Extra Work Main Header")]
         public int? BoQHeadLineId { get; set; }
         [Display(Name = "Extra Work Main Header")]
-        public virtual BoQHeadLine BoQHeadLine {get; set;}
+        public virtual BoQHeadLine? BoQHeadLine {get; set;}
         [Display(Name = "Sub Headers")]
-        public ICollection<ExtraWorkBoQHeader> Headers { get; set; }
+        public ICollection<ExtraWorkBoQHeader>? Headers { get; set; }
         [Display(Name = "Bullet Point Descriptions")]
-        public ICollection<ExtraWorkBoQDescription> Descriptions { get; set; }
+        public ICollection<ExtraWorkBoQDescription>? Descriptions { get; set; }
         public ExtraWorkBoQ()
         {
 
@@ -33,28 +33,28 @@ namespace MainOps.Models
     public class ExtraWorkBoQVM
     {
         [Display(Name = "Title of Extra Work BoQ")]
-        public string ExtraWorkSubTitle { get; set; }
+        public string? ExtraWorkSubTitle { get; set; }
         public int? BoQHeadLineId { get; set; }
         [Display(Name = "Extra Work Main Header")]
-        public virtual BoQHeadLine BoQHeadLine { get; set; }
+        public virtual BoQHeadLine? BoQHeadLine { get; set; }
         [Display(Name = "Sub Headers")]
-        public List<ExtraWorkBoQHeader> Headers { get; set; }
+        public List<ExtraWorkBoQHeader>? Headers { get; set; }
         [Display(Name = "Bullet Point Descriptions")]
-        public List<ExtraWorkBoQDescription> Descriptions { get; set; }
+        public List<ExtraWorkBoQDescription>? Descriptions { get; set; }
         [Display(Name = "BoQ Items")]
-        public List<ExtraWorkBoQItem> BoQItems { get; set; }
+        public List<ExtraWorkBoQItem>? BoQItems { get; set; }
     }
     public class ExtraWorkBoQHeader
     {
         [Key]
         public int Id { get; set; }
         public int? ExtraWorkBoQId { get; set; }
-        public virtual ExtraWorkBoQ ExtraWorkBoQ { get; set; }
+        public virtual ExtraWorkBoQ? ExtraWorkBoQ { get; set; }
         [Display(Name = "Sub Header Title")]
-        public string Title { get; set; }
-        public string Number { get; set; }
+        public string? Title { get; set; }
+        public string? Number { get; set; }
         [Display(Name = "BoQ Items")]
-        public ICollection<ExtraWorkBoQItem> BoQItems { get; set; }
+        public ICollection<ExtraWorkBoQItem>? BoQItems { get; set; }
     }
     public class ExtraWorkBoQDescription
     {
@@ -63,11 +63,11 @@ namespace MainOps.Models
         [Display(Name = "ExtraWork BoQ")]
         public int? ExtraWorkBoQId { get; set; }
         [Display(Name = "ExtraWork BoQ")]
-        public virtual ExtraWorkBoQ ExtraWorkBoQ { get; set; }
+        public virtual ExtraWorkBoQ? ExtraWorkBoQ { get; set; }
         [Display(Name = "Descriptive bullet point for this BoQ")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
         public bool IsRelatedToBoQ { get; set; }
-        public string Topic { get; set; }
+        public string? Topic { get; set; }
     }
     public class ExtraWorkBoQItem
     {

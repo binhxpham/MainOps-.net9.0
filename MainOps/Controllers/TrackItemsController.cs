@@ -6683,8 +6683,10 @@ namespace MainOps.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Admin,DivisionAdmin,Manager")]
-        public ActionResult GetInvoice(string starttime, string endtime, int ProjectId, string generationtime)
+        public async Task<ActionResult> GetInvoice(string starttime, string endtime, int ProjectId, string generationtime)
         {
+            var user = await _userManager.GetUserAsync(User);
+
             DateTime myStart = DateTime.ParseExact(starttime, "yyyy-MM-dd",
                                        System.Globalization.CultureInfo.InvariantCulture);
             DateTime myEnd = DateTime.ParseExact(endtime, "yyyy-MM-dd",
@@ -6692,9 +6694,22 @@ namespace MainOps.Controllers
 
             var project = _context.Projects.Find(ProjectId);
             //string filePath = "~/AHAK/akonto/AKONTO_" + generationtime + "_" + project.Abbreviation + "_" + myStart.ToString("yyyy-MM-dd") + "_" + myEnd.ToString("yyyy-MM-dd") + ".pdf";
-            string filePath = "~/AHAK/akonto/Documentation/AKONTO_" + generationtime + "_" + project.Abbreviation + "_" + myStart.ToString("yyyy-MM-dd") + "_" + myEnd.ToString("yyyy-MM-dd") + ".pdf";
-            Response.Headers.Add("Content-Disposition", "inline; filename=test.pdf");
-            return File(filePath, "application/pdf");
+            //string filePath = "~/AHAK/akonto/Documentation/AKONTO_" + generationtime + "_" + project.Abbreviation + "_" + myStart.ToString("yyyy-MM-dd") + "_" + myEnd.ToString("yyyy-MM-dd") + ".pdf";
+            //Response.Headers.Add("Content-Disposition", "inline; filename=test.pdf");
+            //return File(filePath, "application/pdf");
+
+            var fileName = $"AKONTO_{generationtime}_{project.Abbreviation}_{myStart:yyyy-MM-dd}_{myEnd:yyyy-MM-dd}.pdf";
+            var filePath = Path.Combine(_env.WebRootPath, "AHAK", "akonto", "Documentation", fileName);
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound($"File not found: {filePath}");
+            }
+
+            var fileBytes = await System.IO.File.ReadAllBytesAsync(filePath);
+            return File(fileBytes, "application/pdf", fileName);
+
+            // opens inline in browser
         }
         [HttpGet]
         [Authorize(Roles = "Admin,DivisionAdmin,Manager")]
@@ -6789,7 +6804,7 @@ namespace MainOps.Controllers
         }
         [HttpGet]
         [Authorize(Roles = "Admin,DivisionAdmin,Manager")]
-        public async Task SaveAsPdfBackGround(InvoiceModel model, bool Split, DateTime GenerationTime)
+        public async Task SaveAsPdfBackGround_(InvoiceModel model, bool Split, DateTime GenerationTime)
         {
             var user = await _userManager.GetUserAsync(User);
             string footer = "--footer-center \"" + _SharedLocalizer.GetLocalizedHtmlString("Printed on:").Value + DateTime.Now.Date.ToString("yyyy-MM-dd") + "  Page: [page]/[toPage]\"" + " --footer-line --footer-font-size \"9\" --footer-spacing 6 --footer-font-name \"calibri light\"";
@@ -6877,6 +6892,112 @@ namespace MainOps.Controllers
 
 
         }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin,DivisionAdmin,Manager")]
+        public async Task SaveAsPdfBackGround(InvoiceModel model, bool Split, DateTime GenerationTime)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            string footer = "--footer-center \"" + _SharedLocalizer.GetLocalizedHtmlString("Printed on:").Value + DateTime.Now.Date.ToString("yyyy-MM-dd") + "  Page: [page]/[toPage]\"" + " --footer-line --footer-font-size \"9\" --footer-spacing 6 --footer-font-name \"calibri light\"";
+            if (Split)
+            {
+                var project = await _context.Projects.FindAsync(model.ProjectId);
+                ViewAsPdf pdf = new ViewAsPdf("_invoice_all", model)
+                {
+                    FileName = "AKONTO_" + GenerationTime.ToString("yyyy-MM-dd_HHmmss") + "_" + project.Abbreviation + "_" + model.starttime.ToString("yyyy-MM-dd") + "_" + model.endtime.ToString("yyyy-MM-dd") + ".pdf",
+                    CustomSwitches = footer,
+                };
+
+                //string fullPath = _env.WebRootPath + "\\AHAK\\akonto\\Documentation\\" + user.full_name() + "\\";
+                string fullPath = _env.WebRootPath + "\\AHAK\\akonto\\Documentation\\";
+                if (!Directory.Exists(fullPath))
+                {
+                    Directory.CreateDirectory(fullPath);
+                }
+                Task<byte[]> t = Task.Run(() => pdf.BuildFile(ControllerContext));
+                try
+                {
+                    t.Wait();
+                }
+                catch
+                {
+
+                }
+                if (t.Status == TaskStatus.RanToCompletion)
+                {
+                    using (var fileStream = new FileStream(fullPath + pdf.FileName, FileMode.Create, FileAccess.Write))
+                    {
+                        fileStream.Write(t.Result, 0, t.Result.Length);
+                    }
+                    PersonalFile pfile = new PersonalFile
+                    {
+                        ApplicationUserId = user.Id,
+                        Downloaded = false,
+                        FileName = pdf.FileName,
+                        FileExtension = ".pdf",
+                        path = fullPath + pdf.FileName
+                    };
+                    _context.Add(pfile);
+                    _context.SaveChanges();
+                }
+            }
+            else
+            {
+                //foreach (var it in model.headlines)
+                //{
+                //    Debug.WriteLine($"Headline: {it.HeadLine}");
+                //}
+
+                //foreach (var it in model.items)
+                //{
+                //    Debug.WriteLine($"invoice item: {it.Item_Name}");
+                //}
+
+
+                ViewAsPdf pdf = new ViewAsPdf("_invoice", model)
+                {
+                    FileName = "AKONTO_" + GenerationTime.ToString("yyyy-MM-dd_HHmmss") + "_" + model.Project.Abbreviation + "_" + model.starttime.ToString("yyyy-MM-dd") + "_" + model.endtime.ToString("yyyy-MM-dd") + ".pdf",
+                    CustomSwitches = footer,
+                };
+
+                //string fullPath = _env.WebRootPath + "\\AHAK\\akonto\\documentation\\" + user.full_name() + "\\";
+                string fullPath = _env.WebRootPath + "\\AHAK\\akonto\\documentation\\";
+
+                if (!Directory.Exists(fullPath))
+                {
+                    Directory.CreateDirectory(fullPath);
+                }
+                Task<byte[]> t = Task.Run(() => pdf.BuildFile(ControllerContext));
+                try
+                {
+                    t.Wait();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine("Error creating pdf in bytes: " + ex.ToString());
+                }
+                if (t.Status == TaskStatus.RanToCompletion)
+                {
+                    using (var fileStream = new FileStream(fullPath + pdf.FileName, FileMode.Create, FileAccess.Write))
+                    {
+                        fileStream.Write(t.Result, 0, t.Result.Length);
+                    }
+                    PersonalFile pfile = new PersonalFile
+                    {
+                        ApplicationUserId = user.Id,
+                        Downloaded = false,
+                        FileName = pdf.FileName,
+                        FileExtension = ".pdf",
+                        path = fullPath + pdf.FileName
+                    };
+                    _context.Add(pfile);
+                    _context.SaveChanges();
+                }
+            }
+
+
+        }
+
         public async Task SaveDocumenationAsPdfBackGround(AllDocumentation model, bool Split, DateTime GenerationTime)
         {
             var user = await _userManager.GetUserAsync(User);

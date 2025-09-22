@@ -348,13 +348,18 @@ app.Use(async (context, next) =>
     
     context.Response.Headers["Content-Security-Policy"] =
         "default-src 'self'; " +
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://maps.gstatic.com https://ajax.googleapis.com https://cdnjs.cloudflare.com https://www.gstatic.com/charts/; " +
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://ajax.googleapis.com https://www.gstatic.com/charts/; " +
-        "img-src 'self' data: https://maps.gstatic.com https://maps.googleapis.com; " +
+        //"script-src 'self' 'unsafe-inline' 'unsafe-eval' https://maps.googleapis.com https://maps.gstatic.com https://ajax.googleapis.com https://cdnjs.cloudflare.com https://www.gstatic.com/charts/ https://cdn.jsdelivr.net https://js.monitor.azure.com; " +
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' " +
+            "https://maps.googleapis.com https://maps.gstatic.com https://ajax.googleapis.com " +
+            "https://cdnjs.cloudflare.com https://www.gstatic.com/charts/ " +
+            "https://cdn.jsdelivr.net https://ajax.aspnetcdn.com https://js.monitor.azure.com; " +
+        //"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://ajax.googleapis.com https://www.gstatic.com/charts/; " +
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://ajax.googleapis.com https://www.gstatic.com/charts/ https://cdn.jsdelivr.net; " +
+        "img-src 'self' data: https://maps.googleapis.com https://maps.gstatic.com https://maps.googleapis.com; " +
         "font-src 'self' https://fonts.gstatic.com; " +
         "connect-src 'self' https://maps.googleapis.com https://maps.gstatic.com; " +
-        "frame-src 'self' https://www.google.com; " +
-        "img-src 'self' data: https://maps.googleapis.com https://maps.gstatic.com;";
+        "frame-src 'self' https://www.google.com; ";// +
+        //"img-src 'self' data: https://maps.googleapis.com https://maps.gstatic.com;"
 
     await next();
 });
