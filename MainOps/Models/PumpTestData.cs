@@ -21,9 +21,9 @@ namespace MainOps.Models
         [Display(Name = "Dip")]
         public double? Dip { get; set; }
         [Display(Name = "Comment")]
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
         [ForeignKey("ThreeStepTest")]
-        public int ThreeStepTestId { get; set; }
+        public int? ThreeStepTestId { get; set; }
     }
     public class ThreeStepTest
     {
@@ -32,13 +32,13 @@ namespace MainOps.Models
         [Display(Name = "Project")]
         [ForeignKey("Project")]
         public int ProjectId { get; set; }
-        public virtual Project Project { get; set; }
+        public virtual Project? Project { get; set; }
         [Display(Name = "Sub Project")]
         [ForeignKey("SubProject")]
         public int? SubProjectId { get; set; }
-        public virtual SubProject SubProject { get; set; }
+        public virtual SubProject? SubProject { get; set; }
         [Display(Name = "Well")]
-        public string Wellname { get; set; }
+        public string? Wellname { get; set; }
         [Display(Name = "Known Well")]
         [ForeignKey("MeasPoint")]
         public int? MeasPointId { get; set; }
@@ -67,12 +67,12 @@ namespace MainOps.Models
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:hh\\:mm}")]
         [RegularExpression(@"((([0-1][0-9])|(2[0-3]))(:[0-5][0-9])(:[0-5][0-9])?)", ErrorMessage = "Time must be between 00:00 to 23:59")]
         public TimeSpan? Init_Meas_Time { get; set; }
-        public IList<PumpTestData> TestData { get; set; }
-        public string imagepath { get; set; }
-        public string DoneBy { get; set; }
+        public IList<PumpTestData>? TestData { get; set; }
+        public string? imagepath { get; set; }
+        public string? DoneBy { get; set; }
         public double? Latitude { get; set; }
         public double? Longitude { get; set; }
-        public string TestType { get; set; }
+        public string? TestType { get; set; }
         [Display(Name = "Total m3")]
         public double Totalm3
         {
@@ -92,5 +92,7 @@ namespace MainOps.Models
                 }
             }
         }
+
+        public ThreeStepTest() { }
     }
 }

@@ -9,18 +9,18 @@ namespace MainOps.Models
     public class BaseReportInfo
     {
         [Display(Name = "Project" )]
-        public int ProjectId { get; set; }
+        public int? ProjectId { get; set; }
         [Display(Name = "Project")]
-        public virtual Project Project { get; set; }
+        public virtual Project? Project { get; set; }
         [Display(Name = "SubProject")]
         public int? SubProjectId { get; set; }
         [Display(Name = "SubProject")]
-        public virtual SubProject SubProject { get; set; }
+        public virtual SubProject? SubProject { get; set; }
         [Display(Name = "Time Stamp")]
         public DateTime TimeStamp { get; set; }
         [Display(Name = "Comments")]
-        public string Comments { get; set; }
+        public string? Comments { get; set; }
         [Display(Name = "Made By")]
-        public string DoneBy { get; set; }
+        public string? DoneBy { get; set; }
     }
 }

@@ -1,177 +1,190 @@
 ﻿@model IEnumerable<MainOps.Models.HourRegistration>
 
 @{
-    ViewData["Title"] = "HourRegistrations";
+    ViewData["Title"] = "Hour Registrations";
 }
 @inject UserManager<ApplicationUser> _userManager;
+
+@{
+    var currentUser = await _userManager.GetUserAsync(User);
+}
+
 <h2>Time Registreringer</h2>
-<span><button id="hide" type="button">@SharedLocalizer.GetLocalizedHtmlString("Hide Old Hour Sheets")</button></span>
-<span><button id="show" type="button">@SharedLocalizer.GetLocalizedHtmlString("Show Old Hour Sheets")</button></span>
+@* <span><button id="hide" type="button">@SharedLocalizer.GetLocalizedHtmlString("Hide Old Hour Sheets")</button></span>
+<span><button id="show" type="button">@SharedLocalizer.GetLocalizedHtmlString("Show Old Hour Sheets")</button></span> *@
+<span><button id="toggleOldSheets" type="button">@SharedLocalizer.GetLocalizedHtmlString("Hide Old Hour Sheets")</button></span>
+<span><button id="unchecked" type="button">@SharedLocalizer.GetLocalizedHtmlString("Only Unchecked Hour Registrations")</button></span>
+
+@if (currentUser.Email.Equals("bin@hj-as.dk") || currentUser.Email.Equals("jav@hj-as.dk") || currentUser.Email.Equals("jaj@hj-as.dk"))
+{
+    <span>Lønlister sendt til:</span>
+    <span>
+        <form asp-action="Edit_Receiver" method="post">
+            <input type="hidden" name="Id" value="@ViewData["DivisionId"]" /> <!-- known Id -->
+            <input type="text" name="ReceiverEmail" placeholder="Email" value="@ViewData["ReceiverEmail"]" />
+            <button type="submit">OK</button>
+        </form>
+    </span>    
+}
+
+<style>
+    #unchecked.active {
+        background-color: #000000; /* black */
+        color: white;
+    }
+
+    #unchecked.inactive {
+        background-color: #D0D0D0; /* grey */
+        color: black;
+    }
+
+    #toggleOldSheets.active {
+        background-color: #000000; /* black */
+        color: white;
+    }
+
+    #toggleOldSheets.inactive {
+        background-color: #D0D0D0; /* grey */
+        color: black;
+    }
+</style>
+
+
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.FullName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Week1)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Week2)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Edited)
-            </th>
+            <th>@Html.DisplayNameFor(model => model.FullName)</th>
+            <th>@Html.DisplayNameFor(model => model.Week1)</th>
+            <th>@Html.DisplayNameFor(model => model.Week2)</th>
+            <th>@Html.DisplayNameFor(model => model.Edited)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model.OrderByDescending(x => x.HourSheetYear).ThenByDescending(x => x.Week1))
         {
-            @if (User.IsInRole("Admin") || (await _userManager.GetUserAsync(User)).full_name().Equals(item.Supervisor_Name))
-            {
-                @if (item.HourSheetYear < DateTime.Now.Year)
-                {
-                    <tr class="hiddentr" style="display:none;">
-                        <td>
-                            @Html.DisplayFor(modelItem => item.FullName)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Week1)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Week2)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Edited)
-                        </td>
-                        <td>
-                            @if (item.Edited.Equals(false))
-                            {
-                                <a asp-action="Edit_HourRegistration" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
-                            }
-                            else
-                            {
-                                <a asp-action="HourRegistration_PDF" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("View")</a>
-                                <a asp-action="Edit_HourRegistration" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
-                            }
-                        </td>
-                    </tr>
-                }
-                else
-                {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.FullName)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Week1)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Week2)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Edited)
-                        </td>
-                        <td>
-                            @if (item.Edited.Equals(false))
-                            {
-                                <a asp-action="Edit_HourRegistration" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
-                            }
-                            else
-                            {
-                                <a asp-action="HourRegistration_PDF" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("View")</a>
-                                <a asp-action="Edit_HourRegistration" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
-                            }
-                        </td>
-                    </tr>
-                }
+            //var currentUser = await _userManager.GetUserAsync(User);
 
+            // Role: Admin or Supervisor of the person
+            if (User.IsInRole("Admin") || currentUser.full_name().Equals(item.Supervisor_Name))
+            {
+                var trClass = (item.Edited ?  "" : "uncheckedtr ") + (item.HourSheetYear < DateTime.Now.Year ? "hiddentr" : "");
+                var style = item.HourSheetYear < DateTime.Now.Year ? "display:none;" : "";
+
+                <tr class="@trClass" style="@style">
+                    <td>@Html.DisplayFor(modelItem => item.FullName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Week1)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Week2)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Edited)</td>
+                    <td>
+                        @if (!item.Edited)
+                        {
+                            <a asp-action="Edit_HourRegistration" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
+                        }
+                        else
+                        {
+                            <a asp-action="HourRegistration_PDF" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("View")</a>
+                            <a asp-action="Edit_HourRegistration" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
+                        }
+
+                        @if (currentUser.Email.Equals("bin@hj-as.dk") || currentUser.Email.Equals("jav@hj-as.dk") || currentUser.Email.Equals("jaj@hj-as.dk"))
+                        {
+                            <a asp-action="Delete_HourRegistration" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Delete")</a>
+
+                        }
+                    </td>
+                </tr>
             }
-            else if ((User.IsInRole("Supervisor") || User.IsInRole("ProjectMember")) && (await _userManager.GetUserAsync(User)).full_name().Equals(item.FullName))
+            // Role: Supervisor or ProjectMember of themselves
+            else if ((User.IsInRole("Supervisor") || User.IsInRole("ProjectMember")) && currentUser.full_name().Equals(item.FullName))
             {
-                @if (item.HourSheetYear < DateTime.Now.Year)
-                {
-                    <tr class="hiddentr" style="display:none;">
-                        <td>
-                            @Html.DisplayFor(modelItem => item.FullName)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Week1)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Week2)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Edited)
-                        </td>
-                        <td>
-                            @if (item.Edited.Equals(false))
-                            {
-                                <a asp-action="Edit_HourRegistration" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
-                            }
-                            else
-                            {
-                                <a asp-action="HourRegistration_PDF" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("View")</a>
-                                <a asp-action="Edit_HourRegistration" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
-                            }
-                        </td>
-                    </tr>
-                }
-                else
-                {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.FullName)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Week1)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Week2)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Edited)
-                        </td>
-                        <td>
-                            @if (item.Edited.Equals(false))
-                            {
-                                <a asp-action="Edit_HourRegistration" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
-                                <a asp-action="HourRegistration_PDF" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("View Current Un-approved version")</a>
-                            }
-                            else
-                            {
-                                <a asp-action="HourRegistration_PDF" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("View")</a>
-                                <a asp-action="Edit_HourRegistration" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
-                            }
-                        </td>
-                    </tr>
-                }
+                var trClass = (item.Edited == false ? "uncheckedtr " : "") + (item.HourSheetYear < DateTime.Now.Year ? "hiddentr" : "");
+                var style = item.HourSheetYear < DateTime.Now.Year ? "display:none;" : "";
 
+                <tr class="@trClass" style="@style">
+                    <td>@Html.DisplayFor(modelItem => item.FullName)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Week1)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Week2)</td>
+                    <td>@Html.DisplayFor(modelItem => item.Edited)</td>
+                    <td>
+                        @if (!item.Edited)
+                        {
+                            <a asp-action="Edit_HourRegistration" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
+                            <a asp-action="HourRegistration_PDF" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("View Current Un-approved version")</a>
+                        }
+                        else
+                        {
+                            <a asp-action="HourRegistration_PDF" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("View")</a>
+                            <a asp-action="Edit_HourRegistration" asp-route-id="@item.Id">@SharedLocalizer.GetLocalizedHtmlString("Edit")</a>
+                        }
+                    </td>
+                </tr>
             }
         }
     </tbody>
 </table>
 
-@section scripts{
+@section scripts {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $(document).ready(function () {
-            
-            $("#hide").click(function () {
-                const elems = document.getElementsByClassName("hiddentr");
-                for (const x of elems) {
-                    x.style.display = 'none';
+            let uncheckedMode = false; // track toggle state
+            let oldSheetsHidden = false;// false;
+
+            // Initial states
+            $("#unchecked").addClass("inactive");
+            $("#toggleOldSheets").addClass("inactive");//inactive
+
+            // $("#hide").click(function () {
+            //     $(".hiddentr").hide();
+            // });
+
+            // $("#show").click(function () {
+            //     $(".hiddentr").show();
+            // });
+
+            // Toggle old sheets
+            $("#toggleOldSheets").click(function () {
+                if (!oldSheetsHidden) {
+                    $(".hiddentr").hide();
+                    oldSheetsHidden = true;
+
+                    $(this)
+                        .text("@SharedLocalizer.GetLocalizedHtmlString("Show Old Hour Sheets")")
+                        .removeClass("inactive")
+                        .addClass("active");
+
+                } else {
+                    $(".hiddentr").show();
+                    oldSheetsHidden = false;
+
+                    $(this)
+                        .text("@SharedLocalizer.GetLocalizedHtmlString("Hide Old Hour Sheets")")
+                        .removeClass("active")
+                        .addClass("inactive");
                 }
             });
-            $("#show").click(function () {
-                const elems = document.getElementsByClassName("hiddentr");
-                for (const x of elems) {
-                    x.style.display = '';
+
+            // Toggle unchecked rows
+            $("#unchecked").click(function () {
+                if (!uncheckedMode) {
+                    $("tbody tr").hide();
+                    $(".uncheckedtr").show();
+                    uncheckedMode = true;
+
+                    $(this)
+                        .text("@SharedLocalizer.GetLocalizedHtmlString("All Hour Registrations")")
+                        .removeClass("inactive")
+                        .addClass("active");
+                } else {
+                    $("tbody tr").show();
+                    uncheckedMode = false;
+
+                    $(this).text("@SharedLocalizer.GetLocalizedHtmlString("Only Unchecked Hour Registrations")")
+                        .removeClass("active")
+                        .addClass("inactive");
                 }
             });
         });
-        
-        
     </script>
 }

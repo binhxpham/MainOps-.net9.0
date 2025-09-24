@@ -10,10 +10,11 @@ namespace MainOps.Models
     {
         [Key]
         public int Id { get; set; }
+
         [Display(Name = "Plant Name")]
         [Required]
         [StringLength(1500, MinimumLength = 1, ErrorMessage = "Please Name the Plant")]
-        public string PlantId { get; set; }
+        public string? PlantId { get; set; }
         [Display(Name = "Sedimenation emptied and cleaned?")]
         public bool SedimenationCleanedAndEmptied { get; set; }
         [Display(Name = "Sedimenation should be emptied and cleaned?")]
@@ -42,14 +43,16 @@ namespace MainOps.Models
         public bool AcidShouldBeExchanged { get; set; }
         [Display(Name = "Alarm System Functional?")]
         public bool AlarmFunction { get; set; }
-        public ICollection<SedimentationSiteReportPhoto> Photos { get; set; }
+        public ICollection<SedimentationSiteReportPhoto>? Photos { get; set; }
+
+        public SedimentationSiteReport() { }
 
     }
     public class SedimentationSiteReportPhoto
     {
         public int Id { get; set; }
-        public int SedimentationSiteReportId { get; set; }
-        public virtual SedimentationSiteReport SedimentationSiteReport { get; set; }
-        public string Path { get; set; }
+        public int? SedimentationSiteReportId { get; set; }
+        public virtual SedimentationSiteReport? SedimentationSiteReport { get; set; }
+        public string? Path { get; set; }
     }
 }

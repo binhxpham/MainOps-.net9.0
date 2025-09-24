@@ -1,14 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
-
-
-
-
-
-
-
-
-
-
 	<PropertyGroup>
 		<!--<TargetFramework>netcoreapp2.1</TargetFramework>-->
 		<TargetFramework>net9.0</TargetFramework>
@@ -26,13 +16,11 @@
 		<CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
 
 
-
 		<UserSecretsId>aspnet-MainOps-9E6211E2-57C6-4B55-B23E-A02A07F5300B</UserSecretsId>
 		<ApplicationIcon />
 		<OutputType>Exe</OutputType>
 		<StartupObject />
 	</PropertyGroup>
-
 
 
 
@@ -52,6 +40,11 @@
 		<!--<PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>-->
 	</PropertyGroup>
 
+	<Target Name="PrepublishCleanup" BeforeTargets="PrepareForPublish">
+		<RemoveDir Directories="$(ProjectDir)bin;$(ProjectDir)obj" />
+	</Target>
+
+
 	<ItemGroup>
 		<Compile Remove="Migrations\20201016085621_betterhours.cs" />
 		<Compile Remove="Migrations\20201016085621_betterhours.Designer.cs" />
@@ -62,13 +55,13 @@
 
 	<ItemGroup>
 		<Content Remove="Views\DagsRapportBetons\_Details - Copy.cshtml" />
-		<Content Remove="wwwroot\%2a%2a" />
+		<!-- <Content Remove="wwwroot\%2a%2a" /> -->
 	</ItemGroup>
 
 	<ItemGroup>
-		<!--<Content Include="wwwroot\**\*.cshtml" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
+		<Content Include="wwwroot\**\*.*" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
 
-		<Content Include="Views\**\*.cshtml" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always"/>-->
+		<Content Include="Views\**\*.cshtml" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always"/>
 		<Content Include="Views\**\*.cshtml" />
 		<Content Include="Views\Shared\_Layout.cshtml" />
 
@@ -76,19 +69,19 @@
 
 
 	<ItemGroup>
-
+		
 		<Content Include="wwwroot\Rotativa\wkhtmltoimage.exe" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
 		<Content Include="wwwroot\Rotativa\wkhtmltopdf.exe" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always" />
 		<Content Include="Rotativa\wkhtmltoimage.exe" />
 		<Content Include="Rotativa\wkhtmltopdf.exe" />
-		<Content Include="wwwroot\css\bootstrap-3.3.2.min.css" />
+		<!--<Content Include="wwwroot\css\bootstrap-3.3.2.min.css" />
 		<Content Include="wwwroot\css\bootstrap-example.min.css" />
 		<Content Include="wwwroot\css\bootstrap-multiselect.css" />
 		<Content Include="wwwroot\css\bootstrap-theme.css" />
 		<Content Include="wwwroot\css\bootstrap-theme.css.map" />
 		<Content Include="wwwroot\css\bootstrap-theme.min.css" />
 		<Content Include="wwwroot\css\bootstrap-theme.min.css.map" />
-		<Content Include="wwwroot\css\bootstrap.css" />
+		<Content Include="wwwroot\css\bootstrap.css" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always"/>
 		<Content Include="wwwroot\css\bootstrap.css.map" />
 		<Content Include="wwwroot\css\bootstrap.min.css" />
 		<Content Include="wwwroot\css\bootstrap.min.css.map" />
@@ -109,7 +102,7 @@
 		<Content Include="wwwroot\css\prettify.min.css" />
 		<Content Include="wwwroot\css\RandomCss.css" />
 		<Content Include="wwwroot\css\RandomCss.min.css" />
-		<Content Include="wwwroot\css\site.css" />
+		<Content Include="wwwroot\css\site.css" CopyToOutputDirectory="Always" CopyToPublishDirectory="Always"/>
 		<Content Include="wwwroot\css\site.min.css" />
 		<Content Include="wwwroot\css\themes\base\accordion.css" />
 		<Content Include="wwwroot\css\themes\base\all.css" />
@@ -151,7 +144,7 @@
 		<Content Include="wwwroot\css\themes\base\spinner.css" />
 		<Content Include="wwwroot\css\themes\base\tabs.css" />
 		<Content Include="wwwroot\css\themes\base\theme.css" />
-		<Content Include="wwwroot\css\themes\base\tooltip.css" />
+		<Content Include="wwwroot\css\themes\base\tooltip.css" />-->
 		<Content Include="wwwroot\favicon.ico" />
 		<Content Include="wwwroot\fonts\glyphicons-halflings-regular.eot" />
 		<Content Include="wwwroot\fonts\glyphicons-halflings-regular.svg" />
@@ -645,7 +638,7 @@
 		</Content>
 
 		<Content Update="Views\**\*.cshtml" CopyToPublishDirectory="PreserveNewest" />
-		<Content Update="wwwroot\css\site.css" />
+		<!--<Content Update="wwwroot\css\site.css" />-->
 	</ItemGroup>
 
 	<ItemGroup>
@@ -693,6 +686,7 @@
 		<Folder Include="wwwroot\TempFolder\" />
 		<Folder Include="wwwroot\TrackItems\PumpTests\AFV3\96\" />
 		<Folder Include="wwwroot\TrackItems\PumpTests\test\95\" />
+		
 	</ItemGroup>
 
 	<ItemGroup>

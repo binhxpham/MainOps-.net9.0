@@ -38,7 +38,10 @@ namespace MainOps.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             await CheckUser(user);
-            var dataContext = _context.SedimentationSiteReports.Include(s => s.Project).Include(s => s.SubProject).Where(x => x.Project.DivisionId.Equals(user.DivisionId));
+            var dataContext = _context.SedimentationSiteReports
+                .Include(s => s.Project)
+                .Include(s => s.SubProject)
+                .Where(x => x.Project.DivisionId.Equals(user.DivisionId));
             return View(await dataContext.ToListAsync());
         }
 

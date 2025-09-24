@@ -10983,14 +10983,31 @@ namespace MainOps.Controllers
                         List<Install> installs = new List<Install>();
                         if (arr.EndStamp != null)
                         {
-                            installs = installations2.Where(x => x.UniqueID.Equals(arr.UniqueID) && x.ItemTypeId.Equals(arr.ItemTypeId) && x.RentalStartDate >= arr.TimeStamp && x.RentalStartDate <= arr.EndStamp).OrderBy(x => x.TimeStamp).ToList();
+                            //installs = installations2.Where(x => x.UniqueID.Equals(arr.UniqueID) && x.ItemTypeId.Equals(arr.ItemTypeId) && x.RentalStartDate >= arr.TimeStamp && x.RentalStartDate <= arr.EndStamp).OrderBy(x => x.TimeStamp).ToList();
+                            installs = installations2
+                                        .Where(x =>
+                                            string.Equals(x.UniqueID, arr.UniqueID) &&
+                                            x.ItemTypeId == arr.ItemTypeId &&
+                                            x.RentalStartDate >= arr.TimeStamp &&
+                                            x.RentalStartDate <= arr.EndStamp
+                                        )
+                                        .OrderBy(x => x.TimeStamp)
+                                        .ToList();
                         }
                         else
                         {
                             //installs = installations2.Where(x => x.UniqueID.Equals(arr.UniqueID) && x.ItemTypeId.Equals(arr.ItemTypeId) && x.RentalStartDate >= arr.TimeStamp).OrderBy(x => x.TimeStamp).ToList();
                             try
                             {
-                                installs = installations2.Where(x => x.UniqueID.Equals(arr.UniqueID) && x.ItemTypeId.Equals(arr.ItemTypeId) && x.RentalStartDate >= arr.TimeStamp).OrderBy(x => x.TimeStamp).ToList();
+                                //installs = installations2.Where(x => x.UniqueID.Equals(arr.UniqueID) && x.ItemTypeId.Equals(arr.ItemTypeId) && x.RentalStartDate >= arr.TimeStamp).OrderBy(x => x.TimeStamp).ToList();
+                                installs = installations2
+                                        .Where(x =>
+                                            x.UniqueID != null && x.UniqueID == arr.UniqueID &&
+                                            x.ItemTypeId != null && x.ItemTypeId == arr.ItemTypeId &&
+                                            x.RentalStartDate != null && x.RentalStartDate >= arr.TimeStamp
+                                        )
+                                        .OrderBy(x => x.TimeStamp)
+                                        .ToList();
                             }
                             catch
                             {
@@ -17306,6 +17323,13 @@ namespace MainOps.Controllers
                 var user = await _userManager.GetUserAsync(User);
                 model.DoneBy = user.full_name();
                 model.EnteredIntoDataBase = DateTime.Now;
+
+                if (model.ProjectId == 437 || model.ProjectId == 653)
+                {
+                    Debug.WriteLine($"Generator check: Diesel level: {model.Diesel_Level}, Name: {model.GeneratorName},  Address: {model.Address}");
+
+                }
+
                 _context.Add(model);
                 await _context.SaveChangesAsync();
                 var lastadded = await _context.GeneratorChecks.Include(x => x.Project).ThenInclude(x => x.Division).Include(x => x.SubProject).LastAsync();
@@ -17316,8 +17340,9 @@ namespace MainOps.Controllers
                 }
                 foreach (IFormFile photo in files)
                 {
-                    var path = Path.Combine(directory, photo.FileName);
-                    var path2 = Path.Combine(directory, photo.FileName.Split(".")[0] + "_edit." + photo.FileName.Split(".")[1]);
+                    var fileNameCleaned = photo.FileName.Replace(" ", ""); // Remove all spaces
+                    var path = Path.Combine(directory, fileNameCleaned);
+                    //var path2 = Path.Combine(directory, photo.FileName.Split(".")[0] + "_edit." + photo.FileName.Split(".")[1]);
                     PhotoFileGeneratorCheck checkphoto = new PhotoFileGeneratorCheck { Path = path, TimeStamp = model.TimeStamp, GeneratorCheckId = lastadded.Id, Latitude = Convert.ToDouble(model.Latitude), Longitude = Convert.ToDouble(model.Longitude) };
                     _context.Add(checkphoto);
 
@@ -17794,7 +17819,7 @@ namespace MainOps.Controllers
                     SensorCalibration sensorCalibration = new SensorCalibration
                     {
                         EnteredIntoDataBase = DateTime.Now,
-                        WellId = model.WellId,
+                        MeasPointId = model.MeasPointId,
                         RefLevel = model.RefLevel,
                         Hand_dip = model.Hand_dip,
                         ExpectedWaterlevel = model.ExpectedWaterlevel,
@@ -17811,7 +17836,7 @@ namespace MainOps.Controllers
                     await _context.SaveChangesAsync();
 
                     var itemadded = await _context.SensorCalibrations
-                        .Include(x => x.Well)
+                        .Include(x => x.MeasPoint)
                         .Include(x => x.Photos)
                         .Include(x => x.Project).ThenInclude(x => x.Division)
                         .LastAsync();
@@ -17864,7 +17889,7 @@ namespace MainOps.Controllers
 
                     var recipients = new List<string> { "ofw@hj-as.dk", "bin@hj-as.dk" };// 
                     string subject = "Sensor Calibration";
-                    string message = "Sensor Calibration for well: " + itemadded.Well.WellName +
+                    string message = "Sensor Calibration for well: " + itemadded.MeasPoint.Name +
                                      ". Performed on: " + itemadded.TimeStamp.ToString() +
                                      ". On Project: " + itemadded.Project.Name + "<br /><br />";
 
@@ -18257,7 +18282,8 @@ namespace MainOps.Controllers
                 var stream = new FileStream(path, FileMode.Create);
                 await photo.CopyToAsync(stream);
             }
-            if(model.TestType.Equals("Three Step Test")) { 
+            if (model.TestType.Equals("Three Step Test"))
+            {
                 var itemtype = await _context.ItemTypes.Include(x => x.ReportType).Where(x => x.ProjectId.Equals(lastpumptest.ProjectId) && x.ReportType.Type.Equals("ThreeStepTest")).SingleOrDefaultAsync();
                 if (itemtype != null)
                 {
@@ -19006,7 +19032,7 @@ namespace MainOps.Controllers
 
             return View("Reports/Mobilisations", items);
         }
-        [Authorize(Roles ="Admin,DivisionAdmin,Manager,ProjectMember")]
+        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember")]
         public async Task<IActionResult> Reports()
         {
             var user = await _userManager.GetUserAsync(User);
