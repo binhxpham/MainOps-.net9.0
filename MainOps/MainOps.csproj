@@ -40,9 +40,9 @@
 		<!--<PublishWithAspNetCoreTargetManifest>false</PublishWithAspNetCoreTargetManifest>-->
 	</PropertyGroup>
 
-	<Target Name="PrepublishCleanup" BeforeTargets="PrepareForPublish">
+	<!--<Target Name="PrepublishCleanup" BeforeTargets="PrepareForPublish">
 		<RemoveDir Directories="$(ProjectDir)bin;$(ProjectDir)obj" />
-	</Target>
+	</Target>-->
 
 
 	<ItemGroup>

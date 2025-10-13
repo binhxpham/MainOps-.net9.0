@@ -11,21 +11,21 @@ namespace MainOps.Models
         [Key]
         public int Id { get; set; }
         [Display(Name = "Project")]
-        public int ProjectId { get; set; }
-        public virtual Project Project { get; set; }
+        public int? ProjectId { get; set; }
+        public virtual Project? Project { get; set; }
         [Display(Name = "SubProject")]
         public int? SubProjectId { get; set; }
-        public virtual SubProject SubProject { get; set; }
+        public virtual SubProject? SubProject { get; set; }
         public DateTime TimeStamp { get; set; }
         [Display(Name = "Well ID" )]
-        public string WellID { get; set; }
+        public string? WellID { get; set; }
         [Display(Name = "Well Depth m.u.t.")]
         public double DrillDepth { get; set; }
         [Display(Name = "Pipe Diameter")]
-        public string PipeDiameter { get; set; }
+        public string? PipeDiameter { get; set; }
         [Display(Name = "Pipe Height(m.o.t)")]
         public double PipeHeight { get; set; }
-        public string Location { get; set; }
+        public string? Location { get; set; }
         [Display(Name = "Filter length")]
         public double FilterLength { get; set; }
         [Display(Name = "Blind Pipe length")]
@@ -34,23 +34,25 @@ namespace MainOps.Models
         public double SandBagsUsed { get; set; }
         [Display(Name = "Mikrolit B bags(25kg) used")]
         public double MikrolitBagsUsed { get; set; }
-        public ICollection<DrillPhoto> Photos { get; set; }
+        public ICollection<DrillPhoto>? Photos { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         [Display(Name = "Done By")]
-        public string DoneBy { get; set; }
+        public string? DoneBy { get; set; }
         [Display(Name = "Comments")]
-        public string Comments { get; set; }
+        public string? Comments { get; set; }
         [Display(Name = "Filter Start(m.u.t)")]
         public double? FilterStart { get; set; }
         [Display(Name = "Filter End(m.u.t)")]
         public double? FilterEnd { get; set; }
+
+        public Drill() { }
     }
     public class DrillPhoto
     {
         public int Id { get; set; }
-        public string Path { get; set; }
+        public string? Path { get; set; }
         public int? DrillId { get; set; }
-        public virtual Drill Drill { get; set; }
+        public virtual Drill? Drill { get; set; }
     }
 }

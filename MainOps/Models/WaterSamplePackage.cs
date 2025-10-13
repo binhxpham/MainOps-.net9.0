@@ -12,12 +12,12 @@ namespace MainOps.Models
         public int Id { get; set; }
         [Display(Name = "Project")]
         public int? ProjectId { get; set; }
-        public virtual Project Project { get; set; }
+        public virtual Project? Project { get; set; }
         [Display(Name = "Sample Name")]
-        public string Annotation { get; set; }
+        public string? Annotation { get; set; }
         [Display(Name = "Content of Sample")]
-        public string ListOfComponents { get; set; }
-        public ICollection<WaterSampleTypeWaterSamplePackage> WaterSampleTypeWaterSamplePackages { get; set; }
+        public string? ListOfComponents { get; set; }
+        public ICollection<WaterSampleTypeWaterSamplePackage>? WaterSampleTypeWaterSamplePackages { get; set; }
         public WaterSamplePackage()
         {
 
@@ -31,7 +31,7 @@ namespace MainOps.Models
     }
     public class WaterSamplePackagePDFViewModel
     {
-        public List<WaterSamplePackage> packages;
+        public List<WaterSamplePackage>? packages;
         public List<string> result;
         public WaterSamplePackagePDFViewModel(List<WaterSamplePackage> packages,List<string> result)
         {
@@ -46,17 +46,17 @@ namespace MainOps.Models
     public class WaterSampleType
     {
         public int Id { get; set; }
-        public string Komponent { get; set; }
-        public string Enhed { get; set; }
+        public string? Komponent { get; set; }
+        public string? Enhed { get; set; }
         public double DL { get; set; }
-        public ICollection<WaterSampleTypeWaterSamplePackage> WaterSampleTypeWaterSamplePackages { get; set; }
+        public ICollection<WaterSampleTypeWaterSamplePackage>? WaterSampleTypeWaterSamplePackages { get; set; }
     }
     public class WaterSampleTypeWaterSamplePackage
     {
         public int WaterSamplePackageId { get; set; }
-        public virtual WaterSamplePackage WaterSamplePackage { get; set; }
+        public virtual WaterSamplePackage? WaterSamplePackage { get; set; }
         public int WaterSampleTypeId { get; set; }
-        public virtual WaterSampleType WaterSampleType { get; set; }
+        public virtual WaterSampleType? WaterSampleType { get; set; }
         public WaterSampleTypeWaterSamplePackage(WaterSamplePackage WSP, WaterSampleType WST)
         {
             this.WaterSamplePackageId = WSP.Id;
@@ -70,14 +70,14 @@ namespace MainOps.Models
     public class UploadPackageViewModel
     {
         public int? ProjectId { get; set; }
-        public string Annotation { get; set; }
+        public string? Annotation { get; set; }
     }
     public class CreatePackageViewModel
     {
         public int? ProjectId { get; set; }
-        public string Annotation { get; set; }
-        public string WaterSampleTypes { get; set; }
-        public string WaterSampleTypesNames { get; set; }
+        public string? Annotation { get; set; }
+        public string? WaterSampleTypes { get; set; }
+        public string? WaterSampleTypesNames { get; set; }
         public int? OldPackageId { get; set; }
         public CreatePackageViewModel()
         {

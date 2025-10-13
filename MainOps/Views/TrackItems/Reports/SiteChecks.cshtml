@@ -1,12 +1,27 @@
 ﻿@model IEnumerable<MainOps.Models.SiteCheck>
 
 @{
-    ViewData["Title"] = "SiteChecks";
+    ViewData["Title"] = "Site Checks";
 }
 
-<h2>SiteChecks</h2>
+<h2>Site Checks</h2>
 
-<table style="width:100%;table-layout:fixed;">
+<div style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;">
+
+    <div>
+        <select id="projectSelect" class="form-control" onchange="filterTable(this.value)">
+            <option value="all">@SharedLocalizer.GetLocalizedHtmlString("- Choose a project -")</option>
+            @foreach (var item in Model.Select(x => x.Project?.Name).Distinct())
+            {
+                <option value="@item">@item</option>
+            }
+        </select>
+    </div>
+
+    
+</div>
+
+<table style="width:100%;table-layout:fixed;" id="projectTable">
     <thead>
         <tr>
             <th>
@@ -61,3 +76,48 @@
 }
     </tbody>
 </table>
+
+
+@section Scripts {
+    <script>
+        function filterTable(projectName) {
+               const table = document.getElementById('projectTable');
+               const rows = document.querySelectorAll('#projectTable tbody tr');
+               console.log('Selected: ' + projectName);
+
+               if (projectName === '- Choose a project -' || projectName === 'all' ) {
+                   // Show all rows when "Choose a project" is selected
+                   rows.forEach(row => row.style.display = '');
+                   table.style.display = ''; // Ensure the table is visible
+                   return;
+               }
+
+               let hasVisibleRow = false; // To track if at least one row matches
+
+               rows.forEach(row => {
+                   const projectCell = row.cells[0].textContent.trim(); // Adjust index if needed
+                   console.log('Project: ' + projectCell);
+
+                   if (projectCell === projectName) {
+                       row.style.display = "";
+                       hasVisibleRow = true;
+                   } else {
+                       row.style.display = "none";
+                   }
+               });
+
+               // Show table only if there are visible rows
+               table.style.display = hasVisibleRow ? '' : 'none';
+           }
+
+
+              // Hide the table initially until an option is selected
+              // document.addEventListener("DOMContentLoaded", function () {
+              //     document.getElementById('loggerTable').style.display = 'none';
+              // });
+
+
+    </script>
+}
+
+

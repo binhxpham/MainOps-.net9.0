@@ -1,15 +1,41 @@
 ﻿@model IEnumerable<MainOps.Models.Airlift>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Airlift";
 }
 
-<h2>Index</h2>
+<h2>Airlift</h2>
+
+<div style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;">
+
+    <div>
+        <select id="projectSelect" class="form-control" onchange="filterTable(this.value)">
+            <option value="all">@SharedLocalizer.GetLocalizedHtmlString("- Choose a project -")</option>
+           
+            @foreach (var item in Model
+                .GroupBy(i => new { i.ProjectId, SubProjectName = (i.SubProjectId != null) ? i.SubProject.Name : "" })
+                .Select(g => g.First()))
+                {
+                    var itm = item.ProjectId.ToString();
+                    if (item.SubProjectId != null)
+                    {
+                        itm += " - " + item.SubProject.Name;
+                    }
+                    <option value="@itm">@itm</option>
+                }
+        </select>
+    </div>
+
+    <div>
+        <input type="text" id="searchInput" class="form-control" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Search by Well Name...")" />
+    </div>
+</div>
+
 
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
+<table class="table" id="projectTable">
     <thead>
         <tr>
             <th>
@@ -31,37 +57,114 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ProjectId)
-                @if(item.SubProjectId != null)
-                {
-                    <text>
-                - @item.SubProject.Name
-                    </text>
-                }
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TimeStamp)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.MeasPoint.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Comments)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DoneBy)
-            </td>
-            <td>
-                <a asp-action="Details" asp-route-id="@item.Id" target="_blank">@SharedLocalizer.GetLocalizedHtmlString("View")</a>
-                @if (User.IsInRole("Admin") || User.IsInRole("Manager")) { 
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                }
-            </td>
-        </tr>
-}
+        @foreach (var item in Model) {
+                <tr>
+                    @* <td>
+                        @Html.DisplayFor(modelItem => item.ProjectId)
+                        @if(item.SubProjectId != null)
+                        {
+                            <text> - @item.SubProject.Name</text>
+                        }
+                    </td> *@
+
+                    <td>
+                        @Html.Raw(item.ProjectId + (item.SubProjectId != null ? " - " + item.SubProject.Name : ""))
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TimeStamp)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MeasPoint.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Comments)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DoneBy)
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id" target="_blank">@SharedLocalizer.GetLocalizedHtmlString("View")</a>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Manager")) { 
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        }
+                    </td>
+                </tr>
+        }
     </tbody>
 </table>
+
+<script>
+    document.getElementById('searchInput').addEventListener('input', function () {
+                 searchByWellName();
+             });
+
+
+
+              function searchByWellName() {
+                  const searchInput = document.getElementById('searchInput').value.trim().toLowerCase();
+                  const table = document.getElementById('projectTable');
+                  const rows = document.querySelectorAll('#projectTable tbody tr');
+
+                  let hasVisibleRow = false;
+
+                  rows.forEach(row => {
+                      const wellNameCell = row.cells[2]; // Adjust index based on Well Name column
+                      if (wellNameCell) {
+                          const wellName = wellNameCell.textContent.trim().toLowerCase();
+                          if (wellName.includes(searchInput)) {
+                              row.style.display = '';
+                              hasVisibleRow = true;
+                          } else {
+                              row.style.display = 'none';
+                          }
+                      }
+                  });
+
+                  // Show table only if there are matching rows
+                  table.style.display = hasVisibleRow ? '' : 'none';
+              }
+
+
+        function filterTable(projectName) {
+               const table = document.getElementById('projectTable');
+               const rows = document.querySelectorAll('#projectTable tbody tr');
+
+               rows.forEach(row => {
+                   console.log('row: ' + row.cells[0].textContent.trim());
+               });
+
+
+               console.log('Selected: ' + projectName);
+
+               if (projectName === '- Choose a project -' || projectName === 'all' ) {
+                   // Show all rows when "Choose a project" is selected
+                   rows.forEach(row => row.style.display = '');
+                   table.style.display = ''; // Ensure the table is visible
+                   return;
+               }
+
+               let hasVisibleRow = false; // To track if at least one row matches
+
+               rows.forEach(row => {
+                   const projectCell = row.cells[0].textContent.trim(); // Adjust index if needed
+
+                   if (projectCell === projectName) {
+                       row.style.display = "";
+                       hasVisibleRow = true;
+                       console.log('Project: ' + projectCell);
+
+                   } else {
+                       row.style.display = "none";
+                   }
+               });
+
+               // Show table only if there are visible rows
+               table.style.display = hasVisibleRow ? '' : 'none';
+           }
+
+
+</script>
+
+

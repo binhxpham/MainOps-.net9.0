@@ -6,7 +6,26 @@
 
 <h2>@SharedLocalizer.GetLocalizedHtmlString("Alarm Calls")</h2>
 
-<table class="table">
+<div style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;">
+
+    <div>
+        <select id="alarmCallstSelect" class="form-control" onchange="filterTable(this.value)">
+            <option value="all">@SharedLocalizer.GetLocalizedHtmlString("- Choose a project -")</option>
+            @foreach (var item in Model.Select(x => x.Project.Name).Distinct())
+            {
+                <option value="@item">@item</option>
+            }
+        </select>
+    </div>
+
+    @* <div>
+		<input type="text" id="searchInput" class="form-control" placeholder="@SharedLocalizer.GetLocalizedHtmlString("Search by Well Name...")" />
+	</div> *@
+</div>
+
+
+<table class="table" id="alarmCallTable">
+
     <thead>
         <tr>
             <th>
@@ -31,45 +50,81 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Project.Abbreviation)
-            </td>
-            @if(item.SubProjectId != null) { 
-            <td>
-                @Html.DisplayFor(modelItem => item.SubProject.Name)
-            </td>
-            }
-            else
-            {
-                <td></td>
-            }
-            <td>
-                @Html.DisplayFor(modelItem => item.TimeStamp)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.LogText)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Hours)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DoneBy)
-            </td>
-            <td>
-                @if(User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DivisionAdmin"))
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Project.Name)
+                    @* .Abbreviation) *@
+                </td>
+                @if (item.SubProjectId != null)
                 {
-                    <form asp-action="Edit_AlarmCall" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
-                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
-                    </form>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.SubProject.Name)
+                    </td>
                 }
-                <form asp-action="AlarmCall_PDF" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
-                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
-                </form>
-            </td>
-        </tr>
-}
+                else
+                {
+                    <td></td>
+                }
+                <td>
+                    @Html.DisplayFor(modelItem => item.TimeStamp)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.LogText)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Hours)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DoneBy)
+                </td>
+                <td>
+                    @if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("DivisionAdmin"))
+                    {
+                        <form asp-action="Edit_AlarmCall" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
+                            <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
+                        </form>
+                    }
+                    <form asp-action="AlarmCall_PDF" asp-controller="TrackItems" asp-route-id="@item.Id" method="get" target="_blank">
+                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View")</button>
+                    </form>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+@section Scripts {
+    <script>
+        // Hide the table initially until an option is selected
+         // document.addEventListener("DOMContentLoaded", function () {
+         //     document.getElementById('alarmCallTable').style.display = 'none';
+         // });
+
+
+           function filterTable(projectName) {
+               const table = document.getElementById('alarmCallTable');
+               const rows =  document.querySelectorAll('#alarmCallTable tbody tr');
+               console.log('Selected: ' + projectName);
+               let hasVisibleRow = false; // To track if at least one row matches
+
+               rows.forEach(row => {
+                      const projectCell = row.cells[0].textContent.trim(); // Adjust index based on Project column
+
+                       console.log('Project: ' + projectCell);
+                       if (projectCell === projectName || projectName === 'all') {
+                          row.style.display = "";
+                          hasVisibleRow = true;
+                         } else {
+                          row.style.display = "none";
+                      }
+               });
+
+               // Show table only if there are visible rows and project is not "Choose project"
+               table.style.display = (hasVisibleRow) // && (projectName !== '- Choose a project -')) ? '' : 'none';
+           }
+    </script>
+}
+
 <a asp-action="Reports">@SharedLocalizer.GetLocalizedHtmlString("Back to Reports page")</a>

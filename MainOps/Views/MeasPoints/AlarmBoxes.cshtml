@@ -1,6 +1,8 @@
 ﻿@model IEnumerable<MainOps.Models.MeasPoint>
 <head>
     <script src="https://maps.googleapis.com/maps/api/js?key=@GoogleMaps.Value.ApiKey&sensor=false&libraries=places"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
 </head>
 
 @{
@@ -52,37 +54,37 @@
             var map = new google.maps.Map(document.getElementById("myDiv"), mapOptions);
             
             @foreach(var item in Model){
-             <text>
-                var marker = new google.maps.Marker({
-                  map: map,
-                  position: { lat: @item.Lati, lng: @item.Longi },
-                  title: "@item.Project.Name (@item.Project.ProjectNr) : @item.Name",
-            });
-            marker['infowindow'] = new google.maps.InfoWindow({
-                content: '@item.Project.Name (@item.Project.ProjectNr)' + ' : ' + '@item.Name : @item.Description <button class="btn-hoelscher" onclick="DisplayDocuments(@item.Id)">Show Pictures</button>'
-            });
+                 <text>
+                    var marker = new google.maps.Marker({
+                      map: map,
+                      position: { lat: @item.Lati, lng: @item.Longi },
+                      title: "@item.Project.Name (@item.Project.ProjectNr) : @item.Name",
+                });
+                marker['infowindow'] = new google.maps.InfoWindow({
+                    content: '@item.Project.Name (@item.Project.ProjectNr)' + ' : ' + '@item.Name : @item.Description <button class="btn-hoelscher" onclick="DisplayDocuments(@item.Id)">Show Pictures</button>'
+                });
 
-            google.maps.event.addListener(marker, 'click', function () {
-                this['infowindow'].open(map, this);
-            });
+                google.maps.event.addListener(marker, 'click', function () {
+                    this['infowindow'].open(map, this);
+                });
 
-            @if (item.MonitorType.MonitorTypeName == "Alarm Box")
-            {
-                if (item.LoggerActive)
+                @if (item.MonitorType.MonitorTypeName == "Alarm Box")
                 {
-                     <text>
-                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/blue-dot.png')
-                    </text>
+                    if (item.LoggerActive)
+                    {
+                         <text>
+                    marker.setIcon('https://maps.google.com/mapfiles/ms/icons/blue-dot.png')
+                        </text>
+                    }
+                    else
+                    {
+                        <text>
+                    marker.setIcon('https://maps.google.com/mapfiles/ms/icons/red.png')
+                        </text>
+                    }
                 }
-                else
-                {
-                    <text>
-                marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red.png')
-                    </text>
-                }
-            }
-            marker.setMap(map);
-            </text>
+                marker.setMap(map);
+                </text>
             }
 
 
