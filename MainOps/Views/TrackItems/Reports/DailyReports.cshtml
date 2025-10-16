@@ -20,11 +20,16 @@
             </form>
         </td>
         @if(User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager")) {
-        <td>
-            <form asp-action="ShowUncheckedDailyReports" asp-controller="TrackItems" method="get">
-                <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Go-To Unchecked Reports!")</button>
-            </form>
-        </td>
+            <td>
+                <form asp-action="ShowUncheckedDailyReports" asp-controller="TrackItems" method="get">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Go-To Unchecked Reports!")</button>
+                </form>
+            </td>
+            <td>
+                <form asp-action="ManageCheckedDailyReports" asp-controller="TrackItems" method="get">
+                    <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Manager to check")</button>
+                </form>
+            </td>
         }
     </tr>
 </table>

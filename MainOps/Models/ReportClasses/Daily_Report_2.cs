@@ -72,7 +72,7 @@ namespace MainOps.Models.ReportClasses
         public TimeSpan? SafetyHours { get; set; }
         [Display(Name = "Is Report Checked")]
         public bool Report_Checked { get; set; }
-        [Display(Name = "Report checked by")]
+        [Display(Name = "Checked by")]
         public string? Checked_By { get; set; }
         [Display(Name = "Sub Project")]
         public int? SubProjectId { get; set; }

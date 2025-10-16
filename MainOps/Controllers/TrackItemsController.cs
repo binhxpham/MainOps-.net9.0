@@ -1597,12 +1597,6 @@ namespace MainOps.Controllers
             return View("AlarmCall");
         }
 
-        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember")]
-        public async Task<IActionResult> Install()
-        {
-            ViewData["ProjectId"] = await GetProjectList();
-            return View("InstallMultiple");
-        }
         [Authorize(Roles = "Admin,ProjectMember,Member,Manager,DivisionAdmin")]
         public async Task<IEnumerable<SelectListItem>> GetUserList()
         {
@@ -1657,7 +1651,7 @@ namespace MainOps.Controllers
             return View("ArrivalMultiple");
         }
         [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember")]
-        public async Task<IActionResult> DeInstall()
+        public async Task<IActionResult> DeInstall_old()
         {
             ViewData["ProjectId"] = await GetProjectList();
             var user = await _userManager.GetUserAsync(User);
@@ -1681,6 +1675,41 @@ namespace MainOps.Controllers
                              select it).OrderBy(x => x.BoQnr).ToList();
             ViewData["ItemTypeId"] = new SelectList(itemtypes, "Id", "Item_Type");
             return View("Deinstall", model);
+        }
+
+
+        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember")]
+        public async Task<IActionResult> Install()
+        {
+            ViewData["ProjectId"] = await GetProjectList();
+            return View("InstallMultiple");
+        }
+
+        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember")]
+        public async Task<IActionResult> DeInstall()
+        {
+            ViewData["ProjectId"] = await GetProjectList();
+            //var user = await _userManager.GetUserAsync(User);
+            //if (user.Active == false)
+            //{
+            //    return RedirectToAction("ErrorMessage", "Home", new { text = "You are inactive" });
+            //}
+            //DeInstallItemVM model = new DeInstallItemVM();
+            //if (User.IsInRole("Admin"))
+            //{
+            //    model.InstalledCoordinates = await _context.Installations.Include(x => x.ItemType).Where(x => x.isInstalled.Equals(true)).ToListAsync();
+            //}
+            //else
+            //{
+            //    model.InstalledCoordinates = await _context.Installations.Include(x => x.ItemType).Where(x => x.isInstalled.Equals(true) && x.Project.DivisionId.Equals(user.DivisionId)).ToListAsync();
+            //}
+
+            //var itemtypes = (from it in _context.ItemTypes
+            //                 join bqh in _context.BoQHeadLines on Math.Floor(it.BoQnr) equals Math.Floor(bqh.BoQnum)
+            //                 where bqh.Type.Equals("Installation") && !it.Item_Type.ToLower().Contains("discount")
+            //                 select it).OrderBy(x => x.BoQnr).ToList();
+            //ViewData["ItemTypeId"] = new SelectList(itemtypes, "Id", "Item_Type");
+            return View("DeInstall");
         }
 
         [HttpPost]
@@ -8295,6 +8324,105 @@ namespace MainOps.Controllers
             await _context.SaveChangesAsync();
             return Ok();
         }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<IActionResult> ApprovePaidAjax1(int? id) //both "approved" and "paid"
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var dr = await _context.Daily_Report_2s.Where(x => x.Id.Equals(id)).SingleOrDefaultAsync();
+            dr.tobepaid = 1;
+            dr.Report_Checked = true;
+            dr.Checked_By = user.full_name();
+            dr.InvoiceDate = DateTime.Now;
+            _context.Daily_Report_2s.Update(dr);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<IActionResult> ApprovePaidAjax(int id) // both "approved" and "paid"
+        {
+            var dr = await _context.Daily_Report_2s
+                .SingleOrDefaultAsync(x => x.Id == id);
+
+            if (dr == null)
+                return NotFound(new { ok = false, message = "Not found" });
+
+            var user = await _userManager.GetUserAsync(User);
+
+            dr.tobepaid = 1;
+            dr.Report_Checked = true;
+            dr.Checked_By = user.full_name();
+            dr.InvoiceDate = DateTime.Now;
+            _context.Daily_Report_2s.Update(dr);
+
+            await _context.SaveChangesAsync();
+
+            // Send back the new value + localized label
+            var yesText = "Yes";// SharedLocalizer.GetLocalizedHtmlString("Yes").Value;
+
+            return Json(new
+            {
+                ok = true,
+                tobepaid = dr.tobepaid, // 1
+                label = yesText
+            });
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<IActionResult> ApproveUnpaidAjax(int id) // both "approved" and "unpaid"
+        {
+            var dr = await _context.Daily_Report_2s
+                .SingleOrDefaultAsync(x => x.Id == id);
+
+            if (dr == null)
+                return NotFound(new { ok = false, message = "Not found" });
+
+            var user = await _userManager.GetUserAsync(User);
+
+            dr.tobepaid = 2;
+            dr.Report_Checked = true;
+            dr.Checked_By = user.full_name();
+            dr.InvoiceDate = DateTime.Now;
+            _context.Daily_Report_2s.Update(dr);
+
+            await _context.SaveChangesAsync();
+
+            // Send back the new value + localized label
+            var noText = "No";// SharedLocalizer.GetLocalizedHtmlString("Yes").Value;
+
+            return Json(new
+            {
+                ok = true,
+                tobepaid = dr.tobepaid, //2
+                label = noText
+            });
+        }
+
+
+        [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<IActionResult> ApproveUnpaidAjax1(int? id) //both "approved" and "unpaid"
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var dr = await _context.Daily_Report_2s.Where(x => x.Id.Equals(id)).SingleOrDefaultAsync();
+            dr.tobepaid = 2;
+            dr.Report_Checked = true;
+            dr.Checked_By = user.full_name();
+            dr.InvoiceDate = DateTime.Now;
+            _context.Daily_Report_2s.Update(dr);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+
         [HttpPost]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> MakeUnPaidAjax(int? id)
@@ -8672,6 +8800,110 @@ namespace MainOps.Controllers
             }
 
         }
+
+        [Authorize(Roles = "Admin,DivisionAdmin,Manager")]
+        public async Task<IActionResult> ManageCheckedDailyReports(int? ProjectId, int? SubProjectId, bool all)
+        {
+            ViewData["all"] = all;
+            var user = await _userManager.GetUserAsync(User);
+            List<Daily_Report_2> daily_reports = new List<Daily_Report_2>();
+            if (User.IsInRole("Manager") || User.IsInRole("Admin") || User.IsInRole("DivisionAdmin"))
+            {
+                ViewData["ProjectId"] = await GetProjectList();
+                if (all == true)
+                {
+                    if (ProjectId != null)
+                    {
+                        daily_reports = await _context.Daily_Report_2s
+                            .Include(x => x.Title)
+                            .Include(x => x.Project)
+                            .Include(x => x.SubProject)
+                            .Include(x => x.VariationOrder)
+                            .Where(x => x.ProjectId.Equals(ProjectId) && x.Report_Checked.Equals(true))
+                            .OrderByDescending(x => x.Report_Date).ToListAsync();
+
+
+                    }
+                    else
+                    {
+                        if (SubProjectId == null)
+                        {
+                            daily_reports = await _context.Daily_Report_2s
+                            .Include(x => x.Title)
+                            .Include(x => x.Project)
+                            .Include(x => x.SubProject)
+                            .Include(x => x.VariationOrder)
+                            .Where(x => x.Report_Checked.Equals(true) && x.Project.DivisionId.Equals(user.DivisionId))
+                            .OrderByDescending(x => x.Report_Date).Take(100).ToListAsync();
+                        }
+                        else
+                        {
+                            daily_reports = await _context.Daily_Report_2s
+                            .Include(x => x.Title)
+                            .Include(x => x.Project)
+                            .Include(x => x.SubProject)
+                            .Include(x => x.VariationOrder)
+                            .Where(x => x.Report_Checked.Equals(true) && x.Project.DivisionId.Equals(user.DivisionId))
+                            .OrderByDescending(x => x.Report_Date).ToListAsync();
+                        }
+
+                    }
+                }
+                else
+                {
+                    if (ProjectId != null)
+                    {
+                        daily_reports = await _context.Daily_Report_2s
+                            .Include(x => x.Title)
+                            .Include(x => x.Project)
+                            .Include(x => x.SubProject)
+                            .Include(x => x.VariationOrder)
+                            .Where(x => x.ProjectId.Equals(ProjectId) && x.Report_Checked.Equals(true) && x.Report_Date >= DateTime.Now.AddDays(-60))
+                            .OrderByDescending(x => x.Report_Date).ToListAsync();
+
+
+                    }
+                    else
+                    {
+                        if (SubProjectId == null)
+                        {
+                            daily_reports = await _context.Daily_Report_2s
+                            .Include(x => x.Title)
+                            .Include(x => x.Project)
+                            .Include(x => x.SubProject)
+                            .Include(x => x.VariationOrder)
+                            .Where(x => x.Report_Checked.Equals(true) && x.Project.DivisionId.Equals(user.DivisionId) && x.Report_Date >= DateTime.Now.AddDays(-60))
+                            .OrderByDescending(x => x.Report_Date).Take(100).ToListAsync();
+                        }
+                        else
+                        {
+                            daily_reports = await _context.Daily_Report_2s
+                            .Include(x => x.Title)
+                            .Include(x => x.Project)
+                            .Include(x => x.SubProject)
+                            .Include(x => x.VariationOrder)
+                            .Where(x => x.Report_Checked.Equals(true) && x.Project.DivisionId.Equals(user.DivisionId) && x.Report_Date >= DateTime.Now.AddDays(-60))
+                            .OrderByDescending(x => x.Report_Date).ToListAsync();
+                        }
+
+                    }
+                }
+
+                if (SubProjectId != null)
+                {
+                    daily_reports = daily_reports.Where(x => x.SubProjectId.Equals(SubProjectId)).OrderByDescending(x => x.Report_Date).ThenBy(x => x.Project.Name).ThenBy(x => x.SubProject.Name).ToList();
+                }
+
+                return View("Reports/ManagerCheckeReports", daily_reports);
+            }
+            else
+            {
+                return NotFound();
+            }
+
+        }
+
+
         [HttpGet]
         [Authorize(Roles = "Admin,DivisionAdmin,Guest,Manager,International")]
         public async Task<IActionResult> GenerateInvoice()

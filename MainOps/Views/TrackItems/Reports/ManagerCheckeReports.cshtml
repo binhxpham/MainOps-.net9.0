@@ -1,13 +1,14 @@
 ﻿@model IEnumerable<MainOps.Models.ReportClasses.Daily_Report_2>
 
 @{
-    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Unchecked Reports");
+    ViewData["Title"] = SharedLocalizer.GetLocalizedHtmlString("Manage Check Reports");
 }
 
-<h2 class="mb-4 text-end">@SharedLocalizer.GetLocalizedHtmlString("Unchecked Reports")</h2>
+@Html.AntiForgeryToken()
+
+<h2 class="mb-4 text-end">@SharedLocalizer.GetLocalizedHtmlString("Checked Reports")</h2>
 @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
-{
-    @* <div class="container mt-4"> *@
+{    
     <div>
         <!-- Back button -->
         <form asp-action="DailyReports" method="get" class="mb-5 text-end">
@@ -17,7 +18,7 @@
         </form>
 
         <!-- Filter form -->
-        <form asp-controller="TrackItems" asp-action="ShowUncheckedDailyReports" method="get" class="card p-4 shadow-sm">
+        <form asp-controller="TrackItems" asp-action="ManageCheckedDailyReports" method="get" class="card p-4 shadow-sm">
 
             <!-- Row 1: Project + Subproject -->
             <div class="row g-4 text-end justify-content-end align-items-end">
@@ -60,8 +61,7 @@
                                name="all"
                                value="@(ViewBag.all == true ? "true" : "false")"
                                @(ViewBag.all == true ? "checked" : "")
-                               onchange="this.value = this.checked; applytheall(this);" />
-                        
+                               onchange="this.value = this.checked; applytheall(this);" />                       
                     </div>
 
                     <button type="submit" class="btn-hoelscher">
@@ -74,6 +74,25 @@
     </div>
 
     <style>
+        .tobepaid-cell { /* optional padding etc. */
+        }
+
+            .tobepaid-cell.status-yes {
+                background-color: lightgreen;
+            }
+
+            .tobepaid-cell.status-no {
+                background-color: lightcoral;
+            }
+
+            .tobepaid-cell.status-undef {
+                background-color: yellow;
+            }
+
+        /* If Bootstrap's table-striping overrides your color, add !important or higher specificity:
+        table.table .tobepaid-cell.status-yes { background-color: lightgreen !important; }
+        */
+
         /* Increase dropdown height */
         .form-select-lg {
             height: 38px;
@@ -125,6 +144,9 @@
                 </th>
                 <th style="width:4%;">
                     @Html.DisplayNameFor(model => model.Amount)
+                </th> 
+                <th style="width:4%;">
+                    @Html.DisplayNameFor(model => model.Checked_By)
                 </th>
                 <th>@Html.DisplayNameFor(model => model.VariationOrder)</th>
                 <th style="width:25%;"></th>
@@ -150,7 +172,7 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.short_Description)
                     </td>
-                    @if (item.tobepaid == null)
+                    @* @if (item.tobepaid == null)
                     {
                         <td style="background-color:yellow;overflow-wrap:break-word;">@SharedLocalizer.GetLocalizedHtmlString("Undefined")</td>
                     }
@@ -161,7 +183,17 @@
                     else
                     {
                         <td style="background-color:lightcoral;">@SharedLocalizer.GetLocalizedHtmlString("No")</td>
-                    }
+                    } *@
+
+                    <td id="tobepaid-cell-@item.Id" class="tobepaid-cell @(item.tobepaid == null ? "status-undef" : item.tobepaid == 1 ? "status-yes" : "status-no")">
+                        <span class="tobepaid-text">
+                            @(item.tobepaid == null ? SharedLocalizer.GetLocalizedHtmlString("Undefined") :
+                                                      item.tobepaid == 1 ? SharedLocalizer.GetLocalizedHtmlString("Yes") :
+                                                                          SharedLocalizer.GetLocalizedHtmlString("No"))
+                        </span>
+                    </td>
+
+
                     <td>
                         @Html.DisplayFor(modelItem => item.Report_Date)
                     </td>
@@ -176,6 +208,9 @@
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Amount)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Checked_By)
                     </td>
                     <td>
                         @if (item.VariationOrderId != null)
@@ -214,21 +249,7 @@
                                     @*</form>*@
                                 </td>
                             </tr>
-                            <tr>
-                                @* <td>
-                                    <form asp-action="Approve_DailyReport" method="post" asp-route-id="@item.Id">
-                                    <button onclick="Approve(@item.Id);" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Approve Report")</button>
-                                    @if (ViewBag.all == true)
-                                    {
-                                        <input type="checkbox" class="allclass" name="all" value="true" checked="checked" hidden="hidden" />
-                                    }
-                                    else
-                                    {
-                                        <input type="checkbox" class="allclass" name="all" value="false" hidden="hidden" />
-                                    }
-                                    </form>
-                                </td> *@
-
+                            <tr>                       
                                 <td>
                                     <form asp-action="Daily_Report_2_DetailsPdf" method="get" asp-route-id="@item.Id" target="_blank">
                                         <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View Report")</button>
@@ -241,11 +262,6 @@
                                 </td>
                             </tr>
                             <tr>
-                                @* <td>
-                                    <form asp-action="Daily_Report_2_DetailsPdf" method="get" asp-route-id="@item.Id" target="_blank">
-                                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("View Report")</button>
-                                    </form>
-                                </td> *@
                                 <td>
                                     <form asp-action="Delete_DailyReport" method="get" asp-route-id="@item.Id" target="_blank">
                                         <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Delete Report")</button>
@@ -259,18 +275,7 @@
                                 </td>
                             </tr>
 
-                            @* <tr>
-                                <td>
-                                    <form asp-action="MakeDrillRigDownTime" method="post" asp-route-id="@item.Id">
-                                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Make Drill Rig DownTime")</button>
-                                    </form>
-                                </td> 
-                                 <td>
-                                    <form asp-controller="DailyReport" asp-action="SplitDailyReport" asp-route-id="@item.Id" method="get" target="_blank">
-                                        <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Split")</button>
-                                    </form>
-                                </td>
-                            </tr> *@
+                          
 
                         </table>
                     </td>
@@ -287,6 +292,13 @@
     }
     <script src="~/js/jquery-ui-timepicker-addon.min.js"></script>
     <script type="text/javascript">
+        // optional: set the antiforgery header globally
+        $.ajaxSetup({
+          headers: {
+            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+          }
+        });
+
         $(document).ready(function () {
             $(function () {
 
@@ -324,8 +336,8 @@
             });
         }
 
-        function ApprovePaid(theid) { //both "approved" and "paid"
-            var url = '@Url.Action("ApprovePaidAjax1", "TrackItems")';
+        function ApprovePaid_work(theid) { //both "approved" and "paid"
+            var url = '@Url.Action("ApprovePaidAjax", "TrackItems")';
             $.ajax({
                 type: 'POST',
                 url: url,
@@ -334,6 +346,56 @@
                     alert("Approved and Paid!");
                 }
             });
+        }
+
+        
+         function ApprovePaid(theid) { // both "approved" and "paid"
+              var url = '@Url.Action("ApprovePaidAjax", "TrackItems")';
+
+              $.ajax({
+                type: 'POST',
+                url: url,
+                data: { id: theid },
+                success: function (data) {
+                  // Expecting { ok: true, tobepaid: 1, label: "Yes" }
+                  var $cell = $('#tobepaid-cell-' + theid);
+                  $cell.removeClass('status-yes status-no status-undef');
+                  $cell.addClass('status-yes');
+                  $cell.find('.tobepaid-text').text(data.label);
+                                 
+
+              // Optional toast/alert
+              alert("@SharedLocalizer.GetLocalizedHtmlString("Approved and Paid")");
+            },
+            error: function (xhr) {
+              alert((xhr.responseJSON && xhr.responseJSON.message) || 'Error');
+            }
+          });
+        }
+
+          function ApproveUnPaid(theid) { // both "approved" and "unpaid"
+              var url = '@Url.Action("ApproveUnpaidAjax", "TrackItems")';
+
+              $.ajax({
+                type: 'POST',
+                url: url,
+                data: { id: theid },
+                success: function (data) {
+                  // Expecting { ok: true, tobepaid: 1, label: "Yes" }
+                  var $cell = $('#tobepaid-cell-' + theid);
+                  $cell.removeClass('status-yes status-no status-undef');
+                  $cell.addClass('status-no');
+                  $cell.find('.tobepaid-text').text(data.label);
+
+                 
+
+              // Optional toast/alert
+              alert("@SharedLocalizer.GetLocalizedHtmlString("Approved and Unpaid")");
+            },
+            error: function (xhr) {
+              alert((xhr.responseJSON && xhr.responseJSON.message) || 'Error');
+            }
+          });
         }
 
 
@@ -350,8 +412,8 @@
             });
         }
 
-        function ApproveUnPaid(theid) { //both "approved" and "unpaid"
-            var url = '@Url.Action("ApproveUnpaidAjax1", "TrackItems")';
+        function ApproveUnPaid_work(theid) { //both "approved" and "unpaid"
+            var url = '@Url.Action("ApproveUnpaidAjax", "TrackItems")';
             $.ajax({
                 type: 'POST',
                 url: url,
@@ -359,9 +421,10 @@
                 success: function (data) {
                     alert("Approved and Unpaid!");
                 }
-
             });
         }
+
+
         function Approve(theid) {
             var url = '@Url.Action("ApproveAjax", "TrackItems")';
             $.ajax({
