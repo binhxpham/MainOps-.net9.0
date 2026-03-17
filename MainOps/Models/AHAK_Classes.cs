@@ -13,16 +13,16 @@ namespace MainOps.Models
         public int Id { get; set; }
         [Display(Name = "Project")]
         public int? ProjectId { get; set; }
-        public virtual Project Project { get; set; }
+        public virtual Project? Project { get; set; }
         [Display(Name = "Sub Project")]
         public int? SubProjectId { get; set; }
         [Display(Name = "Sub Project")]
-        public virtual SubProject SubProject { get; set; }
+        public virtual SubProject? SubProject { get; set; }
         [Display(Name = "Item")]
         [Required]
         public int? ItemTypeId {get; set;}
         [Display(Name = "Item")]
-        public virtual ItemType ItemType { get; set; }
+        public virtual ItemType? ItemType { get; set; }
         [Display(Name = "Description")]
         public string? MobilizeText_Text { get; set; }
         public double? Amount { get; set; }
@@ -39,8 +39,8 @@ namespace MainOps.Models
         public double PaidAmount { get; set; } 
         public string? UniqueID { get; set; }
         public int? VariationOrderId { get; set; }
-        public virtual BoQHeadLine VariationOrder { get; set; }
-        IList<string> pdfs { get; set; }
+        public virtual BoQHeadLine? VariationOrder { get; set; }
+        IList<string>? pdfs { get; set; }
         public bool Within_Coords(double latitude, double longitude)
         {
             double distance = DistanceAlgorithm.DistanceBetweenPlaces(longitude, latitude, Convert.ToDouble(this.Longitude), Convert.ToDouble(this.Latitude));
@@ -61,11 +61,11 @@ namespace MainOps.Models
         [Display(Name = "Project")]
         public int? ProjectId { get; set; }
         [Display(Name = "Project")]
-        public virtual Project Project { get; set; }
+        public virtual Project? Project { get; set; }
         [Display(Name = "Sub Project")]
         public int? SubProjectId { get; set; }
         [Display(Name = "Sub Project")]
-        public virtual SubProject SubProject { get; set; }        
+        public virtual SubProject? SubProject { get; set; }        
         [Display(Name = "Time Stamp")]
         public DateTime TimeStamp { get; set; }
         [Display(Name = "Description")]
@@ -83,18 +83,18 @@ namespace MainOps.Models
         [RegularExpression(@"((([0-1][0-9])|(2[0-3]))(:[0-5][0-9])(:[0-5][0-9])?)", ErrorMessage = "Time must be between 00:00 to 23:59")]
         public TimeSpan? Alarm_Time { get; set; }
         public string? DoneBy { get; set; }
-        public ICollection<PhotoFileAlarmCall> pictures { get; set; }
+        public ICollection<PhotoFileAlarmCall>? pictures { get; set; }
     }
     public class Install
     {
         public int Id { get; set; }
         [Display(Name = "Project")]
         public int? ProjectId { get; set; }
-        public virtual Project Project { get; set; }
+        public virtual Project? Project { get; set; }
         [Display(Name = "Sub Project")]
         public int? SubProjectId { get; set; }
         [Display(Name = "Sub Project")]
-        public virtual SubProject SubProject { get; set; }
+        public virtual SubProject? SubProject { get; set; }
         [Display(Name = "Item")]
         public int ItemTypeId { get; set; }
         [Display(Name = "Item")]
@@ -272,17 +272,17 @@ namespace MainOps.Models
         public int Id { get; set; }
         [Display(Name = "Project")]
         public int? ProjectId { get; set; }
-        public virtual Project Project { get; set; }
+        public virtual Project? Project { get; set; }
         [Display(Name = "Sub Project")]
         public int? SubProjectId { get; set; }
         [Display(Name = "Sub Project")]
-        public virtual SubProject SubProject { get; set; }
+        public virtual SubProject? SubProject { get; set; }
         [Display(Name = "Item")]
         public int? ItemTypeId {get; set;}
         [Display(Name = "Item")]
-        public virtual ItemType ItemType { get; set; }
+        public virtual ItemType? ItemType { get; set; }
         public int? InstallId { get; set; }
-        public virtual Install Install { get; set; }
+        public virtual Install? Install { get; set; }
         [Display(Name = "Description")]
         public string? DeInstall_Text { get; set; }
         public double? Amount { get; set; }
@@ -315,7 +315,7 @@ namespace MainOps.Models
         [ForeignKey("Item")]
         public int ItemTypeId { get; set; }
         [Display(Name = "Item")]
-        public virtual ItemType ItemType { get; set; }
+        public virtual ItemType? ItemType { get; set; }
     }
     public class InstallInOperation
     {

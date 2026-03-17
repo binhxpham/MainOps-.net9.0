@@ -1,41 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using ImageMagick;
+using MainOps.Data;
+using MainOps.ExtensionMethods;
+using MainOps.Models;
+using MainOps.Models.ReportClasses;
+using MainOps.Models.ViewModels;
+using MainOps.Resources;
+using MainOps.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using MainOps.Data;
-using MainOps.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
-using System.IO;
-using MainOps.Models.ViewModels;
-using MainOps.Resources;
-using QRCoder;
-using System.Drawing;
-using Rotativa.AspNetCore;
-using MainOps.ExtensionMethods;
-using MainOps.Models.ReportClasses;
-using System.Net.Http.Headers;
-using System.Threading;
 using Microsoft.Extensions.DependencyInjection;
-using Rotativa.AspNetCore.Options;
-using System.Drawing.Imaging;
-using MainOps.Services;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using QRCoder;
+using Rotativa.AspNetCore;
+using Rotativa.AspNetCore.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
-using System.Drawing.Drawing2D;
-using System.Text;
-using ImageMagick;
-using Newtonsoft.Json;
-using System.IO.Compression;
-using System.Diagnostics;
+//using Telerik.SvgIcons;
+using Microsoft.EntityFrameworkCore;
 
 namespace MainOps.Controllers
 {
@@ -540,6 +541,8 @@ namespace MainOps.Controllers
             return "failure";
         }
 
+
+
         public async Task<IEnumerable<SelectListItem>> CreateItemlist(string type)
         {
             List<ItemType> filternames = new List<ItemType>();
@@ -630,6 +633,126 @@ namespace MainOps.Controllers
                                                       Value = s.Id.ToString(),
                                                       Text = s.Project.Name + " : " + String.Format("{0:0.##}", s.BoQnr) + " : " + s.Item_Type
                                                   };
+
+            return selList;
+        }
+
+        public async Task<IEnumerable<SelectListItem>> CreateItemlist(string type, int projectId)
+        {
+            List<ItemType> filternames = new List<ItemType>();
+            var theuser = await _userManager.GetUserAsync(User);
+            if (type.Equals("install") || type.Equals("arrival") || type.Equals("deinstall"))
+            {
+                if (!User.IsInRole("Guest") && !User.IsInRole("MemberGuest"))
+                {
+                    filternames = (from it in _context.ItemTypes.Include(x => x.Project).ThenInclude(x => x.Division)
+                                   join bqh in _context.BoQHeadLines on Math.Floor(it.BoQnr) equals Math.Floor(bqh.BoQnum)
+                                   where bqh.Type.Equals("Installation")
+                                   && bqh.ProjectId.Equals(it.ProjectId)
+                                   && !it.Item_Type.ToLower().Contains("discount")
+                                   select it).ToList();
+                }
+                else
+                {
+
+                    filternames = (from it in _context.ItemTypes.Include(x => x.Project).ThenInclude(x => x.Division)
+                                   join bqh in _context.BoQHeadLines on Math.Floor(it.BoQnr) equals Math.Floor(bqh.BoQnum)
+                                   where bqh.Type.Equals("Installation") && !it.Item_Type.ToLower().Contains("discount")
+                                   join pu in _context.ProjectUsers on it.ProjectId equals pu.projectId
+                                   where pu.userId.Equals(theuser.Id) && bqh.ProjectId.Equals(it.ProjectId)
+                                   select it).OrderBy(x => x.Project.Division.Name).ThenBy(x => x.Project.Name).ThenBy(x => x.BoQnr).ToList();
+                }
+            }
+            else if (type.Equals("mobilize"))
+            {
+                if (!User.IsInRole("Guest") && !User.IsInRole("MemberGuest"))
+                {
+                    //filternames = _context.ItemTypes.Include(x => x.Project).ThenInclude(x => x.Division).Where(x => x.BoQnr >= (decimal)1.0 && x.BoQnr < (decimal)2.0).OrderBy(x => x.Project.Division.Name).ThenBy(x => x.Project.Name).ThenBy(x => x.BoQnr).ToList();
+                    filternames = (from it in _context.ItemTypes.Include(x => x.Project).ThenInclude(x => x.Division)
+                                   join bqh in _context.BoQHeadLines on Math.Floor(it.BoQnr) equals Math.Floor(bqh.BoQnum)
+                                   where bqh.Type.Equals("Mobilization") && !it.Item_Type.ToLower().Contains("discount")
+                                   && bqh.ProjectId.Equals(it.ProjectId)
+                                   select it).ToList();
+                }
+                else
+                {
+                    filternames = (from it in _context.ItemTypes.Include(x => x.Project).ThenInclude(x => x.Division)
+                                   join bqh in _context.BoQHeadLines on Math.Floor(it.BoQnr) equals Math.Floor(bqh.BoQnum)
+                                   where bqh.Type.Equals("Mobilization") && !it.Item_Type.ToLower().Contains("discount")
+                                   join pu in _context.ProjectUsers on it.ProjectId equals pu.projectId
+                                   where pu.userId.Equals(theuser.Id) && bqh.ProjectId.Equals(it.ProjectId)
+                                   select it).ToList();
+                }
+            }
+            else if (type.Equals("hours"))
+            {
+                if (!User.IsInRole("Guest") && !User.IsInRole("MemberGuest"))
+                {
+                    filternames = (from it in _context.ItemTypes.Include(x => x.Project).ThenInclude(x => x.Division)
+                                   join bqh in _context.BoQHeadLines on Math.Floor(it.BoQnr) equals Math.Floor(bqh.BoQnum)
+                                   where bqh.Type.Equals("Hours") && !it.Item_Type.ToLower().Contains("discount")
+                                   join pu in _context.ProjectUsers on it.ProjectId equals pu.projectId
+                                   where pu.userId.Equals(theuser.Id) && bqh.ProjectId.Equals(it.ProjectId)
+                                   select it).ToList();
+                }
+                else
+                {
+                    filternames = (from it in _context.ItemTypes.Include(x => x.Project).ThenInclude(x => x.Division)
+                                   join bqh in _context.BoQHeadLines on Math.Floor(it.BoQnr) equals Math.Floor(bqh.BoQnum)
+                                   where bqh.Type.Equals("Hours") && !it.Item_Type.ToLower().Contains("discount")
+                                   join pu in _context.ProjectUsers on it.ProjectId equals pu.projectId
+                                   where pu.userId.Equals(theuser.Id) && bqh.ProjectId.Equals(it.ProjectId)
+                                   select it).ToList();
+                }
+
+            }
+            else
+            {
+                filternames = _context.ItemTypes.Include(x => x.Project).ThenInclude(x => x.Division).ToList();
+            }
+            if (!User.IsInRole("Admin") && !User.IsInRole("International"))
+            {
+                filternames = filternames.Where(x => x.Project.DivisionId.Equals(theuser.DivisionId)).OrderBy(x => x.Project.Division.Name).ThenBy(x => x.Project.Name).ThenBy(x => x.BoQnr).ToList();
+            }
+            if (User.IsInRole("International") && !User.IsInRole("Admin"))
+            {
+                filternames = filternames.Where(x => x.Project.Name.Contains("STOCK")).ToList();
+            }
+            filternames = filternames.GroupBy(test => test.Id)
+                   .Select(grp => grp.First()).OrderBy(x => x.Item_Type).ThenBy(x => x.Project.DivisionId).ThenBy(x => x.Project.Name).ThenBy(x => x.BoQnr)
+                   .ToList();
+
+            filternames = filternames.Where(i => i.Project.Id == projectId)
+                                         .GroupBy(test => test.Id)
+                                         .Select(grp => grp.First())
+                                         .OrderBy(x => x.Item_Type)
+                                         .ThenBy(x => x.Project.DivisionId)
+                                         .ThenBy(x => x.Project.Name)
+                                         .ThenBy(x => x.BoQnr)
+                                         .ToList();
+
+
+            IEnumerable<SelectListItem> selList = from s in filternames
+                                                  select new SelectListItem
+                                                  {
+                                                      Value = s.Id.ToString(),
+                                                      Text = s.Project.Name + " : " + String.Format("{0:0.##}", s.BoQnr) + " : " + s.Item_Type
+                                                  };
+
+
+            /*  var filternames = mobItemTypes.Where(i =>  i.Project.Id == 437)
+                                                    .GroupBy(test => test.Id)
+                                                    .Select(grp => grp.First())
+                                                    .OrderBy(x => x.Item_Type)
+                                                    .ThenBy(x => x.Project.DivisionId)
+                                                    .ThenBy(x => x.Project.Name)
+                                                    .ThenBy(x => x.BoQnr)
+                                                    .ToList();
+            var fnames = filternames.Select(s => new SelectListItem
+            {
+                Value = s.Id.ToString(),
+                Text = s.Project.Name + " : " + string.Format("{0:0.##}", s.BoQnr) + " : " + s.Item_Type
+            }).ToList();*/
 
             return selList;
         }
@@ -1689,26 +1812,7 @@ namespace MainOps.Controllers
         public async Task<IActionResult> DeInstall()
         {
             ViewData["ProjectId"] = await GetProjectList();
-            //var user = await _userManager.GetUserAsync(User);
-            //if (user.Active == false)
-            //{
-            //    return RedirectToAction("ErrorMessage", "Home", new { text = "You are inactive" });
-            //}
-            //DeInstallItemVM model = new DeInstallItemVM();
-            //if (User.IsInRole("Admin"))
-            //{
-            //    model.InstalledCoordinates = await _context.Installations.Include(x => x.ItemType).Where(x => x.isInstalled.Equals(true)).ToListAsync();
-            //}
-            //else
-            //{
-            //    model.InstalledCoordinates = await _context.Installations.Include(x => x.ItemType).Where(x => x.isInstalled.Equals(true) && x.Project.DivisionId.Equals(user.DivisionId)).ToListAsync();
-            //}
-
-            //var itemtypes = (from it in _context.ItemTypes
-            //                 join bqh in _context.BoQHeadLines on Math.Floor(it.BoQnr) equals Math.Floor(bqh.BoQnum)
-            //                 where bqh.Type.Equals("Installation") && !it.Item_Type.ToLower().Contains("discount")
-            //                 select it).OrderBy(x => x.BoQnr).ToList();
-            //ViewData["ItemTypeId"] = new SelectList(itemtypes, "Id", "Item_Type");
+            
             return View("DeInstall");
         }
 
@@ -4717,7 +4821,9 @@ namespace MainOps.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetUserAsync(User);
-                var itemdeinstalled = await _context.Installations.Include(x => x.ItemType).Where(x => x.Id.Equals(model.DeInstallItemId)).SingleOrDefaultAsync();
+                var itemdeinstalled = await _context.Installations.Include(x => x.ItemType)
+                                                                    .Where(x => x.Id.Equals(model.DeInstallItemId))
+                                                                    .SingleOrDefaultAsync();
                 itemdeinstalled.isInstalled = false;
                 itemdeinstalled.DeinstallDate = model.TimeStamp;
 
@@ -13895,14 +14001,16 @@ namespace MainOps.Controllers
                             {
                                 II.price = (decimal)0.00;
                                 II.Days = (endtime - arr.TimeStamp.Date).Days + 1;
-                                if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. week"))
+                                //if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. week"))
+                                if (string.Equals(arr?.ItemType?.Rental_Unit?.TheUnit, "pr. week", StringComparison.OrdinalIgnoreCase))
                                 {
                                     var previousdays = Math.Max(Math.Ceiling((starttime.AddDays(-1) - arr.TimeStamp.Date).TotalDays / 7), 0);
                                     var alldays = Math.Ceiling((endtime - arr.TimeStamp.Date).TotalDays / 7);
                                     II.Days = Convert.ToDouble(alldays - previousdays);
                                     //II.Days = Convert.ToDouble(Convert.ToInt32(II.Days / 7));
                                 }
-                                else if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. month"))
+                                //else if (arr.ItemType.Rental_Unit.TheUnit.ToLower().Equals("pr. month"))
+                                else if (string.Equals(arr?.ItemType?.Rental_Unit?.TheUnit, "pr. month", StringComparison.OrdinalIgnoreCase))
                                 {
                                     II.Days = CalculateRentalMonths(arr, starttime.Date, endtime.Date);
                                     //if(arr.TimeStamp.Date  <= modelin.starttime.Date) {
@@ -21350,8 +21458,8 @@ namespace MainOps.Controllers
                 bool sendMail = false;
                 if (lastadded.ProjectId == 437 || lastadded.ProjectId == 653)
                 {
-                    sendMail = (lastadded.Diesel_Level < 80
-                        || lastadded.SpareTank_Level < 80
+                    sendMail = (lastadded.Diesel_Level < 50
+                        || lastadded.SpareTank_Level < 50
                         || !lastadded.Coolant
                         || !lastadded.Oil_Level
                         || lastadded.Generator_Started.Equals("No")
@@ -21390,13 +21498,12 @@ namespace MainOps.Controllers
                                      ". Test performed on: " + lastadded.TimeStamp.ToString() +
                                      ". On Project: " + lastadded.Project.Name;
 
-                    if (lastadded.ProjectId == 437 || lastadded.ProjectId == 653)
+                    if (lastadded.ProjectId == 437)// || lastadded.ProjectId == 653)
                     {
                         recipients.Add("jonba@BESIX-MTH.com");//jonba@besix-mth.dk
 
                         if (lastadded.GeneratorName == "Generator Nr. 1 (Atlas Copco)"
                             || lastadded.GeneratorName == "Generator Nr. 2 (Atlas Copco)"
-                            //|| lastadded.GeneratorName == "Generator Nr. 3 (Repto)"
                             || lastadded.GeneratorName == "Generator Nr. 5 (Atlas Copco)"
                             || lastadded.GeneratorName == "Generator Nr. 6 (Atlas Copco)"
                             || lastadded.GeneratorName == "Generator Nr. 7 (Atlas Copco)")
@@ -21421,7 +21528,11 @@ namespace MainOps.Controllers
                         }
                     }
 
-                    Debug.WriteLine($"Message: {message}");
+                    if (lastadded.ProjectId == 653){
+                        recipients = new List<string> { "ofw@hj-as.dk", "bin@hj-as.dk" };
+                    }
+
+                        Debug.WriteLine($"Message: {message}");
                     foreach (var email in recipients)
                     {
                         Debug.WriteLine($"Send email to: {email}");
@@ -22973,7 +23084,7 @@ namespace MainOps.Controllers
                 .Where(x => x.Project.DivisionId.Equals(user.DivisionId) && x.Project.Active.Equals(true))
                 .OrderByDescending(x => x.TimeStamp).Take(100).ToListAsync();
             }
-            ViewData["ItemTypeId"] = await CreateItemlist("install");
+            ViewData["ItemTypeId"] = await CreateItemlist("install", 437);
             ViewData["ProjectId"] = await GetProjectList();
 
             return View("Reports/Installations", items);
@@ -23000,29 +23111,87 @@ namespace MainOps.Controllers
             }
             return View("Reports/DeInstallations", items);
         }
+
+
+        public async Task<List<ItemType>> MobilizationItemTypes()
+        {            
+            var theuser = await _userManager.GetUserAsync(User);
+            List<ItemType> mobItemTypes = new List<ItemType>();
+            if (!User.IsInRole("Guest") && !User.IsInRole("MemberGuest"))
+            {
+                mobItemTypes = (from it in _context.ItemTypes.Include(x => x.Project).ThenInclude(x => x.Division)
+                                join bqh in _context.BoQHeadLines on Math.Floor(it.BoQnr) equals Math.Floor(bqh.BoQnum)
+                                where bqh.Type.Equals("Mobilization") && !it.Item_Type.ToLower().Contains("discount")
+                                && bqh.ProjectId.Equals(it.ProjectId)
+                                select it).ToList();
+            }
+            else
+            {
+                mobItemTypes = (from it in _context.ItemTypes.Include(x => x.Project).ThenInclude(x => x.Division)
+                                join bqh in _context.BoQHeadLines on Math.Floor(it.BoQnr) equals Math.Floor(bqh.BoQnum)
+                                where bqh.Type.Equals("Mobilization") && !it.Item_Type.ToLower().Contains("discount")
+                                join pu in _context.ProjectUsers on it.ProjectId equals pu.projectId
+                                where pu.userId.Equals(theuser.Id) && bqh.ProjectId.Equals(it.ProjectId)
+                                select it).ToList();
+            }
+
+            if (!User.IsInRole("Admin") && !User.IsInRole("International"))
+            {
+                mobItemTypes = mobItemTypes.Where(x => x.Project.DivisionId.Equals(theuser.DivisionId)).OrderBy(x => x.Project.Division.Name).ThenBy(x => x.Project.Name).ThenBy(x => x.BoQnr).ToList();
+            }
+            if (User.IsInRole("International") && !User.IsInRole("Admin"))
+            {
+                mobItemTypes = mobItemTypes.Where(x => x.Project.Name.Contains("STOCK")).ToList();
+            }
+            mobItemTypes = mobItemTypes.GroupBy(test => test.Id)
+                   .Select(grp => grp.First()).OrderBy(x => x.Item_Type).ThenBy(x => x.Project.DivisionId).ThenBy(x => x.Project.Name).ThenBy(x => x.BoQnr)
+                   .ToList();
+
+            return mobItemTypes;
+        }
+
         public async Task<IActionResult> Mobilisations()
         {
-            var user = await _userManager.GetUserAsync(User);
-            ViewData["ItemTypeId"] = await CreateItemlist("mobilize");
+            var theuser = await _userManager.GetUserAsync(User);
+            var mobItemTypes = await MobilizationItemTypes();
+            var filternames = mobItemTypes.Where(i =>  i.Project.Id == 437)
+                                                    .GroupBy(test => test.Id)
+                                                    .Select(grp => grp.First())
+                                                    .OrderBy(x => x.Item_Type)
+                                                    .ThenBy(x => x.Project.DivisionId)
+                                                    .ThenBy(x => x.Project.Name)
+                                                    .ThenBy(x => x.BoQnr)
+                                                    .ToList();
+            var fnames = filternames.Select(s => new SelectListItem
+            {
+                Value = s.Id.ToString(),
+                Text = s.Project.Name + " : " + string.Format("{0:0.##}", s.BoQnr) + " : " + s.Item_Type
+            }).ToList();
+
+            ViewData["ItemTypeId"] = fnames;
+
+            //ViewData["ItemTypeId"] = await CreateItemlist("mobilize");
             ViewData["ProjectId"] = await GetProjectList();
             List<Mobilize> items = new List<Mobilize>();
+
             if (User.IsInRole("Guest"))
             {
                 items = await (from pu in _context.ProjectUsers
                                join dr in _context.Mobilisations.Include(x => x.ItemType).Include(x => x.Project).ThenInclude(x => x.Division) on pu.projectId equals dr.ProjectId
-                               where pu.userId.Equals(user.Id) && dr.Project.DivisionId.Equals(user.DivisionId)
+                               where pu.userId.Equals(theuser.Id) && dr.Project.DivisionId.Equals(theuser.DivisionId)
                                select dr).OrderByDescending(x => x.TimeStamp).ToListAsync();
             }
             else
             {
                 items = await _context.Mobilisations.
                 Include(x => x.ItemType).Include(x => x.Project).ThenInclude(x => x.Division)
-                .Where(x => x.Project.DivisionId.Equals(user.DivisionId))
+                .Where(x => x.Project.DivisionId.Equals(theuser.DivisionId))
                 .OrderByDescending(x => x.TimeStamp).ToListAsync();
             }
 
             return View("Reports/Mobilisations", items);
         }
+
         [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember")]
         public async Task<IActionResult> Reports()
         {

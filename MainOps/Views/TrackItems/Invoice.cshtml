@@ -1020,7 +1020,7 @@
                         }
                     }
 
-                    @if (subtotal > (decimal)0.0)
+                    @if (subtotal > 0m && (item?.ArrivalId ?? 0) != 10000)
                     {
                         <tr>
                             @if (item.InstallationId == null && item.Daily_Report_2Id == null && item.ArrivalId == null && item.MobilizationId == null)

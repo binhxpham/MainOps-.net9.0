@@ -74,11 +74,13 @@ builder.Services.AddResponseCompression(options =>
 });
 
 
-#if DEBUG
-    builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
-#else
-    builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
-#endif
+//#if DEBUG
+//    builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
+//#else
+//    builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
+//#endif
+
+builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
 // Update JSON options
 builder.Services.AddControllers()
@@ -150,7 +152,7 @@ builder.Services.AddHsts(options =>
     options.MaxAge = TimeSpan.FromDays(365);
 });
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
+var connectionString = builder.Configuration.GetConnectionString("MySqlConnection") ?? //;// DefaultConnection");// ??
     new MySqlConnectionStringBuilder
     {
         Server = "handdipnew.mysql.database.azure.com",
@@ -278,7 +280,7 @@ builder.Services.AddSession(options =>
 builder.Services.AddMemoryCache();
 
 // Add rate limiting
-builder.Services.AddRateLimiter(options =>
+/*builder.Services.AddRateLimiter(options =>
 {
     options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
         RateLimitPartition.GetFixedWindowLimiter("GlobalLimiter",
@@ -287,6 +289,22 @@ builder.Services.AddRateLimiter(options =>
                 AutoReplenishment = true,
                 PermitLimit = 100,
                 Window = TimeSpan.FromMinutes(1)
+            }));
+});*/
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+        RateLimitPartition.GetFixedWindowLimiter(
+            context.User.Identity?.Name
+                ?? context.Connection.RemoteIpAddress?.ToString()
+                ?? "anonymous",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 500,
+                Window = TimeSpan.FromMinutes(1),
+                AutoReplenishment = true
             }));
 });
 
@@ -322,7 +340,7 @@ else
 
 app.UseHttpLogging();
 app.UseResponseCompression();
-app.UseRateLimiter();
+/*app.UseRateLimiter();*/
 
 app.UseHttpsRedirection();
 app.UseStaticFiles(new StaticFileOptions

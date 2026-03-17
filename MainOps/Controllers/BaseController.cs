@@ -87,13 +87,14 @@ namespace MainOps.Controllers
 
             if (User.IsInRole("Admin"))
             {
-                var projects = _context.Projects.Where(x => x.Active.Equals(true)).OrderBy(x => x.DivisionId).ThenBy(x => x.Name).ToList();
+                var projects = _context.Projects.Where(x => x.Active.Equals(true) && x.Id != 588)
+                                                .OrderBy(x => x.DivisionId).ThenBy(x => x.Name).ToList();
                 IEnumerable<SelectListItem> selList = from s in projects
                                                       select new SelectListItem
                                                       {
                                                           Value = s.Id.ToString(),
                                                           Text = s.Name + " : " + s.ProjectNr,
-                                                          Selected = s.Id == 437 ? true : false
+                                                          Selected = (s.Id == 437) // ? true : false
                                                       };
                 //if(projects.FindIndex(x => x.Id.Equals(437)) >= 0)
                 //{

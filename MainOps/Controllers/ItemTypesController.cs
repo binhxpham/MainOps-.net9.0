@@ -18,6 +18,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using MainOps.Models.ViewModels;
+using System.Diagnostics;
 
 namespace MainOps.Controllers
 {
@@ -182,6 +183,66 @@ namespace MainOps.Controllers
             ViewData["UnitId"] = new SelectList(_context.Units, "Id", "TheUnit");
             ViewData["ReportTypeId"] = new SelectList(_context.ReportTypes, "Id", "Type");
             return View();
+        }
+
+
+        [HttpGet]
+        public async Task<JsonResult> GetItemTypesByProject(int theId)
+        {
+            List<ItemType> filternames = new List<ItemType>();
+
+            var theuser = await _userManager.GetUserAsync(User);
+            if (!User.IsInRole("Guest") && !User.IsInRole("MemberGuest"))
+            {
+                //filternames = _context.ItemTypes.Include(x => x.Project).ThenInclude(x => x.Division).Where(x => x.BoQnr >= (decimal)1.0 && x.BoQnr < (decimal)2.0).OrderBy(x => x.Project.Division.Name).ThenBy(x => x.Project.Name).ThenBy(x => x.BoQnr).ToList();
+                filternames = (from it in _context.ItemTypes.Include(x => x.Project).ThenInclude(x => x.Division)
+                               join bqh in _context.BoQHeadLines on Math.Floor(it.BoQnr) equals Math.Floor(bqh.BoQnum)
+                               where bqh.Type.Equals("Mobilization") && !it.Item_Type.ToLower().Contains("discount")
+                               && bqh.ProjectId.Equals(it.ProjectId)
+                               select it).ToList();
+            }
+            else
+            {
+                filternames = (from it in _context.ItemTypes.Include(x => x.Project).ThenInclude(x => x.Division)
+                               join bqh in _context.BoQHeadLines on Math.Floor(it.BoQnr) equals Math.Floor(bqh.BoQnum)
+                               where bqh.Type.Equals("Mobilization") && !it.Item_Type.ToLower().Contains("discount")
+                               join pu in _context.ProjectUsers on it.ProjectId equals pu.projectId
+                               where pu.userId.Equals(theuser.Id) && bqh.ProjectId.Equals(it.ProjectId)
+                               select it).ToList();
+            }
+            if (!User.IsInRole("Admin") && !User.IsInRole("International"))
+            {
+                filternames = filternames.Where(x => x.Project.DivisionId.Equals(theuser.DivisionId)).OrderBy(x => x.Project.Division.Name).ThenBy(x => x.Project.Name).ThenBy(x => x.BoQnr).ToList();
+            }
+            if (User.IsInRole("International") && !User.IsInRole("Admin"))
+            {
+                filternames = filternames.Where(x => x.Project.Name.Contains("STOCK")).ToList();
+            }
+            filternames = filternames.GroupBy(test => test.Id)
+                   .Select(grp => grp.First()).OrderBy(x => x.Item_Type).ThenBy(x => x.Project.DivisionId).ThenBy(x => x.Project.Name).ThenBy(x => x.BoQnr)
+                   .ToList();
+
+            // Get the items that belong to this project
+            var items = filternames
+                .Where(i => i.ProjectId == theId)
+                .GroupBy(i => i.Id)
+                .Select(g => g.FirstOrDefault())
+                .OrderBy(x => x.Item_Type)
+                .ThenBy(x => x.Project.DivisionId)
+                .ThenBy(x => x.Project.Name)
+                .ThenBy(x => x.BoQnr)
+                .Select(i => new
+                {
+                    value = i.Id,
+                    text = i.Project.Name
+                           + " : "
+                           + string.Format("{0:0.##}", i.BoQnr)
+                           + " : "
+                           + i.Item_Type
+                })
+                .ToList();
+
+            return Json(items);
         }
         public async Task<IActionResult> GetItemTypes(string theId,string searchfield)
         {
@@ -615,9 +676,186 @@ namespace MainOps.Controllers
             
             return Json(thedata);
         }
+
         [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,Guest,International")]
         [HttpGet]
-        public JsonResult GetItemsProject(string theId,string type)
+        public JsonResult GetItemsProject(string theId, string type)
+        {
+            int Id = Convert.ToInt32(theId);
+            List<ItemType> thedata = new List<ItemType>();
+            List<ItemType> thenewdata = new List<ItemType>();
+            switch (type)
+            {
+                case "install":
+                    //thedata = (from it in _context.ItemTypes 
+                    //           where 
+                    //           it.ProjectId.Equals(Id)
+                    //           && !it.Item_Type.ToLower().Contains("discount") && !it.Item_Type.ToLower().Contains(" idle") && !it.Item_Type.ToLower().Contains(" idxle") && !it.Item_Type.ToLower().Contains(" excluded grouting l") && !it.Item_Type.ToLower().Contains("decommission")
+                    //           && (!it.Rental_UnitId.Equals(5) && !it.Rental_UnitId.Equals(6)) && it.ReportTypeId == null
+                    //           select it).OrderBy(x => x.BoQnr).ToList();
+                    thedata = _context.ItemTypes.Where(x => x.ProjectId.Equals(Id)).ToList();
+                    thedata = thedata.Where(x => !x.Item_Type.ToLower().Contains("discount") && !x.Item_Type.ToLower().Contains(" idle") && !x.Item_Type.ToLower().Contains(" idxle") && !x.Item_Type.ToLower().Contains(" excluded grouting l") && !x.Item_Type.ToLower().Contains("decommission")).ToList();
+                    thedata = thedata.Where(it => !(it.Item_Type.ToLower().Contains("decommission") ||
+                                                        it.Item_Type.ToLower().Contains("decomm. ") ||
+                                                        it.Item_Type.ToLower().Contains("deinstall") ||
+                                                        it.Item_Type.ToLower().Contains("de-install") ||
+                                                        (it.Item_Type.ToLower().Contains("removal") && !it.Item_Type.ToLower().Contains("add on for acid treatment"))
+                                                     )
+                                            )
+                                .ToList();
+                    thedata = thedata.Where(x => x.price > 0 && !x.Rental_UnitId.Equals(5) && !x.Rental_UnitId.Equals(6) && !x.Rental_UnitId.Equals(19) && !x.Install_UnitId.Equals(19) && x.ReportTypeId == null).ToList();
+                    var boqheadlines = _context.BoQHeadLines.Where(x => x.ProjectId.Equals(Id) && x.Type.ToLower().Equals("installation")).ToList();
+                    foreach (var item in thedata)
+                    {
+                        if (boqheadlines.Select(x => Convert.ToInt32(Math.Floor(x.BoQnum))).Distinct().Contains(Convert.ToInt32(Math.Floor(item.BoQnr))))
+                        {
+                            thenewdata.Add(item);
+                        }
+                    }
+                    thedata = thenewdata.OrderBy(x => x.Item_Type).ThenBy(x => x.BoQnr).ToList();
+                    //thedata = (from it in _context.ItemTypes
+                    //           join bqh in _context.BoQHeadLines on Convert.ToInt32(it.BoQnr) equals Convert.ToInt32(bqh.BoQnum)
+                    //           where bqh.Type.Equals("Installation") && it.ProjectId.Equals(Id) && bqh.ProjectId.Equals(Id)
+                    //            && !it.Item_Type.ToLower().Contains("discount") && !it.Item_Type.ToLower().Contains(" idle") && !it.Item_Type.ToLower().Contains(" idxle") && !it.Item_Type.ToLower().Contains(" excluded grouting l") && !it.Item_Type.ToLower().Contains("decommission")
+                    //           && (!it.Rental_UnitId.Equals(5) && !it.Rental_UnitId.Equals(6)) && it.ReportTypeId == null
+                    //           select it).OrderBy(x => x.BoQnr).ToList();
+                    foreach (var item in thedata)
+                    {
+                        item.Item_Type = _localizer.GetLocalizedHtmlString(item.Item_Type);
+                    }
+                    return Json(thedata);
+                case "installedit":
+
+                    thedata = (from it in _context.ItemTypes
+                               join bqh in _context.BoQHeadLines on Convert.ToInt32(Math.Floor(it.BoQnr)) equals Convert.ToInt32(Math.Floor(bqh.BoQnum))
+                               where bqh.Type.Equals("Installation") && it.ProjectId.Equals(Id) && bqh.ProjectId.Equals(Id)
+                                && !it.Item_Type.ToLower().Contains("discount") && !it.Item_Type.ToLower().Contains(" idle") && !it.Item_Type.ToLower().Contains(" idxle") && !it.Item_Type.ToLower().Contains(" excluded grouting l")
+                               && (!it.Rental_UnitId.Equals(5) && !it.Rental_UnitId.Equals(6))
+                               select it).OrderBy(x => x.Item_Type).ThenBy(x => x.BoQnr).ToList();
+                    foreach (var item in thedata)
+                    {
+                        item.Item_Type = _localizer.GetLocalizedHtmlString(item.Item_Type);
+                    }
+                    return Json(thedata);
+                case "pump":
+
+                    thedata = (from it in _context.ItemTypes
+                               where it.ProjectId.Equals(Id) && it.ReportTypeId.Equals(20)
+
+                               select it).OrderBy(x => x.Item_Type).ThenBy(x => x.BoQnr).ToList();
+                    return Json(thedata);
+                case "reinf":
+
+                    thedata = (from it in _context.ItemTypes
+                               where it.ProjectId.Equals(Id) && it.ReportTypeId.Equals(21)
+
+                               select it).OrderBy(x => x.Item_Type).ThenBy(x => x.BoQnr).ToList();
+                    return Json(thedata);
+                case "obs":
+
+                    thedata = (from it in _context.ItemTypes
+                               where it.ProjectId.Equals(Id) && it.ReportTypeId.Equals(22)
+
+                               select it).OrderBy(x => x.BoQnr).ToList();
+                    return Json(thedata);
+                case "mobilize":
+                    Debug.WriteLine("Querying mobilize..........");
+                    thedata = (from it in _context.ItemTypes
+                               join bqh in _context.BoQHeadLines 
+                               on Convert.ToInt32(it.BoQnr) equals Convert.ToInt32(bqh.BoQnum)
+                               where bqh.Type.Equals("Mobilization")
+                               && it.ProjectId.Equals(Id) 
+                               && (it.Item_Type.Contains("Mobilization")
+                                    || it.Item_Type.Contains("mobilisation")
+                                    || it.Item_Type.Contains("mob")
+                                    || it.Item_Type.Contains("Demobilization")
+                                    || (it.Item_Type.Contains("demob") 
+                                        && !it.Item_Type.Contains("Monitoring period after end of demob"))
+                                    || it.Item_Type.Contains("Moving")) 
+                               && bqh.ProjectId.Equals(Id)
+                               select it).OrderBy(x => x.Item_Type).ThenBy(x => x.BoQnr).ToList();
+
+                    return Json(thedata);
+                case "arrival":
+                    if (User.IsInRole("International") && !User.IsInRole("Admin"))
+                    {
+                        thedata = (from it in _context.ItemTypes
+                                   .OrderBy(x => x.Item_Type).ThenBy(x => x.BoQnr)
+                                   join bqh in _context.BoQHeadLines on Convert.ToInt32(Math.Floor(it.BoQnr)) equals Convert.ToInt32(Math.Floor(bqh.BoQnum))
+                                   where bqh.Type.Equals("Installation") && it.ProjectId.Equals(Id) && bqh.ProjectId.Equals(Id)
+                                   select it).ToList();
+                    }
+                    else
+                    {
+                        List<ItemType> thedata2 = new List<ItemType>();
+                        thedata = (from it in _context.ItemTypes
+                                   where it.ProjectId.Equals(Id)
+                                   && it.ReportTypeId == null
+                                   && !it.Item_Type.ToLower().Contains("discount")
+                                   && !it.Item_Type.ToLower().Contains(" idle")
+                                   && (it.rental_price > (decimal)0.01 || it.rental_price < (decimal)-0.01)
+                                   && (it.Rental_UnitId.Equals(3) || it.Rental_UnitId.Equals(4) || it.Rental_UnitId.Equals(11) || it.Rental_UnitId.Equals(12) || it.Rental_UnitId.Equals(13) || it.Rental_UnitId.Equals(14) || it.Rental_UnitId.Equals(16) || it.Rental_UnitId.Equals(17) || it.Rental_UnitId.Equals(18))
+                                   select it).OrderBy(x => x.Item_Type).ThenBy(x => x.BoQnr_Rental).ToList();
+                    }
+
+
+                    return Json(thedata);
+                case "arrivaledit":
+
+                    thedata = (from it in _context.ItemTypes
+                               join bqh in _context.BoQHeadLines on Math.Floor(Math.Floor(it.BoQnr_Rental.Value)) equals Math.Floor(Math.Floor(bqh.BoQnum))
+                               where bqh.Type.Equals("Rental") && it.ProjectId.Equals(Id) && bqh.ProjectId.Equals(Id)
+                                && !it.Item_Type.ToLower().Contains("discount") && !it.Item_Type.ToLower().Contains(" idle") && !it.Item_Type.ToLower().Contains(" idxle")
+                                && (it.rental_price > (decimal)0.01 || it.rental_price < (decimal)-0.01)
+                                && (it.Rental_UnitId.Equals(3) || it.Rental_UnitId.Equals(4) || it.Rental_UnitId.Equals(11) || it.Rental_UnitId.Equals(12) || it.Rental_UnitId.Equals(13) || it.Rental_UnitId.Equals(14) || it.Rental_UnitId.Equals(16) || it.Rental_UnitId.Equals(17) || it.Rental_UnitId.Equals(18))
+                               select it).OrderBy(x => x.Item_Type).ThenBy(x => x.BoQnr_Rental).ToList();
+                    foreach (var item in thedata)
+                    {
+                        item.Item_Type = _localizer.GetLocalizedHtmlString(item.Item_Type);
+                    }
+                    return Json(thedata);
+                case "deinstall":
+
+                    thedata = _context.ItemTypes.Where(x => x.ProjectId.Equals(Id)).ToList();
+                    thedata = thedata.Where(x => !x.Item_Type.ToLower().Contains("discount") && !x.Item_Type.ToLower().Contains(" idle") && !x.Item_Type.ToLower().Contains(" idxle") && !x.Item_Type.ToLower().Contains(" excluded grouting l") && !x.Item_Type.ToLower().Contains("decommission")).ToList();
+                    thedata = thedata.Where(x => x.price > 0 && !x.Rental_UnitId.Equals(5) && !x.Rental_UnitId.Equals(6) && !x.Rental_UnitId.Equals(19) && !x.Install_UnitId.Equals(19)).ToList();
+                    var boqheadlines2 = _context.BoQHeadLines.Where(x => x.ProjectId.Equals(Id) && x.Type.ToLower().Equals("installation")).ToList();
+                    foreach (var item in thedata)
+                    {
+                        if (boqheadlines2.Select(x => Convert.ToInt32(Math.Floor(x.BoQnum))).Distinct().Contains(Convert.ToInt32(Math.Floor(item.BoQnr))))
+                        {
+                            thenewdata.Add(item);
+                        }
+                    }
+                    thedata = thenewdata.OrderBy(x => x.Item_Type).ThenBy(x => x.BoQnr).ToList();
+                    foreach (var item in thedata)
+                    {
+                        item.Item_Type = _localizer.GetLocalizedHtmlString(item?.Item_Type);
+                    }
+                    return Json(thedata);
+                case "hours":
+                    thedata = (from it in _context.ItemTypes
+                               where
+                               it.ProjectId.Equals(Id)
+                               && !it.Item_Type.ToLower().Contains("discount") && !it.Item_Type.ToLower().Contains(" idle") && !it.Item_Type.ToLower().Contains(" idxle") && !it.Item_Type.ToLower().Contains(" excluded grouting l")
+                               && (it.Rental_UnitId.Equals(5) || it.Rental_UnitId.Equals(6))
+                               select it).OrderBy(x => x.Item_Type).ThenBy(x => x.BoQnr).ToList();
+                    return Json(thedata);
+                case "drill":
+                    thedata = (from it in _context.ItemTypes where it.ProjectId.Equals(Id) && it.ReportTypeId.Equals(13) select it).OrderBy(x => x.Item_Type).ThenBy(x => x.BoQnr).ToList();
+                    return Json(thedata);
+                case "decom":
+                    thedata = (from it in _context.ItemTypes join di in _context.DecommissionableItems on it.Id equals di.InstalledItemTypeId where it.ProjectId.Equals(Id) && it.ReportTypeId.Equals(1) select it).OrderBy(x => x.Item_Type).ThenBy(x => x.BoQnr).ToList();
+                    return Json(thedata);
+                default:
+                    thedata = _context.ItemTypes.Where(x => x.ProjectId.Equals(Id)).OrderBy(x => x.Item_Type).ThenBy(x => x.BoQnr).ToList();
+                    return Json(thedata);
+            }
+        }
+
+        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,Guest,International")]
+        [HttpGet]
+        public JsonResult GetItemsProjectForDeinstall(string theId,string type)
         {
             int Id = Convert.ToInt32(theId);
             List<ItemType> thedata = new List<ItemType>();
@@ -732,7 +970,20 @@ namespace MainOps.Controllers
                 case "deinstall":
                    
                     thedata = _context.ItemTypes.Where(x => x.ProjectId.Equals(Id)).ToList();
-                    thedata = thedata.Where(x => !x.Item_Type.ToLower().Contains("discount") && !x.Item_Type.ToLower().Contains(" idle") && !x.Item_Type.ToLower().Contains(" idxle") && !x.Item_Type.ToLower().Contains(" excluded grouting l") && !x.Item_Type.ToLower().Contains("decommission")).ToList();
+                    //thedata = thedata.Where(x => !x.Item_Type.ToLower().Contains("discount") && 
+                    //                             !x.Item_Type.ToLower().Contains(" idle") && 
+                    //                             !x.Item_Type.ToLower().Contains(" idxle") && 
+                    //                             !x.Item_Type.ToLower().Contains(" excluded grouting l") && 
+                    //                             !x.Item_Type.ToLower().Contains("decommission"))
+                    //                .ToList();
+                    thedata = thedata
+                                .Where(it =>  ((it.Item_Type.ToLower().Contains("decommission") || it.Item_Type.ToLower().Contains("decomm. ")) && !it.Item_Type.ToLower().Contains("well"))
+                                                || it.Item_Type.ToLower().Contains("deinstall")
+                                                || it.Item_Type.ToLower().Contains("de-install")
+                                                || (it.Item_Type.ToLower().Contains("removal") && !it.Item_Type.ToLower().Contains("add on for acid treatment"))
+                                      )
+                                .ToList();
+
                     thedata = thedata.Where(x => x.price > 0 && !x.Rental_UnitId.Equals(5) && !x.Rental_UnitId.Equals(6) && !x.Rental_UnitId.Equals(19) && !x.Install_UnitId.Equals(19)).ToList();
                     var boqheadlines2 = _context.BoQHeadLines.Where(x => x.ProjectId.Equals(Id) && x.Type.ToLower().Equals("installation")).ToList();
                     foreach (var item in thedata)

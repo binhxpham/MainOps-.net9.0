@@ -69,7 +69,7 @@
 }
 <table style="width:100%;table-layout:fixed;word-break:break-word;">
     <thead>
-        <tr>
+        <tr style="border-bottom:2px solid black;">
             <th>
                 @Html.DisplayNameFor(model => model.ItemType.Project.Name)
             </th>
@@ -111,11 +111,9 @@
     <tbody>
         @foreach (var item in Model)
         {
-
-
             @if (!item.ItemTypeId.Equals(1782))
             {
-                <tr>
+                <tr style="border-bottom:1.5px solid lightgrey;">
                     <td>
                         @Html.DisplayFor(modelItem => item.Project.Name)
                         @if (item.SubProjectId != null)
@@ -155,7 +153,8 @@
                         @Html.DisplayFor(modelITem => item.DoneBy)
                     </td>
                     <td>
-                        @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager") || (await _userManager.GetUserAsync(User)).full_name().Equals(item.DoneBy))
+                        @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || 
+                           User.IsInRole("Manager") || (await _userManager.GetUserAsync(User)).full_name().Equals(item.DoneBy))
                         {
                             <form asp-action="Edit_Install" asp-route-id="@item.Id" method="get" target="_blank">
                                 <button class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Edit")</button>
@@ -165,15 +164,18 @@
                         <form asp-controller="TrackItems" asp-action="Details_Install" asp-route-id="@item.Id" method="get" target="_blank">
                             <button type="submit" class="btn-hoelscher">@SharedLocalizer.GetLocalizedHtmlString("Details")</button>
                         </form>
-                        @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || User.IsInRole("Manager"))
+                        @if (User.IsInRole("Admin") || User.IsInRole("DivisionAdmin") || 
+                             User.IsInRole("Guest") || User.IsInRole("MemberGuest") ||
+                             User.IsInRole("Member") || User.IsInRole("ProjectMember") ||
+                            User.IsInRole("Manager"))
                         {
                             <form asp-action="Delete_Install" asp-route-id="@item.Id" method="post">
-                                <button class="btn-hoelscher" onclick="return confirm('do you really want to delet this item?')">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button>
+                                <button class="btn-hoelscher" onclick="return confirm('Do you really want to delet this item?')">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button>
                             </form>
-                            if (item.isInstalled.Equals(true))
+                            if (item.DeinstallDate == null && item.isInstalled.Equals(true))
                             {
                                 <form asp-action="DeInstallItem" asp-route-id="@item.Id" method="get">
-                                    <button class="btn-hoelscher" onclick="return confirm('do you really want to deinstall this item?')">@SharedLocalizer.GetLocalizedHtmlString("DeInstall")</button>
+                                    <button class="btn-hoelscher" onclick="return confirm('Do you really want to deinstall this item?')">@SharedLocalizer.GetLocalizedHtmlString("DeInstall")</button>
                                 </form>
                             }
                             <form asp-action="AddArrival" asp-controller="Installs" asp-route-id="@item.Id" method="post">
@@ -188,7 +190,7 @@
             }
             else
             {
-                <tr class="hiddenwpline">
+                <tr class="hiddenwpline" style="border-bottom:1.5px solid lightgrey;">
                     <td>
                         @Html.DisplayFor(modelItem => item.Project.Name)
                         @if (item.SubProjectId != null)
@@ -241,10 +243,10 @@
                             <form asp-action="Delete_Install" asp-route-id="@item.Id" method="post">
                                 <button class="btn-hoelscher" onclick="confirm('do you really want to delet this item?')">@SharedLocalizer.GetLocalizedHtmlString("Delete")</button>
                             </form>
-                            if (item.isInstalled.Equals(true))
+                            @if (item.DeinstallDate == null && item.isInstalled.Equals(true))
                             {
                                 <form asp-action="DeInstallItem" asp-route-id="@item.Id" method="get">
-                                    <button class="btn-hoelscher" onclick="confirm('do you really want to deinstall this item?')">@SharedLocalizer.GetLocalizedHtmlString("DeInstall")</button>
+                                    <button class="btn-hoelscher" onclick="confirm('Do you really want to deinstall this item?')">@SharedLocalizer.GetLocalizedHtmlString("DeInstall")</button>
                                 </form>
                             }
                             <form asp-action="AddArrival" asp-controller="Installs" asp-route-id="@item.Id" method="post">
@@ -269,7 +271,7 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script type="text/javascript">
-    var lang = $("#requestCulture_RequestCulture_UICulture_Name").val();
+        var lang = $("#requestCulture_RequestCulture_UICulture_Name").val();
         function ShowWellPoints() {
             $(".hiddenwpline").toggle();
         }

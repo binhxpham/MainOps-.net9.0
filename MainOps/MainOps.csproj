@@ -63,7 +63,7 @@
 
 		<Content Include="Views\**\*.cshtml" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="Always"/>
 		<Content Include="Views\**\*.cshtml" />
-		<Content Include="Views\Shared\_Layout.cshtml" />
+		<Content Include="Views\Shared\_Layout.cshtml" CopyToPublishDirectory="Always"/>
 
 	</ItemGroup>
 

@@ -30,13 +30,15 @@
                 <label>@SharedLocalizer.GetLocalizedHtmlString("Installation Item / BoQ nr"):</label>
             </td>
             <td>
-                @Html.DropDownList("filterchoice", ViewData["ItemTypeId"] as IEnumerable<SelectListItem>, @SharedLocalizer.GetLocalizedHtmlString("All"), new { @class = "form-control" })
+                @* @Html.DropDownList("filterchoice", ViewData["ItemTypeId"] as IEnumerable<SelectListItem>, @SharedLocalizer.GetLocalizedHtmlString("All"), new { @class = "form-control" }) *@ 
+                   @Html.DropDownList("filterchoice", ViewData["ItemTypeId"] as IEnumerable<SelectListItem>, @SharedLocalizer.GetLocalizedHtmlString("All"), new { @id = "ItemTypeId", @class = "form-control" })
+
             </td>
         </tr>
         <tr>
             <td><label>@SharedLocalizer.GetLocalizedHtmlString("Project"):</label></td>
             <td>
-                <select id="ProjectId" name="filterchoice2" class="form-control" asp-items="ViewBag.ProjectId">
+                <select id="ProjectId2" name="filterchoice2" class="form-control" asp-items="ViewBag.ProjectId" onchange="FillItems();">
                     <option value="@null">@SharedLocalizer.GetLocalizedHtmlString("All")</option>
                 </select>
             </td>
@@ -139,3 +141,67 @@
 }
     </tbody>
 </table>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script type="text/javascript">
+
+        
+        var lang = $("#requestCulture_RequestCulture_UICulture_Name").val();
+        
+        function ShowWellPoints() {
+            $(".hiddenwpline").toggle();
+        }
+
+        function FillItems() {
+                var ProjectId = $('#ProjectId2').val();
+                var url = '@Url.Action("GetItemsProjectForDeinstall", "ItemTypes")';
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    dataType: 'json',
+                    data: {
+                        'theId': ProjectId,
+                        'type' : "deinstall" //installedit
+                    },
+                    success: function (data) {
+                        var s = '<option value="">Please Select</option>';
+                        if (lang == "de-DE") {
+                            s = '<option value="">Bitte auswählen</option>';
+                        }
+                        for (var prop in data) {
+                            s += '<option value="' + data[prop]["id"] + '">' + data[prop]["item_Type"] + '</option>';
+                        }
+                        $("#ItemTypeId").html(s);
+                        document.getElementById("ItemTypeId").style.width = "100%";
+                    },
+                    error: function () {
+                        alert("error");
+                    }
+                });
+        }
+
+        function GetBillableActivities(index) {
+           var url = '@Url.Action("BilledActivities", "Installs")';
+                $.ajax({
+                type: 'GET',
+                url: url,
+                data: { "id" : index },
+                contentType: 'application/html;charset=utf-8',
+                dataType: 'html',
+                success: function (data) {
+                    var thepartial = $("#billableContent").html(data);
+                    OpenBillableModal();
+                }
+              });
+        }
+
+
+        $(document).ready(function () {
+                FillItems();
+        })
+    </script>
+}
+

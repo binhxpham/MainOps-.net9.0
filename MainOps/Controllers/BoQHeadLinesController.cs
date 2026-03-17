@@ -39,9 +39,65 @@ namespace MainOps.Controllers
             return Json(headlinelist);
         }
         // GET: BoQHeadLines
+        /*[Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,Guest,International")]
+        [HttpGet]*/
         [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,Guest,International")]
         [HttpGet]
         public async Task<IActionResult> Index()
+        {
+            try
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    return Unauthorized();
+                }
+
+                IQueryable<BoQHeadLine> query = _context.BoQHeadLines
+                    .Include(b => b.Project)
+                    .AsNoTracking();
+
+                if (!User.IsInRole("Admin"))
+                {
+                    query = query.Where(x => x.Project != null &&
+                                             x.Project.DivisionId == user.DivisionId);
+                }
+
+                var boqHeadLines = await query
+                    .OrderBy(x => x.ProjectId)
+                    .ThenBy(x => x.BoQnum)
+                    .ToListAsync();
+
+                return View(boqHeadLines);
+            }
+            catch (Exception ex)
+            {
+                return Content(
+                    $"BoQ headlines exception:\n{ex}\n\nInner:\n{ex.InnerException}",
+                    "text/plain");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Index___test()
+        {
+            try
+            {
+                var data = await _context.BoQHeadLines
+                    .Include(x => x.Project)
+                    .AsNoTracking()
+                    .Take(20)
+                    .ToListAsync();
+
+                return Content($"Loaded {data.Count} rows with project");
+            }
+            catch (Exception ex)
+            {
+                return Content(ex.ToString(), "text/plain");
+            }
+        }
+
+        public async Task<IActionResult> Index_()
         {
             try
             {
@@ -59,7 +115,7 @@ namespace MainOps.Controllers
                 //    return View(await dataContext.ToListAsync());
                 //}
 
-                IQueryable<BoQHeadLine> query = _context.BoQHeadLines.Include(b => b.Project);
+                IQueryable<BoQHeadLine> query = _context.BoQHeadLines.Include(b => b.Project).AsNoTracking();
 
                 if (!User.IsInRole("Admin"))
                 {
@@ -84,6 +140,9 @@ namespace MainOps.Controllers
            
             
         }
+
+
+
         [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,Guest,International")]
         [HttpGet]
         public JsonResult GetHeadLinesProject(string theId)
