@@ -1,456 +1,682 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using System.Diagnostics;
+using System.Globalization;
+using System.Text;
+using MainOps.Data;
 using MainOps.Models;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using MainOps.Models.ReportClasses;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Authorization;
-using MainOps.Data;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using System.IO;
-using System.Text;
-using MainOps.Models.ReportClasses;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-namespace MainOps.Controllers
+namespace MainOps.Controllers;
+
+public class HomeController(
+    IHttpContextAccessor httpContextAccessor,
+    DataContext context,
+    UserManager<ApplicationUser> userManager,
+    IWebHostEnvironment env) : Controller
 {
+    private readonly IHttpContextAccessor _http = httpContextAccessor;
+    private readonly DataContext _context = context;
+    private readonly UserManager<ApplicationUser> _userManager = userManager;
+    private readonly IWebHostEnvironment _env = env;
 
-    public class HomeController : Controller
+    private const int BackupColumnCount = 24;
+
+    private static readonly string[] BackupHeaders =
+    [
+        "Id", "short_Description", "Report_Date", "Starthour", "Endhour",
+        "Work_Performed", "Extra_Works", "DoneBy", "TitleId", "ProjectId",
+        "tobepaid", "Signature", "Amount", "Machinery", "SafetyHours",
+        "StandingTime", "EnteredIntoDataBase", "LastEdited", "Checked_By",
+        "Report_Checked", "SubProjectId", "OtherPeople", "HasPhotos", "OtherPeopleIDs"
+    ];
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    public IActionResult LoadBackupData()
     {
-        private readonly IHttpContextAccessor _http;
-        private readonly DataContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IWebHostEnvironment _env;
-        public HomeController(DataContext context,IHttpContextAccessor httpcontext,UserManager<ApplicationUser> userManager, IWebHostEnvironment env)
-        {
-            _http = httpcontext;
-            _context = context;
-            _userManager = userManager;
-            _env = env;
-        }
-        [Authorize(Roles = "Admin")]
-        [HttpGet]
-        public IActionResult LoadBackupData()
-        {
-            return View();
-        }
-        [Authorize(Roles = "Admin")]
-        [HttpPost]
-        public async Task<IActionResult> LoadBackupData(IFormFile postedFile)
-        {
-            if (postedFile != null)
-            {
+        return View();
+    }
 
-                using (var sreader = new StreamReader(postedFile.OpenReadStream()))
-                {
-                    //First line is header. If header is not passed in csv then we can neglect the below line.
-                    string[] headers = sreader.ReadLine().Split(';');
-                    while (!sreader.EndOfStream)
-                    {
-                        string[] rows = sreader.ReadLine().Split(';');
-
-                        Daily_Report_2 dr = new Daily_Report_2();
-
-                        dr.Id = Convert.ToInt32(rows[0]);
-                        dr.short_Description = rows[1];
-                        dr.Report_Date = Convert.ToDateTime(rows[2]);
-                        dr.StartHour = TimeSpan.Parse(rows[3]);
-                        dr.EndHour = TimeSpan.Parse(rows[4]);
-                        dr.Work_Performed = rows[5].Replace("\\r\\n", "\r\n");
-                        dr.Extra_Works = rows[6];
-                        dr.DoneBy = rows[7];
-                        dr.TitleId = Convert.ToInt32(rows[8]);
-                        dr.ProjectId = Convert.ToInt32(rows[9]);
-                       
-                        dr.Signature = rows[11];
-                        dr.Amount = Convert.ToInt32(rows[12]);
-                        dr.Machinery = rows[13];
-                        try
-                        {
-                            dr.SafetyHours = TimeSpan.Parse(rows[14]);
-                        }
-                        catch
-                        {
-                            dr.SafetyHours = TimeSpan.Zero;
-                        }
-                        try
-                        {
-                            dr.StandingTime = TimeSpan.Parse(rows[15]);
-                        }
-                        catch
-                        {
-                            dr.StandingTime = TimeSpan.Zero;
-                        }
-                        
-                        //dr.EnteredIntoDataBase = Convert.ToDateTime(rows[16]);
-                        //dr.LastEditedInDataBase = Convert.ToDateTime(rows[17]);
-                        dr.Checked_By = rows[18];
-                        dr.Report_Checked = Convert.ToBoolean(rows[19]);
-                        //dr.SubProjectId = Convert.ToInt32(rows[20]);
-                        dr.OtherPeople = rows[21];
-                        dr.HasPhotos = Convert.ToBoolean(rows[22]);
-                        dr.OtherPeopleIDs = rows[23];
-
-                        if(rows[10] != "")
-                        {
-                            dr.tobepaid = Convert.ToInt32(rows[10]);
-                        }
-                        if (rows[16] != "")
-                        {
-                            dr.EnteredIntoDataBase = Convert.ToDateTime(rows[16]);
-                        }
-
-                        if (rows[17] != "")
-                        {
-                            dr.LastEditedInDataBase = Convert.ToDateTime(rows[17]);
-                        }
-                        if (rows[20] != "")
-                        {
-                            dr.SubProjectId = Convert.ToInt32(rows[20]);
-                        }
-                        _context.Add(dr);
-                    }
-
-
-
-                }
-                await _context.SaveChangesAsync();
-
-            }
-            return RedirectToAction(nameof(Index));
-        }
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetBackUpData()
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> LoadBackupData(IFormFile? postedFile)
+    {
+        if (postedFile is null || postedFile.Length == 0)
         {
-            StringBuilder sb = new StringBuilder();
-            var drs = await _context.Daily_Report_2s.Where(x => x.TitleId.Equals(637) || x.TitleId.Equals(638) || x.TitleId.Equals(639)).OrderBy(x => x.Report_Date).ThenBy(x => x.StartHour).ToListAsync();
-            List<string> headerrow = new List<string>(new string[] { "Id", "short_Description", "Report_Date", "Starthour", "Endhour", "Work_Performed", "Extra_Works", "DoneBy", "TitleId", "ProjectId", "tobepaid", "Signature", "Amount", "Machinery", "SafetyHours", "StandingTime", "EnteredIntoDataBase", "LastEdited", "Checked_By", "Report_Checked", "SubProjectId", "OtherPeople", "HasPhotos", "OtherPeopleIDs" });
-            List<string> fillerrow = new List<string>(new string[] { "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "","" });
-            sb.AppendLine(string.Join(";", headerrow.ToArray()));
-            foreach(Daily_Report_2 dr in drs)
-            {
-                fillerrow[0] = dr.Id.ToString();
-                fillerrow[1] = dr.short_Description;
-                fillerrow[2] = dr.Report_Date.ToString();
-                fillerrow[3] = dr.StartHour.ToString();
-                fillerrow[4] = dr.EndHour.ToString();
-                fillerrow[5] = dr.Work_Performed.Replace("\r\n","\\r\\n");
-                fillerrow[6] = dr.Extra_Works;
-                fillerrow[7] = dr.DoneBy;
-                if (dr.TitleId.Equals(637))
-                {
-                    fillerrow[8] = "764";
-                }
-                else if (dr.TitleId.Equals(638))
-                {
-                    fillerrow[8] = "762";
-                }
-                else if (dr.TitleId.Equals(639))
-                {
-                    fillerrow[8] = "763";
-                }
-                fillerrow[9] = dr.ProjectId.ToString();
-                fillerrow[10] = dr.tobepaid.ToString();
-                fillerrow[11] = dr.Signature;
-                fillerrow[12] = dr.Amount.ToString();
-                fillerrow[13] = dr.Machinery;
-                fillerrow[14] = dr.SafetyHours.ToString();
-                fillerrow[15] = dr.StandingTime.ToString();
-                fillerrow[16] = dr.EnteredIntoDataBase.ToString();
-                fillerrow[17] = dr.LastEditedInDataBase.ToString();
-                fillerrow[18] = dr.Checked_By;
-                fillerrow[19] = dr.Report_Checked.ToString();
-                fillerrow[20] = dr.SubProjectId.ToString();
-                fillerrow[21] = dr.OtherPeople;
-                fillerrow[22] = dr.HasPhotos.ToString();
-                fillerrow[23] = dr.OtherPeopleIDs;
-                sb.AppendLine(string.Join(";", fillerrow.ToArray()));
-                
-            }
-            return File(System.Text.Encoding.ASCII.GetBytes(sb.ToString()), "text/csv", "dailyreportsbackup.csv");
-        }
-        [HttpGet]
-        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,StorageManager")]
-        public async Task<IActionResult> GetBoQExtraWorkItems(string theId)
-        {
-            int BoQHeadLineId = Convert.ToInt32(theId);
-            var data = await _context.BoQHeadLines.Include(x => x.ExtraWorkBoQs).ThenInclude(x => x.Headers).ThenInclude(x => x.BoQItems).SingleOrDefaultAsync(x => x.Id.Equals(BoQHeadLineId));
-            return PartialView("_BoQHeadLine", data);
-
-        }
-        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,StorageManager")]
-        public async Task<IActionResult> GetUserExtraWorks()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if(user != null)
-            {
-                List<BoQHeadLine> enddata = new List<BoQHeadLine>();
-                //var data = await (from boq in _context.BoQHeadLines.Include(x => x.Project).Include(x => x.ExtraWorkBoQs).ThenInclude(x => x.Descriptions)
-                //                  join ewbq in _context.ExtraWorkBoQs on boq.Id equals ewbq.Id
-                //                  where boq.Project.DivisionId.Equals(user.DivisionId) && boq.Type.Equals("ExtraWork") && ewbq.Descriptions.Count > 0
-                //                  select boq).OrderBy(x => x.ProjectId).ThenBy(x => x.BoQnum).ToListAsync();
-                var data = await _context.BoQHeadLines.Include(x => x.Project).Include(x => x.ExtraWorkBoQs).ThenInclude(x => x.Descriptions)
-                    .Where(x => x.Project.DivisionId.Equals(user.DivisionId)
-                    && x.Type.Equals("ExtraWork")).OrderBy(x => x.ProjectId).ThenBy(x => x.BoQnum).ToListAsync();
-                foreach(var item in data)
-                {
-                    if (item.ExtraWorkBoQs.Count > 0) 
-                    {
-                        enddata.Add(item);
-                    }
-                }
-                return PartialView("_extraworkinfo", enddata);
-            }
-            else
-            {
-                return NotFound();
-            }
-        }
-        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,StorageManager")]
-        public async Task<IActionResult> GetUserDownloads()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if(user != null) {
-                //string fullPath = _env.WebRootPath + "\\AHAK\\akonto\\Documentation\\" + user.full_name() + "\\";
-                //string fullPath2 = _env.WebRootPath + "\\AHAK\\akonto\\Documentation\\" + user.full_name() + "\\TempFolder2\\";
-                //List<string> paths = new List<string>();
-                //if (Directory.Exists(fullPath))
-                //{
-                //     var filePaths = Directory.GetFiles(fullPath);
-                //     foreach(string filename in filePaths)
-                //     {
-                //        paths.Add(filename);
-                //     }
-                //}
-                //if (Directory.Exists(fullPath2))
-                //{
-                //    var fileFolders = Directory.GetDirectories(fullPath2);
-                //    foreach(var folder in fileFolders)
-                //    {
-                //        var subfileFolders = Directory.GetDirectories(folder);
-                //        foreach(var subfolder in subfileFolders) {
-                //            var filePaths = Directory.GetFiles(subfolder);
-                //            foreach (string filename in filePaths)
-                //            {
-                //                paths.Add(filename);
-                //            }
-                //        }
-                //    }
-                //}
-                //return PartialView("_Downloads", paths);
-                var data = await _context.PersonalFiles.Where(x => x.ApplicationUserId.Equals(user.Id)).ToListAsync();
-                return PartialView("_Downloads2", data);
-            }
-             else
-             {
-                 return NotFound();
-             }
-        }
-        public async Task<int> GetAmountDownloads()
-        {
-            var user = await _userManager.GetUserAsync(User);
-            //int numfiles = 0;
-            if (user != null)
-            {
-                //string fullPath = _env.WebRootPath + "\\AHAK\\akonto\\Documentation\\" + user.full_name() + "\\";
-                //string fullPath2 = _env.WebRootPath + "\\AHAK\\akonto\\Documentation\\" + user.full_name() + "\\TempFolder2\\";
-                //List<string> paths = new List<string>();
-                //if (Directory.Exists(fullPath))
-                //{
-                //    var filePaths = Directory.GetFiles(fullPath);
-                //    foreach (string filename in filePaths)
-                //    {
-                //        numfiles += 1;
-                //    }
-                //}
-                //if (Directory.Exists(fullPath2))
-                //{
-                //    var fileFolders = Directory.GetDirectories(fullPath2);
-                //    foreach (var folder in fileFolders)
-                //    {
-                //        var subfileFolders = Directory.GetDirectories(folder);
-                //        foreach (var subfolder in subfileFolders)
-                //        {
-                //            var filePaths = Directory.GetFiles(subfolder);
-                //            foreach (string filename in filePaths)
-                //            {
-                //                numfiles += 1;
-                //            }
-                //        }
-                //    }
-                //}
-                //return numfiles;
-                return await _context.PersonalFiles.Where(x => x.Downloaded.Equals(false) && user.Id.Equals(x.ApplicationUserId)).CountAsync();
-            }
-            else
-            {
-                return 0;
-            }
-        }
-        [HttpGet]
-        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,StorageManaager")]
-        public IActionResult DownloadFile(string filename)
-        {
-            byte[] fileBytes = System.IO.File.ReadAllBytes(filename);
-
-            return File(fileBytes, "application/force-download", "download.pdf");
-        }
-        [HttpGet]
-        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,StorageManaager")]
-        public async Task<IActionResult> DownloadPersonalFile(int? id)
-        {
-            if(id != null)
-            {
-                var thefile = await _context.PersonalFiles.SingleOrDefaultAsync(x => x.Id.Equals(id));
-                if (thefile.FileExtension.Contains("pdf")) {
-                    byte[] fileBytes = System.IO.File.ReadAllBytes(thefile.path);
-                    thefile.Downloaded = true;
-                    _context.Update(thefile);
-                    await _context.SaveChangesAsync();
-                    return File(fileBytes, "application/force-download", thefile.FileName);
-                }
-                else
-                {
-                    return NotFound();
-                }
-            }
-            else { return NotFound(); }
-            
-
-            
-        }
-        [HttpPost]
-        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,StorageManaager")]
-        public IActionResult RemoveFile(string filename)
-        {
-            System.IO.File.Delete(filename);
-            return RedirectToAction(nameof(Index));
-        }
-        [HttpPost]
-        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,StorageManaager")]
-        public async Task<IActionResult> RemovePersonalFile(int? id)
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if(id != null)
-            {
-                var thefile = await _context.PersonalFiles.SingleOrDefaultAsync(x => x.Id.Equals(id) && x.ApplicationUserId.Equals(user.Id));
-                if(thefile != null)
-                {
-                    System.IO.File.Delete(thefile.path);
-                    _context.Remove(thefile);
-                    await _context.SaveChangesAsync();
-                }
-            }
-            return RedirectToAction(nameof(Index));
-        }
-        [HttpPost]
-        [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,StorageManaager")]
-        public async Task<IActionResult> RemoveAllPersonalFiles()
-        {
-            var user = await _userManager.GetUserAsync(User);
-
-                var thefiles = await _context.PersonalFiles.Where(x => x.ApplicationUserId.Equals(user.Id)).ToListAsync();
-                foreach(var thefile in thefiles)
-                {
-                    System.IO.File.Delete(thefile.path);
-                    _context.Remove(thefile);
-                await _context.SaveChangesAsync();
-            }
-            
+            TempData["Error"] = "No file was uploaded.";
             return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Index()
+        if (!Path.GetExtension(postedFile.FileName).Equals(".csv", StringComparison.OrdinalIgnoreCase))
         {
-          
-            try
+            TempData["Error"] = "Only CSV files are allowed.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var reports = new List<Daily_Report_2>();
+
+        using var stream = postedFile.OpenReadStream();
+        using var reader = new StreamReader(stream);
+
+        _ = await reader.ReadLineAsync(); // skip header
+
+        var lineNumber = 1;
+
+        while (!reader.EndOfStream)
+        {
+            lineNumber++;
+            var line = await reader.ReadLineAsync();
+
+            if (string.IsNullOrWhiteSpace(line))
             {
-                // your logic
-                var url = _http.HttpContext.Request.GetDisplayUrl();
-                if (url.ToLower().Contains("tjaden-maps") || url.ToLower().Contains("mainops-test"))
-                {
-                    Response.Cookies.Append(
+                continue;
+            }
+
+            var row = line.Split(';');
+
+            if (row.Length < BackupColumnCount)
+            {
+                TempData["Error"] = $"CSV import failed at line {lineNumber}: expected {BackupColumnCount} columns, got {row.Length}.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (!TryMapDailyReport(row, out var report))
+            {
+                TempData["Error"] = $"CSV import failed at line {lineNumber}: invalid data format.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            reports.Add(report);
+        }
+
+        if (reports.Count == 0)
+        {
+            TempData["Error"] = "The CSV file did not contain any valid rows.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        await _context.Daily_Report_2s.AddRangeAsync(reports);
+        await _context.SaveChangesAsync();
+
+        TempData["Success"] = $"{reports.Count} backup rows imported successfully.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    public async Task<IActionResult> GetBackUpData()
+    {
+        var reports = await _context.Daily_Report_2s
+            .AsNoTracking()
+            .Where(x => x.TitleId == 637 || x.TitleId == 638 || x.TitleId == 639)
+            .OrderBy(x => x.Report_Date)
+            .ThenBy(x => x.StartHour)
+            .ToListAsync();
+
+        var sb = new StringBuilder();
+        sb.AppendLine(string.Join(';', BackupHeaders));
+
+        foreach (var dr in reports)
+        {
+            var row = new string[BackupColumnCount];
+
+            row[0] = dr.Id.ToString(CultureInfo.InvariantCulture);
+            row[1] = dr.short_Description ?? string.Empty;
+            row[2] = dr.Report_Date.ToString("O", CultureInfo.InvariantCulture);
+            row[3] = dr.StartHour.ToString();
+            row[4] = dr.EndHour.ToString();
+            row[5] = (dr.Work_Performed ?? string.Empty).Replace("\r\n", "\\r\\n");
+            row[6] = dr.Extra_Works ?? string.Empty;
+            row[7] = dr.DoneBy ?? string.Empty;
+            row[8] = MapTitleIdForBackup(dr.TitleId);
+            row[9] = dr.ProjectId.ToString(CultureInfo.InvariantCulture);
+            row[10] = dr.tobepaid?.ToString(CultureInfo.InvariantCulture);
+            row[11] = dr.Signature ?? string.Empty;
+            row[12] = dr.Amount.ToString(CultureInfo.InvariantCulture);
+            row[13] = dr.Machinery ?? string.Empty;
+            row[14] = dr.SafetyHours.ToString();
+            row[15] = dr.StandingTime.ToString();
+            row[16] = dr.EnteredIntoDataBase?.ToString(CultureInfo.InvariantCulture);
+            row[17] = dr.LastEditedInDataBase?.ToString(CultureInfo.InvariantCulture);
+            row[18] = dr.Checked_By ?? string.Empty;
+            row[19] = dr.Report_Checked.ToString();
+            row[20] = dr.SubProjectId?.ToString(CultureInfo.InvariantCulture);
+            row[21] = dr.OtherPeople ?? string.Empty;
+            row[22] = dr.HasPhotos.ToString();
+            row[23] = dr.OtherPeopleIDs ?? string.Empty;
+
+            sb.AppendLine(string.Join(';', row.Select(EscapeCsvField)));
+        }
+
+        return File(Encoding.UTF8.GetBytes(sb.ToString()), "text/csv", "dailyreportsbackup.csv");
+    }
+    
+
+    [HttpGet]
+    [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,StorageManager")]
+    public IActionResult DownloadFile(string filename)
+    {
+        if (string.IsNullOrWhiteSpace(filename))
+        {
+            return BadRequest("Filename is required.");
+        }
+
+        var safeFileName = Path.GetFileName(filename);
+        if (!string.Equals(safeFileName, filename, StringComparison.Ordinal))
+        {
+            return BadRequest("Invalid filename.");
+        }
+
+        var allowedFolder = Path.GetFullPath(Path.Combine(_env.WebRootPath, "AHAK", "Downloads"));
+        var fullPath = Path.GetFullPath(Path.Combine(allowedFolder, safeFileName));
+
+        if (!fullPath.StartsWith(allowedFolder, StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest("Invalid file path.");
+        }
+
+        if (!System.IO.File.Exists(fullPath))
+        {
+            return NotFound();
+        }
+
+        var contentType = "application/octet-stream";
+        return PhysicalFile(fullPath, contentType, safeFileName);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,StorageManager")]
+    public IActionResult RemoveFile(string filename)
+    {
+        if (string.IsNullOrWhiteSpace(filename))
+        {
+            return BadRequest("Filename is required.");
+        }
+
+        var safeFileName = Path.GetFileName(filename);
+        if (!string.Equals(safeFileName, filename, StringComparison.Ordinal))
+        {
+            return BadRequest("Invalid filename.");
+        }
+
+        var allowedFolder = Path.GetFullPath(Path.Combine(_env.WebRootPath, "AHAK", "Downloads"));
+        var fullPath = Path.GetFullPath(Path.Combine(allowedFolder, safeFileName));
+
+        if (!fullPath.StartsWith(allowedFolder, StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest("Invalid file path.");
+        }
+
+        if (!System.IO.File.Exists(fullPath))
+        {
+            return NotFound();
+        }
+
+        System.IO.File.Delete(fullPath);
+
+        TempData["Success"] = "File removed.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,StorageManager")]
+    public async Task<IActionResult> GetBoQExtraWorkItems(string theId)
+    {
+        if (!int.TryParse(theId, out var boQHeadLineId))
+        {
+            return BadRequest("Invalid id.");
+        }
+
+        var data = await _context.BoQHeadLines
+                                .AsNoTracking()
+                                .Include(x => x.ExtraWorkBoQs)
+                                    .ThenInclude(x => x.Headers)
+                                        .ThenInclude(x => x.BoQItems)
+                                .SingleOrDefaultAsync(x => x.Id == boQHeadLineId);
+
+        if (data is null)
+        {
+            return NotFound();
+        }
+
+        return PartialView("_BoQHeadLine", data);
+    }
+
+    [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,StorageManager")]
+    [HttpGet]
+    public async Task<IActionResult> GetUserExtraWorks()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        var data = await _context.BoQHeadLines
+            .AsNoTracking()
+            .Include(x => x.Project)
+            .Include(x => x.ExtraWorkBoQs)
+                .ThenInclude(x => x.Descriptions)
+            .Where(x => x.Project.DivisionId == user.DivisionId && x.Type == "ExtraWork")
+            .OrderBy(x => x.ProjectId)
+            .ThenBy(x => x.BoQnum)
+            .ToListAsync();
+
+        var endData = data
+            .Where(x => x.ExtraWorkBoQs.Count > 0)
+            .ToList();
+
+        return PartialView("_extraworkinfo", endData);
+    }
+
+    [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,StorageManager")]
+    [HttpGet]
+    public async Task<IActionResult> GetUserDownloads()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        var data = await _context.PersonalFiles
+            .AsNoTracking()
+            .Where(x => x.ApplicationUserId == user.Id)
+            .ToListAsync();
+
+        return PartialView("_Downloads2", data);
+    }
+
+    [HttpGet]
+    public async Task<int> GetAmountDownloads()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return 0;
+        }
+
+        return await _context.PersonalFiles
+            .AsNoTracking()
+            .CountAsync(x => !x.Downloaded && x.ApplicationUserId == user.Id);
+    }
+
+    [HttpGet]
+    [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,StorageManager")]
+    public async Task<IActionResult> DownloadPersonalFile(int? id)
+    {
+        if (id is null)
+        {
+            return BadRequest();
+        }
+
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        var file = await _context.PersonalFiles
+            .SingleOrDefaultAsync(x => x.Id == id && x.ApplicationUserId == user.Id);
+
+        if (file is null)
+        {
+            return NotFound();
+        }
+
+        if (!file.FileExtension.Contains("pdf", StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest("Only PDF files can be downloaded here.");
+        }
+
+        if (string.IsNullOrWhiteSpace(file.path) || !System.IO.File.Exists(file.path))
+        {
+            return NotFound("The physical file does not exist.");
+        }
+
+        var fileBytes = await System.IO.File.ReadAllBytesAsync(file.path);
+
+        if (!file.Downloaded)
+        {
+            file.Downloaded = true;
+            _context.Update(file);
+            await _context.SaveChangesAsync();
+        }
+
+        var safeName = string.IsNullOrWhiteSpace(file.FileName) ? "download.pdf" : file.FileName;
+        return File(fileBytes, "application/pdf", safeName);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,StorageManager")]
+    public async Task<IActionResult> RemovePersonalFile(int? id)
+    {
+        if (id is null)
+        {
+            return BadRequest();
+        }
+
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        var file = await _context.PersonalFiles
+            .SingleOrDefaultAsync(x => x.Id == id && x.ApplicationUserId == user.Id);
+
+        if (file is null)
+        {
+            return NotFound();
+        }
+
+        if (!string.IsNullOrWhiteSpace(file.path) && System.IO.File.Exists(file.path))
+        {
+            System.IO.File.Delete(file.path);
+        }
+
+        _context.PersonalFiles.Remove(file);
+        await _context.SaveChangesAsync();
+
+        TempData["Success"] = "File removed.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin,DivisionAdmin,Manager,ProjectMember,StorageManager")]
+    public async Task<IActionResult> RemoveAllPersonalFiles()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user is null)
+        {
+            return Unauthorized();
+        }
+
+        var files = await _context.PersonalFiles
+            .Where(x => x.ApplicationUserId == user.Id)
+            .ToListAsync();
+
+        foreach (var file in files)
+        {
+            if (!string.IsNullOrWhiteSpace(file.path) && System.IO.File.Exists(file.path))
+            {
+                System.IO.File.Delete(file.path);
+            }
+        }
+
+        _context.PersonalFiles.RemoveRange(files);
+        await _context.SaveChangesAsync();
+
+        TempData["Success"] = $"{files.Count} file(s) removed.";
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public IActionResult Index()
+    {
+        try
+        {
+            var url = _http.HttpContext?.Request.GetDisplayUrl();
+
+            if (!string.IsNullOrWhiteSpace(url) &&
+                (url.Contains("tjaden-maps", StringComparison.OrdinalIgnoreCase) ||
+                 url.Contains("mainops-test", StringComparison.OrdinalIgnoreCase)))
+            {
+                Response.Cookies.Append(
                     CookieRequestCultureProvider.DefaultCookieName,
                     CookieRequestCultureProvider.MakeCookieValue(new RequestCulture("nl-NL")),
-                    new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
-                );
-                }
-                return View();
+                    new CookieOptions
+                    {
+                        Expires = DateTimeOffset.UtcNow.AddYears(1),
+                        HttpOnly = true,
+                        IsEssential = true,
+                        Secure = Request.IsHttps
+                    });
             }
-            catch (Exception ex)
-            {
-                // log error
-                return Content($"Error in Index: {ex.Message}");
-            }    
 
-       
-        }
-        [AllowAnonymous]
-        public async Task<ActionResult> Footer(int? id)
-        {
-            if(id != null) {
-                
-                var well = await _context.Wells
-                    .Include(x => x.Project).ThenInclude(x => x.Division)
-                    .Include(x => x.CoordSystem)
-                    .Include(x => x.SubProject)
-                    .SingleOrDefaultAsync(x => x.Id.Equals(id));
-               
-                    well.BentoniteLayers = await _context.BentoniteWellLayers.Include(x => x.CastingType).Where(x => x.WellId.Equals(well.Id)).OrderBy(x => x.meter_start).ToListAsync();
-                    well.SoilSamples = await _context.SoilSamples.Where(x => x.WellId.Equals(well.Id)).OrderBy(x => x.sample_meter).ToListAsync();
-                    well.FilterLayers = await _context.FilterWellLayers.Where(x => x.WellId.Equals(well.Id)).OrderBy(x => x.meter_start).ToListAsync();
-                    well.SandLayers = await _context.SandWellLayers.Include(x => x.SandType).Where(x => x.WellId.Equals(well.Id)).OrderBy(x => x.meter_start).ToListAsync();
-                    well.WellLayers = await _context.WellLayers.Include(x => x.Layer).Where(x => x.WellId.Equals(well.Id)).OrderBy(x => x.Start_m).ToListAsync();
-                    return View(well);
-            }
-            else
-            {
-                return NotFound();
-            }
-        }
-        public IActionResult MoreInformation()
-        {
             return View();
         }
-        public IActionResult Directions()
+        catch (Exception ex)
         {
-            return View();
+            return Content($"Error in Index: {ex.Message}");
         }
-        public IActionResult Contact()
-        {
-            return View();
-        }
-        public IActionResult ErrorMessage(string text)
-        {
-            ErrorModel model = new ErrorModel { ErrorText = text };
-            return View("Error",model);
-        }
-        [HttpPost]
-        public IActionResult SetLanguage(string culture, string returnUrl)
-        {
-            Response.Cookies.Append(
-                CookieRequestCultureProvider.DefaultCookieName,
-                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
-                new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
-            );
-
-            ViewData["ReturnUrl"] = returnUrl;
-            return LocalRedirect(returnUrl);
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            //if(HttpContext.Response.StatusCode == 500)
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-
     }
+
+    [AllowAnonymous]
+    [HttpGet]
+    public async Task<ActionResult> Footer(int? id)
+    {
+        if (id is null)
+        {
+            return NotFound();
+        }
+
+        var well = await _context.Wells
+            .AsNoTracking()
+            .Include(x => x.Project).ThenInclude(x => x.Division)
+            .Include(x => x.CoordSystem)
+            .Include(x => x.SubProject)
+            .SingleOrDefaultAsync(x => x.Id == id);
+
+        if (well is null)
+        {
+            return NotFound();
+        }
+
+        well.BentoniteLayers = await _context.BentoniteWellLayers
+            .AsNoTracking()
+            .Include(x => x.CastingType)
+            .Where(x => x.WellId == well.Id)
+            .OrderBy(x => x.meter_start)
+            .ToListAsync();
+
+        well.SoilSamples = await _context.SoilSamples
+            .AsNoTracking()
+            .Where(x => x.WellId == well.Id)
+            .OrderBy(x => x.sample_meter)
+            .ToListAsync();
+
+        well.FilterLayers = await _context.FilterWellLayers
+            .AsNoTracking()
+            .Where(x => x.WellId == well.Id)
+            .OrderBy(x => x.meter_start)
+            .ToListAsync();
+
+        well.SandLayers = await _context.SandWellLayers
+            .AsNoTracking()
+            .Include(x => x.SandType)
+            .Where(x => x.WellId == well.Id)
+            .OrderBy(x => x.meter_start)
+            .ToListAsync();
+
+        well.WellLayers = await _context.WellLayers
+            .AsNoTracking()
+            .Include(x => x.Layer)
+            .Where(x => x.WellId == well.Id)
+            .OrderBy(x => x.Start_m)
+            .ToListAsync();
+
+        return View(well);
+    }
+
+    [HttpGet]
+    public IActionResult MoreInformation()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    public IActionResult Directions()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    public IActionResult Contact()
+    {
+        return View();
+    }
+
+    [HttpGet]
+    public IActionResult ErrorMessage(string text)
+    {
+        var model = new ErrorModel { ErrorText = text };
+        return View("Error", model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public IActionResult SetLanguage(string culture, string returnUrl)
+    {
+        if (string.IsNullOrWhiteSpace(culture))
+        {
+            return BadRequest("Culture is required.");
+        }
+
+        if (string.IsNullOrWhiteSpace(returnUrl) || !Url.IsLocalUrl(returnUrl))
+        {
+            return RedirectToAction(nameof(Index));
+        }
+
+        Response.Cookies.Append(
+            CookieRequestCultureProvider.DefaultCookieName,
+            CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(culture)),
+            new CookieOptions
+            {
+                Expires = DateTimeOffset.UtcNow.AddYears(1),
+                HttpOnly = true,
+                IsEssential = true,
+                Secure = Request.IsHttps
+            });
+
+        return LocalRedirect(returnUrl);
+    }
+
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    [HttpGet]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel
+        {
+            RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+        });
+    }
+
+    private static string MapTitleIdForBackup(int titleId) =>
+        titleId switch
+        {
+            637 => "764",
+            638 => "762",
+            639 => "763",
+            _ => titleId.ToString(CultureInfo.InvariantCulture)
+        };
+
+    private static string EscapeCsvField(string? value)
+    {
+        value ??= string.Empty;
+
+        if (!value.Contains(';') && !value.Contains('"') && !value.Contains('\n') && !value.Contains('\r'))
+        {
+            return value;
+        }
+
+        return $"\"{value.Replace("\"", "\"\"")}\"";
+    }
+
+    private static bool TryMapDailyReport(string[] row, out Daily_Report_2 report)
+    {
+        report = null!;
+
+        if (!TryParseInt(row[0], out var id)) return false;
+        if (!TryParseDateTime(row[2], out var reportDate)) return false;
+        if (!TimeSpan.TryParse(row[3], out var startHour)) return false;
+        if (!TimeSpan.TryParse(row[4], out var endHour)) return false;
+        if (!TryParseInt(row[8], out var titleId)) return false;
+        if (!TryParseInt(row[9], out var projectId)) return false;
+        if (!TryParseInt(row[12], out var amount)) return false;
+        if (!TryParseBool(row[19], out var reportChecked)) return false;
+        if (!TryParseBool(row[22], out var hasPhotos)) return false;
+
+        report = new Daily_Report_2
+        {
+            Id = id,
+            short_Description = row[1],
+            Report_Date = reportDate,
+            StartHour = startHour,
+            EndHour = endHour,
+            Work_Performed = (row[5] ?? string.Empty).Replace("\\r\\n", "\r\n"),
+            Extra_Works = row[6],
+            DoneBy = row[7],
+            TitleId = titleId,
+            ProjectId = projectId,
+            Signature = row[11],
+            Amount = amount,
+            Machinery = row[13],
+            SafetyHours = TryParseTimeSpanOrZero(row[14]),
+            StandingTime = TryParseTimeSpanOrZero(row[15]),
+            Checked_By = row[18],
+            Report_Checked = reportChecked,
+            OtherPeople = row[21],
+            HasPhotos = hasPhotos,
+            OtherPeopleIDs = row[23]
+        };
+
+        if (TryParseNullableInt(row[10], out var toBePaid))
+        {
+            report.tobepaid = toBePaid;
+        }
+
+        if (TryParseNullableDateTime(row[16], out var enteredIntoDatabase))
+        {
+            report.EnteredIntoDataBase = enteredIntoDatabase;
+        }
+
+        if (TryParseNullableDateTime(row[17], out var lastEdited))
+        {
+            report.LastEditedInDataBase = lastEdited;
+        }
+
+        if (TryParseNullableInt(row[20], out var subProjectId))
+        {
+            report.SubProjectId = subProjectId;
+        }
+
+        return true;
+    }
+
+    private static bool TryParseInt(string? value, out int result) =>
+        int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out result);
+
+    private static bool TryParseNullableInt(string? value, out int result)
+    {
+        result = default;
+        return !string.IsNullOrWhiteSpace(value) &&
+               int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out result);
+    }
+
+    private static bool TryParseDateTime(string? value, out DateTime result) =>
+        DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
+
+    private static bool TryParseNullableDateTime(string? value, out DateTime result)
+    {
+        result = default;
+        return !string.IsNullOrWhiteSpace(value) &&
+               DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
+    }
+
+    private static bool TryParseBool(string? value, out bool result) =>
+        bool.TryParse(value, out result);
+
+    private static TimeSpan TryParseTimeSpanOrZero(string? value) =>
+        TimeSpan.TryParse(value, out var result) ? result : TimeSpan.Zero;
 }
